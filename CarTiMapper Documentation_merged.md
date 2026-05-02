@@ -33,7 +33,8 @@
 15. **[PROT-04] Architectural Pushback:** The engine (AI) is explicitly authorized and required to challenge user suggestions or design decisions if they violate DOM physics, introduce structural fragility, or break mobile responsiveness. A logic-based case and safe counter-proposals must always be presented.
 16. **[PROT-05] Context Acquisition (The Block Gate):** If a diagnosis requires altering a component whose exact current state is not actively locked in the engine's immediate memory, the engine must explicitly request the user to paste the necessary component code block *alongside* the request for the execution "go-ahead". No blind overwriting is permitted.
 17. **[PROT-06] Touch Target Preservation (Fitts’s Law):** The engine refuses structural UI requests that compromise safe touch interactions on mobile. Primary interaction labels cannot be wholly enveloped in `<a href>` routing tags, as this conflates discrete actions and causes UX failure on smaller viewports.
-
+**18. [REF: PROT-07] The Context Horizon & Rehydration Protocol:** 
+To preserve maximum computational bandwidth and prevent context-window saturation, the engine (AI) is instructed to memorize strictly the architectural taxonomy, DOM physics, and core directives of the platform. If a requested surgical patch requires mutating a specific code module that has fallen beyond the engine's active token horizon, the engine is strictly forbidden from hallucinating or guessing the codebase. The engine must instantly halt execution and trigger a "Context Rehydration" request, prompting the user to re-upload the specific file or block before proceeding.
 ---
 
 ## II. Data Schema & The Upstream ETL Pipeline 
