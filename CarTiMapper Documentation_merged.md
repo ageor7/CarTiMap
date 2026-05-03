@@ -84,7 +84,7 @@ To preserve maximum computational bandwidth and prevent context-window saturatio
 
 ---
 
-## IV. UI/UX Elements & Design Solutions
+## 4. UI/UX Elements & Design Solutions
 
 * **[REF: UI-05] Visual Hierarchy (Map Pins):** Permanent geographical anchors (VIPs) = Gold pins. Active elements = Oversized Green pins. Inactive clusters = Standard Blue pins.
 * **[REF: UI-08] Multi-Context Branding:** Logo Hex-Frame Chrono-Compass scales from Splash Context to Status Bar Context.
@@ -120,6 +120,10 @@ To preserve maximum computational bandwidth and prevent context-window saturatio
 * **[REF: UI-150] Layout Reset Engine:** Prevents mobile users from structurally breaking the viewport. A core `Reset Layout` command executes a DOM override, instantly zero-stating all active pane variables back to the structural baseline (`55% / 50% / 10%`) and clearing active Maximize states.
 * **[REF: UI-156] Ascender/Descender Brand Typographic Locking:** Inline `CarTiMapperLogo` SVGs are bound to an absolute vertical wrapper (`height: 22px`). This forces the `align-items: baseline` CSS directive to perfectly align the Logo ascender to the brand text descender.
 *   **[REF: UI-177] Fluid Metadata Wrapping:** Extinguished the restrictive `white-space: nowrap` horizontal cage on the `.metadata-ribbon`. Location strings displaying massive text values dynamically execute `flex-wrap: wrap`, gracefully stacking secondary labels (Tags) vertically to preserve absolute UX margins without horizontal clipping.
+* **[REF: UI-49] Typographical Outset (The Hero Overhang):** The sticky header utilizes a `max-width: 90ch` envelope, while the narrative description utilizes a `max-width: 75ch` envelope. This architectural decoupling creates a mathematically perfect typographic overhang, allowing long Event Titles and Place names to symmetrically expand beyond the text margins without forcing premature line breaks.
+* **[REF: UI-69] Ribbon Alignment & Spatial Wrapping:** The Date string is locked with `flex-shrink: 0` to prevent horizontal crushing. A fluid CSS spacer (`margin-left: auto`) is injected between the Date and the Metadata array, forcing the Date to anchor permanently left, while instantly pushing all Tags and Places into a secondary flex-container on the far right. This sub-container safely executes `flex-wrap: wrap` without breaking the primary Date axis.
+* **[REF: UI-178] Ghost Margin & Scrollbar Annihilation (Updated):** Stripped archaic `padding-bottom` hacks from the timeline track. Enforced strict WebKit scrollbar suppression (`::-webkit-scrollbar`) globally. Locked the `#tm-root` envelope to absolute `height: 100vh; overflow: hidden;` and forced global `box-sizing: border-box` against a primary `#fcfcfc` root to completely eradicate sub-pixel UI bleed and phantom vertical text-node overflow (the "black ribbon").
+
 ---
 
 ## VII. Timeline Physics & Chronological Mathematics
@@ -160,7 +164,7 @@ To preserve maximum computational bandwidth and prevent context-window saturatio
 
 ---
 
-## IX. System Stability & Error Boundaries
+## 9. System Stability & Error Boundaries
 
 * **[REF: BOOT-CRASH-01] Boot Safety Validation:** To prevent fatal unrecoverable blank screens, all Native JS constructors (`new URLSearchParams`) must be strictly validated against syntax typos prior to React's first render hook.
 * **[REF: TL-CLAMP-01] Span Geometry Clamp:** The Timeline Scrubber must strictly enforce a minimum temporal visual width of 24 hours (`86400000` ms) to prevent `0px` layout collapse in single-event datasets.
@@ -168,6 +172,8 @@ To preserve maximum computational bandwidth and prevent context-window saturatio
 * **[REF: DIAG-01] Active Sensor Telemetry:** The Vibe Monitor passively exposes the application version manifest and the raw location string of the currently active dataset row.
 * **[REF: CRASH-01] Library Polyfill Injection:** The `MapViewer` implements a native string-interception polyfill that explicitly deconstructs `GEOMETRYCOLLECTION` wrappers and passes isolated internal primitives through the parser.
 * **[REF: CRASH-02] React Prop Continuity:** Cross-component navigational functions (e.g., `jumpToSlide`) must be explicitly passed via React component props to prevent fatal unrecoverable ReferenceErrors inside isolated Modals.
+* **[REF: CRASH-03] HTM/Preact Parser Collision Prevention:** The engine strictly forbids the use of standard React pseudo-comments (`{/* comment */}`) inside HTM template literals (`html\``). The parser misinterprets these as literal text nodes, generating invisible DOM elements that shatter layout geometry and create phantom background overflow.
+* **[REF: DIAG-04] Omni-Directional Telemetry Scaling & DOM State Anchoring:** Telemetry windows natively support manual fluid scaling (`resize: both; overflow: hidden;`) via OS-level border dragging. To prevent the Virtual DOM from resetting manual user dimensions during coordinate translation, the `onMouseDown` drag event polls the physical DOM via `getBoundingClientRect()`. It locks the exact physical dimensions into a React `size` state, rendering the window immune to layout collapse during drag-and-drop.
 
 ---
 
