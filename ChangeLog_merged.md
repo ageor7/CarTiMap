@@ -1,6 +1,17 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+### [v6.8.24] - Typographic Envelopes & Density Rendering
+
+**ContentSlider (v4.4.0):**
+*   **[UI-49] Master Alignment Wrap:** Re-architected the header to utilize a unified `85ch` bounding box. The Date strings and Title headers now correctly share an absolute left-aligned margin, eliminating the previous staggered indentation while preserving the symmetrical text overhang.
+
+**TimelineScrubber (v24.3.0):**
+*   **[TL-18] Concurrent Stacking Physics:** Injected a `stackRegistry` algorithm into the map loop. Exact concurrent events (same time, same tag lane) are now mathematically fanned out in a cascading `6px x 4px` geometric stack, exposing hidden event densities previously masked by pure overlapping absolute positioning. 
+
+**AppOrchestrator:**
+*   Manually incremented `APP_VERSION` string to `'v6.8.24'`.
+
 ### [v6.8.23] - Absolute Geometry Locks
 
 **Global Styles (CSS):**
