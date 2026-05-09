@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarTiMapper</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket-leaflet.min.js"></script>
+    <style id="global-styles">
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;1,400&display=swap');
+
+        /* --- [ SubBlock: Root & Base ] --- */
+        :root { --bg: #121212; --paneBg: #fcfcfc; --border: #ccc; --text: #222; --accent: #007acc; --coral: #f36c56; }
+        body { margin: 0; font-family: 'Noto Sans', system-ui, sans-serif; font-weight: 400; overflow: hidden; background: var(--bg); color: var(--text); }
+        /* --- [ End SubBlock: Root & Base ] --- */
+
+        /* --- [ SubBlock: Splash & Loading ] --- */
+        .loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--paneBg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; opacity: 1; }
+        .loading-screen.fade-out { opacity: 0; pointer-events: none; }
+        .logo-stack-splash { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; }
+        .splash-icon-wrapper { width: 350px; height: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15)); }
+        .splash-text { font-size: 2.8rem; color: #333; letter-spacing: -1px; line-height: 1; margin: 10px 0 0 0; text-align: center; width: 350px;}
+        .splash-version { font-size: 1rem; color: #888; font-family: monospace; margin-top: 5px; letter-spacing: 1px; text-align: center;}
+        .loading-bar-container { width: 250px; height: 4px; background: #ddd; border-radius: 2px; overflow: hidden; margin-top: 20px;}
+        .loading-bar-fill { height: 100%; background: #007acc; transition: width 0.4s ease; }
+        /* --- [ End SubBlock: Splash & Loading ] --- */
+
+        /* --- [ SubBlock: Layout & Resizers ] --- */
+        #tm-root { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; display: flex; flex-direction: column; }
+        #app-layout { --top-height: 35%; --map-width: 50%; --timeline-height: 15%; display: flex; flex-direction: column; flex: 1; width: 100vw; height: 100%; }
+        .top-row { flex: 0 0 var(--top-height); height: var(--top-height); display: flex; background: #fff; overflow: hidden; }
+        .map-pane { width: var(--map-width); flex-shrink: 0; background: #e0e0e0; position: relative; }
+        .map-pane.no-media { width: 100% !important; }
+        .resizer-v { height: 6px; background: #999; cursor: row-resize; flex-shrink: 0; z-index: 100; transition: background 0.2s; }
+        .resizer-v:hover, .resizer-v:active { background: #007acc; }
+        .resizer-h { width: 6px; background: #999; cursor: col-resize; flex-shrink: 0; z-index: 100; transition: background 0.2s; }
+        .resizer-h:hover, .resizer-h:active { background: #007acc; }
+        .media-pane { flex: 1; position: relative; overflow: hidden; background: #111; display: flex; flex-direction: column; }
+        .content-pane-wrapper { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--paneBg); overflow: hidden; }
+        .timeline-pane { flex: 0 0 var(--timeline-height); height: var(--timeline-height); background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        /* --- [ End SubBlock: Layout & Resizers ] --- */
+
+        /* --- [ SubBlock: Leaflet Map & Spatial HUD ] --- */
+        .leaflet-tooltip { white-space: normal !important; word-wrap: break-word !important; width: max-content !important; max-width: 300px !important; text-align: left !important; font-size: 0.85rem; line-height: 1.4; padding: 6px 10px !important; }
+        .custom-map-pin { display: flex; align-items: flex-end; justify-content: center; width: 24px; height: 34px; position: relative; transition: transform 0.2s;}
+        .pin-head { width: 14px; height: 14px; border-radius: 50%; background: #d32f2f; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.4); position: absolute; top: 0; }
+        .pin-stem { width: 2px; height: 20px; background: #333; position: absolute; bottom: 0; }
+        .custom-div-icon { background: transparent !important; border: none !important; }
+        .centered-tooltip { text-align: center; }
+        
+        .map-zoom-indicator { position: absolute; bottom: 15px; right: 15px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; color: #333; pointer-events: none; border: 1px solid #ccc; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+        
+        .minimap-container { 
+            position: absolute !important; 
+            bottom: 50px !important; 
+            right: 15px !important; 
+            width: 150px !important; 
+            height: 110px !important; 
+            max-width: 150px !important; 
+            max-height: 110px !important; 
+            z-index: 1000 !important; 
+            border: 2px solid #fff !important; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; 
+            border-radius: 4px !important; 
+            overflow: hidden !important; 
+            background: #e0e0e0 !important; 
+            transition: transform 0.2s !important; 
+            flex-shrink: 0 !important;
+        }
+        .minimap-container:hover { transform: scale(1.05) !important; }
+
+        @media (max-width: 1023px) {
+            .minimap-container {
+                width: 90px !important;
+                height: 65px !important;
+                bottom: 45px !important;
+                right: 10px !important;
+                border-width: 1px !important;
+            }
+        }
+
+        .marker-cluster-small { background-color: rgba(255, 180, 80, 0.6) !important; }
+        .marker-cluster-small div { background-color: rgba(240, 140, 40, 0.7) !important; color: white !important; }
+        .marker-cluster-medium { background-color: rgba(240, 130, 130, 0.6) !important; }
+        .marker-cluster-medium div { background-color: rgba(220, 80, 80, 0.7) !important; color: white !important; }
+        .marker-cluster-large { background-color: rgba(180, 100, 180, 0.6) !important; }
+        .marker-cluster-large div { background-color: rgba(150, 60, 150, 0.7) !important; color: white !important; }
+        /* --- [ End SubBlock: Leaflet Map & Spatial HUD ] --- */
+
+        /* --- [ SubBlock: Media Carousel ] --- */
+        .media-carousel { flex: 1; display: flex; width: 100%; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+        .media-item { width: 100%; height: 100%; flex-shrink: 0; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .media-content-wrapper { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .media-item img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.2s; }
+        .media-item img:hover { transform: scale(1.01); }
+        .media-item iframe { width: 100%; height: 100%; border: none; }
+        
+        .media-meta-box { width: 100%; background: #1a1a1a; color: #ddd; padding: 12px 15px; box-sizing: border-box; font-size: 0.85rem; border-top: 1px solid #333; z-index: 10; display: flex; flex-direction: column; gap: 4px; }
+        .media-meta-box a { color: #8be9fd; text-decoration: none; transition: color 0.2s; }
+        .media-meta-box a:hover { color: #fff; text-decoration: underline; }
+        .media-caption { font-style: italic; font-size: 0.9rem; }
+        .media-credit { color: #aaa; font-size: 0.75rem; }
+        
+        .media-counter { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; pointer-events: none; z-index: 20; }
+        /* --- [ End SubBlock: Media Carousel ] --- */
+
+        /* --- [ SubBlock: Narrative Content Slider ] --- */
+        .content-scroll-area { flex: 1; overflow-y: auto; padding: 2rem 4rem; display: flex; flex-direction: column; z-index: 5; scroll-behavior: smooth; }
+        .slide-container { width: 100%; max-width: 1000px; margin: 0 auto; flex: 1; box-sizing: border-box; }
+        .slide-desc { line-height: 1.6; font-size: 1.15rem; color: #333; width: 100%; }
+        .click-zone { position: absolute; top: 0; bottom: 40px; width: 15%; z-index: 10; cursor: pointer; }
+        .click-zone-left { left: 0; }
+        .click-zone-right { right: 0; }
+        
+        /* [FIX: UI-65] Micro-Scroll Ribbon CSS */
+        .metadata-ribbon { display: flex; gap: 8px; align-items: center; overflow-x: auto; scrollbar-width: none; white-space: nowrap; -ms-overflow-style: none; }
+        .metadata-ribbon::-webkit-scrollbar { display: none; }
+        /* --- [ End SubBlock: Narrative Content Slider ] --- */
+
+        /* --- [ SubBlock: Status Bar & Modals ] --- */
+        .unified-status-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: #fff; border-top: 1px solid #ddd; display: flex; align-items: center; padding: 0 15px; box-shadow: 0 -2px 5px rgba(0,0,0,0.02); z-index: 20; }
+        .status-left { display: flex; align-items: center; gap: 10px; z-index: 2; }
+        .status-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 1; }
+        .status-right { position: absolute; right: 15px; display: flex; align-items: center; font-size: 0.85rem; color: #666; gap: 10px; z-index: 2; }
+        
+        .status-btn { background: #eee; color: #444; border: 1px solid #ccc; border-radius: 12px; padding: 4px 12px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; font-family: inherit; }
+        .status-btn:hover { background: #ddd; }
+        .nav-btn-bottom { background: #f8f8f8; color: #333; border: 1px solid #ccc; border-radius: 4px; padding: 4px 15px; cursor: pointer; font-size: 0.85rem; transition: background 0.2s; font-family: inherit; }
+        .nav-btn-bottom:hover:not(:disabled) { background: #e0e0e0; }
+        .nav-btn-bottom:disabled { opacity: 0.3; cursor: not-allowed; }
+        .semantic-time-span { font-size: 0.75rem; color: #007acc; padding: 0 10px; border-left: 1px solid #ddd; border-right: 1px solid #ddd; margin: 0 5px; display: flex; align-items: center; height: 20px;}
+        
+        #about-modal, #search-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 700px; max-height: 85vh; background: #fff; z-index: 9001; border-radius: 12px; padding: 30px; overflow-y: auto; display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid #ccc; color: #222; font-size: 1.1rem; }
+        #about-modal.open, #search-modal.open { display: block; }
+        .modal-close { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+        
+        /* [FIX: UI-66] Omni-Search UI Elements */
+        .search-input { width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #ccc; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: #007acc; }
+        .search-result-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
+        .search-result-item:hover { background: #f4f8fb; }
+        .search-result-title { font-weight: bold; font-size: 1rem; color: #222; }
+        .search-result-meta { font-size: 0.8rem; color: #666; margin-top: 4px; }
+        /* --- [ End SubBlock: Status Bar & Modals ] --- */
+
+        /* --- [ SubBlock: Timeline UI & Leaflet Controls ] --- */
+        .timeline-scroll-wrapper { width: 100%; height: 100%; overflow-y: hidden; overflow-x: auto; position: relative; display: flex; align-items: flex-start; cursor: grab; }
+        .timeline-scroll-wrapper:active { cursor: grabbing; }
+        .timeline-track-container { position: relative; height: 100%; }
+        .tag-lane { border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; box-sizing: border-box; width: 100%; position: absolute; left: 0; right: 0; }
+        .tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
+        .event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
+        .event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
+        
+        .event-block { 
+            display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease; box-sizing: border-box;
+            --diag-w: 10px; min-height: var(--lane-h); padding: 2px 12px 2px calc(var(--diag-w) + 8px); 
+            clip-path: polygon( 0 calc(50% - (var(--lane-h) / 2) + 0.5px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + (var(--lane-h) / 2) - 0.5px) );
+        }
+        .event-block:hover { filter: brightness(1.05); z-index: 40; }
+        .timeline-axis { position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
+        .timeline-ruler-tick { position: absolute; bottom: 3px; display: flex; flex-direction: column; align-items: center; z-index: 5; transform: translateX(-50%); font-size: 0.7rem; color: #555;}
+        
+        .timeline-leaflet-controls { position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; box-shadow: 0 1px 5px rgba(0,0,0,0.65); border-radius: 4px; background: #fff; border: 2px solid rgba(0,0,0,0.2); overflow: hidden; }
+        .timeline-leaflet-btn { width: 34px; height: 34px; line-height: 34px; text-align: center; text-decoration: none; color: black; background: #fff; border-bottom: 1px solid #ccc; cursor: pointer; font-size: 1.2rem; user-select: none; transition: background 0.2s; }
+        .timeline-leaflet-btn:last-child { border-bottom: none; }
+        .timeline-leaflet-btn:hover { background: #f4f4f4; }
+        .timeline-leaflet-text { font-size: 0.65rem; line-height: 1; display: flex; align-items: center; justify-content: center; height: 24px; border-bottom: 1px solid #ccc; background: #fff; color: #333; }
+        /* --- [ End SubBlock: Timeline UI & Leaflet Controls ] --- */
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module">
+        // === [ MAJOR BLOCK: Imports & Globals v1.0.52 ] ===
+        import { h, render, Component } from 'https://esm.sh/preact';
+        import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
+        import htm from 'https://esm.sh/htm';
+        import Papa from 'https://esm.sh/papaparse';
+
+        const html = htm.bind(h);
+        const APP_VERSION = 'v6.6.8';
+        document.title = `CarTiMapper Core - ${APP_VERSION}`; 
+        const MODULE_VERSIONS = { Styles: 'v4.11.0', Globals: 'v1.0.52' }; 
+        const TM_CONFIG = { timeZone: 'Europe/Athens', paneBackground: '#fcfcfc' };
+        // === [ END MAJOR BLOCK: Imports & Globals v1.0.52 ] ===
+
+        // === [ MAJOR BLOCK: Utilities v1.0.0 ] ===
+        const stripHTML = (htmlStr) => {
+            if (!htmlStr) return '';
+            const tmp = document.createElement("DIV");
+            tmp.innerHTML = htmlStr;
+            return tmp.textContent || tmp.innerText || "";
+        };
+        // === [ END MAJOR BLOCK: Utilities v1.0.0 ] ===
+
+        // === [ MAJOR BLOCK: ErrorBoundary v1.0.0 ] ===
+        class ErrorBoundary extends Component {
+            constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+            static getDerivedStateFromError(error) { return { hasError: true, error }; }
+            render() {
+                if (this.state.hasError) return html`<div style="padding:20px; color:red; font-family:monospace;"><h3>CarTiMapper Crash</h3><p>${this.state.error.toString()}</p></div>`;
+                return this.props.children;
+            }
+        }
+        // === [ END MAJOR BLOCK: ErrorBoundary v1.0.0 ] ===
+
+        // === [ MAJOR BLOCK: VibeMonitor v2.0.0 ] ===
+        // [FIX: DIAG-01] Added Active Sensor Telemetry block
+        const VibeMonitor = ({ logs, status, isOpen, setIsOpen, activeSlide, appVersion, moduleVersions }) => {
+            const logsEndRef = useRef(null);
+            const monitorRef = useRef(null);
+            const [isDragging, setIsDragging] = useState(false);
+            const [pos, setPos] = useState({ x: 10, y: 50 }); 
+            const dragStart = useRef({ x: 0, y: 0 });
+
+            useEffect(() => { if (logsEndRef.current && isOpen) logsEndRef.current.scrollIntoView({ behavior: "smooth" }); }, [logs, isOpen]);
+
+            const onMouseDown = (e) => {
+                if (e.target.closest('.vibe-close-btn')) return;
+                setIsDragging(true);
+                dragStart.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+            };
+            const onMouseMove = (e) => {
+                if (!isDragging) return;
+                let newX = e.clientX - dragStart.current.x; let newY = e.clientY - dragStart.current.y;
+                setPos({ x: newX, y: newY });
+            };
+            const onMouseUp = () => setIsDragging(false);
+
+            useEffect(() => {
+                if (isDragging) { document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp); }
+                else { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }
+                return () => { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); };
+            }, [isDragging]);
+
+            if (!isOpen) return null;
+            return html`
+                <div id="vibe-monitor" ref=${monitorRef} style="left: ${pos.x}px; bottom: ${pos.y}px;">
+                    <div id="vibe-header" onMouseDown=${onMouseDown}>
+                        <span>SYS MON | ${appVersion}</span>
+                        <button class="vibe-close-btn" onClick=${() => setIsOpen(false)}>Close</button>
+                    </div>
+                    <div style="background: #111; padding: 6px 10px; border-bottom: 1px solid #333; font-size: 11px; color: #aaa;">
+                        <div style="margin-bottom: 4px;">MODULES: Env:${moduleVersions.Globals} | UI:${moduleVersions.Styles}</div>
+                        <div style="color: #8be9fd;">ACTIVE LOC: ${activeSlide ? (activeSlide.location || 'NULL') : 'N/A'}</div>
+                    </div>
+                    <div id="vibe-logs">
+                        ${logs.map((log, i) => html`<div key=${i} class="log-${log.type}"><span class="log-time">[${log.time}]</span> ${log.msg}</div>`)}
+                        <div ref=${logsEndRef} />
+                    </div>
+                </div>
+            `;
+        };
+        // === [ END MAJOR BLOCK: VibeMonitor v2.0.0 ] ===
+
+        // === [ MAJOR BLOCK: MapViewer v3.28.0 ] ===
+        const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, showButtonText }) => {
+            const mapDomRef = useRef(null);
+            const miniMapDomRef = useRef(null);
+            
+            const mapInstance = useRef(null);
+            const miniMapInstance = useRef(null);
+            const rectBoundsRef = useRef(null);
+            
+            const markerLayer = useRef(null); 
+            const clusterLayer = useRef(null); 
+            const gridLayerRef = useRef(null);
+            const markersRef = useRef({}); 
+            
+            const hasFitBounds = useRef(false);
+            const [mapZoom, setMapZoom] = useState(2);
+            const [showGrid, setShowGrid] = useState(false);
+            const [showLayersMenu, setShowLayersMenu] = useState(false);
+
+            const [activeBasemap, setActiveBasemap] = useState(null);
+            const [activeOverlays, setActiveOverlays] = useState([]); 
+            // [FIX: CMS-07] Local state for overlay opacities
+            const [overlayOpacities, setOverlayOpacities] = useState({});
+            const initialLoadRef = useRef(false);
+
+            const baseLayerRef = useRef(null);
+            const miniBaseLayerRef = useRef(null);
+            const overlayLayersRef = useRef({});
+            const miniOverlayLayersRef = useRef({});
+
+            const minimapOffsetRef = useRef(minimapOffset || -4);
+
+            const formatPlaces = (str) => {
+                if (!str) return '';
+                return str.split(/[|\-·;]/).map(s => s.split(',')[0].trim()).filter(Boolean).join(' | ');
+            };
+
+            const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 
+                ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) 
+                : 22;
+
+            useEffect(() => {
+                if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
+                    const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
+                    if (defaultBase) setActiveBasemap(defaultBase.id);
+                    
+                    const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
+                    setActiveOverlays(defaultOverlays);
+
+                    // Initialize opacities from CMS schema
+                    const initOpac = {};
+                    basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
+                        initOpac[o.id] = o.defaultOpacity ?? 1.0;
+                    });
+                    setOverlayOpacities(initOpac);
+                    
+                    initialLoadRef.current = true;
+                }
+            }, [basemapsRegistry]);
+
+            useEffect(() => {
+                minimapOffsetRef.current = minimapOffset;
+                if (mapInstance.current && miniMapInstance.current) {
+                    let targetMiniZoom = mapInstance.current.getZoom() + minimapOffset;
+                    if (targetMiniZoom < 0) targetMiniZoom = 0;
+                    miniMapInstance.current.setView(mapInstance.current.getCenter(), targetMiniZoom, { animate: true });
+                }
+            }, [minimapOffset]);
+
+            const createPinHtml = (isActive, isVip) => {
+                const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
+                const scale = isActive ? 'scale(1.3)' : 'scale(1)';
+                const z = isActive ? '1000' : '0';
+                return `<div class="custom-map-pin" style="transform: ${scale}; z-index: ${z};">
+                            <div class="pin-head" style="background: ${color};"></div>
+                            <div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'};"></div>
+                        </div>`;
+            };
+
+            const extractLayers = (layerObj) => {
+                let layers = [];
+                if (Array.isArray(layerObj)) layerObj.forEach(l => layers = layers.concat(extractLayers(l)));
+                else if (layerObj && layerObj.eachLayer) layerObj.eachLayer(l => layers = layers.concat(extractLayers(l)));
+                else if (layerObj) layers.push(layerObj);
+                return layers;
+            };
+
+            const parseGeometryCollection = (wktStr) => {
+                const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\s*\(/i, '').replace(/\)\s*$/, '');
+                let inParen = 0;
+                let currentGeom = '';
+                const geometries = [];
+                
+                for (let i = 0; i < cleanStr.length; i++) {
+                    const char = cleanStr[i];
+                    if (char === '(') inParen++;
+                    if (char === ')') inParen--;
+                    
+                    if (char === ',' && inParen === 0) {
+                        geometries.push(currentGeom.trim());
+                        currentGeom = '';
+                    } else {
+                        currentGeom += char;
+                    }
+                }
+                if (currentGeom.trim()) geometries.push(currentGeom.trim());
+                
+                let extractedLayers = [];
+                geometries.forEach(geomStr => {
+                    try {
+                        const wkt = new window.Wkt.Wkt();
+                        wkt.read(geomStr);
+                        extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
+                    } catch (e) {
+                        const upper = geomStr.toUpperCase();
+                        if (upper.startsWith('POINT')) {
+                            const m = geomStr.match(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/);
+                            if (m) extractedLayers.push(L.marker([parseFloat(m[2]), parseFloat(m[1])])); 
+                        } else if (upper.startsWith('LINESTRING')) {
+                            const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
+                            if (m.length > 0) extractedLayers.push(L.polyline(m.map(x => [parseFloat(x[2]), parseFloat(x[1])])));
+                        } else if (upper.startsWith('POLYGON')) {
+                            const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
+                            if (m.length > 0) extractedLayers.push(L.polygon(m.map(x => [parseFloat(x[2]), parseFloat(x[1])])));
+                        }
+                    }
+                });
+                return extractedLayers;
+            };
+
+            useEffect(() => {
+                if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const initialZoom = urlParams.get('mapzoom') ? parseInt(urlParams.get('mapzoom')) : 2;
+                    setMapZoom(initialZoom);
+                    
+                    const map = L.map(mapDomRef.current, { zoomControl: false, maxZoom: maxGlobalZoom }).setView([20, 0], initialZoom);
+                    L.control.scale({ position: 'bottomleft', imperial: true, metric: true }).addTo(map);
+                    
+                    map.on('zoomend', () => setMapZoom(map.getZoom()));
+
+                    markerLayer.current = L.featureGroup().addTo(map);
+                    clusterLayer.current = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true }).addTo(map);
+                    gridLayerRef.current = L.layerGroup().addTo(map);
+                    
+                    clusterLayer.current.on('clustermouseover', (c) => {
+                        const children = c.layer.getAllChildMarkers();
+                        const titles = [...new Set(children.map(m => m.getTooltip().getContent()))];
+                        let displayHtml = titles.slice(0, 5).join('<br/>');
+                        if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em;">+${titles.length - 5} more locations...</em>`;
+                        c.layer.bindTooltip(displayHtml, { direction: 'top', className: 'centered-tooltip' }).openTooltip();
+                    });
+                    clusterLayer.current.on('clustermouseout', (c) => c.layer.unbindTooltip());
+
+                    const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, maxZoom: maxGlobalZoom }).setView([20, 0], 0);
+                    
+                    const boundsRect = L.rectangle(map.getBounds(), { color: '#007acc', weight: 2, fillOpacity: 0.15 }).addTo(miniMap);
+                    rectBoundsRef.current = boundsRect;
+
+                    map.on('move', () => { 
+                        let targetMiniZoom = map.getZoom() + minimapOffsetRef.current;
+                        if (targetMiniZoom < 0) targetMiniZoom = 0; 
+                        
+                        miniMap.setView(map.getCenter(), targetMiniZoom, { animate: false });
+
+                        const mapBounds = map.getBounds();
+                        const center = map.getCenter();
+                        const nw = miniMap.project(mapBounds.getNorthWest(), targetMiniZoom);
+                        const se = miniMap.project(mapBounds.getSouthEast(), targetMiniZoom);
+                        
+                        const w = Math.abs(se.x - nw.x);
+                        const h = Math.abs(se.y - nw.y);
+                        const MIN_PX = 30; 
+                        
+                        if (w < MIN_PX || h < MIN_PX) {
+                            const cPx = miniMap.project(center, targetMiniZoom);
+                            const adjW = Math.max(w, MIN_PX);
+                            const adjH = Math.max(h, MIN_PX);
+                            
+                            const newNw = L.point(cPx.x - adjW / 2, cPx.y - adjH / 2);
+                            const newSe = L.point(cPx.x + adjW / 2, cPx.y + adjH / 2);
+                            
+                            boundsRect.setBounds(L.latLngBounds(
+                                miniMap.unproject(newNw, targetMiniZoom),
+                                miniMap.unproject(newSe, targetMiniZoom)
+                            ));
+                        } else {
+                            boundsRect.setBounds(mapBounds);
+                        }
+                    });
+
+                    mapInstance.current = map;
+                    miniMapInstance.current = miniMap;
+                    
+                    if (window.ResizeObserver) {
+                        const ro = new ResizeObserver(() => { setTimeout(() => { if (mapInstance.current) mapInstance.current.invalidateSize(); if (miniMapInstance.current) miniMapInstance.current.invalidateSize(); }, 50); });
+                        ro.observe(mapDomRef.current.parentElement);
+                    }
+                }
+            }, [basemapsRegistry]);
+
+            useEffect(() => {
+                const map = mapInstance.current;
+                if (!map || !gridLayerRef.current) return;
+                
+                const updateGrid = () => {
+                    gridLayerRef.current.clearLayers();
+                    if (!showGrid) return;
+
+                    const z = map.getZoom();
+                    let step = 20;
+                    if (z > 3) step = 10;
+                    if (z > 5) step = 5;
+                    if (z > 7) step = 1;
+                    if (z > 9) step = 0.5;
+                    if (z > 11) step = 0.1;
+                    if (z > 13) step = 0.05;
+                    if (z > 15) step = 0.01;
+
+                    const b = map.getBounds();
+                    const w = Math.floor(b.getWest() / step) * step - step;
+                    const e = Math.ceil(b.getEast() / step) * step + step;
+                    const s = Math.floor(b.getSouth() / step) * step - step;
+                    const n = Math.ceil(b.getNorth() / step) * step + step;
+
+                    const style = { color: '#007acc', weight: 1, opacity: 0.25, dashArray: '2, 6', interactive: false };
+
+                    for (let lat = s; lat <= n; lat += step) {
+                        if (lat >= -90 && lat <= 90) L.polyline([[lat, w], [lat, e]], style).addTo(gridLayerRef.current);
+                    }
+                    for (let lng = w; lng <= e; lng += step) {
+                        L.polyline([[-90, lng], [90, lng]], style).addTo(gridLayerRef.current);
+                    }
+                };
+
+                updateGrid();
+                map.on('moveend', updateGrid);
+                return () => map.off('moveend', updateGrid);
+            }, [showGrid]);
+
+            useEffect(() => {
+                const map = mapInstance.current;
+                const miniMap = miniMapInstance.current;
+                if (!map || !miniMap || !basemapsRegistry || !activeBasemap) return;
+
+                const config = basemapsRegistry.find(b => b.id === activeBasemap) || basemapsRegistry[0];
+                
+                if (baseLayerRef.current) map.removeLayer(baseLayerRef.current);
+                baseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0 }).addTo(map);
+                
+                if (miniBaseLayerRef.current) miniMap.removeLayer(miniBaseLayerRef.current);
+                miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0 }).addTo(miniMap);
+                
+            }, [activeBasemap, basemapsRegistry, maxGlobalZoom]);
+
+            // [FIX: CMS-07] Apply opacities during tile generation
+            useEffect(() => {
+                const map = mapInstance.current;
+                const miniMap = miniMapInstance.current;
+                if (!map || !miniMap || !basemapsRegistry) return;
+
+                Object.keys(overlayLayersRef.current).forEach(id => {
+                    if (!activeOverlays.includes(id)) {
+                        map.removeLayer(overlayLayersRef.current[id]);
+                        miniMap.removeLayer(miniOverlayLayersRef.current[id]);
+                        delete overlayLayersRef.current[id];
+                        delete miniOverlayLayersRef.current[id];
+                    }
+                });
+
+                activeOverlays.forEach((id, idx) => {
+                    if (!overlayLayersRef.current[id]) {
+                        const config = basemapsRegistry.find(b => b.id === id);
+                        if (config) {
+                            const z = idx + 10; 
+                            const dynamicOpacity = overlayOpacities[id] !== undefined ? overlayOpacities[id] : (config.defaultOpacity ?? 1.0);
+                            overlayLayersRef.current[id] = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, transparent: true }).addTo(map);
+                            miniOverlayLayersRef.current[id] = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, transparent: true }).addTo(miniMap);
+                        }
+                    }
+                });
+            }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]); // Re-eval if opacity state changes
+
+            // [FIX: CMS-07] Real-time opacity slider sync loop
+            useEffect(() => {
+                Object.keys(overlayOpacities).forEach(id => {
+                    if (overlayLayersRef.current[id]) overlayLayersRef.current[id].setOpacity(overlayOpacities[id]);
+                    if (miniOverlayLayersRef.current[id]) miniOverlayLayersRef.current[id].setOpacity(overlayOpacities[id]);
+                });
+            }, [overlayOpacities]);
+
+            useEffect(() => {
+                const map = mapInstance.current;
+                if (!map || data.length === 0) return;
+                
+                markerLayer.current.clearLayers();
+                clusterLayer.current.clearLayers();
+                markersRef.current = {};
+                let validMarkers = 0;
+
+                const stripHTML = (html) => {
+                    const tmp = document.createElement("DIV");
+                    tmp.innerHTML = html;
+                    return tmp.textContent || tmp.innerText || "";
+                };
+
+                data.forEach((item, idx) => {
+                    const locStr = String(item.location || '').trim();
+                    if (!locStr) return;
+                    const activeLayersArray = []; 
+                    let featureLayers = [];
+
+                    try {
+                        if (locStr.match(/^GEOMETRYCOLLECTION/i)) {
+                            featureLayers = parseGeometryCollection(locStr);
+                        } else if (locStr.match(/^[A-Z]+\s*\(/)) {
+                            const wkt = new window.Wkt.Wkt(); wkt.read(locStr);
+                            featureLayers = extractLayers(wkt.toObject());
+                        } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
+                            featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
+                        } else {
+                            const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
+                            if (coordMatch) featureLayers.push(L.marker([parseFloat(coordMatch[1]), parseFloat(coordMatch[2])]));
+                        }
+
+                        const subLabels = item.subLabels ? item.subLabels.split(/[|\-·;\n]/).map(s => s.split(',')[0].trim()) : [];
+                        const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
+
+                        featureLayers.forEach((layer, layerIdx) => {
+                            if (layer instanceof L.Polygon) {
+                                layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: 0.4 });
+                            } else if (layer instanceof L.Polyline) {
+                                layer.setStyle({ color: '#007acc', weight: 2, dashArray: '5, 5' });
+                            } else if (layer.setStyle) {
+                                layer.setStyle({ color: '#007acc', weight: 4 });
+                            }
+
+                            if (layer instanceof L.Marker) {
+                                layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, isVip), iconSize: [24, 34], iconAnchor: [12, 34] }));
+                                layer.isVip = isVip;
+                            } 
+                            
+                            let rawLabel = subLabels[layerIdx] ? subLabels[layerIdx] : (item.place ? formatPlaces(item.place) : item.title);
+                            let labelText = stripHTML(rawLabel);
+                            
+                            layer.bindTooltip(labelText, { direction: 'top', offset: [0, -48], className: 'centered-tooltip' });
+                            layer.on('click', () => setActiveIndex(idx));
+
+                            if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer); 
+                            else markerLayer.current.addLayer(layer); 
+
+                            activeLayersArray.push(layer);
+                            validMarkers++;
+                        });
+
+                        if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray; 
+                    } catch(e) { console.error("Map Error Row", idx, e); }
+                });
+
+                setTimeout(() => {
+                    if (map && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
+                        const bounds = L.latLngBounds();
+                        markerLayer.current.eachLayer(l => { if (l.getLatLng) bounds.extend(l.getLatLng()); else if (l.getBounds) bounds.extend(l.getBounds()); });
+                        clusterLayer.current.eachLayer(l => bounds.extend(l.getLatLng()));
+                        if (bounds.isValid()) {
+                            map.fitBounds(bounds, { padding: [30, 30], maxZoom: 6 });
+                            hasFitBounds.current = true;
+                        }
+                    }
+                }, 150);
+            }, [data]);
+
+            useEffect(() => {
+                const map = mapInstance.current;
+                const markers = markersRef.current;
+                if (!map || Object.keys(markers).length === 0) return;
+
+                Object.keys(markers).forEach(idxStr => {
+                    const isTarget = parseInt(idxStr, 10) === activeIndex;
+                    markers[idxStr].forEach(l => {
+                        if (l instanceof L.Polygon) {
+                            l.setStyle({ stroke: false, fillColor: isTarget ? '#28a745' : '#007acc', fillOpacity: isTarget ? 0.6 : 0.4 });
+                            if (isTarget && l.bringToFront) l.bringToFront();
+                        } else if (l instanceof L.Polyline) {
+                            l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 3 : 2, dashArray: '5, 5' });
+                            if (isTarget && l.bringToFront) l.bringToFront();
+                        } else if (l instanceof L.Marker) {
+                            if (isTarget) {
+                                l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(true, l.isVip), iconSize: [24, 34], iconAnchor: [12, 34] }));
+                                if (!l.isVip) { clusterLayer.current.removeLayer(l); markerLayer.current.addLayer(l); }
+                                l.setZIndexOffset(1000);
+                            } else {
+                                l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, l.isVip), iconSize: [24, 34], iconAnchor: [12, 34] }));
+                                if (!l.isVip) { markerLayer.current.removeLayer(l); clusterLayer.current.addLayer(l); }
+                                l.setZIndexOffset(0);
+                            }
+                        } else if (l.setStyle) {
+                            l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 5 : 4 });
+                            if (isTarget && l.bringToFront) l.bringToFront();
+                        }
+                    });
+                });
+
+                const activeLayers = markers[activeIndex];
+                if (activeLayers && activeLayers.length > 0) {
+                    const activeFeatureGroup = L.featureGroup(activeLayers);
+                    setTimeout(() => {
+                        try {
+                            const bounds = activeFeatureGroup.getBounds();
+                            if (bounds.isValid()) map.flyToBounds(bounds, { animate: true, duration: 2.5, maxZoom: maxAutoZoom });
+                            activeLayers.forEach(l => { if (l.openTooltip) l.openTooltip(); });
+                        } catch(err) {}
+                    }, 100);
+                }
+            }, [activeIndex, data, maxAutoZoom]);
+
+            const btnStyle = "background: #fcfcfc; color: #444; border: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; padding: 0;";
+            const btnStyleActive = "background: #007acc; color: #fff; border: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; padding: 0;";
+            
+            const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
+            const overlays = basemapsRegistry.filter(b => b.type === 'overlay');
+
+            return html`
+                <div style="position: relative; width:100%; height:100%;">
+                    
+                    <style>
+                        .layer-attribution-link a { color: #888; text-decoration: underline; text-decoration-color: #ccc; transition: all 0.2s; }
+                        .layer-attribution-link a:hover { color: #007acc; text-decoration-color: #007acc; }
+                        
+                        /* Opacity Slider styling */
+                        .tm-opacity-slider { -webkit-appearance: none; width: 100px; height: 4px; background: #ddd; border-radius: 2px; outline: none; }
+                        .tm-opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; }
+                        .tm-opacity-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; border: none; }
+                    </style>
+
+                    <div ref=${mapDomRef} style="width:100%; height:100%; z-index:1; position: absolute; top:0; left:0; right:0; bottom:0;"></div>
+                    
+                    <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+                        
+                        <div style="display: flex; flex-direction: column; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.25); background: #fcfcfc; border: 1px solid #ccc;">
+                            <button onClick=${() => mapInstance.current?.zoomIn()} style="${btnStyle} border-bottom: 1px solid #e0e0e0;" title="Zoom In">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </button>
+                            
+                            <div title="Current Zoom Level" style="width: 34px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: monospace;">
+                                ${mapZoom}z
+                            </div>
+
+                            <button onClick=${() => mapInstance.current?.zoomOut()} style="${btnStyle}" title="Zoom Out">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </button>
+                        </div>
+
+                        <div style="display: flex; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border: 1px solid #ccc;">
+                            <button onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="${showGrid ? btnStyleActive : btnStyle} ${showButtonText ? 'width: auto; padding: 0 10px; gap: 6px;' : ''}">
+                                <span style="font-size: 1.1rem; line-height: 1; filter: ${showGrid ? 'brightness(0) invert(1)' : 'none'};">🌐</span>
+                                ${showButtonText ? html`<span style="font-size: 0.85rem; font-weight: 500;">Grid</span>` : ''}
+                            </button>
+                        </div>
+
+                        <div style="display: flex; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border: 1px solid #ccc;">
+                            <button onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="${showLayersMenu ? btnStyleActive : btnStyle} ${showButtonText ? 'width: auto; padding: 0 10px; gap: 6px;' : ''}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                                ${showButtonText ? html`<span style="font-size: 0.85rem; font-weight: 500;">Layers</span>` : ''}
+                            </button>
+                        </div>
+
+                        ${showLayersMenu ? html`
+                            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; font-size: 0.85rem; color: #333;">
+                                
+                                <div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                                    ${bases.map(b => html`
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
+                                                <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${activeBasemap === b.id} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                                                <div style="display: inline; margin: 0;">
+                                                    <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
+                                                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `)}
+                                </div>
+
+                                <div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    ${overlays.length > 0 ? overlays.map(o => html`
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
+                                                <input type="checkbox" id="over_${o.id}" checked=${activeOverlays.includes(o.id)} onChange=${(e) => {
+                                                    if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]);
+                                                    else setActiveOverlays(prev => prev.filter(id => id !== o.id));
+                                                }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                                                <div style="display: inline; margin: 0;">
+                                                    <label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
+                                                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
+                                                </div>
+                                            </div>
+                                            ${activeOverlays.includes(o.id) ? html`
+                                                <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
+                                                    <span style="font-size: 0.65rem; color: #888;">Opacity</span>
+                                                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" />
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                    </div>
+                    <div class="minimap-container" ref=${miniMapDomRef}></div>
+                </div>
+            `;
+        };
+        MODULE_VERSIONS['MapViewer'] = 'v3.28.0';
+        // === [ END MAJOR BLOCK: MapViewer v3.28.0 ] ===
+
+        // === [ MAJOR BLOCK: MediaViewer v2.9.0 ] ===
+        const MediaViewer = ({ activeSlide, addLog }) => {
+            const carouselRef = useRef(null);
+            // Used to prevent clicks firing if the user is swiping natively
+            const isSwiping = useRef(false);
+            const touchStartX = useRef(0);
+
+            useEffect(() => {
+                if (carouselRef.current) {
+                    carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+                }
+            }, [activeSlide]);
+
+            if (!activeSlide || !activeSlide.media || activeSlide.media.length === 0) return null;
+            
+            const splitRegex = /[\r\n]+|\\n/;
+            
+            let mediaItems = [];
+            let captions = [];
+            let credits = [];
+
+            const rawMediaData = activeSlide.media;
+            const rawCaptionData = activeSlide.mediaCaption;
+            const rawCreditData = activeSlide.mediaCredit;
+
+            const rawMedia = Array.isArray(rawMediaData) ? rawMediaData : [rawMediaData || ''];
+            rawMedia.forEach(m => {
+                if (typeof m === 'string') mediaItems.push(...m.split(splitRegex));
+                else mediaItems.push(m);
+            });
+            mediaItems = mediaItems.map(s => String(s).trim()).filter(Boolean);
+
+            const rawCaps = Array.isArray(rawCaptionData) ? rawCaptionData : [rawCaptionData || ''];
+            rawCaps.forEach(c => {
+                if (typeof c === 'string') captions.push(...c.split(splitRegex));
+                else captions.push(c);
+            });
+            captions = captions.map(s => String(s).trim());
+
+            const rawCreds = Array.isArray(rawCreditData) ? rawCreditData : [rawCreditData || ''];
+            rawCreds.forEach(c => {
+                if (typeof c === 'string') credits.push(...c.split(splitRegex));
+                else credits.push(c);
+            });
+            credits = credits.map(s => String(s).trim());
+
+            useEffect(() => {
+                if (addLog) {
+                    addLog(`[Media Viewer] Raw String: ${JSON.stringify(rawMediaData)}`);
+                    addLog(`[Media Viewer] Parsed URLs: ${JSON.stringify(mediaItems)}`);
+                    addLog(`[Media Viewer] Parsed Caps: ${JSON.stringify(captions)}`);
+                }
+            }, [activeSlide, addLog]);
+
+            const getCleanUrl = (rawUrl) => {
+                const url = rawUrl.trim();
+                if (url.toLowerCase().startsWith('<iframe')) {
+                    const match = url.match(/src=["']([^"']+)["']/);
+                    return match ? match[1] : '#';
+                }
+                return url;
+            };
+
+            const handleTouchStart = (e) => {
+                touchStartX.current = e.touches[0].clientX;
+                isSwiping.current = false;
+            };
+
+            const handleTouchMove = (e) => {
+                // If they drag finger more than 10px, flag it as a swipe to block the click
+                if (Math.abs(e.touches[0].clientX - touchStartX.current) > 10) {
+                    isSwiping.current = true;
+                }
+            };
+
+            const handleWrapperClick = (e) => {
+                if (!carouselRef.current || mediaItems.length <= 1) return;
+                
+                // Block click logic if the user was actively swiping natively
+                if (isSwiping.current) {
+                    isSwiping.current = false;
+                    return;
+                }
+
+                const rect = e.currentTarget.getBoundingClientRect(); 
+                const clickX = e.clientX - rect.left;
+                const direction = clickX < rect.width / 2 ? -1 : 1;
+                carouselRef.current.scrollBy({ left: direction * carouselRef.current.clientWidth, behavior: 'smooth' });
+            };
+
+            const renderMedia = (rawUrl, isMulti) => {
+                const url = rawUrl.trim();
+
+                if (url.toLowerCase().startsWith('<iframe')) {
+                    return html`<div dangerouslySetInnerHTML=${{ __html: url }} style="flex-grow: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; pointer-events: auto;"></div>`;
+                }
+
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    const videoId = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop().split('?')[0];
+                    return html`<div style="flex-grow: 1; width: 100%; min-height: 0; display: flex;"><iframe src="https://www.youtube.com/embed/${videoId}" style="width:100%; height:100%; border:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+                }
+
+                if (url.includes('google.com/maps/embed') || url.includes('googleusercontent.com/maps')) {
+                     return html`<div style="flex-grow: 1; width: 100%; min-height: 0; display: flex;"><iframe src="${url}" style="width:100%; height:100%; border:none;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>`;
+                }
+
+                // [FIX: MED-25] Embedded Touch Collision Prevention math
+                return html`
+                    <div 
+                        onClick=${isMulti ? handleWrapperClick : null}
+                        onTouchStart=${handleTouchStart}
+                        onTouchMove=${handleTouchMove}
+                        style="flex-grow: 1; display: flex; width: 100%; min-height: 0; align-items: center; justify-content: center; cursor: ${isMulti ? 'ew-resize' : 'default'};"
+                    >
+                        <img src=${url} alt="Media" loading="lazy" style="max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none;" />
+                    </div>
+                `;
+            };
+
+            return html`
+                <div style="position: relative; height: 100%; width: 100%;">
+                    <style>
+                        .media-carousel::-webkit-scrollbar { display: none !important; }
+                    </style>
+                    <div class="media-carousel" ref=${carouselRef} style="scrollbar-width: none; -ms-overflow-style: none; height: 100%; width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory;">
+                        ${mediaItems.map((rawUrl, i) => {
+                            const cleanUrl = getCleanUrl(rawUrl);
+                            const itemCaption = captions[i] || '';
+                            const itemCredit = credits[i] || '';
+                            const isMulti = mediaItems.length > 1;
+
+                            return html`
+                                <div class="media-item" key=${i} style="display: flex; flex-direction: column; height: 100%; width: 100%; flex-shrink: 0; position: relative; scroll-snap-align: start;">
+                                    
+                                    ${isMulti ? html`<div class="media-counter" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">${i + 1} / ${mediaItems.length}</div>` : ''}
+                                    
+                                    ${renderMedia(rawUrl, isMulti)}
+                                    
+                                    ${(itemCaption || itemCredit) ? html`
+                                        <div class="media-meta-box" style="flex-shrink: 0; width: 100%;">
+                                            ${itemCaption ? html`<div class="media-caption"><a href=${cleanUrl !== '#' ? cleanUrl : '#'} target=${cleanUrl !== '#' ? '_blank' : ''} rel="noopener noreferrer">${itemCaption}</a></div>` : ''}
+                                            <div style="display: flex; align-items: center; width: 100%; margin-top: 2px;">
+                                                ${itemCredit ? html`<div class="media-credit"><a href=${itemCredit} target="_blank" rel="noopener noreferrer">${itemCredit}</a></div>` : ''}
+                                                ${cleanUrl !== '#' ? html`<a href=${cleanUrl} target="_blank" rel="noopener noreferrer" title="Open source media" style="color: #8be9fd; text-decoration: none; font-size: 0.9rem; margin-left: auto; letter-spacing: 1px;">[↗]</a>` : ''}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        })}
+                    </div>
+                </div>
+            `;
+        };
+        MODULE_VERSIONS['MediaViewer'] = 'v2.9.0';
+        // === [ END MAJOR BLOCK: MediaViewer v2.9.0 ] ===
+
+        // === [ MAJOR BLOCK: ContentSlider v3.19.0 ] ===
+        const ContentSlider = ({ data, activeIndex, setActiveIndex, jumpToSlide, slideHistory, goBack, aboutData, isAboutOpen, setIsAboutOpen, isMonitorOpen, setIsMonitorOpen, isSettingsOpen, setIsSettingsOpen, CarTiMapperLogo, visibleTimeSpan, showButtonText }) => {
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const touchStartX = useRef(0);
+            
+            const [isScrolled, setIsScrolled] = useState(false);
+            
+            const [isSearchOpen, setIsSearchOpen] = useState(false);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [searchHistory, setSearchHistory] = useState(() => {
+                try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; } 
+                catch(e) { return []; }
+            });
+
+            const slide = data[activeIndex];
+            if (!slide) return null;
+
+            const formatSmartDate = (start, end) => {
+                if (!start || isNaN(start.getTime())) return 'Unknown Date';
+                const optsD = { day: 'numeric', month: 'short', year: 'numeric' };
+                const optsT = { hour: '2-digit', minute: '2-digit' };
+
+                const sDate = start.toLocaleDateString('en-GB', optsD);
+                const sTime = start.toLocaleTimeString('en-GB', optsT).replace(/^00:00$/, '');
+
+                if (!end || isNaN(end.getTime()) || start.getTime() === end.getTime()) {
+                    return sTime ? `${sDate}, ${sTime}` : sDate;
+                }
+
+                const eDate = end.toLocaleDateString('en-GB', optsD);
+                const eTime = end.toLocaleTimeString('en-GB', optsT).replace(/^00:00$/, '');
+                const sParts = sDate.split(' '); 
+                const eParts = eDate.split(' '); 
+
+                if (sDate === eDate) {
+                    if (sTime && eTime && sTime !== eTime) return `${sDate}, ${sTime} — ${eTime}`;
+                    return sTime ? `${sDate}, ${sTime}` : sDate;
+                }
+
+                if (sParts[2] === eParts[2]) { 
+                    if (sParts[1] === eParts[1]) return `${sParts[0]} - ${eDate}${eTime ? `, ${eTime}` : ''}`;
+                    return `${sParts[0]} ${sParts[1]} - ${eDate}${eTime ? `, ${eTime}` : ''}`;
+                }
+
+                return `${sTime ? `${sDate}, ${sTime}` : sDate} — ${eTime ? `${eDate}, ${eTime}` : eDate}`;
+            };
+
+            const getParsedTags = (rawTagsArray) => {
+                if (!rawTagsArray || rawTagsArray.length === 0) return [];
+                const splitRegex = /[\r\n]+|\\n/; let arr = [];
+                const rawData = Array.isArray(rawTagsArray) ? rawTagsArray : [rawTagsArray];
+                rawData.forEach(t => { if (typeof t === 'string') arr.push(...t.split(splitRegex)); else arr.push(t); });
+                return arr.map(s => String(s).trim()).filter(Boolean);
+            };
+
+            const formatPlaces = (str) => {
+                if (!str) return '';
+                return str.split(/[|\-·;]/).map(s => s.split(',')[0].trim()).filter(Boolean).join(' | ');
+            };
+
+            const tags = getParsedTags(slide.tags);
+            const hasLocation = slide.place && String(slide.place).trim() !== '';
+
+            const goPrev = () => { if (activeIndex > 0) setActiveIndex(activeIndex - 1); };
+            const goNext = () => { if (activeIndex < data.length - 1) setActiveIndex(activeIndex + 1); };
+            const handlePaneClick = () => { if (isMenuOpen) setIsMenuOpen(false); };
+
+            const handleTouchStart = (e) => { touchStartX.current = e.changedTouches[0].screenX; };
+            const handleTouchEnd = (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                if (touchStartX.current - touchEndX > 50) goNext(); 
+                if (touchEndX - touchStartX.current > 50) goPrev(); 
+            };
+
+            const handleScroll = (e) => {
+                const scrollTop = e.target.scrollTop;
+                if (scrollTop > 40 && !isScrolled) setIsScrolled(true);
+                else if (scrollTop <= 40 && isScrolled) setIsScrolled(false);
+            };
+
+            const executeSearch = (query) => {
+                if (!query.trim()) return [];
+                const q = query.toLowerCase();
+                return data.filter(d => {
+                    const titleMatch = d.title && d.title.toLowerCase().includes(q);
+                    const descMatch = d.description && d.description.toLowerCase().includes(q);
+                    const placeMatch = d.place && d.place.toLowerCase().includes(q);
+                    const tagsMatch = d.tags && d.tags.some(t => t.toLowerCase().includes(q));
+                    const dateMatch = formatSmartDate(d.startDate, d.endDate).toLowerCase().includes(q);
+                    return titleMatch || descMatch || placeMatch || tagsMatch || dateMatch;
+                });
+            };
+
+            const handleResultClick = (idx, qString) => {
+                jumpToSlide(idx);
+                setIsSearchOpen(false);
+                if (qString && !searchHistory.includes(qString)) {
+                    const newHistory = [qString, ...searchHistory].slice(0, 8); 
+                    setSearchHistory(newHistory);
+                    localStorage.setItem('tm_search_history', JSON.stringify(newHistory));
+                }
+            };
+
+            const searchResults = executeSearch(searchQuery);
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramsList = Array.from(urlParams.entries()).map(([k, v]) => `${k}=${v}`).join(' | ') || 'None';
+
+            return html`
+                <div class="content-pane-wrapper" style="display: flex; flex-direction: column; height: 100%;" onClick=${handlePaneClick}>
+                    
+                    <div style="position: relative; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; scroll-behavior: smooth;" onTouchStart=${handleTouchStart} onTouchEnd=${handleTouchEnd} onScroll=${handleScroll}>
+                        <div class="click-zone click-zone-left" onClick=${goPrev} title="Previous"></div>
+                        <div class="click-zone click-zone-right" onClick=${goNext} title="Next"></div>
+
+                        <div style="flex-shrink: 0; position: sticky; top: 0; background: var(--paneBg, #ffffff); z-index: 10; padding: ${isScrolled ? '0.6rem 1.5rem 0.4rem 1.5rem' : '1.2rem 1.5rem 0.2rem 1.5rem'}; border-bottom: 1px solid rgba(128,128,128,0.2); box-shadow: ${isScrolled ? '0 4px 12px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.04)'}; display: flex; justify-content: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);">
+                            <div style="max-width: 90ch; width: 100%; display: flex; flex-direction: column;">
+                                
+                                <div class="metadata-ribbon" style="margin-bottom: ${isScrolled ? '0.2rem' : '0.4rem'};">
+                                    <div class="slide-date" style="font-weight: 400; color: #007acc; font-size: 0.9rem; flex-shrink: 0;">
+                                        ${formatSmartDate(slide.startDate, slide.endDate)}
+                                    </div>
+                                    
+                                    ${hasLocation ? html`
+                                        <span style="display: inline-flex; align-items: center; background: rgba(128,128,128,0.06); color: var(--text-color, #444); padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; border: 1px solid rgba(128,128,128,0.15); flex-shrink: 0; margin-left: auto;">
+                                            <span style="margin-right: 4px;">📍</span> ${formatPlaces(slide.place)}
+                                        </span>
+                                    ` : html`<div style="margin-left: auto;"></div>`}
+
+                                    ${tags.map(tag => html`
+                                        <span style="display: inline-flex; align-items: center; background: rgba(128,128,128,0.06); color: var(--text-color, #444); padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; border: 1px solid rgba(128,128,128,0.15); flex-shrink: 0;">
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;">
+                                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                            </svg>
+                                            <span>${tag}</span>
+                                        </span>
+                                    `)}
+                                </div>
+
+                                <h2 class="slide-title" style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease;" dangerouslySetInnerHTML=${{ __html: slide.title }}></h2>
+                            </div>
+                        </div>
+
+                        <div style="flex-grow: 1; padding: 0.2rem 2rem 2rem 2rem; display: flex; justify-content: center;">
+                            <div class="slide-desc" dangerouslySetInnerHTML=${{ __html: slide.description }}></div>
+                        </div>
+                    </div>
+
+                    <div class="unified-status-bar" style="flex-shrink: 0; z-index: 20;">
+                        <div class="status-left" style="position: relative; display: flex; align-items: center; gap: 5px;">
+                            
+                            <button class="status-btn" onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="Menu">
+                                <span style="font-size: 1.2rem; line-height: 1;">☰</span>
+                            </button>
+
+                            ${isMenuOpen ? html`
+                                <div style="position: absolute; bottom: calc(100% + 5px); left: 0; background: var(--paneBg, #fff); border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 5px 0; min-width: 140px; z-index: 1000;" onClick=${e => e.stopPropagation()}>
+                                    <div style="padding: 10px 15px; cursor: pointer; border-bottom: 1px solid rgba(128,128,128,0.1); display: flex; align-items: center; gap: 8px; font-size: 0.85rem;" onClick=${(e) => { e.stopPropagation(); setIsSettingsOpen(true); setIsMenuOpen(false); }}>
+                                        <span>⚙️</span> Settings
+                                    </div>
+                                    <div style="padding: 10px 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem;" onClick=${(e) => { e.stopPropagation(); setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }}>
+                                        <span>📊</span> Monitor
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${aboutData ? html`<button class="status-btn" style="padding: 4px; display: flex; align-items: center;" onClick=${() => setIsAboutOpen(true)} title="About"><${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} /></button>` : ''}
+                        </div>
+                        
+                        <div class="status-center">
+                            <button class="nav-btn-bottom" style="display: flex; align-items: center; gap: 4px;" onClick=${goPrev} disabled=${activeIndex === 0} title="Previous">
+                                <span>◀</span> ${showButtonText ? html`<span>Prev</span>` : ''}
+                            </button>
+                            
+                            <span class="semantic-time-span" title="Visible Time Span">${visibleTimeSpan || '...'}</span>
+                            
+                            <button class="nav-btn-bottom" style="display: flex; align-items: center; gap: 4px;" onClick=${goNext} disabled=${activeIndex === data.length - 1} title="Next">
+                                ${showButtonText ? html`<span>Next</span>` : ''} <span>▶</span>
+                            </button>
+                        </div>
+                        
+                        <div class="status-right" style="display: flex; gap: 10px; align-items: center;">
+                            <button class="status-btn" onClick=${() => setIsSearchOpen(true)} style="display: flex; align-items: center; gap: 4px;" title="Search">
+                                <span>🔍</span> ${showButtonText ? html`<span>Search</span>` : ''}
+                            </button>
+                            
+                            ${slideHistory && slideHistory.length > 0 ? html`
+                                <button class="status-btn" onClick=${goBack} style="display: flex; align-items: center; gap: 4px;" title="Back to Previous Slide">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+                                    ${showButtonText ? html`<span>Back</span>` : ''}
+                                </button>
+                            ` : ''}
+                            <span>${activeIndex + 1} / ${data.length}</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="display: ${isSearchOpen ? 'block' : 'none'};"></div>
+                    <div id="search-modal" class=${isSearchOpen ? 'open' : ''} style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column;">
+                        <button class="modal-close" onClick=${() => setIsSearchOpen(false)}>×</button>
+                        <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 15px;">Search Dataset</h3>
+                        
+                        <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} autoFocus />
+                        
+                        ${searchHistory.length > 0 && !searchQuery ? html`
+                            <div style="margin-bottom: 15px;">
+                                <div style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">Recent Searches:</div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    ${searchHistory.map(hist => html`
+                                        <button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; color: #444;" onClick=${() => setSearchQuery(hist)}>${hist}</button>
+                                    `)}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div style="flex-grow: 1; overflow-y: auto; border-top: 1px solid #eee;">
+                            ${searchQuery && searchResults.length === 0 ? html`
+                                <div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>
+                            ` : ''}
+                            
+                            ${searchResults.map(res => html`
+                                <div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}>
+                                    <div class="search-result-title">${res.title}</div>
+                                    <div class="search-result-meta">${formatSmartDate(res.startDate, res.endDate)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div>
+                                </div>
+                            `)}
+                        </div>
+                    </div>
+
+                    <div class="modal-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="display: ${isAboutOpen ? 'block' : 'none'}; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9000;"></div>
+                    <div id="about-modal" class=${isAboutOpen ? 'open' : ''} style="display: ${isAboutOpen ? 'block' : 'none'}; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 700px; max-height: 85vh; background: #fff; z-index: 9001; border-radius: 12px; padding: 30px; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid #ccc; color: #222;">
+                        <button class="modal-close" onClick=${() => setIsAboutOpen(false)}>×</button>
+                        <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
+                        
+                        <div dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
+                        
+                        <div style="text-align: center; margin: 25px 0;">
+                            <button class="status-btn" style="padding: 8px 16px; font-size: 0.9rem; background: #eee; color: #333; border: 1px solid #ccc; border-radius: 12px; cursor: pointer;" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>View overview as slide</button>
+                        </div>
+
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.85rem; color: #666; font-family: monospace;">
+                            <div style="margin-bottom: 8px; color: #333;">CarTiMapper Core ${APP_VERSION}</div>
+                            <div style="margin-bottom: 8px;">URL Params: ${paramsList}</div>
+                            <div style="margin-bottom: 8px;">Data Source: ${aboutData ? aboutData.rawSource : 'None'}</div>
+                            <div style="margin-top: 15px; color: #333;">Usage Instructions:</div>
+                            <ul style="margin-top: 5px; padding-left: 20px;">
+                                <li>Scroll or swipe media to view galleries.</li>
+                                <li>Map and Timeline automatically sync to the active record.</li>
+                                <li>Timeline 🔓/🔒 locks automatic zooming during navigation.</li>
+                                <li>☰ Menu adjusts spatial and temporal formatting.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+        MODULE_VERSIONS['ContentSlider'] = 'v3.19.0';
+        // === [ END MAJOR BLOCK: ContentSlider v3.19.0 ] ===
+
+        // === [ MAJOR BLOCK: TimelineScrubber v23.17.0 ] ===
+        const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan }) => {
+            const wrapperRef = useRef(null);
+            const [zoomLevel, setZoomLevel] = useState(1);
+            const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
+            const touchZoomRef = useRef({ initialDist: 0, initialZoom: 1 });
+            const prevActiveIndexRef = useRef(-1);
+            const scrollTargetRef = useRef(null);
+            const scrollTimeout = useRef(null);
+            
+            const [containerHeight, setContainerHeight] = useState(200);
+            const [viewLeftEdge, setViewLeftEdge] = useState(0);
+
+            useEffect(() => {
+                const measure = () => { if (wrapperRef.current) setContainerHeight(wrapperRef.current.clientHeight); };
+                measure();
+                window.addEventListener('resize', measure);
+                return () => window.removeEventListener('resize', measure);
+            }, []);
+
+            const getParsedTags = (rawTagsArray) => {
+                if (!rawTagsArray || rawTagsArray.length === 0) return ['Untagged'];
+                const splitRegex = /[\r\n]+|\\n/;
+                let arr = [];
+                rawTagsArray.forEach(t => {
+                    if (typeof t === 'string') arr.push(...t.split(splitRegex));
+                    else arr.push(t);
+                });
+                arr = arr.map(s => String(s).trim()).filter(Boolean);
+                return arr.length > 0 ? arr : ['Untagged'];
+            };
+
+            const tagsMap = new Set();
+            const tagPairs = [];
+            data.forEach(d => {
+                if(!d.startDate || isNaN(d.startDate.getTime())) return;
+                const t = getParsedTags(d.tags);
+                t.forEach(tag => tagsMap.add(tag));
+                for(let i=0; i<t.length-1; i++) tagPairs.push([t[i], t[i+1]]);
+            });
+
+            let orderedTags = [];
+            const remaining = Array.from(tagsMap);
+            if (remaining.length > 0) orderedTags.push(remaining.shift());
+            
+            while(remaining.length > 0) {
+                let placed = false;
+                for (let i = 0; i < remaining.length; i++) {
+                    const r = remaining[i];
+                    const pairedWithFirst = tagPairs.some(p => (p[0]===r && p[1]===orderedTags[0]) || (p[1]===r && p[0]===orderedTags[0]));
+                    const pairedWithLast = tagPairs.some(p => (p[0]===r && p[1]===orderedTags[orderedTags.length-1]) || (p[1]===r && p[0]===orderedTags[orderedTags.length-1]));
+                    if (pairedWithLast) { orderedTags.push(r); remaining.splice(i, 1); placed = true; break; }
+                    if (pairedWithFirst) { orderedTags.unshift(r); remaining.splice(i, 1); placed = true; break; }
+                }
+                if (!placed) orderedTags.push(remaining.shift());
+            }
+
+            const availableLanesHeight = Math.max(containerHeight - 38, 50); 
+            const laneHeight = Math.max(24, availableLanesHeight / (orderedTags.length || 1));
+
+            const validData = data.filter(d => d.startDate && !isNaN(d.startDate.getTime()));
+            const minTimeRaw = validData.length > 0 ? validData[0].startDate.getTime() : new Date().getTime();
+            let maxTimeRaw = minTimeRaw;
+            validData.forEach(d => { if (d.endDate && !isNaN(d.endDate.getTime()) && d.endDate.getTime() > maxTimeRaw) maxTimeRaw = d.endDate.getTime(); else if (d.startDate.getTime() > maxTimeRaw) maxTimeRaw = d.startDate.getTime(); });
+            
+            const rawTimeRange = Math.max(maxTimeRaw - minTimeRaw, 86400000); 
+            const padMs = rawTimeRange * 0.05; 
+            const renderMinTime = minTimeRaw - padMs;
+            const renderMaxTime = maxTimeRaw + padMs;
+            const renderTimeRange = renderMaxTime - renderMinTime;
+
+            const measureTextWidth = (text) => {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                context.font = '400 12px "Noto Sans", sans-serif'; 
+                return context.measureText(text).width;
+            };
+
+            const formatLabelSmart = (titleStr) => {
+                const maxPx = 300; 
+                const words = titleStr.split(' ');
+                let targetLines = words.length > 1 ? (measureTextWidth(titleStr) > 280 ? 3 : 2) : 1;
+                if (targetLines === 1) return { lines: [titleStr], pxWidth: measureTextWidth(titleStr) + 35 };
+
+                let bestSplit = []; let bestScore = Infinity;
+                if (targetLines === 2) {
+                    for (let i = 1; i < words.length; i++) {
+                        let l1 = words.slice(0, i).join(' '), l2 = words.slice(i).join(' ');
+                        let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2);
+                        let score = Math.max(w1, w2) + Math.abs(w1 - w2) * 0.8; 
+                        if (score < bestScore) { bestScore = score; bestSplit = [l1, l2]; }
+                    }
+                } else {
+                    for (let i = 1; i < words.length - 1; i++) {
+                        for (let j = i + 1; j < words.length; j++) {
+                            let l1 = words.slice(0, i).join(' '), l2 = words.slice(i, j).join(' '), l3 = words.slice(j).join(' ');
+                            let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2), w3 = measureTextWidth(l3);
+                            let maxW = Math.max(w1, w2, w3), minW = Math.min(w1, w2, w3);
+                            let score = maxW + (maxW - minW) * 0.8;
+                            if (score < bestScore) { bestScore = score; bestSplit = [l1, l2, l3]; }
+                        }
+                    }
+                }
+                let lines = bestSplit.length ? bestSplit : [titleStr];
+                if (lines.length === 3) { let last = lines[2]; if (measureTextWidth(last) > maxPx) { while(measureTextWidth(last + '...') > maxPx && last.length > 0) last = last.slice(0, -1); lines[2] = last.trim() + '...'; } }
+                else if (lines.length === 2) { let last = lines[1]; if (measureTextWidth(last) > maxPx * 1.3) { while(measureTextWidth(last + '...') > maxPx * 1.3 && last.length > 0) last = last.slice(0, -1); lines[1] = last.trim() + '...'; } }
+
+                const finalMaxW = Math.max(...lines.map(l => measureTextWidth(l)));
+                return { lines, pxWidth: Math.max(60, finalMaxW + 35) };
+            };
+
+            // [FIX: UI-69] Compressed Timeline Telemetry String
+            useEffect(() => {
+                const visibleMs = renderTimeRange / zoomLevel;
+                const secs = visibleMs / 1000; const mins = secs / 60; const hrs = mins / 60;
+                const days = hrs / 24; const mos = days / 30.44; const yrs = days / 365.25;
+                
+                let str = `${Math.round(mins)} Minutes`;
+                if (yrs >= 1) str = `${Math.round(yrs)} Years`;
+                else if (mos >= 1) str = `${Math.round(mos)} Months`;
+                else if (days >= 1) str = `${Math.round(days)} Days`;
+                else if (hrs >= 1) str = `${Math.round(hrs)} Hours`;
+                
+                setVisibleTimeSpan(`Span: ${str}`);
+            }, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
+
+            useEffect(() => {
+                const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+                if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
+                    const sT = validData[activeDataIndex].startDate.getTime();
+                    const { pxWidth } = formatLabelSmart(stripHTML(validData[activeDataIndex].title));
+                    const containerW = wrapperRef.current.clientWidth || 1000;
+                    const targetTrackW = Math.max(containerW, containerW * zoomLevel);
+                    const sPct = (sT - renderMinTime) / renderTimeRange;
+                    const visualCenterPx = (sPct * targetTrackW) + (pxWidth / 2);
+                    const scrollPos = visualCenterPx - (containerW / 2);
+                    
+                    wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
+                    setViewLeftEdge(Math.max(0, scrollPos));
+                }
+            }, [activeIndex]);
+
+            useEffect(() => {
+                if (validData.length > 1 && wrapperRef.current && !dragRef.current.isDragging) {
+                    if (activeIndex !== prevActiveIndexRef.current) {
+                        prevActiveIndexRef.current = activeIndex;
+                        
+                        if (zoomLock === 'hard') return; 
+                        if (zoomLock === 'soft') setZoomLock('auto'); 
+
+                        const timeoutId = setTimeout(() => {
+                            const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+                            if (activeDataIndex >= 0) {
+                                let startIdx = Math.max(0, activeDataIndex - 2);
+                                let endIdx = Math.min(validData.length - 1, activeDataIndex + 2);
+                                
+                                let clusterMin = validData[startIdx].startDate.getTime();
+                                let clusterMax = validData[endIdx].startDate.getTime();
+                                
+                                for (let i = startIdx; i <= endIdx; i++) {
+                                    if (validData[i].endDate && !isNaN(validData[i].endDate.getTime())) clusterMax = Math.max(clusterMax, validData[i].endDate.getTime());
+                                    clusterMax = Math.max(clusterMax, validData[i].startDate.getTime());
+                                    clusterMin = Math.min(clusterMin, validData[i].startDate.getTime());
+                                }
+                                
+                                const safeSpan = Math.max(clusterMax - clusterMin, 1800000); 
+                                const idealZoom = (0.6 * renderTimeRange) / safeSpan;
+                                const clampedZoom = Math.min(Math.max(1, idealZoom), 300); 
+                                
+                                const sT = validData[activeDataIndex].startDate.getTime();
+                                const { pxWidth } = formatLabelSmart(stripHTML(validData[activeDataIndex].title));
+                                const containerW = wrapperRef.current.clientWidth || 1000;
+                                const targetTrackW = Math.max(containerW, containerW * clampedZoom);
+                                const sPct = (sT - renderMinTime) / renderTimeRange;
+                                const visualCenterPx = (sPct * targetTrackW) + (pxWidth / 2);
+                                scrollTargetRef.current = visualCenterPx - (containerW / 2);
+
+                                setZoomLevel(clampedZoom); 
+                            }
+                        }, 500); 
+                        return () => clearTimeout(timeoutId);
+                    }
+                }
+            }, [activeIndex, data, zoomLock, setZoomLock]); 
+
+            useLayoutEffect(() => {
+                if (scrollTargetRef.current !== null && wrapperRef.current) {
+                    wrapperRef.current.scrollTo({ left: scrollTargetRef.current, behavior: 'auto' });
+                    setViewLeftEdge(Math.max(0, scrollTargetRef.current));
+                    scrollTargetRef.current = null;
+                }
+            }, [zoomLevel]);
+
+            const handleManualZoom = (newZoom, centerType = 'center', eventX = 0) => {
+                if (!wrapperRef.current) return;
+                const containerW = wrapperRef.current.clientWidth;
+                const scrollPos = wrapperRef.current.scrollLeft;
+                const currentTrackW = Math.max(containerW, containerW * zoomLevel);
+                
+                let anchorPx = scrollPos + (containerW / 2); 
+                if (centerType === 'mouse') anchorPx = scrollPos + eventX;
+
+                const centerPct = anchorPx / currentTrackW;
+                const newTrackW = Math.max(containerW, containerW * newZoom);
+                const newAnchorPx = centerPct * newTrackW;
+                
+                scrollTargetRef.current = newAnchorPx - (centerType === 'mouse' ? eventX : (containerW / 2));
+                setZoomLevel(newZoom);
+            };
+
+            const doManualZoom = (direction) => {
+                if (zoomLock !== 'hard') setZoomLock('soft');
+                const newZoom = direction === 'in' ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1);
+                handleManualZoom(newZoom, 'center');
+            };
+            const toggleHardLock = () => { setZoomLock(p => p === 'hard' ? 'auto' : 'hard'); };
+
+            const onDown = (e) => { 
+                if (zoomLock !== 'hard') setZoomLock('soft');
+                if (e.touches && e.touches.length === 2) {
+                    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    touchZoomRef.current = { initialDist: dist, initialZoom: zoomLevel }; return;
+                }
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                dragRef.current = { isDragging: true, startX: x - wrapperRef.current.offsetLeft, scrollLeft: wrapperRef.current.scrollLeft }; 
+                wrapperRef.current.classList.add('is-dragging'); 
+            };
+            const onUp = () => { 
+                dragRef.current.isDragging = false; 
+                wrapperRef.current?.classList.remove('is-dragging'); 
+                if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft);
+            };
+            const onMove = (e) => {
+                if (e.touches && e.touches.length === 2) {
+                    e.preventDefault(); 
+                    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    const scale = dist / touchZoomRef.current.initialDist;
+                    handleManualZoom(Math.min(Math.max(touchZoomRef.current.initialZoom * scale, 1), 500), 'center'); return;
+                }
+                if (!dragRef.current.isDragging) return;
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                if (!e.touches) e.preventDefault(); 
+                wrapperRef.current.scrollLeft = dragRef.current.scrollLeft - ((x - wrapperRef.current.offsetLeft - dragRef.current.startX) * 2);
+            };
+            const onWheel = (e) => {
+                e.preventDefault();
+                if (zoomLock !== 'hard') setZoomLock('soft');
+                const newZoom = e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1);
+                const rect = wrapperRef.current.getBoundingClientRect();
+                const eventX = e.clientX - rect.left;
+                handleManualZoom(newZoom, 'mouse', eventX);
+            };
+
+            const onScroll = (e) => {
+                if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+                scrollTimeout.current = setTimeout(() => {
+                    if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft);
+                }, 100);
+            };
+
+            if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
+
+            const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+            const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+            const visibleMs = renderTimeRange / zoomLevel;
+            const msPerPixel = renderTimeRange / trackWidthPx;
+            
+            const targetMsPerMajorTick = (200 / containerW) * visibleMs; 
+            const SECOND = 1000; const MINUTE = 60 * SECOND; const HOUR = 60 * MINUTE; 
+            const DAY = 24 * HOUR; const MONTH = 30 * DAY; const YEAR = 365.25 * DAY;
+
+            const scaleConfigs = [
+                { ms: 1000 * YEAR, type: 'year', step: 1000, minorType: 'year', minorStep: 100 },
+                { ms: 100 * YEAR, type: 'year', step: 100, minorType: 'year', minorStep: 10 },
+                { ms: 10 * YEAR, type: 'year', step: 10, minorType: 'year', minorStep: 1 },
+                { ms: YEAR, type: 'year', step: 1, minorType: 'month', minorStep: 1 },
+                { ms: 6 * MONTH, type: 'month', step: 6, minorType: 'month', minorStep: 1 },
+                { ms: 3 * MONTH, type: 'month', step: 3, minorType: 'month', minorStep: 1 },
+                { ms: MONTH, type: 'month', step: 1, minorType: 'day', minorStep: 5 },
+                { ms: 7 * DAY, type: 'day', step: 7, minorType: 'day', minorStep: 1 },
+                { ms: 2 * DAY, type: 'day', step: 2, minorType: 'hour', minorStep: 12 },
+                { ms: DAY, type: 'day', step: 1, minorType: 'hour', minorStep: 4 },
+                { ms: 12 * HOUR, type: 'hour', step: 12, minorType: 'hour', minorStep: 2 },
+                { ms: 6 * HOUR, type: 'hour', step: 6, minorType: 'hour', minorStep: 1 },
+                { ms: HOUR, type: 'hour', step: 1, minorType: 'minute', minorStep: 15 },
+                { ms: 30 * MINUTE, type: 'minute', step: 30, minorType: 'minute', minorStep: 5 },
+                { ms: 15 * MINUTE, type: 'minute', step: 15, minorType: 'minute', minorStep: 1 },
+                { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 15 }
+            ];
+
+            let activeScale = scaleConfigs[0];
+            for (let c of scaleConfigs) { if (targetMsPerMajorTick <= c.ms) activeScale = c; }
+
+            const rulerTicks = [];
+            let iterDate = new Date(renderMinTime);
+            iterDate.setMilliseconds(0);
+            
+            if (activeScale.type === 'year') { iterDate.setMonth(0, 1); iterDate.setHours(0,0,0); iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step); }
+            else if (activeScale.type === 'month') { iterDate.setDate(1); iterDate.setHours(0,0,0); iterDate.setMonth(Math.floor(iterDate.getMonth() / activeScale.step) * activeScale.step); }
+            else if (activeScale.type === 'day') { iterDate.setHours(0,0,0); }
+            else if (activeScale.type === 'hour') { iterDate.setMinutes(0,0); iterDate.setHours(Math.floor(iterDate.getHours() / activeScale.step) * activeScale.step); }
+            else if (activeScale.type === 'minute') { iterDate.setSeconds(0); iterDate.setMinutes(Math.floor(iterDate.getMinutes() / activeScale.step) * activeScale.step); }
+
+            let safety = 0;
+            
+            let expectedVisibleMinWithBuffer = renderMinTime + ((viewLeftEdge + 60) / trackWidthPx) * renderTimeRange;
+            let firstVisibleMajorTickTime = null;
+            let firstVisibleMajorTickPx = -1;
+
+            while (iterDate.getTime() <= renderMaxTime && safety < 2000) {
+                safety++;
+                const t = iterDate.getTime();
+                
+                if (t >= renderMinTime) {
+                    const pctLeft = ((t - renderMinTime) / renderTimeRange) * 100;
+                    const currentTickPx = (pctLeft / 100) * trackWidthPx;
+                    let label = '';
+                    let isFirstVisibleMajor = false;
+                    
+                    if (t >= expectedVisibleMinWithBuffer && firstVisibleMajorTickTime === null) {
+                        firstVisibleMajorTickTime = t;
+                        firstVisibleMajorTickPx = currentTickPx;
+                        isFirstVisibleMajor = true;
+                    }
+
+                    if (isFirstVisibleMajor) {
+                        label = iterDate.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: (activeScale.type==='hour'||activeScale.type==='minute')?'2-digit':undefined, minute: (activeScale.type==='hour'||activeScale.type==='minute')?'2-digit':undefined });
+                    } else {
+                        if (activeScale.type === 'year') label = iterDate.getFullYear();
+                        else if (activeScale.type === 'month') label = iterDate.toLocaleString('en-GB', { month: 'short', year: 'numeric' });
+                        else if (activeScale.type === 'day') label = iterDate.toLocaleString('en-GB', { day: 'numeric', month: 'short' });
+                        else if (activeScale.type === 'hour' || activeScale.type === 'minute') label = iterDate.toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    rulerTicks.push(html`
+                        <div class="timeline-ruler-tick" style="left: ${pctLeft}%; position: absolute; bottom: 3px; display: flex; flex-direction: column; align-items: center; z-index: 6; transform: translateX(-50%);">
+                            <div style="width: 2px; height: 10px; background: #666; margin-bottom: 2px;"></div>
+                            <div style="font-size: 0.75rem; color: #444; white-space: nowrap;">${label}</div>
+                        </div>
+                    `);
+                }
+
+                let nextMajor = new Date(iterDate);
+                if (activeScale.type === 'year') nextMajor.setFullYear(nextMajor.getFullYear() + activeScale.step);
+                else if (activeScale.type === 'month') nextMajor.setMonth(nextMajor.getMonth() + activeScale.step);
+                else if (activeScale.type === 'day') nextMajor.setDate(nextMajor.getDate() + activeScale.step);
+                else if (activeScale.type === 'hour') nextMajor.setHours(nextMajor.getHours() + activeScale.step);
+                else if (activeScale.type === 'minute') nextMajor.setMinutes(nextMajor.getMinutes() + activeScale.step);
+
+                let minorIter = new Date(iterDate);
+                let minorSafety = 0;
+                while (minorSafety < 100) {
+                    minorSafety++;
+                    if (activeScale.minorType === 'year') minorIter.setFullYear(minorIter.getFullYear() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'month') minorIter.setMonth(minorIter.getMonth() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'day') minorIter.setDate(minorIter.getDate() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'hour') minorIter.setHours(minorIter.getHours() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'minute') minorIter.setMinutes(minorIter.getMinutes() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'second') minorIter.setSeconds(minorIter.getSeconds() + activeScale.minorStep);
+
+                    if (minorIter.getTime() >= nextMajor.getTime()) break;
+                    
+                    const minorT = minorIter.getTime();
+                    if (minorT >= renderMinTime && minorT <= renderMaxTime) {
+                        const mPct = ((minorT - renderMinTime) / renderTimeRange) * 100;
+                        const minorTickPx = (mPct / 100) * trackWidthPx;
+                        const gapPx = minorTickPx - ((t - renderMinTime) / renderTimeRange) * trackWidthPx; 
+
+                        let hideMinor = false;
+                        if (firstVisibleMajorTickPx !== -1 && minorTickPx >= firstVisibleMajorTickPx - 65 && minorTickPx <= firstVisibleMajorTickPx + 65) {
+                            hideMinor = true;
+                        }
+
+                        if (!hideMinor && gapPx > 15) { 
+                            let minorLabel = '';
+                            
+                            if (gapPx > 45) { 
+                                if (activeScale.minorType === 'year') minorLabel = minorIter.getFullYear();
+                                else if (activeScale.minorType === 'month') minorLabel = minorIter.toLocaleString('en-GB', { month: 'short' });
+                                else if (activeScale.minorType === 'day') minorLabel = minorIter.getDate();
+                                else if (activeScale.minorType === 'hour' || activeScale.minorType === 'minute') minorLabel = minorIter.toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                                else if (activeScale.minorType === 'second') minorLabel = minorIter.toLocaleString('en-GB', { second: '2-digit' }) + 's';
+                            }
+
+                            const labelHtml = minorLabel ? html`<div style="position: absolute; left: -20px; right: -20px; top: 7px; text-align: center; font-size: 0.6rem; color: #888;">${minorLabel}</div>` : '';
+                            rulerTicks.push(html`<div style="position: absolute; left: ${mPct}%; top: 0; width: 1px; height: ${minorLabel ? '7px' : '5px'}; background: #aaa; z-index: 4;">${labelHtml}</div>`);
+                        }
+                    }
+                }
+                iterDate = nextMajor;
+            }
+
+            const markers = validData.map((item, index) => {
+                const globalIndex = data.findIndex(d => d.id === item.id);
+                const startPct = Number((((item.startDate.getTime() - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+                let endPct = startPct;
+                if (item.endDate && !isNaN(item.endDate.getTime()) && item.endDate.getTime() > item.startDate.getTime()) endPct = Number((((item.endDate.getTime() - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+                const hasDuration = (endPct - startPct) > 0.001;
+                
+                const isActive = globalIndex === activeIndex;
+
+                const activeTags = getParsedTags(item.tags);
+                const tagIndices = activeTags.map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
+                
+                const minIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
+                const maxIdx = tagIndices.length > 0 ? Math.max(...tagIndices) : 0;
+                
+                const topPos = (minIdx * laneHeight) + 5;
+                const blockHeight = (maxIdx - minIdx + 1) * laneHeight; 
+                const distanceToAxis = (containerHeight - 28) - topPos; 
+
+                let activeAnchor = '';
+                if (isActive) {
+                    if (hasDuration) {
+                        activeAnchor = html`
+                            <div style="position: absolute; left: 0; top: 50%; height: ${distanceToAxis - (blockHeight / 2)}px; width: 2px; background: #007acc; z-index: 999;"></div>
+                            <div style="position: absolute; top: ${distanceToAxis - 16}px; left: 0; width: 100%; min-width: 2px; height: 16px; background: rgba(0,122,204,0.3); clip-path: polygon(0 0, 100% calc(100% - 5px), 100% 100%, 0 100%); filter: drop-shadow(0 2px 2px rgba(0,122,204,0.4)); z-index: 998;"></div>
+                        `;
+                    } else {
+                        activeAnchor = html`
+                            <div style="position: absolute; left: 0; top: 50%; height: ${distanceToAxis - (blockHeight / 2)}px; width: 2px; background: #007acc; z-index: 999;"></div>
+                            <div style="position: absolute; top: ${distanceToAxis - 4}px; left: -3px; width: 6px; height: 6px; border-radius: 50%; background: #007acc; border: 1px solid #fff; z-index: 998; box-sizing: content-box;"></div>
+                        `;
+                    }
+                }
+
+                const { lines, pxWidth } = formatLabelSmart(stripHTML(item.title));
+                const groupWidth = hasDuration ? `width: ${endPct - startPct}%; min-width: 4px;` : `width: ${pxWidth}px;`;
+
+                return html`
+                    <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: ${startPct}%; top: ${topPos}px; height: ${blockHeight}px; ${groupWidth}" onClick=${() => setActiveIndex(globalIndex)}>
+                        ${activeAnchor}
+                        <div class="event-block" style="position: absolute; top: 50%; transform: translateY(-50%); left: 0; --lane-h: ${laneHeight}px; background: ${isActive ? '#007acc' : '#f4f4f5'}; color: ${isActive ? '#fff' : '#444'}; z-index: 5; width: ${pxWidth}px;">
+                            <div class="event-text">${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const timelineX = Math.round(zoomLevel) + 'x';
+
+            // [FIX: UI-68] Custom SVG padlocks
+            return html`
+                <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column;">
+                    <div class="timeline-leaflet-controls">
+                        <div class="timeline-leaflet-btn" onClick=${() => doManualZoom('in')} title="Zoom In">+</div>
+                        <div class="timeline-leaflet-text" title="1x fits all data to screen">${timelineX}</div>
+                        
+                        <div class="timeline-leaflet-btn" style="display: flex; align-items: center; justify-content: center;" onClick=${toggleHardLock} title="Toggle Auto-Zoom Lock">
+                            ${zoomLock === 'hard' 
+                                ? html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
+                                : html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`
+                            }
+                        </div>
+                        
+                        <div class="timeline-leaflet-btn" onClick=${() => doManualZoom('out')} title="Zoom Out">-</div>
+                    </div>
+
+                    <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
+                        <div class="timeline-track-container" style="width: ${trackWidthPx}px; flex-shrink: 0; min-width: 100%; height: 100%;">
+                            <div style="position: absolute; top: 5px; left: 0; right: 0; bottom: 33px; pointer-events: none; z-index: 0;">
+                                ${orderedTags.map((tag, i) => html`
+                                    <div class="tag-lane" style="top: ${i * laneHeight}px; height: ${laneHeight}px; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'transparent'};">
+                                        <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; pointer-events: auto;">${tag}</div>
+                                    </div>
+                                `)}
+                            </div>
+                            <div class="timeline-axis">${rulerTicks}</div>
+                            ${markers}
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+        MODULE_VERSIONS['TimelineScrubber'] = 'v23.17.0';
+        // === [ END MAJOR BLOCK: TimelineScrubber v23.17.0 ] ===
+
+        // === [ MAJOR BLOCK: AppOrchestrator v1.48.0 ] ===
+        const App = () => {
+            const [logs, setLogs] = useState([]);
+            const [rawCsvRows, setRawCsvRows] = useState([]);
+            const [data, setData] = useState([]);
+            const [aboutData, setAboutData] = useState(null); 
+            const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
+            const [activeIndex, setActiveIndex] = useState(0); 
+            const [slideHistory, setSlideHistory] = useState([]);
+            const [isMonitorOpen, setIsMonitorOpen] = useState(false); 
+            const [isAboutOpen, setIsAboutOpen] = useState(false);
+            const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+            const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
+            
+            // [FIX: CMS-07] Added DefaultOpacity to Schema
+            const DEFAULT_BASEMAPS = [
+                { id: 'carto-light', label: 'CartoDB Light', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', maxZoom: 19, active: true, attrText: '© CartoDB', attrLink: 'https://carto.com/attributions', defaultOpacity: 1.0 },
+                { id: 'esri-street', label: 'Esri World Street', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
+                { id: 'esri-sat', label: 'Esri Satellite', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
+                { id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', maxZoom: 19, active: false, attrText: '© OpenStreetMap', attrLink: 'https://openstreetmap.org/copyright', defaultOpacity: 1.0 },
+                { id: 'topo', label: 'OpenTopoMap', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', maxZoom: 17, active: false, attrText: '© OpenTopoMap', attrLink: 'https://opentopomap.org', defaultOpacity: 1.0 },
+                { id: 'athens-1944', label: 'Athens 1944 (GSGS)', type: 'overlay', url: 'https://allmaps.xyz/images/59dc92d35e7d424b/{z}/{x}/{y}@2x.png', maxZoom: 21, active: true, attrText: '© GSGS, Princeton Univ.', attrLink: 'https://maps.princeton.edu/catalog/princeton-gt54kq43t', defaultOpacity: 0.8 }
+            ];
+            const [basemapsRegistry, setBasemapsRegistry] = useState(DEFAULT_BASEMAPS);
+            
+            const [maxAutoZoom, setMaxAutoZoom] = useState(15);
+            const [minimapOffset, setMinimapOffset] = useState(-4); 
+            const [zoomLock, setZoomLock] = useState('auto'); 
+            const [visibleTimeSpan, setVisibleTimeSpan] = useState('');
+            const [showButtonText, setShowButtonText] = useState(false);
+
+            const hasInitializedRef = useRef(false);
+            const appRef = useRef(null);
+
+            const addLog = (msg, type = 'info') => setLogs(p => [...p, { time: new Date().toLocaleTimeString('en-US', { hour12: false }), msg, type }]);
+
+            const getOmniParam = (key) => {
+                const searchParams = new URLSearchParams(window.location.search);
+                let val = searchParams.get(key) || searchParams.get(`amp;${key}`);
+                if (val) return val;
+                
+                const hash = window.location.hash.replace(/^#\/?\??/, '');
+                const hashParams = new URLSearchParams(hash);
+                return hashParams.get(key) || hashParams.get(`amp;${key}`);
+            };
+
+            const jumpToSlide = (newIdx, isSequential = false) => {
+                if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
+                    if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
+                    setActiveIndex(newIdx);
+                }
+            };
+
+            const goBack = () => {
+                if (slideHistory.length > 0) {
+                    const prev = slideHistory[slideHistory.length - 1];
+                    setSlideHistory(h => h.slice(0, -1));
+                    setActiveIndex(prev);
+                }
+            };
+
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+                    if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
+                    else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [activeIndex, data.length]);
+
+            useEffect(() => {
+                const updateAppHeight = () => {
+                    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+                };
+                updateAppHeight(); 
+
+                let wasDesktop = window.innerWidth >= 1024;
+                const handleResize = () => {
+                    updateAppHeight(); 
+                    const isDesktop = window.innerWidth >= 1024;
+                    if (isDesktop !== wasDesktop) {
+                        if (appRef.current) {
+                            appRef.current.style.setProperty('--primary-split', '50%');
+                            appRef.current.style.setProperty('--secondary-split', '50%');
+                            window.dispatchEvent(new Event('resize')); 
+                        }
+                        wasDesktop = isDesktop;
+                    }
+                };
+                window.addEventListener('resize', handleResize);
+                return () => window.removeEventListener('resize', handleResize);
+            }, []);
+
+            const startPrimaryResize = (e) => {
+                const startX = e.touches ? e.touches[0].clientX : e.clientX;
+                const startY = e.touches ? e.touches[0].clientY : e.clientY;
+                const isDesktop = window.innerWidth >= 1024;
+                const containerNode = appRef.current.querySelector('.core-viewports');
+                const startVal = isDesktop ? appRef.current.querySelector('.content-slider-pane').offsetWidth : appRef.current.querySelector('.visual-pane').offsetHeight;
+                const containerSize = isDesktop ? containerNode.offsetWidth : containerNode.offsetHeight;
+
+                const onMove = (e2) => {
+                    const currentX = e2.touches ? e2.touches[0].clientX : e2.clientX;
+                    const currentY = e2.touches ? e2.touches[0].clientY : e2.clientY;
+                    const delta = isDesktop ? (currentX - startX) : (currentY - startY);
+                    let pct = ((startVal + delta) / containerSize) * 100;
+                    if (pct < 15) pct = 15; if (pct > 85) pct = 85;
+                    appRef.current.style.setProperty('--primary-split', `${pct}%`);
+                };
+                const onUp = () => { 
+                    document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); 
+                    document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp);
+                    window.dispatchEvent(new Event('resize')); 
+                };
+                document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+                document.addEventListener('touchmove', onMove, { passive: false }); document.addEventListener('touchend', onUp);
+            };
+
+            const startSecondaryResize = (e) => {
+                const startX = e.touches ? e.touches[0].clientX : e.clientX;
+                const startY = e.touches ? e.touches[0].clientY : e.clientY;
+                const isDesktop = window.innerWidth >= 1024;
+                const containerNode = appRef.current.querySelector('.visual-pane');
+                const startVal = isDesktop ? appRef.current.querySelector('.map-pane').offsetHeight : appRef.current.querySelector('.map-pane').offsetWidth;
+                const containerSize = isDesktop ? containerNode.offsetHeight : containerNode.offsetWidth;
+
+                const onMove = (e2) => {
+                    const currentX = e2.touches ? e2.touches[0].clientX : e2.clientX;
+                    const currentY = e2.touches ? e2.touches[0].clientY : e2.clientY;
+                    const delta = isDesktop ? (currentY - startY) : (currentX - startX);
+                    let pct = ((startVal + delta) / containerSize) * 100;
+                    if (pct < 10) pct = 10; if (pct > 90) pct = 90;
+                    appRef.current.style.setProperty('--secondary-split', `${pct}%`);
+                };
+                const onUp = () => { 
+                    document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); 
+                    document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp);
+                    window.dispatchEvent(new Event('resize')); 
+                };
+                document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+                document.addEventListener('touchmove', onMove, { passive: false }); document.addEventListener('touchend', onUp);
+            };
+
+            const startTimelineResize = (e) => {
+                const startY = e.touches ? e.touches[0].clientY : e.clientY;
+                const startHeight = appRef.current.querySelector('.timeline-pane').offsetHeight;
+                const containerHeight = appRef.current.offsetHeight;
+
+                const onMove = (e2) => {
+                    const currentY = e2.touches ? e2.touches[0].clientY : e2.clientY;
+                    const delta = currentY - startY; 
+                    let pct = ((startHeight - delta) / containerHeight) * 100;
+                    if (pct < 10) pct = 10; if (pct > 60) pct = 60;
+                    appRef.current.style.setProperty('--timeline-height', `${pct}%`);
+                };
+                const onUp = () => { 
+                    document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); 
+                    document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onUp);
+                    window.dispatchEvent(new Event('resize')); 
+                };
+                document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+                document.addEventListener('touchmove', onMove, { passive: false }); document.addEventListener('touchend', onUp);
+            };
+
+            useEffect(() => {
+                const gid = getOmniParam('gid') || '0'; 
+                const bgid = getOmniParam('bgid'); 
+                const source = getOmniParam('source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+                
+                setStatus({ text: 'Fetching CMS Manifests...', progress: 30, isFading: false, active: false });
+
+                const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+                const primaryFetch = fetch(fetchUrlPrimary).then(res => res.text());
+                
+                let basemapsFetch = Promise.resolve(null);
+                if (bgid) {
+                    const fetchUrlBasemaps = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}`;
+                    basemapsFetch = fetch(fetchUrlBasemaps).then(res => res.text()).catch(e => { console.warn("Basemaps CMS Fetch Failed", e); return null; });
+                }
+
+                Promise.all([primaryFetch, basemapsFetch]).then(([csvPrimary, csvBasemaps]) => {
+                    setStatus({ text: 'Parsing Data...', progress: 60, isFading: false, active: false });
+                    
+                    if (csvBasemaps) {
+                        Papa.parse(csvBasemaps, { header: true, skipEmptyLines: true, complete: (res) => {
+                            const parsedBMs = res.data.map(row => {
+                                const norm = {}; for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                                const isActive = /^(true|yes)$/i.test(String(norm.active || '').trim());
+                                // [FIX: CMS-07] Parsing the float
+                                const rawOpac = parseFloat(norm.defaultopacity);
+                                return {
+                                    id: norm.id || '', label: norm.label || '', type: norm.type?.toLowerCase() === 'overlay' ? 'overlay' : 'base', 
+                                    url: norm.url || '', maxZoom: parseInt(norm.maxzoom, 10) || 19, 
+                                    active: isActive, attrText: norm.attrtext || '', attrLink: norm.attrlink || '',
+                                    defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac
+                                };
+                            }).filter(b => b.id && b.url);
+
+                            if (parsedBMs.length > 0) {
+                                setBasemapsRegistry(prev => {
+                                    const merged = [...prev];
+                                    parsedBMs.forEach(bm => {
+                                        const existIdx = merged.findIndex(m => m.id === bm.id);
+                                        if (existIdx >= 0) merged[existIdx] = bm; else merged.push(bm);
+                                    });
+                                    return merged;
+                                });
+                            }
+                        }});
+                    }
+
+                    Papa.parse(csvPrimary, { header: true, skipEmptyLines: true, complete: (results) => { 
+                        const firstRowNorm = {};
+                        if (results.data[0]) {
+                            for (let k in results.data[0]) firstRowNorm[k.toLowerCase().trim()] = results.data[0][k];
+                        }
+                        const exactGet = (normObj, key) => { const val = normObj[key]; return val !== undefined && val !== null ? String(val).trim() : ""; };
+                        setAboutData({ 
+                            title: exactGet(firstRowNorm, 'title') || 'About', 
+                            description: exactGet(firstRowNorm, 'description') || 'No project description provided.',
+                            rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source
+                        });
+                        setRawCsvRows(results.data); 
+                    }});
+                }).catch(err => {
+                    console.error("Fatal CMS Error", err);
+                    setStatus({ text: 'Error Loading Data', progress: 100, isFading: false, active: false });
+                });
+            }, []);
+
+            useEffect(() => {
+                if (rawCsvRows.length === 0) return;
+                const exactGet = (normObj, key) => { const val = normObj[key]; return val !== undefined && val !== null ? String(val).trim() : ""; };
+                const omniSplitRegex = /[\r\n]+|\\n/;
+
+                const cleaned = rawCsvRows.map((row, index) => {
+                    const norm = {}; for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                    const dynamicDateParse = (str) => {
+                        if (!str) return null;
+                        const parts = str.split(' ');
+                        if (parts.length < 1) return null;
+                        const dParts = parts[0].split(/[/\-.]/);
+                        const tParts = parts[1] ? parts[1].split(':') : [0,0,0];
+                        const secParts = String(tParts[2] || '0').split('.');
+                        
+                        const d = parseInt(dParts[0], 10); const m = parseInt(dParts[1], 10) - 1; const y = parseInt(dParts[2], 10);
+                        const h = parseInt(tParts[0], 10); const min = parseInt(tParts[1], 10); const sec = parseInt(secParts[0], 10); const ms = parseInt(secParts[1] || '0', 10);
+
+                        const dateObj = new Date(y, m, d, h, min, sec, ms);
+                        return isNaN(dateObj.getTime()) ? null : dateObj;
+                    };
+
+                    return {
+                        id: index, title: exactGet(norm, 'title'),
+                        startDate: dynamicDateParse(exactGet(norm, 'start')),
+                        endDate: dynamicDateParse(exactGet(norm, 'end')),
+                        description: exactGet(norm, 'description'),
+                        place: exactGet(norm, 'place'), location: exactGet(norm, 'location'), priority: exactGet(norm, 'priority'),
+                        media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
+                        mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
+                        mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
+                        tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(',').map(t => t.trim()).filter(Boolean) : []
+                    };
+                });
+                
+                const valid = cleaned.filter(r => r.startDate).sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+                setData(valid);
+
+                if (!hasInitializedRef.current) {
+                    const paramSlide = getOmniParam('slide');
+                    const paramDate = getOmniParam('date');
+                    let initialIdx = 0;
+
+                    if (paramSlide && !isNaN(parseInt(paramSlide))) {
+                        initialIdx = Math.max(0, Math.min(valid.length - 1, parseInt(paramSlide) - 1));
+                    } else if (paramDate) {
+                        const targetTime = new Date(paramDate).getTime();
+                        if (!isNaN(targetTime)) {
+                            let minDiff = Infinity;
+                            valid.forEach((d, i) => {
+                                if (d.startDate) {
+                                    const diff = Math.abs(d.startDate.getTime() - targetTime);
+                                    if (diff < minDiff) { minDiff = diff; initialIdx = i; }
+                                }
+                            });
+                        }
+                    }
+                    setActiveIndex(initialIdx); 
+                    hasInitializedRef.current = true;
+                }
+
+                setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
+                setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
+
+            }, [rawCsvRows]);
+
+            const CarTiMapperLogo = ({ context, appVersion }) => {
+                const svgIcon = html`
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: auto; display: block;">
+                        <defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs>
+                        <path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#222" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/>
+                        <g fill="#fff" opacity="0.9">
+                            <rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" />
+                            <rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" />
+                            <rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" />
+                            <rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" />
+                        </g>
+                        <g transform="translate(112, 50)">
+                            <path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#444" opacity="0.8"/>
+                            <g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g>
+                            <g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g>
+                            <g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g>
+                            <g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g>
+                            <circle cx="0" cy="0" r="1.5" fill="#fff" />
+                        </g>
+                    </svg>
+                `;
+                if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMapper</div><div class="splash-version">${appVersion}</div></div>`;
+                if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 4px;"><div style="width: 24px; height: 16px; display: flex; align-items: center;">${svgIcon}</div><span style="font-size: 0.8rem; color: #444; letter-spacing: -0.3px;">CarTiMapper</span><span style="font-size: 0.6rem; color: #888; margin-left: 4px;">${appVersion}</span></div>`;
+                return html`<div class="logo-horizontal-about" style="flex-direction: column; align-items: flex-start; gap: 10px;"><div style="width: 200px; height: auto;">${svgIcon}</div></div>`;
+            };
+
+            const activeSlide = data[activeIndex];
+            const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
+
+            return html`
+                <div id="tm-root">
+                    <style>
+                        :root { --primary-split: 50%; --secondary-split: 50%; --timeline-height: 20%; }
+                        .core-viewports { display: flex; flex-grow: 1; height: calc(100% - var(--timeline-height) - 4px); width: 100%; overflow: hidden; }
+                        .visual-pane { display: flex; overflow: hidden; }
+                        .visual-pane.no-media .map-pane { height: 100% !important; width: 100% !important; }
+                        .visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
+                        .visual-pane.no-media .media-pane { display: none !important; }
+                        
+                        .resizer-dyn-primary, .resizer-dyn-secondary, .resizer-dyn-timeline { 
+                            background: #eee; transition: background 0.2s; z-index: 10; flex-shrink: 0; position: relative; 
+                            touch-action: none; 
+                        }
+                        .resizer-dyn-primary::after, .resizer-dyn-secondary::after, .resizer-dyn-timeline::after {
+                            content: ''; position: absolute; top: -18px; bottom: -18px; left: -18px; right: -18px; z-index: 11;
+                        }
+                        
+                        .resizer-dyn-primary:hover, .resizer-dyn-secondary:hover, .resizer-dyn-timeline:hover { background: #007acc; }
+                        .resizer-dyn-timeline { height: 4px; width: 100%; cursor: row-resize; }
+                        .content-slider-pane { background: var(--paneBg); overflow: hidden; }
+
+                        @media (max-width: 1023px) {
+                            .core-viewports { flex-direction: column; }
+                            .visual-pane { width: 100%; height: var(--primary-split); flex-direction: row; order: 1; }
+                            .content-slider-pane { width: 100%; height: calc(100% - var(--primary-split) - 4px); order: 3; }
+                            .resizer-dyn-primary { width: 100%; height: 4px; cursor: row-resize; order: 2; }
+                            .map-pane { width: var(--secondary-split); height: 100%; position: relative; }
+                            .resizer-dyn-secondary { width: 4px; height: 100%; cursor: col-resize; }
+                            .media-pane { width: calc(100% - var(--secondary-split) - 4px); height: 100%; background: #000; }
+                        }
+
+                        @media (min-width: 1024px) {
+                            .core-viewports { flex-direction: row; }
+                            .content-slider-pane { height: 100%; width: var(--primary-split); order: 1; }
+                            .resizer-dyn-primary { height: 100%; width: 4px; cursor: col-resize; order: 2; }
+                            .visual-pane { height: 100%; width: calc(100% - var(--primary-split) - 4px); flex-direction: column; order: 3; }
+                            .map-pane { height: var(--secondary-split); width: 100%; position: relative; }
+                            .resizer-dyn-secondary { width: 100%; height: 4px; cursor: row-resize; }
+                            .media-pane { height: calc(100% - var(--secondary-split) - 4px); width: 100%; background: #000; }
+                        }
+                    </style>
+
+                    ${!status.active ? html`
+                        <div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
+                            <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION || 'v6.6.8'} />
+                            <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%;"></div></div>
+                        </div>
+                    ` : ''}
+
+                    ${data.length > 0 && status.active ? html`
+                        <div id="app-layout" ref=${appRef} style="display: flex; flex-direction: column; height: var(--app-height, 100vh); width: 100vw; overflow: hidden; position: relative;">
+                            
+                            <div class="core-viewports">
+                                <div class="visual-pane ${hasMedia ? '' : 'no-media'}">
+                                    <div class="map-pane">
+                                        <${MapViewer} data=${data} activeIndex=${activeIndex} setActiveIndex=${jumpToSlide} maxAutoZoom=${maxAutoZoom} minimapOffset=${minimapOffset} basemapsRegistry=${basemapsRegistry} showButtonText=${showButtonText} />
+                                        <${VibeMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION || 'v6.6.8'} moduleVersions=${{Globals: 'v1.0.52', Styles: 'v4.13.0'}} />
+                                    </div>
+                                    <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize}></div>
+                                    <div class="media-pane">
+                                        <${MediaViewer} activeSlide=${activeSlide} />
+                                    </div>
+                                </div>
+                                <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize}></div>
+                                <div class="content-slider-pane">
+                                    <${ContentSlider} 
+                                        data=${data} 
+                                        activeIndex=${activeIndex} 
+                                        setActiveIndex=${jumpToSlide} 
+                                        jumpToSlide=${jumpToSlide}
+                                        slideHistory=${slideHistory}
+                                        goBack=${goBack}
+                                        aboutData=${aboutData}
+                                        isAboutOpen=${isAboutOpen}
+                                        setIsAboutOpen=${setIsAboutOpen}
+                                        isMonitorOpen=${isMonitorOpen}
+                                        setIsMonitorOpen=${setIsMonitorOpen}
+                                        isSettingsOpen=${isSettingsOpen}
+                                        setIsSettingsOpen=${setIsSettingsOpen}
+                                        CarTiMapperLogo=${CarTiMapperLogo} 
+                                        visibleTimeSpan=${visibleTimeSpan}
+                                        showButtonText=${showButtonText}
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize}></div>
+
+                            <div class="timeline-pane" style="height: var(--timeline-height); flex-shrink: 0;">
+                                <${TimelineScrubber} data=${data} activeIndex=${activeIndex} setActiveIndex=${jumpToSlide} setVisibleTimeSpan=${setVisibleTimeSpan} zoomLock=${zoomLock} setZoomLock=${setZoomLock} />
+                            </div>
+                        </div>
+
+                        <div class="modal-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)}></div>
+                        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 450px; background: #fff; z-index: 9002; border-radius: 12px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); color: #222; display: ${isSettingsOpen ? 'block' : 'none'};">
+                            <button class="about-close" onClick=${() => setIsSettingsOpen(false)}>×</button>
+                            <h3 style="margin-top: 0; color: #333; font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 10px; font-weight: 400;">Engine Settings</h3>
+                            
+                            <div style="margin-top: 20px;">
+                                <label style="display: block; margin-bottom: 8px; color: #555; font-size: 0.95rem;">Data Locale Format</label>
+                                <select style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; background: #fcfcfc; cursor: pointer; color: #333;" 
+                                        value=${dateFormat} onChange=${(e) => setDateFormat(e.target.value)}>
+                                    <option value="DD/MM/YYYY">European / Global (DD/MM/YYYY)</option>
+                                    <option value="MM/DD/YYYY">United States (MM/DD/YYYY)</option>
+                                    <option value="YYYY/MM/DD">Scientific / ISO (YYYY/MM/DD)</option>
+                                </select>
+                            </div>
+
+                            <div style="margin-top: 20px;">
+                                <label style="display: block; margin-bottom: 8px; color: #555; font-size: 0.95rem;">Auto-Zoom Depth</label>
+                                <select style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; background: #fcfcfc; cursor: pointer; color: #333;" 
+                                        value=${maxAutoZoom} onChange=${(e) => setMaxAutoZoom(parseInt(e.target.value, 10))}>
+                                    <option value="14">Level 14 (Wider Area)</option>
+                                    <option value="15">Level 15 (Standard City)</option>
+                                    <option value="16">Level 16 (Street Level)</option>
+                                    <option value="17">Level 17 (Building Level)</option>
+                                    <option value="18">Level 18 (Campus Level)</option>
+                                </select>
+                            </div>
+
+                            <div style="margin-top: 20px;">
+                                <label style="display: block; margin-bottom: 8px; color: #555; font-size: 0.95rem;">Radar Minimap Offset</label>
+                                <select style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; background: #fcfcfc; cursor: pointer; color: #333;" 
+                                        value=${minimapOffset} onChange=${(e) => setMinimapOffset(parseInt(e.target.value, 10))}>
+                                    ${[-2, -3, -4, -5, -6, -7, -8].map(lvl => html`
+                                        <option value=${lvl}>${lvl} Levels Out</option>
+                                    `)}
+                                </select>
+                            </div>
+
+                            <div style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 6px; border: 1px solid #ccc; background: #fcfcfc;">
+                                <label style="color: #555; font-size: 0.95rem; cursor: pointer;" for="btnTextToggle">Show text labels on buttons</label>
+                                <input type="checkbox" id="btnTextToggle" style="width: 20px; height: 20px; cursor: pointer;" checked=${showButtonText} onChange=${(e) => setShowButtonText(e.target.checked)} />
+                            </div>
+
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        };
+        MODULE_VERSIONS['AppOrchestrator'] = 'v1.48.0';
+        // === [ END MAJOR BLOCK: AppOrchestrator v1.48.0 ] ===
+        
+        // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
+        render(html`<${ErrorBoundary}><${App} /></${ErrorBoundary}>`, document.getElementById('root'));
+        // === [ END MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
+    </script>
+</body>
+</html>
