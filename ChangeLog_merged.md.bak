@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+### [v6.8.26] - Desktop Pointer Drag Kinetics
+
+**MediaViewer (v2.11.7):**
+*   **[UI-181] Pointer DOM Interception:** Injected explicit React pointer events (`onMouseDown`, `onMouseMove`, `onMouseUp`) into the Media Carousel. Added a 1.5x friction multiplier to calculate desktop mouse deltas. 
+*   **[UI-182] Snap-Scroll Decoupling:** Added dynamic `.is-dragging` CSS class injection during pointer drag. This temporarily strips CSS `scroll-snap-type: x mandatory` to prevent violent engine stuttering, resulting in buttery smooth desktop image panning.
+*   **[PERF-35] Image Ghosting Annihilation:** Passed `draggable="false"` and `user-select: none` to the DOM `<img />` tags, physically preventing the browser from attempting to drag the image asset itself off the canvas during swipe routines.
+
 ### [v6.8.25] - Typographic Restoration & Margin Sealing
 
 **Global Styles (CSS):**

@@ -1,6 +1,42 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v7.0.2] - 2026-06-06
+### Fixed
+- **Fatal Boot Crash (Patch .2):** Executed a full manual sweep to restore missing Javascript Array Accessor brackets (``, `[1]`, `[2]`). In the prior build, these symbols were erroneously stripped from the output format, causing the legacy Date parser to evaluate entire arrays instead of isolated variables (resulting in `NaN` logic and a blank white screen).
+- **Touch Event Hijack:** Restored the `` array targets to `e.touches` across all UI resizers and the timeline scrubber to re-enable mobile swiping interactions.
+- **Smart Date Formatting:** Restored the `sParts[2] === eParts[2]` exact comparisons within the display output engine to prevent visual concatenation errors.
+
+## [v7.0.1] - 2026-06-06
+### Added
+- **Parallel EDTF Schema:** The engine now seamlessly intercepts EDTF strings from newly designated "Start EDTF" and "End EDTF" spreadsheet columns [4].
+- **Mathematical EDTF Visuals:** Integrated EDTF uncertainty visuals on the X-Axis. Approximate dates render with radial gold gradients, uncertain dates render with dashed `#ff4500` borders, Sets render as transparent gold bounding boxes, and Lists render as sub-dots along a baseline span.
+- **Global Styles (v5.0.0):** Deployed updated CSS block containing Hexagon Arrow Typographic Envelopes (`clip-path`) and strict hardware bounds for the timeline.
+
+### Fixed
+- **Fatal Boot Crash (Patch .1):** Hotfixed a critical syntax destruction bug in the legacy date parser where empty array indices crashed the Preact engine and caused a blank white screen.
+- **Touch Kinetics:** Restored stripped `e.touches` array targets to resolve broken touch-zoom event handlers on mobile viewports.
+
+### Changed
+- **Major Version Sync:** Advanced App to `v7.0.0` (hotfixed to `v7.0.1`), AppOrchestrator to `v2.0.1`, TimelineScrubber to `v25.0.1`, and GlobalStyles to `v5.0.0`.
+- **Indentation Protocol:** Hardened entire codebase to adhere to a strict 8-character base indentation rule for major blocks.
+
+v7.0.0: The Chrono-Engine Update (EDTF Integration)
+
+- [FEATURE] Integrated `edtf.js` via ESM import to natively parse Level 0, 1, and 2 ISO 8601-2 Extended Date Time Formats.
+- [ARCHITECTURE] Bypassed need for strict build tools, maintaining the zero-build, <500KB constraint.
+- [UI/UX] Timeline Engine now dynamically resolves overlapping temporal limits using absolute `min` and `max` EDTF boundaries.
+- [UI/UX] Replaced standard timeline dots with semantic geometry:
+  * Solid red for precise historical marks.
+  * Gold glowing `<radialGradient>` for approximate (~) markers.
+  * Orange-Red dashed `<circle>` for uncertain (?) markers.
+  * `<rect>` Probability Bands for single-choice Sets [].
+  * Multi-point Constellations for inclusive Lists {}.
+- [UI/UX] Duration lengths now project discrete horizontal spans directly on the X-axis, featuring linear gradients for open-ended intervals (../).
+- [DATA] Engine receives un-coerced, pristine strings directly from the Extracts Combined Formula v6.1.2 without requiring local JavaScript artifact scrubbing.
+
+
+
 ### [v6.8.26] - Desktop Pointer Drag Kinetics
 
 **MediaViewer (v2.11.7):**

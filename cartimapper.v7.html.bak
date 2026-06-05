@@ -983,7 +983,7 @@
         MODULE_VERSIONS ["ContentSlider"] = 'v4.4.1';
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: TimelineScrubber v25.0.1 ] ===
+        // === [ MAJOR BLOCK: TimelineScrubber v25.0.2 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight }) => {
           const wrapperRef = useRef(null);
           const [zoomLevel, setZoomLevel] = useState(1);
@@ -1585,10 +1585,10 @@
             </div>
           `;
         };
-        MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.1';
+        MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.2';
         // === [ END MAJOR BLOCK ] ===
-
-        // === [ MAJOR BLOCK: AppOrchestrator v2.0.1 ] ===
+		
+        // === [ MAJOR BLOCK: AppOrchestrator v2.0.2 ] ===
         const App = () => {
           const [logs, setLogs] = useState([]);
           const [rawCsvRows, setRawCsvRows] = useState([]);
@@ -1707,7 +1707,7 @@
             const eParts = eDate.split(' ');
 
             if (sDate === eDate) return sTime && eTime && sTime !== eTime ? `${sDate}, ${sTime} — ${eTime}` : (sTime ? `${sDate}, ${sTime}` : sDate);
-            if (sParts[1] === eParts[1] && sParts[2] === eParts[2] && sParts.length > 2) return sParts === eParts ? `${sParts} - ${eDate}${eTime ? `, ${eTime}` : ''}` : `${sParts} - ${eDate}${eTime ? `, ${eTime}` : ''}`;
+            if (sParts[2] === eParts[2] && sParts[1] === eParts[1] && sParts.length > 2) return sParts === eParts ? `${sParts} - ${eDate}${eTime ? `, ${eTime}` : ''}` : `${sParts} - ${eDate}${eTime ? `, ${eTime}` : ''}`;
             return `${sTime ? `${sDate}, ${sTime}` : sDate} — ${eTime ? `${eDate}, ${eTime}` : eDate}`;
           };
 
@@ -2192,7 +2192,7 @@
               <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'};">
                 <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">×</button>
                 <div style="margin-bottom: 25px;">
-                  <h2 style="margin: 0 0 10px 0; font-size: 1.6rem;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Info'}}></h2>
+                  <h2 style="margin: 0 0 10px 0; font-size: 1.6rem;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Overview'}}></h2>
                   <div style="font-size: 1.05rem; line-height: 1.5; color: #333;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
                   <div style="margin-top: 15px; text-align: left;">
                     <button class="status-btn-text" style="width: max-content; padding: 0 12px;" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>View overview as slide</button>
@@ -2249,7 +2249,7 @@
             </div>
           `;
         };
-        MODULE_VERSIONS['AppOrchestrator'] = 'v2.0.1';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v2.0.2';
         // === [ END MAJOR BLOCK ] ===
 		
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
