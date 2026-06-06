@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v7.0.5] - 2026-06-06
+### Changed
+- **Strict Chronological Engine Modes:** Abolished per-record fallback. Introduced `dateEngineMode` state (`auto`, `edtf`, `legacy`). On boot, the app scans the `start edtf` column and automatically locks into the highest available standard. Added a dropdown to the Settings Modal for manual overrides. 
+### Fixed
+- **Legacy Date Inversion:** The legacy parser now mathematically obeys `dateLocale`. Selecting `en-US` cleanly swaps the `dParts.at()` index targeting, fixing the bug that inverted Days and Months. 
+- **EDTF Visual Formatting:** Decoupled EDTF strings from the `toLocaleDateString` formatter. They now display their raw literal text directly, preventing visual confusion with the localized legacy date strings.
+
 v7.0.4 - ESM Bootloader Crash Fix (EDTF Transpilation)
 
 * **Version Bump:** Advanced App to v7.0.4 and Globals to v2.0.1.

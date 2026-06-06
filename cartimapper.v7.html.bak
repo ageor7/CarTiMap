@@ -236,22 +236,22 @@
 <body>
     <div id="root"></div>
     <script type="module">
-        // === [ MAJOR BLOCK: Imports & Globals ] ===
-		import { h, render, Component } from 'https://esm.sh/preact';
-		import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
-		import htm from 'https://esm.sh/htm';
-		import Papa from 'https://esm.sh/papaparse';
-
-		// [REF: CHRONO-01] EDTF.js Extended Date Parser
-		import * as edtf from 'https://unpkg.com/edtf/dist/index.js';
-
-		const html = htm.bind(h);
-		const APP_VERSION = 'v7.0.3';
-		document.title = `CarTiMapper Core - ${APP_VERSION}`;
-
-		const MODULE_VERSIONS = { Styles: 'v4.13.12', Globals: 'v2.0.0' };
-		const TM_CONFIG = { paneBackground: '#fcfcfc' };
-		// === [ END MAJOR BLOCK ] ===
+        // === [ MAJOR BLOCK: Imports & Globals v2.0.1 ] ===
+        import { h, render, Component } from 'https://esm.sh/preact';
+        import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
+        import htm from 'https://esm.sh/htm';
+        import Papa from 'https://esm.sh/papaparse';
+        
+        // [REF: CHRONO-01] EDTF.js Extended Date Parser (Transpiled for Browser)
+        import * as edtf from 'https://esm.sh/edtf';
+        
+        const html = htm.bind(h);
+        const APP_VERSION = 'v7.0.4';
+        document.title = `CarTiMapper Core - ${APP_VERSION}`;
+        
+        const MODULE_VERSIONS = { Styles: 'v4.13.12', Globals: 'v2.0.1' };
+        const TM_CONFIG = { paneBackground: '#fcfcfc' };
+        // === [ END MAJOR BLOCK ] ===
 
         // === [ MAJOR BLOCK: Utilities v1.0.0 ] ===
         const stripHTML = (htmlStr) => {
