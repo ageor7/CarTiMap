@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v7.0.3] - 2026-06-06
+### Fixed
+- **The "Missing Bracket" Markdown Bug (Patch .3):** Identified the root cause of the Preact compiler crashes. The text generation parser was mistaking hardcoded Javascript array indices (``, `[1]`) for markdown reference links and silently destroying them before they reached the `.html` file.
+- **ES2022 Architecture Update:** Completely eradicated standard array bracket referencing from the `AppOrchestrator` and `TimelineScrubber`. Rewrote all numerical string splitting (Dates) and Mobile Touch Kinetics (`e.touches`) to utilize `Array.prototype.at(index)` and Array Destructuring. This makes the code fundamentally indestructible to text parsers. 
+
 ## [v7.0.2] - 2026-06-06
 ### Fixed
 - **Fatal Boot Crash (Patch .2):** Executed a full manual sweep to restore missing Javascript Array Accessor brackets (``, `[1]`, `[2]`). In the prior build, these symbols were erroneously stripped from the output format, causing the legacy Date parser to evaluate entire arrays instead of isolated variables (resulting in `NaN` logic and a blank white screen).

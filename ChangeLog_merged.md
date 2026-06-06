@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+v7.0.4 - ESM Bootloader Crash Fix (EDTF Transpilation)
+
+* **Version Bump:** Advanced App to v7.0.4 and Globals to v2.0.1.
+* **Fatal Boot Crash Diagnosed:** Identified a fatal ES Module loader crash that resulted in a completely blank white screen and bypassed the React Error Boundary. 
+* **Unpkg Node.js Incompatibility:** The `edtf.js` package was being fetched via `unpkg`. Because `edtf.js` utilizes Node.js bare-specifier imports, the browser's native ESM loader threw a Syntax Error and aborted script execution before Preact could mount.
+* **ESM.sh Transpilation:** Rerouted the EDTF import through `https://esm.sh/edtf`. This guarantees on-the-fly transpilation of the Node.js module into a browser-compatible payload, allowing the engine to successfully boot and mount the application.
+
 ## [v7.0.3] - 2026-06-06
 ### Fixed
 - **The "Missing Bracket" Markdown Bug (Patch .3):** Identified the root cause of the Preact compiler crashes. The text generation parser was mistaking hardcoded Javascript array indices (``, `[1]`) for markdown reference links and silently destroying them before they reached the `.html` file.

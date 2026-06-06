@@ -246,7 +246,7 @@
 		import * as edtf from 'https://unpkg.com/edtf/dist/index.js';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v7.0.2';
+		const APP_VERSION = 'v7.0.3';
 		document.title = `CarTiMapper Core - ${APP_VERSION}`;
 
 		const MODULE_VERSIONS = { Styles: 'v4.13.12', Globals: 'v2.0.0' };
@@ -983,7 +983,7 @@
         MODULE_VERSIONS ["ContentSlider"] = 'v4.4.1';
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: TimelineScrubber v25.0.2 ] ===
+        // === [ MAJOR BLOCK: TimelineScrubber v25.0.3 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight }) => {
           const wrapperRef = useRef(null);
           const [zoomLevel, setZoomLevel] = useState(1);
@@ -997,8 +997,9 @@
 
           useEffect(() => {
             const ro = new ResizeObserver(entries => {
-              if (entries && entries && entries.target) {
-                setContainerHeight(entries.target.clientHeight);
+              const entry = entries.at(0);
+              if (entry && entry.target) {
+                setContainerHeight(entry.target.clientHeight);
               }
             });
             if (wrapperRef.current) ro.observe(wrapperRef.current);
@@ -1023,7 +1024,7 @@
             if (!d.startDate || isNaN(d.startDate.min)) return;
             const t = getParsedTags(d.tags);
             t.forEach(tag => tagsMap.add(tag));
-            for (let i = 0; i < t.length - 1; i++) tagPairs.push([t[i], t[i + 1]]);
+            for (let i = 0; i < t.length - 1; i++) tagPairs.push([t.at(i), t.at(i + 1)]);
           });
 
           let orderedTags = [];
@@ -1033,9 +1034,12 @@
           while (remaining.length > 0) {
             let placed = false;
             for (let i = 0; i < remaining.length; i++) {
-              const r = remaining[i];
-              const pairedWithFirst = tagPairs.some(p => (p === r && p[1] === orderedTags) || (p[1] === r && p === orderedTags));
-              const pairedWithLast = tagPairs.some(p => (p === r && p[1] === orderedTags[orderedTags.length - 1]) || (p[1] === r && p === orderedTags[orderedTags.length - 1]));
+              const r = remaining.at(i);
+              const firstTag = orderedTags.at(0);
+              const lastTag = orderedTags.at(-1);
+              const pairedWithFirst = tagPairs.some(p => (p.at(0) === r && p.at(1) === firstTag) || (p.at(1) === r && p.at(0) === firstTag));
+              const pairedWithLast = tagPairs.some(p => (p.at(0) === r && p.at(1) === lastTag) || (p.at(1) === r && p.at(0) === lastTag));
+              
               if (pairedWithLast) {
                 orderedTags.push(r);
                 remaining.splice(i, 1);
@@ -1056,7 +1060,7 @@
           const laneHeight = Math.max(24, (containerHeight - 38) / laneCount);
 
           const validData = data.filter(d => d.startDate && !isNaN(d.startDate.min));
-          const minTimeRaw = validData.length > 0 ? validData.startDate.min : new Date().getTime();
+          const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
           let maxTimeRaw = minTimeRaw;
 
           validData.forEach(d => {
@@ -1109,16 +1113,16 @@
 
             let lines = bestSplit.length ? bestSplit : [titleStr];
             if (lines.length === 3) {
-              let last = lines[2];
+              let last = lines.at(2);
               if (measureTextWidth(last) > maxPx) {
                 while (measureTextWidth(last + '...') > maxPx && last.length > 0) last = last.slice(0, -1);
-                lines[2] = last.trim() + '...';
+                lines.splice(2, 1, last.trim() + '...');
               }
             } else if (lines.length === 2) {
-              let last = lines[1];
+              let last = lines.at(1);
               if (measureTextWidth(last) > maxPx * 1.3) {
                 while (measureTextWidth(last + '...') > maxPx * 1.3 && last.length > 0) last = last.slice(0, -1);
-                lines[1] = last.trim() + '...';
+                lines.splice(1, 1, last.trim() + '...');
               }
             }
             return { lines, pxWidth: Math.max(60, Math.max(...lines.map(l => measureTextWidth(l))) + 35) };
@@ -1143,8 +1147,9 @@
           useEffect(() => {
             const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
             if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
-              const sT = validData[activeDataIndex].startDate.min;
-              const { pxWidth } = formatLabelSmart(stripHTML(validData[activeDataIndex].title));
+              const activeNode = validData.at(activeDataIndex);
+              const sT = activeNode.startDate.min;
+              const { pxWidth } = formatLabelSmart(stripHTML(activeNode.title));
               const containerW = wrapperRef.current.clientWidth || 1000;
               const targetTrackW = Math.max(containerW, containerW * zoomLevel);
               const scrollPos = ((sT - renderMinTime) / renderTimeRange * targetTrackW) + (pxWidth / 2) - (containerW / 2);
@@ -1161,21 +1166,24 @@
               const timeoutId = setTimeout(() => {
                 const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
                 if (activeDataIndex >= 0) {
-                  let clusterMin = validData[Math.max(0, activeDataIndex - 2)].startDate.min;
-                  let clusterMax = validData[Math.min(validData.length - 1, activeDataIndex + 2)].startDate.min;
+                  let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
+                  let clusterMax = validData.at(Math.min(validData.length - 1, activeDataIndex + 2)).startDate.min;
 
                   for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
-                    if (validData[i].endDate && !isNaN(validData[i].endDate.max)) {
-                      clusterMax = Math.max(clusterMax, validData[i].endDate.max);
+                    const node = validData.at(i);
+                    if (node.endDate && !isNaN(node.endDate.max)) {
+                      clusterMax = Math.max(clusterMax, node.endDate.max);
                     }
-                    clusterMax = Math.max(clusterMax, validData[i].startDate.min);
-                    clusterMin = Math.min(clusterMin, validData[i].startDate.min);
+                    clusterMax = Math.max(clusterMax, node.startDate.min);
+                    clusterMin = Math.min(clusterMin, node.startDate.min);
                   }
 
                   const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
                   const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
-                  const sT = validData[activeDataIndex].startDate.min;
-                  const { pxWidth } = formatLabelSmart(stripHTML(validData[activeDataIndex].title));
+                  
+                  const activeNode = validData.at(activeDataIndex);
+                  const sT = activeNode.startDate.min;
+                  const { pxWidth } = formatLabelSmart(stripHTML(activeNode.title));
                   const containerW = wrapperRef.current.clientWidth || 1000;
 
                   scrollTargetRef.current = (((sT - renderMinTime) / renderTimeRange * Math.max(containerW, containerW * clampedZoom)) + (pxWidth / 2)) - (containerW / 2);
@@ -1207,13 +1215,16 @@
           const onDown = (e) => {
             if (zoomLock !== 'hard') setZoomLock('soft');
             if (e.touches && e.touches.length === 2) {
+              const t1 = Array.from(e.touches).at(0);
+              const t2 = Array.from(e.touches).at(1);
               touchZoomRef.current = {
-                initialDist: Math.hypot(e.touches.clientX - e.touches[1].clientX, e.touches.clientY - e.touches[1].clientY),
+                initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY),
                 initialZoom: zoomLevel
               };
               return;
             }
-            const x = e.touches ? e.touches.clientX : e.clientX;
+            const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+            const x = t1.clientX;
             dragRef.current = { isDragging: true, startX: x - wrapperRef.current.offsetLeft, scrollLeft: wrapperRef.current.scrollLeft };
             wrapperRef.current.classList.add('is-dragging');
           };
@@ -1226,13 +1237,16 @@
           const onMove = (e) => {
             if (e.touches && e.touches.length === 2) {
               e.preventDefault();
-              const scale = Math.hypot(e.touches.clientX - e.touches[1].clientX, e.touches.clientY - e.touches[1].clientY) / touchZoomRef.current.initialDist;
+              const t1 = Array.from(e.touches).at(0);
+              const t2 = Array.from(e.touches).at(1);
+              const scale = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY) / touchZoomRef.current.initialDist;
               handleManualZoom(Math.min(Math.max(touchZoomRef.current.initialZoom * scale, 1), 500), 'center');
               return;
             }
             if (!dragRef.current.isDragging) return;
             if (!e.touches) e.preventDefault();
-            wrapperRef.current.scrollLeft = dragRef.current.scrollLeft - (((e.touches ? e.touches.clientX : e.clientX) - wrapperRef.current.offsetLeft - dragRef.current.startX) * 2);
+            const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+            wrapperRef.current.scrollLeft = dragRef.current.scrollLeft - ((t1.clientX - wrapperRef.current.offsetLeft - dragRef.current.startX) * 2);
           };
 
           const onWheel = (e) => {
@@ -1287,7 +1301,7 @@
             { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
           ];
 
-          let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs[scaleConfigs.length - 1];
+          let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
           const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
           const visibleRightMs = renderMinTime + ((viewLeftEdge + containerW) / trackWidthPx) * renderTimeRange;
           const viewportCenterMs = visibleLeftMs + ((visibleRightMs - visibleLeftMs) / 2);
@@ -1374,7 +1388,7 @@
             }
           });
 
-          const centerTickPx = centerTickIndex !== -1 ? (majorTicksData[centerTickIndex].pctLeft / 100) * trackWidthPx : -1000;
+          const centerTickPx = centerTickIndex !== -1 ? (majorTicksData.at(centerTickIndex).pctLeft / 100) * trackWidthPx : -1000;
           const centerKeepout = 65;
 
           const rulerTicksHTML = majorTicksData.map((d, i) => {
@@ -1585,10 +1599,10 @@
             </div>
           `;
         };
-        MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.2';
+        MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.3';
         // === [ END MAJOR BLOCK ] ===
 		
-        // === [ MAJOR BLOCK: AppOrchestrator v2.0.2 ] ===
+        // === [ MAJOR BLOCK: AppOrchestrator v2.0.3 ] ===
         const App = () => {
           const [logs, setLogs] = useState([]);
           const [rawCsvRows, setRawCsvRows] = useState([]);
@@ -1667,7 +1681,7 @@
 
           const goBack = () => {
             if (slideHistory.length > 0) {
-              const prev = slideHistory[slideHistory.length - 1];
+              const prev = slideHistory.at(-1);
               setSlideHistory(h => h.slice(0, -1));
               setActiveIndex(prev);
             }
@@ -1705,14 +1719,17 @@
             const eTime = end.date ? end.date.toLocaleTimeString(loc, optsT).replace(/^00:00$/, '') : '';
             const sParts = sDate.split(' ');
             const eParts = eDate.split(' ');
+            
+            const sDay = sParts.at(0); const sMon = sParts.at(1); const sYear = sParts.at(2);
+            const eDay = eParts.at(0); const eMon = eParts.at(1); const eYear = eParts.at(2);
 
             if (sDate === eDate) return sTime && eTime && sTime !== eTime ? `${sDate}, ${sTime} — ${eTime}` : (sTime ? `${sDate}, ${sTime}` : sDate);
-            if (sParts[2] === eParts[2] && sParts[1] === eParts[1] && sParts.length > 2) return sParts === eParts ? `${sParts} - ${eDate}${eTime ? `, ${eTime}` : ''}` : `${sParts} - ${eDate}${eTime ? `, ${eTime}` : ''}`;
+            if (sYear === eYear && sParts.length > 2) return sMon === eMon ? `${sDay} - ${eDate}${eTime ? `, ${eTime}` : ''}` : `${sDay} ${sMon} - ${eDate}${eTime ? `, ${eTime}` : ''}`;
             return `${sTime ? `${sDate}, ${sTime}` : sDate} — ${eTime ? `${eDate}, ${eTime}` : eDate}`;
           };
 
           const formatPlaces = (str) => {
-            return str ? str.split(/[|\-·;]/).map(s => s.split(',').trim()).filter(Boolean).join(' | ') : '';
+            return str ? str.split(/[|\-·;]/).map(s => s.split(',').at(0).trim()).filter(Boolean).join(' | ') : '';
           };
 
           const executeSearch = (query) => {
@@ -1753,16 +1770,18 @@
 
           const startPrimaryResize = (e) => {
             if (maxPane) return;
-            const startX = e.touches ? e.touches.clientX : e.clientX;
-            const startY = e.touches ? e.touches.clientY : e.clientY;
+            const tStart = e.touches ? Array.from(e.touches).at(0) : e;
+            const startX = tStart.clientX;
+            const startY = tStart.clientY;
             const isDesktop = window.innerWidth >= 1024;
             const containerNode = appRef.current.querySelector('.core-viewports');
             const startVal = isDesktop ? appRef.current.querySelector('.content-slider-pane').offsetWidth : appRef.current.querySelector('.content-slider-pane').offsetHeight;
             const containerSize = isDesktop ? containerNode.offsetWidth : containerNode.offsetHeight;
 
             const onMove = (e2) => {
-              const currentX = e2.touches ? e2.touches.clientX : e2.clientX;
-              const currentY = e2.touches ? e2.touches.clientY : e2.clientY;
+              const tCurrent = e2.touches ? Array.from(e2.touches).at(0) : e2;
+              const currentX = tCurrent.clientX;
+              const currentY = tCurrent.clientY;
               const delta = isDesktop ? (currentX - startX) : (startY - currentY);
               let pct = ((startVal + delta) / containerSize) * 100;
               if (pct < 15) pct = 15;
@@ -1786,16 +1805,18 @@
 
           const startSecondaryResize = (e) => {
             if (maxPane) return;
-            const startX = e.touches ? e.touches.clientX : e.clientX;
-            const startY = e.touches ? e.touches.clientY : e.clientY;
+            const tStart = e.touches ? Array.from(e.touches).at(0) : e;
+            const startX = tStart.clientX;
+            const startY = tStart.clientY;
             const isDesktop = window.innerWidth >= 1024;
             const containerNode = appRef.current.querySelector('.visual-pane');
             const startVal = isDesktop ? appRef.current.querySelector('.map-pane').offsetHeight : appRef.current.querySelector('.map-pane').offsetWidth;
             const containerSize = isDesktop ? containerNode.offsetHeight : containerNode.offsetWidth;
 
             const onMove = (e2) => {
-              const currentX = e2.touches ? e2.touches.clientX : e2.clientX;
-              const currentY = e2.touches ? e2.touches.clientY : e2.clientY;
+              const tCurrent = e2.touches ? Array.from(e2.touches).at(0) : e2;
+              const currentX = tCurrent.clientX;
+              const currentY = tCurrent.clientY;
               const delta = isDesktop ? (currentY - startY) : (currentX - startX);
               let pct = ((startVal + delta) / containerSize) * 100;
               if (pct < 10) pct = 10;
@@ -1819,12 +1840,14 @@
 
           const startTimelineResize = (e) => {
             if (isTimelineExpanded || isTimelineMinimized) return;
-            const startY = e.touches ? e.touches.clientY : e.clientY;
+            const tStart = e.touches ? Array.from(e.touches).at(0) : e;
+            const startY = tStart.clientY;
             const startHeight = appRef.current.querySelector('.timeline-pane').offsetHeight;
             const containerHeight = appRef.current.offsetHeight;
 
             const onMove = (e2) => {
-              const currentY = e2.touches ? e2.touches.clientY : e2.clientY;
+              const tCurrent = e2.touches ? Array.from(e2.touches).at(0) : e2;
+              const currentY = tCurrent.clientY;
               const delta = currentY - startY;
               let pct = ((startHeight - delta) / containerHeight) * 100;
               if (pct < 10) pct = 10;
@@ -1900,8 +1923,9 @@
               Papa.parse(csvPrimary, {
                 header: true, skipEmptyLines: true, complete: (results) => {
                   const firstRowNorm = {};
-                  if (results.data && results.data) {
-                    for (let k in results.data) firstRowNorm[k.toLowerCase().trim()] = results.data[k];
+                  const firstRow = results.data.at(0);
+                  if (firstRow) {
+                    for (let k in firstRow) firstRowNorm[k.toLowerCase().trim()] = firstRow[k];
                   }
                   const exactGet = (normObj, key) => { const val = normObj[key]; return val !== undefined && val !== null ? String(val).trim() : ""; };
                   setAboutData({
@@ -1958,25 +1982,29 @@
 
                 const parts = cleanLegacy.split(' ');
                 if (parts.length < 1) return null;
+                
+                const dateStr = parts.at(0) || '';
+                const timeStr = parts.at(1) || '';
 
-                const dParts = parts.split(/[/\-.]/);
-                const tParts = parts[1] ? parts[1].split(':') : [];
-                const secParts = String(tParts[2] || '0').split('.');
+                const dParts = dateStr.split(/[/\-.]/);
+                const tParts = timeStr ? timeStr.split(':') : [];
+                const secParts = String(tParts.at(2) || '0').split('.');
+
+                const dYear = parseInt(dParts.at(2), 10);
+                const dMonth = parseInt(dParts.at(1), 10) - 1;
+                const dDay = parseInt(dParts.at(0), 10);
+                
+                const tHour = parseInt(tParts.at(0) || 0, 10);
+                const tMin = parseInt(tParts.at(1) || 0, 10);
+                const tSec = parseInt(secParts.at(0) || 0, 10);
+                const tMs = parseInt(secParts.at(1) || 0, 10);
 
                 let ts;
                 if (!isNaN(cleanLegacy) && cleanLegacy !== '') {
                   // Google Sheets numerical serial dates
                   ts = (parseFloat(cleanLegacy) - 25569) * 86400 * 1000;
                 } else {
-                  const dateObj = new Date(
-                    parseInt(dParts[2], 10), 
-                    parseInt(dParts[1], 10) - 1, 
-                    parseInt(dParts, 10), 
-                    parseInt(tParts || '0', 10), 
-                    parseInt(tParts[1] || '0', 10), 
-                    parseInt(secParts || '0', 10), 
-                    parseInt(secParts[1] || '0', 10)
-                  );
+                  const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
                   ts = dateObj.getTime();
                 }
 
@@ -2066,7 +2094,7 @@
           };
 
           const searchResults = executeSearch(searchQuery);
-          const activeSlide = data[activeIndex];
+          const activeSlide = data.at(activeIndex);
           const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
 
           const CarTiMapperLogo = ({ context, appVersion }) => {
@@ -2249,7 +2277,7 @@
             </div>
           `;
         };
-        MODULE_VERSIONS['AppOrchestrator'] = 'v2.0.2';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v2.0.3';
         // === [ END MAJOR BLOCK ] ===
 		
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
