@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+v7.0.6 - Layout Axis Synchronization & Parser Invocation Fix
+
+* **Version Bump:** Advanced App to v7.0.6, Styles to v5.0.1, Globals to v2.0.3, and AppOrchestrator to v2.0.6.
+* **ESM Namespacing Fix:** Transpilation via `esm.sh` exports `edtf` as the default function. Directly calling `edtf.parse()` was failing silently and causing a lethal data purge (the "No valid temporal data" crash). The engine now executes `edtf(cleanEdtf)` directly, restoring chronological data parsing.
+* **Global Engine Modes Restored:** Reverted the aggressive purge of the legacy parser. The global toggle ('Auto', 'Strict EDTF', 'Legacy') is maintained. It strictly enforces row-by-row isolation based on the global state without triggering per-record fallback loops.
+* **Resizer / Layout Physics Fix:** The JavaScript Resizer hooks possessed an `isDesktop` toggle that had been disconnected from the CSS. Both CSS layout geometry and JS Delta calculations are now universally hard-locked to follow the Master Blueprint. Desktop matrix enforces `flex-direction: row` natively pinning Text to the left and Visual panes to the right. Desktop primary resize math correctly pulls horizontally, and secondary resize correctly drags vertically.
+
+
 ## [v7.0.5] - 2026-06-06
 ### Changed
 - **Strict Chronological Engine Modes:** Abolished per-record fallback. Introduced `dateEngineMode` state (`auto`, `edtf`, `legacy`). On boot, the app scans the `start edtf` column and automatically locks into the highest available standard. Added a dropdown to the Settings Modal for manual overrides. 

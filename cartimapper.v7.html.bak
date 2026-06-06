@@ -88,57 +88,97 @@
         .loading-bar-fill { height: 100%; background: #007acc; transition: width 0.4s ease; }
         /* --- [ End SubBlock: Splash & Loading ] --- */
 
-        /* --- [ SubBlock: Layout & Resizers ] --- */
-        #app-layout {
-          --primary-split: 50%;
-          --secondary-split: 50%;
-          --timeline-height: 10%;
-          display: flex; flex-direction: column; flex: 1; width: 100%; max-width: 100%; height: 100%; overflow: hidden; position: relative;
-        }
-        .core-viewports { display: flex; flex-grow: 1; height: calc(100% - var(--timeline-height) - 4px); width: 100%; max-width: 100%; overflow: visible; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; min-width: 0; position: relative; z-index: 10; }
-        .visual-pane { display: flex; overflow: visible; min-height: 0; min-width: 0; flex-grow: 1; position: relative; z-index: 20;}
-        .visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
-        .visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
-        .visual-pane.no-media .media-pane { display: none !important; }
-        .map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; flex-shrink: 0; overflow: visible; z-index: 30; }
-        .media-pane { position: relative; overflow: hidden; background-color: #1e1e1e; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px; display: flex; flex-direction: column; min-height: 0; min-width: 0; flex-shrink: 0; z-index: 10; }
-        .content-slider-pane { background: var(--paneBg); overflow: hidden; display: flex; flex-direction: column; min-height: 0; min-width: 0; flex-shrink: 0; z-index: 15; }
-        /* Strict max-width binding prevents timeline from pushing OS margins */
-        .timeline-pane { background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; z-index: 5; width: 100%; max-width: 100%; box-sizing: border-box; }
-        
-        /* Maximize Panes Matrix */
-        .core-viewports.max-text .visual-pane { display: none !important; }
-        .core-viewports.max-text .content-slider-pane { width: 100% !important; height: 100% !important; flex: 1 !important; max-width: none !important; }
-        .core-viewports.max-text .resizer-dyn-primary { display: none !important; }
-        .core-viewports.max-map .content-slider-pane { display: none !important; }
-        .core-viewports.max-map .media-pane { display: none !important; }
-        .core-viewports.max-map .visual-pane { width: 100% !important; height: 100% !important; flex-direction: row !important; flex: 1 !important; }
-        .core-viewports.max-map .map-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; }
-        .core-viewports.max-map .resizer-dyn-primary, .core-viewports.max-map .resizer-dyn-secondary { display: none !important; }
-        .core-viewports.max-media .content-slider-pane { display: none !important; }
-        .core-viewports.max-media .map-pane { display: none !important; }
-        .core-viewports.max-media .visual-pane { width: 100% !important; height: 100% !important; flex-direction: row !important; flex: 1 !important; }
-        .core-viewports.max-media .media-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; display: block !important; }
-        .core-viewports.max-media .resizer-dyn-primary, .core-viewports.max-media .resizer-dyn-secondary { display: none !important; }
-        .is-expanded-timeline .resizer-dyn-timeline { display: none !important; }
-        .is-minimized-timeline .resizer-dyn-timeline { display: none !important; }
-        .is-minimized-timeline .core-viewports { height: 100% !important; }
-        
-        .resizer-dyn-primary, .resizer-dyn-secondary, .resizer-dyn-timeline { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; }
-        .resizer-dyn-primary::after, .resizer-dyn-secondary::after, .resizer-dyn-timeline::after { content: ''; position: absolute; top: -18px; bottom: -18px; left: -18px; right: -18px; z-index: 51; }
-        .resizer-dyn-primary:hover, .resizer-dyn-secondary:hover, .resizer-dyn-timeline:hover { background: var(--accent); }
-        .resizer-dyn-timeline { height: 4px; width: 100%; cursor: row-resize; }
-        
-        @media (max-width: 1023px) {
-          .core-viewports { flex-direction: column; }
-          .visual-pane { width: 100%; height: calc(100% - var(--primary-split) - 4px); flex-direction: row; order: 1; }
-          .resizer-dyn-primary { width: 100%; height: 4px; cursor: row-resize; order: 2; }
-          .content-slider-pane { width: 100%; height: var(--primary-split); order: 3; }
-          .map-pane { flex: 0 0 var(--secondary-split); height: 100%; }
-          .resizer-dyn-secondary { width: 4px; height: 100%; cursor: col-resize; }
-          .media-pane { flex: 1 1 auto; width: 100%; }
-        }
-        /* --- [ End SubBlock: Layout & Resizers ] --- */
+		/* --- [ SubBlock: Layout & Resizers ] --- */
+		#app-layout {
+		  --primary-split: 55%;
+		  --secondary-split: 50%;
+		  --timeline-height: 10%;
+		  display: flex; flex-direction: column; flex: 1; width: 100%; max-width: 100%; height: 100%; overflow: hidden; position: relative;
+		}
+
+		/* [REF: UI-51] Desktop Default Matrix (Text Left, Visuals Right) */
+		.core-viewports {
+		  display: flex; flex-direction: row; 
+		  flex-grow: 1; height: calc(100% - var(--timeline-height) - 4px); width: 100%; max-width: 100%;
+		  overflow: visible; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; min-width: 0; position: relative; z-index: 10;
+		}
+
+		.content-slider-pane {
+		  background: var(--paneBg); overflow: hidden; display: flex; flex-direction: column;
+		  min-height: 0; min-width: 0; flex-shrink: 0; z-index: 15;
+		  order: 1; width: var(--primary-split); height: 100%;
+		}
+
+		.resizer-dyn-primary {
+		  background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none;
+		  order: 2; width: 4px; height: 100%; cursor: col-resize;
+		}
+
+		/* [REF: UI-51] Desktop Visual Stack (Map Top, Media Bottom) */
+		.visual-pane {
+		  display: flex; flex-direction: column;
+		  overflow: visible; min-height: 0; min-width: 0; flex-shrink: 0; position: relative; z-index: 20;
+		  order: 3; width: calc(100% - var(--primary-split) - 4px); height: 100%;
+		}
+
+		.visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
+		.visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
+		.visual-pane.no-media .media-pane { display: none !important; }
+
+		.map-pane {
+		  background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible; z-index: 30;
+		  flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%;
+		}
+
+		.resizer-dyn-secondary {
+		  background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none;
+		  height: 4px; width: 100%; cursor: row-resize;
+		}
+
+		.media-pane {
+		  position: relative; overflow: hidden; background-color: #1e1e1e; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px;
+		  display: flex; flex-direction: column; min-height: 0; min-width: 0; flex: 1 1 auto; z-index: 10;
+		  width: 100%; height: 100%;
+		}
+
+		.timeline-pane { background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; z-index: 5; width: 100%; max-width: 100%; box-sizing: border-box; }
+
+		/* Maximize Panes Matrix */
+		.core-viewports.max-text .visual-pane { display: none !important; }
+		.core-viewports.max-text .content-slider-pane { width: 100% !important; height: 100% !important; flex: 1 !important; max-width: none !important; }
+		.core-viewports.max-text .resizer-dyn-primary { display: none !important; }
+
+		.core-viewports.max-map .content-slider-pane { display: none !important; }
+		.core-viewports.max-map .media-pane { display: none !important; }
+		.core-viewports.max-map .visual-pane { width: 100% !important; height: 100% !important; flex: 1 !important; flex-direction: row !important; }
+		.core-viewports.max-map .map-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; }
+		.core-viewports.max-map .resizer-dyn-primary, .core-viewports.max-map .resizer-dyn-secondary { display: none !important; }
+
+		.core-viewports.max-media .content-slider-pane { display: none !important; }
+		.core-viewports.max-media .map-pane { display: none !important; }
+		.core-viewports.max-media .visual-pane { width: 100% !important; height: 100% !important; flex: 1 !important; flex-direction: row !important; }
+		.core-viewports.max-media .media-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; display: block !important; }
+		.core-viewports.max-media .resizer-dyn-primary, .core-viewports.max-media .resizer-dyn-secondary { display: none !important; }
+
+		.is-expanded-timeline .resizer-dyn-timeline { display: none !important; }
+		.is-minimized-timeline .resizer-dyn-timeline { display: none !important; }
+		.is-minimized-timeline .core-viewports { height: 100% !important; }
+
+		.resizer-dyn-primary::after, .resizer-dyn-secondary::after, .resizer-dyn-timeline::after { content: ''; position: absolute; top: -18px; bottom: -18px; left: -18px; right: -18px; z-index: 51; }
+		.resizer-dyn-primary:hover, .resizer-dyn-secondary:hover, .resizer-dyn-timeline:hover { background: var(--accent); }
+		.resizer-dyn-timeline { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
+
+		/* [REF: UI-51] Mobile Rotation Matrix (Visuals Top, Text Bottom) */
+		@media (max-width: 1023px) {
+		  .core-viewports { flex-direction: column; }
+		  .visual-pane { width: 100%; height: calc(100% - var(--primary-split) - 4px); flex-direction: row; order: 1; }
+		  .resizer-dyn-primary { width: 100%; height: 4px; cursor: row-resize; order: 2; }
+		  .content-slider-pane { width: 100%; height: var(--primary-split); order: 3; }
+		  .map-pane { flex: 0 0 var(--secondary-split); height: 100%; width: var(--secondary-split); }
+		  .resizer-dyn-secondary { width: 4px; height: 100%; cursor: col-resize; }
+		  .media-pane { flex: 1 1 auto; width: 100%; height: 100%; }
+		}
+		/* --- [ End SubBlock: Layout & Resizers ] --- */
 
         /* --- [ SubBlock: Leaflet Map & Spatial HUD ] --- */
         .leaflet-tooltip { white-space: normal !important; word-wrap: break-word !important; width: max-content !important; max-width: 300px !important; text-align: left !important; font-size: 0.85rem; line-height: 1.4; padding: 6px 10px !important; }
@@ -236,31 +276,23 @@
 <body>
     <div id="root"></div>
     <script type="module">
-        // === [ MAJOR BLOCK: Imports & Globals v2.0.1 ] ===
+        // === [ MAJOR BLOCK: Imports & Globals v2.0.3 ] ===
         import { h, render, Component } from 'https://esm.sh/preact';
         import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
         import htm from 'https://esm.sh/htm';
         import Papa from 'https://esm.sh/papaparse';
         
-        // [REF: CHRONO-01] EDTF.js Extended Date Parser (Transpiled for Browser)
-        import * as edtf from 'https://esm.sh/edtf';
+        // [REF: CHRONO-01] EDTF.js Extended Date Parser (Default Export Transpilation)
+        import edtf from 'https://esm.sh/edtf';
         
         const html = htm.bind(h);
-        const APP_VERSION = 'v7.0.5';
+        const APP_VERSION = 'v7.0.6';
         document.title = `CarTiMapper Core - ${APP_VERSION}`;
         
-        const MODULE_VERSIONS = { Styles: 'v4.13.12', Globals: 'v2.0.1' };
+        const MODULE_VERSIONS = { Styles: 'v5.0.1', Globals: 'v2.0.3' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: Utilities v1.0.0 ] ===
-        const stripHTML = (htmlStr) => {
-            if (!htmlStr) return '';
-            const tmp = document.createElement("DIV");
-            tmp.innerHTML = htmlStr;
-            return tmp.textContent || tmp.innerText || "";
-        };
-        // === [ END MAJOR BLOCK ] ===
 
         // === [ MAJOR BLOCK: ErrorBoundary v1.0.0 ] ===
         class ErrorBoundary extends Component {
@@ -1602,7 +1634,7 @@
         MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.3';
         // === [ END MAJOR BLOCK ] ===
 		
-        // === [ MAJOR BLOCK: AppOrchestrator v2.0.4 ] ===
+        // === [ MAJOR BLOCK: AppOrchestrator v2.0.6 ] ===
         const App = () => {
           const [logs, setLogs] = useState([]);
           const [rawCsvRows, setRawCsvRows] = useState([]);
@@ -1707,7 +1739,6 @@
           const formatSmartDate = (start, end, loc) => {
             if (!start) return 'Unknown Date';
 
-            // EDTF Strings physically bypass localization configuration
             if (start.isEDTF || (end && end.isEDTF)) {
               const sTxt = start.text;
               const eTxt = end ? end.text : null;
@@ -1774,6 +1805,7 @@
             return () => window.removeEventListener('resize', handleResize);
           }, []);
 
+          // [REF: UI-51] Dynamic Rotation Matrix (Restored)
           const startPrimaryResize = (e) => {
             if (maxPane) return;
             const tStart = e.touches ? Array.from(e.touches).at(0) : e;
@@ -1781,6 +1813,7 @@
             const startY = tStart.clientY;
             const isDesktop = window.innerWidth >= 1024;
             const containerNode = appRef.current.querySelector('.core-viewports');
+            
             const startVal = isDesktop ? appRef.current.querySelector('.content-slider-pane').offsetWidth : appRef.current.querySelector('.content-slider-pane').offsetHeight;
             const containerSize = isDesktop ? containerNode.offsetWidth : containerNode.offsetHeight;
 
@@ -1788,6 +1821,8 @@
               const tCurrent = e2.touches ? Array.from(e2.touches).at(0) : e2;
               const currentX = tCurrent.clientX;
               const currentY = tCurrent.clientY;
+              // Desktop (Text on Left): moving right (+) increases text width.
+              // Mobile (Text on Bottom): moving up (+) increases text height.
               const delta = isDesktop ? (currentX - startX) : (startY - currentY);
               let pct = ((startVal + delta) / containerSize) * 100;
               if (pct < 15) pct = 15;
@@ -1816,6 +1851,7 @@
             const startY = tStart.clientY;
             const isDesktop = window.innerWidth >= 1024;
             const containerNode = appRef.current.querySelector('.visual-pane');
+            
             const startVal = isDesktop ? appRef.current.querySelector('.map-pane').offsetHeight : appRef.current.querySelector('.map-pane').offsetWidth;
             const containerSize = isDesktop ? containerNode.offsetHeight : containerNode.offsetWidth;
 
@@ -1823,6 +1859,8 @@
               const tCurrent = e2.touches ? Array.from(e2.touches).at(0) : e2;
               const currentX = tCurrent.clientX;
               const currentY = tCurrent.clientY;
+              // Desktop (Map on Top): Dragging down (+) increases map height
+              // Mobile (Map on Left): Dragging right (+) increases map width
               const delta = isDesktop ? (currentY - startY) : (currentX - startX);
               let pct = ((startVal + delta) / containerSize) * 100;
               if (pct < 10) pct = 10;
@@ -1969,6 +2007,7 @@
               const norm = {};
               for (let k in row) norm[k.toLowerCase().trim()] = row[k];
 
+              // [FIX] Strict Mode Separation (Zero Per-Record Fallback)
               const parseChronoNode = (legacyStr, edtfStr) => {
                 const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
                 const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
@@ -1976,7 +2015,8 @@
                 if (activeMode === 'edtf') {
                   if (!cleanEdtf) return null;
                   try {
-                    const edtfObj = edtf.parse(cleanEdtf);
+                    // [FIX] Execute direct function call from ESM default export
+                    const edtfObj = edtf(cleanEdtf);
                     if (edtfObj) {
                       return {
                         isEDTF: true,
@@ -1988,7 +2028,7 @@
                       };
                     }
                   } catch (e) {
-                    return null;
+                    return null; // Suppress and cleanly reject invalid format
                   }
                   return null;
                 } else {
@@ -2306,7 +2346,7 @@
             </div>
           `;
         };
-        MODULE_VERSIONS['AppOrchestrator'] = 'v2.0.4';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v2.0.6';
         // === [ END MAJOR BLOCK ] ===
 		
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===

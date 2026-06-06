@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v7.0.7] - 2026-06-06
+### Changed
+- **DOM Filter Eradication:** Purged the legacy `stripHTML` DOM-dependent utility. Substituted all calls natively via local component closures using lightweight regex logic, securing the engine against fatal `ReferenceError` crashes during high-velocity timeline scrolling.
+### Fixed
+- **Virtual Subtitle Preservation:** Timeline labels and Map Tooltips no longer aggressively squash text. If a Title contains a virtual subtitle within a `<p>` tag, the engine intelligently substitutes the paragraph break for a semantic dash (` - `) before dropping the underlying HTML nodes.
+
 v7.0.6 - Layout Axis Synchronization & Parser Invocation Fix
 
 * **Version Bump:** Advanced App to v7.0.6, Styles to v5.0.1, Globals to v2.0.3, and AppOrchestrator to v2.0.6.
