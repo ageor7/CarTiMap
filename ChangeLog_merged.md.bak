@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+v7.0.8 - Ghost Geometry Eradication & Parallel SubLabel Mapping
+
+* **Version Bump:** Advanced App to v7.0.8, MapViewer to v4.1.12, and AppOrchestrator to v2.0.7.
+* **Spatial Crash Eradication:** Fixed `TypeError: can't access property "lat", t is null`. Empty or un-parsable WKT/GeoJSON arrays were mechanically rendered by Wicket.js as "ghost" layers with undefined coordinates, fatally crashing Leaflet's `getLatLng()` boot loop. The engine now physically strips null geometries before they hit the array.
+* **Syntax Restoration:** Restored the `[x, y]` spatial offset arrays (`iconSize`, `iconAnchor`, `offset`, `padding`) mistakenly truncated in a prior patch, which was crippling default pin behavior.
+* **Duplicate Layer Eradication:** Addressed the "multiple elements" bug. MapViewer now extracts coordinates to 5 decimal places, hashes a signature (`P_37.983_23.727`), and drops identical geometries per row. This prevents the map from wastefully rendering 3 overlapping pins for redundant MULTIPOINT strings.
+* **Parallel SubLabel Routing:** Added `SubLabels` support via `AppOrchestrator` ingestor. `MapViewer` natively parses delimited arrays (`|`, `;`, `·`) and correctly marries discrete tooltip strings to each distinct geometry point in a collection, abandoning the broken fallback behavior.
+
 ## [v7.0.7] - 2026-06-06
 ### Changed
 - **DOM Filter Eradication:** Purged the legacy `stripHTML` DOM-dependent utility. Substituted all calls natively via local component closures using lightweight regex logic, securing the engine against fatal `ReferenceError` crashes during high-velocity timeline scrolling.

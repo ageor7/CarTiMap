@@ -1,6 +1,19 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+v7.1.0 - Phase 1: 4D Telemetry Hoisting & SubLabel Parity
+
+* **Version Bump:** Advanced App to v7.1.0, AppOrchestrator to v2.0.8, TimelineScrubber to v25.0.5, and MapViewer to v5.0.3.
+* **Telemetry Hoisting:** Instantiated the `visibleTimeBounds` shared array at the global `AppOrchestrator` level. The `TimelineScrubber` passively calculates and broadcasts its absolute `[visibleLeftMs, visibleRightMs]` viewport boundaries back to the core. This establishes the structural bridge required for the Phase 2 "Breathing Map" algorithms.
+* **SubLabel Array Parity:** The `MapViewer` now utilizes an explicit array mapping fallback metric (`safeSubLabel`). If an event's `SubLabels` pipe-delimited string provides fewer labels than there are geographic MultiPoints (or none at all), the loop mathematically falls back to the exact local `Place`, and subsequently to the root event `Title`, without throwing silent out-of-bound array index exceptions.
+* **Syntax Restoration:** Corrected the Leaflet UI `[x, y]` arrays (`iconSize`, `iconAnchor`, `padding`) from truncated single digits back to their standard geometries (`[5, 6]` etc.).
+
+## [v7.0.9] - 2026-06-06
+### Fixed
+- **Camera Initialization Crash:** Resolved a fatal `t is null` error where the Map and Minimap cameras were attempting to boot using a truncated coordinate string, causing Leaflet to crash on `getCenter()`. 
+- **WKT Axis Double-Inversion:** Corrected the spatial mapping logic. The Wicket plugin handles `[Lon, Lat]` to `[Lat, Lon]` conversions natively. Removed redundant manual inversions from the GeoJSON loop while preserving strict `m[1], m[2]` inversion explicitly for the WKT regex fallback.
+- **Syntax Restoration:** Restored missing Leaflet geometric configuration arrays (`iconSize`, `iconAnchor`, `offset`, `padding`) to prevent silent geometry failures.
+
 v7.0.8 - Ghost Geometry Eradication & Parallel SubLabel Mapping
 
 * **Version Bump:** Advanced App to v7.0.8, MapViewer to v4.1.12, and AppOrchestrator to v2.0.7.
