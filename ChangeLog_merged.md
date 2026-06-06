@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.1.0] - 2026-06-07
+### Added
+- **EDTF Quantum Physics (Phase 3):** Upgraded the "Breathing Map" temporal intersection algorithm. The MapViewer now natively decodes disjointed Extended Date Time Format (EDTF) Sets and Lists. Historical events with non-continuous dates (e.g., specific recurring days) will cause their geographic pins to perfectly "flash" in and out of the clustered visibility timeline exactly when the dates cross the screen.
+
+### Fixed
+- **Geometric Configuration Arrays:** Restored the hardcoded Leaflet geometry arrays (`iconSize: [1, 2]`, `iconAnchor: [2, 3]`, `padding: [4]`) to completely insulate the DOM from rendering undersized or offset pins.
+
 ## [v8.0.0] - 2026-06-07
 ### Added
 - **The Breathing Map (Phase 2):** Integrated temporal ghosting. The map now actively polls the timeline's `visibleTimeBounds`. Pins falling outside the current chronological window are dropped to 20% opacity and actively pulled out of the `MarkerCluster` bucket, ensuring clusters only reflect the active historical era.

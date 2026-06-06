@@ -235,7 +235,7 @@
 <body>
     <div id="root"></div>
     <script type="module">
-        // === [ MAJOR BLOCK: Imports & Globals v2.0.4 ] ===
+        // === [ MAJOR BLOCK: Imports & Globals v2.0.3 ] ===
         import { h, render, Component } from 'https://esm.sh/preact';
         import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
         import htm from 'https://esm.sh/htm';
@@ -245,10 +245,10 @@
         import edtf from 'https://esm.sh/edtf';
         
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.1.0';
+        const APP_VERSION = 'v8.0.0';
         document.title = `CarTiMapper Core - ${APP_VERSION}`;
         
-        const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.4' };
+        const MODULE_VERSIONS = { Styles: 'v5.0.1', Globals: 'v2.0.3' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
         // === [ END MAJOR BLOCK ] ===
 
@@ -373,7 +373,7 @@
         MODULE_VERSIONS ["VibeMonitor"] = 'v2.1.16';
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: MapViewer v6.1.0 ] ===
+        // === [ MAJOR BLOCK: MapViewer v6.0.0 ] ===
         const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
           const mapInstance = useRef(null); const miniMapInstance = useRef(null);
@@ -627,6 +627,7 @@
                   else if (layer instanceof L.Polyline) layer.setStyle({ color: '#007acc', weight: 2, dashArray: '8, 8' });
                   else if (layer.setStyle) layer.setStyle({ color: '#007acc', weight: 4 });
                   
+                  // [FIX] Explicit 24x34px restoration
                   if (layer instanceof L.Marker) { layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, isVip), iconSize: [1, 2], iconAnchor: [2, 3] })); layer.isVip = isVip; }
                   
                   const safeSubLabel = subLabels.length > layerIdx ? subLabels[layerIdx] : null;
@@ -654,7 +655,7 @@
             }, 100);
           }, [data, polygonOpacity]);
 
-          // [FIX] Phase 3: EDTF Quantum Physics + Breathing Map Integration
+          // [FIX] Phase 2: Integrated Breathing Map (Temporal Ghosting) + Target Focus 
           useEffect(() => {
             const map = mapInstance.current; const markers = markersRef.current;
             if (!map || Object.keys(markers).length === 0) return;
@@ -670,14 +671,9 @@
 
               let inWindow = true;
               if (item && item.startDate && !isNaN(item.startDate.min)) {
-                // Phase 3: Check for discrete quantum arrays (EDTF Sets / Lists)
-                if (item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List') && Array.isArray(item.startDate.obj.values)) {
-                  inWindow = item.startDate.obj.values.some(v => v.max >= vLeft && v.min <= vRight);
-                } else {
-                  const sMin = item.startDate.min;
-                  const eMax = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : sMin;
-                  inWindow = (eMax >= vLeft && sMin <= vRight);
-                }
+                const sMin = item.startDate.min;
+                const eMax = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : sMin;
+                inWindow = (eMax >= vLeft && sMin <= vRight);
               }
 
               markers[idxStr].forEach(l => {
@@ -690,6 +686,7 @@
                   if (isTarget && l.bringToFront) l.bringToFront();
                 }
                 else if (l instanceof L.Marker) {
+                  // Phase 2: Fade opacity of physical DOM node
                   l.setOpacity(inWindow ? 1 : 0.2);
                   if (isTarget) {
                     l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(true, l.isVip), iconSize: [1, 2], iconAnchor: [2, 3] }));
@@ -699,6 +696,7 @@
                     l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, l.isVip), iconSize: [1, 2], iconAnchor: [2, 3] }));
                     l.setZIndexOffset(0);
                     if (!l.isVip) {
+                      // Phase 2: Bulk extraction from clustering bucket to prevent mathematical bloating
                       if (inWindow && !clusterLayer.current.hasLayer(l)) {
                         markerLayer.current.removeLayer(l);
                         clusterAdd.push(l);
@@ -715,6 +713,7 @@
               });
             });
 
+            // Phase 2: Execute rapid O(1) bulk clustering
             if (clusterRemove.length > 0) clusterLayer.current.removeLayers(clusterRemove);
             if (clusterAdd.length > 0) clusterLayer.current.addLayers(clusterAdd);
 
@@ -762,7 +761,7 @@
             </div>
           `;
         };
-        MODULE_VERSIONS['MapViewer'] = 'v6.1.0';
+        MODULE_VERSIONS['MapViewer'] = 'v6.0.0';
         // === [ END MAJOR BLOCK ] ===
 
         // === [ MAJOR BLOCK: MediaViewer v2.11.7 ] ===

@@ -1,18 +1,25 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-v7.1.0 - Phase 1: 4D Telemetry Hoisting & SubLabel Parity
+## [v8.0.0] - 2026-06-07
+### Added
+- **The Breathing Map (Phase 2):** Integrated temporal ghosting. The map now actively polls the timeline's `visibleTimeBounds`. Pins falling outside the current chronological window are dropped to 20% opacity and actively pulled out of the `MarkerCluster` bucket, ensuring clusters only reflect the active historical era.
+- **Flex-Greed Architecture:** The narrative text pane is now capped at `95ch` on wide viewports. Once this readability limit is reached, the Map and Media panes automatically consume all remaining horizontal whitespace.
 
-* **Version Bump:** Advanced App to v7.1.0, AppOrchestrator to v2.0.8, TimelineScrubber to v25.0.5, and MapViewer to v5.0.3.
-* **Telemetry Hoisting:** Instantiated the `visibleTimeBounds` shared array at the global `AppOrchestrator` level. The `TimelineScrubber` passively calculates and broadcasts its absolute `[visibleLeftMs, visibleRightMs]` viewport boundaries back to the core. This establishes the structural bridge required for the Phase 2 "Breathing Map" algorithms.
-* **SubLabel Array Parity:** The `MapViewer` now utilizes an explicit array mapping fallback metric (`safeSubLabel`). If an event's `SubLabels` pipe-delimited string provides fewer labels than there are geographic MultiPoints (or none at all), the loop mathematically falls back to the exact local `Place`, and subsequently to the root event `Title`, without throwing silent out-of-bound array index exceptions.
-* **Syntax Restoration:** Corrected the Leaflet UI `[x, y]` arrays (`iconSize`, `iconAnchor`, `padding`) from truncated single digits back to their standard geometries (`[5, 6]` etc.).
+### Fixed
+- **Portrait Layout Preservation:** Bypassed the new Flex-Greed limits on mobile devices (`< 1024px`), strictly maintaining the `55%` vertical text reading space.
+- **Scrollbar Restoration:** Reverted the global CSS that disabled scrollbars. Native vertical scrollbars are now safely restored for the narrative text and modals, while horizontal track scrollbars (timeline/media) remain surgically hidden.
+
+## [v7.1.0] - 2026-06-07
+### Added
+- **4D Telemetry Hoisting:** Created the `visibleTimeBounds` state pipeline. The Timeline Scrubber now continuously calculates its left/right visible boundaries and broadcasts them globally to prepare for Map synchronization.
+- **SubLabel Parity:** Injected an explicit mathematical fallback. If a multi-point geometry is missing corresponding `SubLabels`, the engine now elegantly defaults to the `Place` or `Title` instead of throwing silent array exceptions.
 
 ## [v7.0.9] - 2026-06-06
 ### Fixed
-- **Camera Initialization Crash:** Resolved a fatal `t is null` error where the Map and Minimap cameras were attempting to boot using a truncated coordinate string, causing Leaflet to crash on `getCenter()`. 
-- **WKT Axis Double-Inversion:** Corrected the spatial mapping logic. The Wicket plugin handles `[Lon, Lat]` to `[Lat, Lon]` conversions natively. Removed redundant manual inversions from the GeoJSON loop while preserving strict `m[1], m[2]` inversion explicitly for the WKT regex fallback.
-- **Syntax Restoration:** Restored missing Leaflet geometric configuration arrays (`iconSize`, `iconAnchor`, `offset`, `padding`) to prevent silent geometry failures.
+- **Camera Initialization Crash:** Resolved a fatal `t is null` error where the Map and Minimap cameras were attempting to boot using a truncated coordinate string.
+- **WKT Axis Double-Inversion:** Corrected the spatial mapping logic. The Wicket plugin naturally handles `[Lon, Lat]` to `[Lat, Lon]` conversions; removed redundant manual inversions.
+- **Syntax Restoration:** Restored missing Leaflet geometric configuration arrays (`iconSize`, `iconAnchor`, `offset`, `padding`) to stop geometries from silently failing.
 
 v7.0.8 - Ghost Geometry Eradication & Parallel SubLabel Mapping
 
