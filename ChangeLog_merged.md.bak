@@ -1,6 +1,9 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.3.15] - MediaViewer v2.12.4
+    [UI/UX] Fixed an issue where the top-right Action Buttons (Maximize, Open Link) became invisible against the light-grey instructional banner when attempting to load a PDF or an unencrypted HTTP link. The banner background has been darkened to match the application's native theme.
+	
 v8.3.14 (MediaViewer v2.12.3) Summary: Optimize Carousel performance, fix URL sanitization, and handle Mixed-Content blocks 
 [Performance / Core Engine] Implemented absolute DOM dimension caching via ResizeObserver in the Media Carousel to completely eliminate 60fps layout thrashing.
 [Performance / Media Engine] Injected loading="lazy" tags into all <iframe> and <img> components, preventing the "Iframe Bomb" network bottleneck when a slide contains dense arrays of media links.

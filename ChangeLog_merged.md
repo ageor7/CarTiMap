@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.3.16] - MediaViewer v2.12.5
+
+    [UI/UX] Upgraded all floating buttons inside the Media Pane (Maximize, Open File, Navigation Chevrons, Array Counter) to an "Obsidian Glass" (dark translucent) theme. This ensures that the controls are universally visible and never wash out, regardless of how bright or white the underlying image or document is.
+	
 [v8.3.15] - MediaViewer v2.12.4
     [UI/UX] Fixed an issue where the top-right Action Buttons (Maximize, Open Link) became invisible against the light-grey instructional banner when attempting to load a PDF or an unencrypted HTTP link. The banner background has been darkened to match the application's native theme.
 	

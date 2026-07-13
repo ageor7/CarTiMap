@@ -244,7 +244,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.3.15';
+		const APP_VERSION = 'v8.3.16';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -822,7 +822,7 @@
           `;
         };
 		
-		// === [ MAJOR BLOCK: MediaViewer v2.12.4 ] ===
+		// === [ MAJOR BLOCK: MediaViewer v2.12.5 ] ===
 		const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
 			const carouselRef = useRef(null);
 			const carouselWidthRef = useRef(0);
@@ -973,19 +973,21 @@
 			};
 
 			const currentCleanUrl = getCleanUrl(mediaItems[activeMediaIdx] || '');
-			const btnStyle = "background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: #eee; padding: 6px; border-radius: 4px; cursor: pointer; backdrop-filter: blur(4px); transition: background 0.2s; pointer-events: auto; display: flex; align-items: center; justify-content: center; text-decoration: none;";
+			
+			// [REF: UI-182] Obsidian Glass Universal Contrast Matrix
+			const btnStyle = "background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px; border-radius: 4px; cursor: pointer; backdrop-filter: blur(4px); transition: background 0.2s; pointer-events: auto; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.3);";
 
 			return html`
 			<div style="position: relative; height: 100%; width: 100%;">
 				<div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
-					<button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle} box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: none;">
+					<button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle}">
 						${maxPane === 'media'
 							? html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
 							: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
 						}
 					</button>
-					${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle} border: none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
-					${mediaItems.length > 1 ? html`<div style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); color: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600;">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
+					${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
+					${mediaItems.length > 1 ? html`<div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
 				</div>
 
 				${mediaItems.length > 1 ? html`
@@ -1033,8 +1035,9 @@
 			</div>
 			`;
 		};
-		MODULE_VERSIONS['MediaViewer'] = 'v2.12.4';
+		MODULE_VERSIONS['MediaViewer'] = 'v2.12.5';
 		// === [ END MAJOR BLOCK ] ===
+
 
 				
         // === [ MAJOR BLOCK: ContentSlider v4.4.1 ] ===

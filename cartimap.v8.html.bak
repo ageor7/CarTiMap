@@ -244,7 +244,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.3.14';
+		const APP_VERSION = 'v8.3.15';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -822,7 +822,7 @@
           `;
         };
 		
-		// === [ MAJOR BLOCK: MediaViewer v2.12.3 ] ===
+		// === [ MAJOR BLOCK: MediaViewer v2.12.4 ] ===
 		const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
 			const carouselRef = useRef(null);
 			const carouselWidthRef = useRef(0);
@@ -953,11 +953,11 @@
 				const isHttpBlocked = lowUrl.startsWith('http://') && window.location.protocol === 'https:';
 				if (evalUrl.endsWith('.pdf') || isHttpBlocked) {
 					return html`
-						<div style="position: relative; width: 100%; height: 100%; background: #eee; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
-							<div style="position: absolute; z-index: 1; color: #555; font-size: 0.9rem; max-width: 80%;">
+						<div style="position: relative; width: 100%; height: 100%; background: #222; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
+							<div style="position: absolute; z-index: 1; color: #ccc; font-size: 0.95rem; max-width: 80%; line-height: 1.5;">
 								${isHttpBlocked 
-									? html`Browser security prevents loading unencrypted (HTTP) content inline.<br/><br/>Please use the <b>[↗]</b> button top-right to open it safely in a new tab.`
-									: html`PDF inline rendering is device-dependent.<br/><br/>If the document does not appear, please use the <b>[↗]</b> button top-right to open it natively.`
+									? html`Browser security prevents loading unencrypted (HTTP) content inline.<br/><br/>Please use the <b style="color: #fff;">[↗]</b> button top-right to open it safely in a new tab.`
+									: html`PDF inline rendering is device-dependent.<br/><br/>If the document does not appear, please use the <b style="color: #fff;">[↗]</b> button top-right to open it natively.`
 								}
 							</div>
 							${!isHttpBlocked ? html`<iframe src="${url}" loading="lazy" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 2; background: transparent;"></iframe>` : ''}
@@ -1033,9 +1033,10 @@
 			</div>
 			`;
 		};
-		MODULE_VERSIONS['MediaViewer'] = 'v2.12.3';
+		MODULE_VERSIONS['MediaViewer'] = 'v2.12.4';
 		// === [ END MAJOR BLOCK ] ===
-		
+
+				
         // === [ MAJOR BLOCK: ContentSlider v4.4.1 ] ===
         const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, dateLocale, formatSmartDate}) => {
             const touchStartX = useRef (0);
