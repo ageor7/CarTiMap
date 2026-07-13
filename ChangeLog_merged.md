@@ -1,7 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-v8.3.13 (MediaViewer v2.13.0) Summary: Implement Chevron HUD failsafe to bypass the Iframe Event-Swallow Trap Description:
+v8.3.14 (MediaViewer v2.12.3) Summary: Optimize Carousel performance, fix URL sanitization, and handle Mixed-Content blocks 
+[Performance / Core Engine] Implemented absolute DOM dimension caching via ResizeObserver in the Media Carousel to completely eliminate 60fps layout thrashing.
+[Performance / Media Engine] Injected loading="lazy" tags into all <iframe> and <img> components, preventing the "Iframe Bomb" network bottleneck when a slide contains dense arrays of media links.
+[Media Engine] Upgraded the Image Parsing Regex to properly detect raw binary GitHub files (e.g., ?raw=true) by temporarily stripping query parameters during evaluation without altering the physical destination URL.
+[UI/UX] Expanded the Z-Stack Passive Failsafe to intercept silent browser "Mixed-Content Blocks" when attempting to render unencrypted http:// legacy archive links (like Efimeris) inside the https:// application envelope.
+
+v8.3.13 (MediaViewer v2.12.2) Summary: Implement Chevron HUD failsafe to bypass the Iframe Event-Swallow Trap Description:
 [UI/UX] Added a permanent, highly visible Left/Right navigation failsafe to the Media Carousel. This allows users to swipe through slides even when interacting with fully embedded documents, maps, or YouTube videos that previously swallowed cursor and touch events.
 
 v8.3.12 (MediaViewer v2.12.1) Summary: Hotfix Preact Virtual DOM reconciliation crash in Carousel mapping 

@@ -1,6 +1,9 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+v8.3.13 (MediaViewer v2.13.0) Summary: Implement Chevron HUD failsafe to bypass the Iframe Event-Swallow Trap Description:
+[UI/UX] Added a permanent, highly visible Left/Right navigation failsafe to the Media Carousel. This allows users to swipe through slides even when interacting with fully embedded documents, maps, or YouTube videos that previously swallowed cursor and touch events.
+
 v8.3.12 (MediaViewer v2.12.1) Summary: Hotfix Preact Virtual DOM reconciliation crash in Carousel mapping 
 [Core Engine] Fixed a fatal application crash when navigating between slides containing different quantities of media assets.
 [Media Engine] Restored compatibility for direct HTML <iframe> strings (like custom Google Maps embeds) coming from the spreadsheet.

@@ -244,7 +244,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.3.13';
+		const APP_VERSION = 'v8.3.14';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -822,15 +822,28 @@
           `;
         };
 		
-		// === [ MAJOR BLOCK: MediaViewer v2.13.0 ] ===
+		// === [ MAJOR BLOCK: MediaViewer v2.12.3 ] ===
 		const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
 			const carouselRef = useRef(null);
+			const carouselWidthRef = useRef(0);
 			const [activeMediaIdx, setActiveMediaIdx] = useState(0);
 			const dragRef = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
 
 			useEffect(() => {
-				if (carouselRef.current) carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+				if (!carouselRef.current) return;
+				carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
 				setActiveMediaIdx(0);
+				carouselWidthRef.current = carouselRef.current.clientWidth;
+
+				// [REF: PERF-35] Passive Dimension Caching to prevent Layout Thrashing
+				if (window.ResizeObserver) {
+					const ro = new ResizeObserver(entries => {
+						const entry = entries.at(0);
+						if (entry) carouselWidthRef.current = entry.contentRect.width;
+					});
+					ro.observe(carouselRef.current);
+					return () => ro.disconnect();
+				}
 			}, [activeSlide]);
 
 			if (!activeSlide || !activeSlide.media || activeSlide.media.length === 0) return null;
@@ -849,13 +862,14 @@
 
 			const getCleanUrl = (rawUrl) => {
 				const url = rawUrl.trim();
-				if (url.toLowerCase().startsWith('<iframe')) { const match = url.match(/src=["']([^"']+)["']/); return match ? match[1] : '#'; }
+				if (url.toLowerCase().startsWith('<iframe')) { const match = url.match(/src=["']([^"']+)["']/); return match ? match.at(1) : '#'; }
 				return url;
 			};
 
 			const handleScroll = (e) => {
-				if (dragRef.current.isDown) return; // Prevent state thrashing during active JS drag
-				const idx = Math.round(e.target.scrollLeft / e.target.clientWidth);
+				if (dragRef.current.isDown) return; 
+				const width = carouselWidthRef.current || e.target.clientWidth;
+				const idx = Math.round(e.target.scrollLeft / width);
 				if (idx !== activeMediaIdx) setActiveMediaIdx(idx);
 			};
 
@@ -866,7 +880,7 @@
 				if (!carouselRef.current) return;
 				const newIdx = activeMediaIdx + direction;
 				if (newIdx >= 0 && newIdx < mediaItems.length) {
-					const width = carouselRef.current.clientWidth;
+					const width = carouselWidthRef.current || carouselRef.current.clientWidth;
 					carouselRef.current.scrollTo({ left: newIdx * width, behavior: 'smooth' });
 				}
 			};
@@ -889,9 +903,10 @@
 				if (!dragRef.current.isDown) return;
 				dragRef.current.isDown = false;
 				carouselRef.current.classList.remove('is-dragging');
-				const idx = Math.round(carouselRef.current.scrollLeft / carouselRef.current.clientWidth);
+				const width = carouselWidthRef.current || carouselRef.current.clientWidth;
+				const idx = Math.round(carouselRef.current.scrollLeft / width);
 				setActiveMediaIdx(idx);
-				carouselRef.current.scrollTo({ left: idx * carouselRef.current.clientWidth, behavior: 'smooth' });
+				carouselRef.current.scrollTo({ left: idx * width, behavior: 'smooth' });
 			};
 
 			const onMouseMove = (e) => {
@@ -906,48 +921,55 @@
 			const renderMedia = (rawUrl) => {
 				const url = getCleanUrl(rawUrl);
 				const lowUrl = url.toLowerCase();
+				
+				// [REF: MED-16] URL Sanitization for Evaluation Only
+				const evalUrl = lowUrl.split('?').at(0).split('#').at(0);
 
 				// [REF: CRASH-04] Raw Iframe Interceptor for custom embeds
-				if (lowUrl.startsWith('<iframe')) {
+				if (evalUrl.startsWith('<iframe')) {
 					return html`<div dangerouslySetInnerHTML=${{ __html: url }} style="flex-grow: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; pointer-events: auto;"></div>`;
 				}
 
 				// [REF: MED-12] YouTube API Time-Stamp Translation
-				if (lowUrl.includes('youtube.com') || lowUrl.includes('youtu.be')) {
+				if (evalUrl.includes('youtube.com') || evalUrl.includes('youtu.be')) {
 					let embedUrl = url;
 					if (lowUrl.includes('youtu.be/')) {
-						embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+						embedUrl = url.replace(/youtu\.be\//i, 'youtube.com/embed/');
 					} else if (lowUrl.includes('watch?v=')) {
-						embedUrl = url.replace('watch?v=', 'embed/').replace(/&/g, '?');
+						embedUrl = url.replace(/watch\?v=/i, 'embed/').replace(/&/g, '?');
 					}
 					
 					const tMatch = url.match(/[?&]t=(\d+)s?/i);
-					if (tMatch && tMatch[1]) {
-						const seconds = tMatch[1];
+					if (tMatch && tMatch.at(1)) {
+						const seconds = tMatch.at(1);
 						embedUrl = embedUrl.replace(/[?&]t=\d+s?/i, '');
 						embedUrl += (embedUrl.includes('?') ? '&' : '?') + `start=${seconds}`;
 					}
 					
-					return html`<iframe src="${embedUrl}" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+					return html`<iframe src="${embedUrl}" loading="lazy" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
 				}
 
-				// [REF: MED-13] Z-Stack Passive PDF Failsafe
-				if (lowUrl.endsWith('.pdf')) {
+				// [REF: MED-13] Z-Stack Passive Failsafe (PDF & Mixed Content Block)
+				const isHttpBlocked = lowUrl.startsWith('http://') && window.location.protocol === 'https:';
+				if (evalUrl.endsWith('.pdf') || isHttpBlocked) {
 					return html`
 						<div style="position: relative; width: 100%; height: 100%; background: #eee; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
 							<div style="position: absolute; z-index: 1; color: #555; font-size: 0.9rem; max-width: 80%;">
-								PDF inline rendering is device-dependent.<br/><br/>If the document does not appear, please use the <b>[↗]</b> button top-right to open it natively.
+								${isHttpBlocked 
+									? html`Browser security prevents loading unencrypted (HTTP) content inline.<br/><br/>Please use the <b>[↗]</b> button top-right to open it safely in a new tab.`
+									: html`PDF inline rendering is device-dependent.<br/><br/>If the document does not appear, please use the <b>[↗]</b> button top-right to open it natively.`
+								}
 							</div>
-							<iframe src="${url}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 2; background: transparent;"></iframe>
+							${!isHttpBlocked ? html`<iframe src="${url}" loading="lazy" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 2; background: transparent;"></iframe>` : ''}
 						</div>
 					`;
 				}
 
-				if (lowUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/)) {
+				if (evalUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/)) {
 					return html`<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
 				}
 
-				return html`<iframe src="${url}" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
+				return html`<iframe src="${url}" loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
 			};
 
 			const currentCleanUrl = getCleanUrl(mediaItems[activeMediaIdx] || '');
@@ -991,7 +1013,6 @@
 						const itemCredit = credits[i] || '';
 						const cUrl = getCleanUrl(rawUrl);
 						
-						// [REF: MED-14] 404-Protected Clickable Credits & Captions
 						const isCreditUrl = /^https?:\/\//i.test(itemCredit);
 						
 						return html`
@@ -1012,9 +1033,9 @@
 			</div>
 			`;
 		};
-		MODULE_VERSIONS['MediaViewer'] = 'v2.13.0';
+		MODULE_VERSIONS['MediaViewer'] = 'v2.12.3';
 		// === [ END MAJOR BLOCK ] ===
-
+		
         // === [ MAJOR BLOCK: ContentSlider v4.4.1 ] ===
         const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, dateLocale, formatSmartDate}) => {
             const touchStartX = useRef (0);
