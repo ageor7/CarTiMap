@@ -1,5 +1,9 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
+v8.3.11 (MediaViewer v2.12.0) Summary: Enhance MediaViewer with YouTube API sync, PDF Z-Stack Failsafe, and Clickable Meta
+[Media Engine] Upgraded MediaViewer to v2.12.0. YouTube videos now mathematically start at the precise second indicated in the database URL.
+[Media Engine] Added a permanent, self-managing instructional banner behind PDF documents to assist mobile users whose devices block inline document rendering.
+[UI/UX] Media Captions and valid Media Credit URLs are now fully clickable, opening natively in new browser tabs.
 
 v8.3.10 ISO Now CarTiMp; date-times optional; version-specific EDTF.js
 [Core Engine] Officially renamed the platform to CarTiMap.
