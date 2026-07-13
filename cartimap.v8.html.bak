@@ -244,7 +244,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.3.11';
+		const APP_VERSION = 'v8.3.12';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -821,173 +821,177 @@
             </div>
           `;
         };
-        MODULE_VERSIONS['MapViewer'] = 'v6.3.8';
-        // === [ END MAJOR BLOCK ] ===		
-        // === [ MAJOR BLOCK: MediaViewer v2.11.7 ] ===
-        const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
-            const carouselRef = useRef(null);
-            const [activeMediaIdx, setActiveMediaIdx] = useState(0);
-            const dragRef = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
+		// === [ MAJOR BLOCK: MediaViewer v2.12.1 ] ===
+		const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
+			const carouselRef = useRef(null);
+			const [activeMediaIdx, setActiveMediaIdx] = useState(0);
+			const dragRef = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
 
-            useEffect(() => {
-                if (carouselRef.current) carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-                setActiveMediaIdx(0);
-            }, [activeSlide]);
+			useEffect(() => {
+				if (carouselRef.current) carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+				setActiveMediaIdx(0);
+			}, [activeSlide]);
 
-            if (!activeSlide || !activeSlide.media || activeSlide.media.length === 0) return null;
-            
-            const splitRegex = /[\r\n]+|\\n/;
-            let mediaItems = []; let captions = []; let credits = [];
-            
-            (Array.isArray(activeSlide.media) ? activeSlide.media : [activeSlide.media || '']).forEach(m => { if (typeof m === 'string') mediaItems.push(...m.split(splitRegex)); else mediaItems.push(m); });
-            mediaItems = mediaItems.map(s => String(s).trim()).filter(Boolean);
+			if (!activeSlide || !activeSlide.media || activeSlide.media.length === 0) return null;
 
-            (Array.isArray(activeSlide.mediaCaption) ? activeSlide.mediaCaption : [activeSlide.mediaCaption || '']).forEach(c => { if (typeof c === 'string') captions.push(...c.split(splitRegex)); else captions.push(c); });
-            captions = captions.map(s => String(s).trim());
+			const splitRegex = /[\r\n]+|\\n/;
+			let mediaItems = []; let captions = []; let credits = [];
 
-            (Array.isArray(activeSlide.mediaCredit) ? activeSlide.mediaCredit : [activeSlide.mediaCredit || '']).forEach(c => { if (typeof c === 'string') credits.push(...c.split(splitRegex)); else credits.push(c); });
-            credits = credits.map(s => String(s).trim());
+			(Array.isArray(activeSlide.media) ? activeSlide.media : [activeSlide.media || '']).forEach(m => { if (typeof m === 'string') mediaItems.push(...m.split(splitRegex)); else mediaItems.push(m); });
+			mediaItems = mediaItems.map(s => String(s).trim()).filter(Boolean);
 
-            const getCleanUrl = (rawUrl) => {
-                const url = rawUrl.trim();
-                if (url.toLowerCase().startsWith('<iframe')) { const match = url.match(/src=["']([^"']+)["']/); return match ? match[1] : '#'; }
-                return url;
-            };
+			(Array.isArray(activeSlide.mediaCaption) ? activeSlide.mediaCaption : [activeSlide.mediaCaption || '']).forEach(c => { if (typeof c === 'string') captions.push(...c.split(splitRegex)); else captions.push(c); });
+			captions = captions.map(s => String(s).trim());
 
-            const handleScroll = (e) => {
-                if (dragRef.current.isDown) return; // Prevent state thrashing during active JS drag
-                const idx = Math.round(e.target.scrollLeft / e.target.clientWidth);
-                if (idx !== activeMediaIdx) setActiveMediaIdx(idx);
-            };
+			(Array.isArray(activeSlide.mediaCredit) ? activeSlide.mediaCredit : [activeSlide.mediaCredit || '']).forEach(c => { if (typeof c === 'string') credits.push(...c.split(splitRegex)); else credits.push(c); });
+			credits = credits.map(s => String(s).trim());
 
-            // --- [ SubBlock: Desktop Drag Kinetics ] ---
-            const onMouseDown = (e) => {
-                dragRef.current.isDown = true;
-                carouselRef.current.classList.add('is-dragging');
-                dragRef.current.startX = e.pageX - carouselRef.current.offsetLeft;
-                dragRef.current.scrollLeft = carouselRef.current.scrollLeft;
-            };
-            const onMouseLeave = () => {
-                if (!dragRef.current.isDown) return;
-                dragRef.current.isDown = false;
-                carouselRef.current.classList.remove('is-dragging');
-            };
-            const onMouseUp = () => {
-                if (!dragRef.current.isDown) return;
-                dragRef.current.isDown = false;
-                carouselRef.current.classList.remove('is-dragging');
-                // Calculate nearest index based on release momentum and snap
-                const idx = Math.round(carouselRef.current.scrollLeft / carouselRef.current.clientWidth);
-                setActiveMediaIdx(idx);
-                carouselRef.current.scrollTo({ left: idx * carouselRef.current.clientWidth, behavior: 'smooth' });
-            };
-            const onMouseMove = (e) => {
-                if (!dragRef.current.isDown) return;
-                e.preventDefault(); // Annihilate default image ghosting/text selection
-                const x = e.pageX - carouselRef.current.offsetLeft;
-                const walk = (x - dragRef.current.startX) * 1.5; // Drag friction multiplier
-                carouselRef.current.scrollLeft = dragRef.current.scrollLeft - walk;
-            };
-            // --- [ End SubBlock ] ---
+			const getCleanUrl = (rawUrl) => {
+				const url = rawUrl.trim();
+				if (url.toLowerCase().startsWith('<iframe')) { const match = url.match(/src=["']([^"']+)["']/); return match ? match[1] : '#'; }
+				return url;
+			};
 
-			// === [ PATCH: MediaViewer v2.12.0 (renderMedia Engine) ] ===
-				const renderMedia = (rawUrl) => {
-					const url = getCleanUrl(rawUrl);
-					const lowUrl = url.toLowerCase();
+			const handleScroll = (e) => {
+				if (dragRef.current.isDown) return; // Prevent state thrashing during active JS drag
+				const idx = Math.round(e.target.scrollLeft / e.target.clientWidth);
+				if (idx !== activeMediaIdx) setActiveMediaIdx(idx);
+			};
 
-					// [REF: MED-12] YouTube API Time-Stamp Translation
-					if (lowUrl.includes('youtube.com') || lowUrl.includes('youtu.be')) {
-						let embedUrl = url;
-						if (lowUrl.includes('youtu.be/')) {
-							embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
-						} else if (lowUrl.includes('watch?v=')) {
-							embedUrl = url.replace('watch?v=', 'embed/').replace(/&/g, '?');
-						}
-						
-						// Surgically intercept and translate consumer 't=' to iframe API '?start='
-						const tMatch = url.match(/[?&]t=(\d+)s?/i);
-						if (tMatch) {
-							const seconds = tMatch[1];
-							embedUrl = embedUrl.replace(/[?&]t=\d+s?/i, '');
-							embedUrl += (embedUrl.includes('?') ? '&' : '?') + `start=${seconds}`;
-						}
-						
-						return html`<iframe src="${embedUrl}" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+			// --- [ SubBlock: Desktop Drag Kinetics ] ---
+			const onMouseDown = (e) => {
+				dragRef.current.isDown = true;
+				carouselRef.current.classList.add('is-dragging');
+				dragRef.current.startX = e.pageX - carouselRef.current.offsetLeft;
+				dragRef.current.scrollLeft = carouselRef.current.scrollLeft;
+			};
+
+			const onMouseLeave = () => {
+				if (!dragRef.current.isDown) return;
+				dragRef.current.isDown = false;
+				carouselRef.current.classList.remove('is-dragging');
+			};
+
+			const onMouseUp = () => {
+				if (!dragRef.current.isDown) return;
+				dragRef.current.isDown = false;
+				carouselRef.current.classList.remove('is-dragging');
+				// Calculate nearest index based on release momentum and snap
+				const idx = Math.round(carouselRef.current.scrollLeft / carouselRef.current.clientWidth);
+				setActiveMediaIdx(idx);
+				carouselRef.current.scrollTo({ left: idx * carouselRef.current.clientWidth, behavior: 'smooth' });
+			};
+
+			const onMouseMove = (e) => {
+				if (!dragRef.current.isDown) return;
+				e.preventDefault(); // Annihilate default image ghosting/text selection
+				const x = e.pageX - carouselRef.current.offsetLeft;
+				const walk = (x - dragRef.current.startX) * 1.5; // Drag friction multiplier
+				carouselRef.current.scrollLeft = dragRef.current.scrollLeft - walk;
+			};
+			// --- [ End SubBlock ] ---
+
+			const renderMedia = (rawUrl) => {
+				const url = getCleanUrl(rawUrl);
+				const lowUrl = url.toLowerCase();
+
+				// [REF: CRASH-04] Restore Raw Iframe Interceptor for custom embeds
+				if (lowUrl.startsWith('<iframe')) {
+					return html`<div dangerouslySetInnerHTML=${{ __html: url }} style="flex-grow: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; pointer-events: auto;"></div>`;
+				}
+
+				// [REF: MED-12] YouTube API Time-Stamp Translation
+				if (lowUrl.includes('youtube.com') || lowUrl.includes('youtu.be')) {
+					let embedUrl = url;
+					if (lowUrl.includes('youtu.be/')) {
+						embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+					} else if (lowUrl.includes('watch?v=')) {
+						embedUrl = url.replace('watch?v=', 'embed/').replace(/&/g, '?');
 					}
+					
+					// Surgically intercept and translate consumer 't=' to iframe API '?start='
+					const tMatch = url.match(/[?&]t=(\d+)s?/i);
+					if (tMatch && tMatch[1]) {
+						const seconds = tMatch[1];
+						embedUrl = embedUrl.replace(/[?&]t=\d+s?/i, '');
+						embedUrl += (embedUrl.includes('?') ? '&' : '?') + `start=${seconds}`;
+					}
+					
+					return html`<iframe src="${embedUrl}" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+				}
 
-					// [REF: MED-13] Z-Stack Passive PDF Failsafe
-					if (lowUrl.endsWith('.pdf')) {
+				// [REF: MED-13] Z-Stack Passive PDF Failsafe
+				if (lowUrl.endsWith('.pdf')) {
+					return html`
+						<div style="position: relative; width: 100%; height: 100%; background: #eee; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
+							<div style="position: absolute; z-index: 1; color: #555; font-size: 0.9rem; max-width: 80%;">
+								PDF inline rendering is device-dependent.<br/><br/>If the document does not appear, please use the <b>[↗]</b> button top-right to open it natively.
+							</div>
+							<iframe src="${url}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 2; background: transparent;"></iframe>
+						</div>
+					`;
+				}
+
+				// Standard Image/Media fallback
+				if (lowUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/)) {
+					return html`<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
+				}
+
+				// Generic Iframe for maps, sites, etc.
+				return html`<iframe src="${url}" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
+			};
+
+			const currentCleanUrl = getCleanUrl(mediaItems[activeMediaIdx] || '');
+			const btnStyle = "background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: #eee; padding: 6px; border-radius: 4px; cursor: pointer; backdrop-filter: blur(4px); transition: background 0.2s; pointer-events: auto; display: flex; align-items: center; justify-content: center; text-decoration: none;";
+
+			return html`
+			<div style="position: relative; height: 100%; width: 100%;">
+				<div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+					<button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle} box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: none;">
+						${maxPane === 'media'
+							? html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
+							: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
+						}
+					</button>
+					${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle} border: none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
+					${mediaItems.length > 1 ? html`<div style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); color: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600;">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
+				</div>
+
+				<style>
+					.media-carousel::-webkit-scrollbar { display: none !important; }
+					.media-carousel.is-dragging { scroll-snap-type: none !important; cursor: grabbing !important; }
+					.media-carousel { cursor: grab; }
+				</style>
+
+				<div class="media-carousel" ref=${carouselRef} onScroll=${handleScroll} onMouseDown=${onMouseDown} onMouseLeave=${onMouseLeave} onMouseUp=${onMouseUp} onMouseMove=${onMouseMove} style="scrollbar-width: none; height: 100%; width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory;">
+					${mediaItems.map((rawUrl, i) => {
+						const itemCaption = captions[i] || ''; 
+						const itemCredit = credits[i] || '';
+						const cUrl = getCleanUrl(rawUrl);
+						
+						// [REF: MED-14] 404-Protected Clickable Credits & Captions
+						const isCreditUrl = /^https?:\/\//i.test(itemCredit);
+						
 						return html`
-							<div style="position: relative; width: 100%; height: 100%; background: #eee; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
-								<div style="position: absolute; z-index: 1; color: #555; font-size: 0.9rem; max-width: 80%;">
-									PDF inline rendering is device-dependent.<br/><br/>If the document does not appear, please use the <b>[↗]</b> button top-right to open it natively.
-								</div>
-								<iframe src="${url}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 2; background: transparent;"></iframe>
+						<div class="media-item" key=${i} style="flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative;">
+							<div style="flex: 1 1 auto; position: relative; overflow: hidden; min-height: 0;">
+								${renderMedia(rawUrl)}
 							</div>
-						`;
-					}
-
-					// Standard Image/Media fallback
-					if (lowUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/)) {
-						return html`<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
-					}
-
-					// Generic Iframe for maps, sites, etc.
-					return html`<iframe src="${url}" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
-				};
-	
-            const currentCleanUrl = getCleanUrl(mediaItems[activeMediaIdx] || '');
-            const btnStyle = "background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: #eee; padding: 6px; border-radius: 4px; cursor: pointer; backdrop-filter: blur(4px); transition: background 0.2s; pointer-events: auto; display: flex; align-items: center; justify-content: center; text-decoration: none;";
-
-            return html`
-                <div style="position: relative; height: 100%; width: 100%;">
-                    <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
-                        <button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle} box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: none;">
-                            ${maxPane === 'media' 
-                                ? html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
-                                : html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
-                            }
-                        </button>
-                        ${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle} border: none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
-                        ${mediaItems.length > 1 ? html`<div style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); color: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600;">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
-                    </div>
-
-                    <style>
-                        .media-carousel::-webkit-scrollbar { display: none !important; }
-                        .media-carousel.is-dragging { scroll-snap-type: none !important; cursor: grabbing !important; }
-                        .media-carousel { cursor: grab; }
-                    </style>
-                    <div class="media-carousel" ref=${carouselRef} onScroll=${handleScroll} onMouseDown=${onMouseDown} onMouseLeave=${onMouseLeave} onMouseUp=${onMouseUp} onMouseMove=${onMouseMove} style="scrollbar-width: none; height: 100%; width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory;">
-					// === [ PATCH: MediaViewer v2.12.0 (Carousel DOM Loop) ] ===
-							<div class="media-carousel" ref=${carouselRef} onScroll=${handleScroll} onMouseDown=${onMouseDown} onMouseLeave=${onMouseLeave} onMouseUp=${onMouseUp} onMouseMove=${onMouseMove} style="scrollbar-width: none; height: 100%; width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory;">
-								${mediaItems.map((rawUrl, i) => {
-									const itemCaption = captions[i] || ''; 
-									const itemCredit = credits[i] || '';
-									const cUrl = getCleanUrl(rawUrl);
-									
-									// [REF: MED-14] 404-Protected Clickable Credits & Captions
-									const isCreditUrl = /^https?:\/\//i.test(itemCredit);
-									
-									return html`
-									<div style="flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative;">
-										<div style="flex: 1 1 auto; position: relative; overflow: hidden; min-height: 0;">
-											${renderMedia(rawUrl)}
-										</div>
-										${(itemCaption || itemCredit) ? html`
-										<div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px;">
-											${itemCaption ? html`<div style="color: #ddd;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
-											${itemCredit ? html`<div style="font-size: 0.75rem; color: #888;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
-										</div>
-										` : ''}
-									</div>
-									`;
-								})}
+							${(itemCaption || itemCredit) ? html`
+							<div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px;">
+								${itemCaption ? html`<div style="color: #ddd;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
+								${itemCredit ? html`<div style="font-size: 0.75rem; color: #888;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
 							</div>
+							` : ''}
 						</div>
 						`;
-					};
-MODULE_VERSIONS['MediaViewer'] = 'v2.12.0';
-        // === [ END MAJOR BLOCK ] ===
+					})}
+				</div>
+			</div>
+			`;
+		};
+		MODULE_VERSIONS['MediaViewer'] = 'v2.12.1';
+		// === [ END MAJOR BLOCK ] ===
 
         // === [ MAJOR BLOCK: ContentSlider v4.4.1 ] ===
         const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, dateLocale, formatSmartDate}) => {

@@ -1,5 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
+
+v8.3.12 (MediaViewer v2.12.1) Summary: Hotfix Preact Virtual DOM reconciliation crash in Carousel mapping 
+[Core Engine] Fixed a fatal application crash when navigating between slides containing different quantities of media assets.
+[Media Engine] Restored compatibility for direct HTML <iframe> strings (like custom Google Maps embeds) coming from the spreadsheet.
+[Media Engine] Fixed an issue where YouTube timestamps were not properly mapping to seconds.
+
 v8.3.11 (MediaViewer v2.12.0) Summary: Enhance MediaViewer with YouTube API sync, PDF Z-Stack Failsafe, and Clickable Meta
 [Media Engine] Upgraded MediaViewer to v2.12.0. YouTube videos now mathematically start at the precise second indicated in the database URL.
 [Media Engine] Added a permanent, self-managing instructional banner behind PDF documents to assist mobile users whose devices block inline document rendering.

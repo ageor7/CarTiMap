@@ -244,7 +244,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.3.12';
+		const APP_VERSION = 'v8.3.13';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -821,7 +821,8 @@
             </div>
           `;
         };
-		// === [ MAJOR BLOCK: MediaViewer v2.12.1 ] ===
+		
+		// === [ MAJOR BLOCK: MediaViewer v2.13.0 ] ===
 		const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
 			const carouselRef = useRef(null);
 			const [activeMediaIdx, setActiveMediaIdx] = useState(0);
@@ -858,6 +859,18 @@
 				if (idx !== activeMediaIdx) setActiveMediaIdx(idx);
 			};
 
+			// --- [ SubBlock: HUD Chevron Kinetics ] ---
+			const handleChevronClick = (e, direction) => {
+				e.preventDefault();
+				e.stopPropagation();
+				if (!carouselRef.current) return;
+				const newIdx = activeMediaIdx + direction;
+				if (newIdx >= 0 && newIdx < mediaItems.length) {
+					const width = carouselRef.current.clientWidth;
+					carouselRef.current.scrollTo({ left: newIdx * width, behavior: 'smooth' });
+				}
+			};
+
 			// --- [ SubBlock: Desktop Drag Kinetics ] ---
 			const onMouseDown = (e) => {
 				dragRef.current.isDown = true;
@@ -876,7 +889,6 @@
 				if (!dragRef.current.isDown) return;
 				dragRef.current.isDown = false;
 				carouselRef.current.classList.remove('is-dragging');
-				// Calculate nearest index based on release momentum and snap
 				const idx = Math.round(carouselRef.current.scrollLeft / carouselRef.current.clientWidth);
 				setActiveMediaIdx(idx);
 				carouselRef.current.scrollTo({ left: idx * carouselRef.current.clientWidth, behavior: 'smooth' });
@@ -884,9 +896,9 @@
 
 			const onMouseMove = (e) => {
 				if (!dragRef.current.isDown) return;
-				e.preventDefault(); // Annihilate default image ghosting/text selection
+				e.preventDefault(); 
 				const x = e.pageX - carouselRef.current.offsetLeft;
-				const walk = (x - dragRef.current.startX) * 1.5; // Drag friction multiplier
+				const walk = (x - dragRef.current.startX) * 1.5; 
 				carouselRef.current.scrollLeft = dragRef.current.scrollLeft - walk;
 			};
 			// --- [ End SubBlock ] ---
@@ -895,7 +907,7 @@
 				const url = getCleanUrl(rawUrl);
 				const lowUrl = url.toLowerCase();
 
-				// [REF: CRASH-04] Restore Raw Iframe Interceptor for custom embeds
+				// [REF: CRASH-04] Raw Iframe Interceptor for custom embeds
 				if (lowUrl.startsWith('<iframe')) {
 					return html`<div dangerouslySetInnerHTML=${{ __html: url }} style="flex-grow: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; pointer-events: auto;"></div>`;
 				}
@@ -909,7 +921,6 @@
 						embedUrl = url.replace('watch?v=', 'embed/').replace(/&/g, '?');
 					}
 					
-					// Surgically intercept and translate consumer 't=' to iframe API '?start='
 					const tMatch = url.match(/[?&]t=(\d+)s?/i);
 					if (tMatch && tMatch[1]) {
 						const seconds = tMatch[1];
@@ -932,12 +943,10 @@
 					`;
 				}
 
-				// Standard Image/Media fallback
 				if (lowUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/)) {
 					return html`<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
 				}
 
-				// Generic Iframe for maps, sites, etc.
 				return html`<iframe src="${url}" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
 			};
 
@@ -956,6 +965,19 @@
 					${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle} border: none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
 					${mediaItems.length > 1 ? html`<div style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); color: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600;">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
 				</div>
+
+				${mediaItems.length > 1 ? html`
+					${activeMediaIdx > 0 ? html`
+						<button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} style="${btnStyle} position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Previous Media">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+						</button>
+					` : ''}
+					${activeMediaIdx < mediaItems.length - 1 ? html`
+						<button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} style="${btnStyle} position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Next Media">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+						</button>
+					` : ''}
+				` : ''}
 
 				<style>
 					.media-carousel::-webkit-scrollbar { display: none !important; }
@@ -990,7 +1012,7 @@
 			</div>
 			`;
 		};
-		MODULE_VERSIONS['MediaViewer'] = 'v2.12.1';
+		MODULE_VERSIONS['MediaViewer'] = 'v2.13.0';
 		// === [ END MAJOR BLOCK ] ===
 
         // === [ MAJOR BLOCK: ContentSlider v4.4.1 ] ===
