@@ -244,7 +244,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.5.0';
+		const APP_VERSION = 'v8.5.1';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1720,7 +1720,7 @@
         MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.5';
         // === [ END MAJOR BLOCK ] ===
 		
-        // === [ MAJOR BLOCK: AppOrchestrator v3.3.0 ] ===
+        // === [ MAJOR BLOCK: AppOrchestrator v3.3.1 ] ===
         const App = () => {
             const [logs, setLogs] = useState([]);
             const [rawCsvRows, setRawCsvRows] = useState([]);
@@ -1863,13 +1863,19 @@
                 return str ? str.split(/[|\-·;]/).map(s => s.split(',').at(0).trim()).filter(Boolean).join(' | ') : '';
             };
         
-            // [REF: SEARCH-02] Advanced Normalization & Agnosticism 
+            // [REF: SEARCH-02] Advanced Normalization & Agnosticism (For Math/Matching)
             const stripAndNormalize = (str) => {
                 if (!str) return '';
                 return String(str)
-                    .replace(/<[^>]*>?/gm, '') // Strip HTML tags
-                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Strip Accents/Diacritics
+                    .replace(/<[^>]*>?/gm, '')
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                     .toLowerCase();
+            };
+            
+            // [REF: SEARCH-03] Visual Payload Sanitization (For UI Presentation)
+            const stripHTMLForDisplay = (str) => {
+                if (!str) return '';
+                return String(str).replace(/<p[^>]*>/gi, ' - ').replace(/<[^>]*>?/gm, '').trim();
             };
         
             const executeSearch = (query) => {
@@ -2390,8 +2396,8 @@
                         ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
                         ${searchResults.map(res => html`
                             <div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}>
-                                <div class="search-result-title">${res.title}</div>
-                                <div class="search-result-meta">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div>
+                                <div class="search-result-title">${stripHTMLForDisplay(res.title)}</div>
+                                <div class="search-result-meta">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${stripHTMLForDisplay(res.place)}` : ''}</div>
                             </div>
                         `)}
                     </div>
@@ -2549,7 +2555,7 @@
             </div>
             `;
         };
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.3.0';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.3.1';
         // === [ END MAJOR BLOCK ] ===
 		
 		// === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===

@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.6.2] - AppOrchestrator v3.4.2
+
+    ✓ [Search Interface] The search bar is now twice as fast at revealing results while you type. We optimized the background delay to 250ms, which perfectly balances a highly responsive, snappy feel with the necessary performance protections for slower mobile devices.
+	
 [v8.5.1] - AppOrchestrator v3.3.1
 
     ✓ [Search Engine UI] Fixed a visual bug in the Search Menu where underlying formatting code and HTML tags (like <p> or <br>) were visibly printing alongside the event titles in the search results list. The interface now strips these out and displays clean, readable text.

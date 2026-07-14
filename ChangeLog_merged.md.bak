@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.5.1] - AppOrchestrator v3.3.1
+
+    ✓ [Search Engine UI] Fixed a visual bug in the Search Menu where underlying formatting code and HTML tags (like <p> or <br>) were visibly printing alongside the event titles in the search results list. The interface now strips these out and displays clean, readable text.
+	
 [v8.5.0] - AppOrchestrator v3.3.0
 
     ✓ [Search Engine] Search is now fully accent-agnostic and ignores hidden HTML code. You can now search for unaccented words (like "Αθηνα" or "Εβερτ") and instantly find the properly accented historical events.

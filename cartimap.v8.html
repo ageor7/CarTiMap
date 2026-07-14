@@ -244,7 +244,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.5.1';
+		const APP_VERSION = 'v8.6.2';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1720,7 +1720,7 @@
         MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.5';
         // === [ END MAJOR BLOCK ] ===
 		
-        // === [ MAJOR BLOCK: AppOrchestrator v3.3.1 ] ===
+        // === [ MAJOR BLOCK: AppOrchestrator v3.4.2 ] ===
         const App = () => {
             const [logs, setLogs] = useState([]);
             const [rawCsvRows, setRawCsvRows] = useState([]);
@@ -1735,6 +1735,7 @@
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [isSearchOpen, setIsSearchOpen] = useState(false);
             const [searchQuery, setSearchQuery] = useState('');
+            const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(''); // [REF: PERF-38] The Transmission Clutch
             const [searchHistory, setSearchHistory] = useState(() => {
                 try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; }
                 catch (e) { return []; }
@@ -1868,8 +1869,10 @@
                 if (!str) return '';
                 return String(str)
                     .replace(/<[^>]*>?/gm, '')
-                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                    .toLowerCase();
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f\u0384\u0385\u00b4\u0060']/g, '') // Strip combining AND standalone accents/ticks
+                    .toLowerCase()
+                    .replace(/ς/g, 'σ'); // Unify Greek Sigma Morphologies
             };
             
             // [REF: SEARCH-03] Visual Payload Sanitization (For UI Presentation)
@@ -1878,16 +1881,23 @@
                 return String(str).replace(/<p[^>]*>/gi, ' - ').replace(/<[^>]*>?/gm, '').trim();
             };
         
+            // [REF: PERF-38] Search Debounce (Transmission Clutch) calibrated to HCI Sweet Spot
+            useEffect(() => {
+                if (!searchQuery.trim()) {
+                    setDebouncedSearchQuery(''); // Instant clear on empty
+                    return;
+                }
+                const handler = setTimeout(() => {
+                    setDebouncedSearchQuery(searchQuery);
+                }, 250); // 250ms Kinetic Balance
+                return () => clearTimeout(handler);
+            }, [searchQuery]);
+        
+            // [REF: PERF-37] O(1) Pre-Calculated Search Execution
             const executeSearch = (query) => {
                 if (!query.trim()) return [];
                 const q = stripAndNormalize(query);
-                return data.filter(d => {
-                    return stripAndNormalize(d.title).includes(q) ||
-                           stripAndNormalize(d.description).includes(q) ||
-                           stripAndNormalize(d.place).includes(q) ||
-                           (d.tags && d.tags.some(t => stripAndNormalize(t).includes(q))) ||
-                           stripAndNormalize(formatSmartDate(d.startDate, d.endDate, dateLocale)).includes(q);
-                });
+                return data.filter(d => d._searchIndex && d._searchIndex.includes(q));
             };
         
             useEffect(() => {
@@ -2220,11 +2230,17 @@
                     if (!aValid && bValid) return 1;
                     return a.id - b.id;
                 });
+                
+                // [REF: PERF-37] Compile O(1) Pre-Calculated Search Matrix
+                const indexedData = valid.map(d => ({
+                    ...d,
+                    _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
+                }));
         
-                setData(valid);
+                setData(indexedData);
         
                 const tagsMap = new Set();
-                valid.forEach(d => {
+                indexedData.forEach(d => {
                     let rawTags = d.tags || [];
                     let arr = [];
                     (Array.isArray(rawTags) ? rawTags : [rawTags]).forEach(t => {
@@ -2242,12 +2258,12 @@
                     const paramDate = getOmniParam('date');
                     let initialIdx = 0;
                     if (paramSlide && !isNaN(parseInt(paramSlide))) {
-                        initialIdx = Math.max(0, Math.min(valid.length - 1, parseInt(paramSlide) - 1));
+                        initialIdx = Math.max(0, Math.min(indexedData.length - 1, parseInt(paramSlide) - 1));
                     } else if (paramDate) {
                         const targetTime = new Date(paramDate).getTime();
                         if (!isNaN(targetTime)) {
                             let minDiff = Infinity;
-                            valid.forEach((d, i) => {
+                            indexedData.forEach((d, i) => {
                                 if (d.startDate) {
                                     const diff = Math.abs(d.startDate.min - targetTime);
                                     if (diff < minDiff) { minDiff = diff; initialIdx = i; }
@@ -2274,7 +2290,7 @@
                 }
             };
         
-            const searchResults = executeSearch(searchQuery);
+            const searchResults = executeSearch(debouncedSearchQuery);
             const activeSlide = data.at(activeIndex);
             const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
         
@@ -2393,9 +2409,9 @@
                         </div>
                     ` : ''}
                     <div style="flex-grow: 1; overflow-y: auto; border-top: 1px solid #eee;">
-                        ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
+                        ${debouncedSearchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${debouncedSearchQuery}"</div>` : ''}
                         ${searchResults.map(res => html`
-                            <div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}>
+                            <div class="search-result-item" onClick=${() => handleResultClick(res.id, debouncedSearchQuery)}>
                                 <div class="search-result-title">${stripHTMLForDisplay(res.title)}</div>
                                 <div class="search-result-meta">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${stripHTMLForDisplay(res.place)}` : ''}</div>
                             </div>
@@ -2555,7 +2571,7 @@
             </div>
             `;
         };
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.3.1';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.4.2';
         // === [ END MAJOR BLOCK ] ===
 		
 		// === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
