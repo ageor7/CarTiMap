@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+ [v8.4.1] - AppOrchestrator v3.2.1
+
+    [Core Engine / Bug Fix] Fixed a fatal crash (InvalidCharacterError) that completely broke the application from loading. The error was caused by a specific symbol (<) being misinterpreted by the rendering engine inside the newly added "About" Map Legend.
+    [Documentation] Improved rendering safety for the URL routing syntax guide to ensure absolute cross-browser compatibility.
+	
 [v8.4.0] - AppOrchestrator v3.2.0
 
     [UI/UX] Upgraded the "About" modal to include a comprehensive Cartographic and Chronological Legend. Instead of static images, the legend uses pure CSS to perfectly replicate the application's native map markers and timeline nodes.

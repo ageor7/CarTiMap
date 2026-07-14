@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.4.2] - AppOrchestrator v3.2.2
+
+    [Core Engine / Bug Fix] Fixed a visual bug in the new System Routing and Legend tabs where ampersands (&) and less-than (<) symbols were displaying incorrectly as HTML code strings (&amp; and &lt;).
+    [UI/UX] Redesigned the top of the "About" modal into a massive, centered "Hero Banner", allowing the CarTiMap logo to seamlessly scale and fill the available width of the screen
+
  [v8.4.1] - AppOrchestrator v3.2.1
 
     [Core Engine / Bug Fix] Fixed a fatal crash (InvalidCharacterError) that completely broke the application from loading. The error was caused by a specific symbol (<) being misinterpreted by the rendering engine inside the newly added "About" Map Legend.
