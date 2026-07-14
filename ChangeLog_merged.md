@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.4.0] - AppOrchestrator v3.2.0
+
+    [UI/UX] Upgraded the "About" modal to include a comprehensive Cartographic and Chronological Legend. Instead of static images, the legend uses pure CSS to perfectly replicate the application's native map markers and timeline nodes.
+    [UI/UX] Introduced an elegant Hero Header in the About modal, featuring an enlarged CarTiMap logo and the active engine version number.
+    [Data / Open Science] Added a "Download Dataset (CSV)" button. The engine now dynamically generates a direct download link to the active Google Sheet, promoting open-data transparency.
+    [Documentation] Added a dedicated, collapsible section documenting analytical URL routing capabilities (e.g., ?source=..., &mapzoom=...).
+    [Core Engine] Wired the Escape key to instantly dismiss any active overlays or modal windows.
+	
 [v8.3.16] - MediaViewer v2.12.5
 
     [UI/UX] Upgraded all floating buttons inside the Media Pane (Maximize, Open File, Navigation Chevrons, Array Counter) to an "Obsidian Glass" (dark translucent) theme. This ensures that the controls are universally visible and never wash out, regardless of how bright or white the underlying image or document is.
