@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.5.0] - AppOrchestrator v3.3.0
+
+    ✓ [Search Engine] Search is now fully accent-agnostic and ignores hidden HTML code. You can now search for unaccented words (like "Αθηνα" or "Εβερτ") and instantly find the properly accented historical events.
+    ✓ [App/Browser UI] The specific name of the dataset you are viewing now automatically displays in your browser's Tab/Window title, making it much easier to track when you have multiple maps open.
+    ✓ [Settings/Basemaps] Added a new "No Basemap (Blank Canvas)" option. This allows you to turn off the modern street map completely, creating a clean grey canvas so your historical map overlays stand out with zero modern visual clutter.
+    ✓ [UI/UX] Added a visible, elegant scrollbar to the Map Layers menu, making it obvious that there are more overlay layers available to select when the list is long.
+	
 [v8.4.2] - AppOrchestrator v3.2.2
 
     [Core Engine / Bug Fix] Fixed a visual bug in the new System Routing and Legend tabs where ampersands (&) and less-than (<) symbols were displaying incorrectly as HTML code strings (&amp; and &lt;).

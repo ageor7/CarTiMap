@@ -244,7 +244,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.4.2';
+		const APP_VERSION = 'v8.5.0';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1720,7 +1720,7 @@
         MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.5';
         // === [ END MAJOR BLOCK ] ===
 		
-        // === [ MAJOR BLOCK: AppOrchestrator v3.2.2 ] ===
+        // === [ MAJOR BLOCK: AppOrchestrator v3.3.0 ] ===
         const App = () => {
             const [logs, setLogs] = useState([]);
             const [rawCsvRows, setRawCsvRows] = useState([]);
@@ -1782,7 +1782,8 @@
                 { id: 'esri-topo', label: 'Esri World Topo', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
                 { id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 19, active: false, attrText: '© OSM', attrLink: 'https://openstreetmap.org/copyright', defaultOpacity: 1.0 },
                 { id: 'opentopo', label: 'OpenTopoMap (OSM)', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 17, active: false, attrText: '© OpenTopoMap', attrLink: 'https://opentopomap.org', defaultOpacity: 1.0 },
-                { id: 'protomaps-vector', label: 'Protomaps Vector Light (OSM)', type: 'base', url: 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', format: 'pbf', maxZoom: 15, active: false, attrText: '© Protomaps', attrLink: 'https://protomaps.com', defaultOpacity: 1.0 }
+                { id: 'protomaps-vector', label: 'Protomaps Vector Light (OSM)', type: 'base', url: 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', format: 'pbf', maxZoom: 15, active: false, attrText: '© Protomaps', attrLink: 'https://protomaps.com', defaultOpacity: 1.0 },
+                { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '', defaultOpacity: 1.0 }
             ];
         
             const [basemapsRegistry, setBasemapsRegistry] = useState(DEFAULT_BASEMAPS);
@@ -1862,15 +1863,24 @@
                 return str ? str.split(/[|\-·;]/).map(s => s.split(',').at(0).trim()).filter(Boolean).join(' | ') : '';
             };
         
+            // [REF: SEARCH-02] Advanced Normalization & Agnosticism 
+            const stripAndNormalize = (str) => {
+                if (!str) return '';
+                return String(str)
+                    .replace(/<[^>]*>?/gm, '') // Strip HTML tags
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Strip Accents/Diacritics
+                    .toLowerCase();
+            };
+        
             const executeSearch = (query) => {
                 if (!query.trim()) return [];
-                const q = query.toLowerCase();
+                const q = stripAndNormalize(query);
                 return data.filter(d => {
-                    return (d.title && d.title.toLowerCase().includes(q)) ||
-                           (d.description && d.description.toLowerCase().includes(q)) ||
-                           (d.place && d.place.toLowerCase().includes(q)) ||
-                           (d.tags && d.tags.some(t => t.toLowerCase().includes(q))) ||
-                           formatSmartDate(d.startDate, d.endDate, dateLocale).toLowerCase().includes(q);
+                    return stripAndNormalize(d.title).includes(q) ||
+                           stripAndNormalize(d.description).includes(q) ||
+                           stripAndNormalize(d.place).includes(q) ||
+                           (d.tags && d.tags.some(t => stripAndNormalize(t).includes(q))) ||
+                           stripAndNormalize(formatSmartDate(d.startDate, d.endDate, dateLocale)).includes(q);
                 });
             };
         
@@ -2001,6 +2011,16 @@
                 document.addEventListener('touchmove', onMove, { passive: false });
                 document.addEventListener('touchend', onUp);
             };
+        
+            // [REF: TELEMETRY-05] Dynamic Document Title Sync
+            useEffect(() => {
+                if (aboutData && aboutData.title) {
+                    const cleanTitle = String(aboutData.title).replace(/<[^>]*>?/gm, '').trim();
+                    document.title = `CarTiMap ${APP_VERSION} - ${cleanTitle}`;
+                } else {
+                    document.title = `CarTiMap Core - ${APP_VERSION}`;
+                }
+            }, [aboutData]);
         
             useEffect(() => {
                 const gid = getOmniParam('gid') || '0';
@@ -2465,11 +2485,11 @@
                             <h5 style="margin: 15px 0 5px 0; color: #222;">Analytical URL Parameters</h5>
                             <ul style="margin: 0; padding-left: 20px; font-family: monospace; color: #007acc;">
                                 <li><span style="color:#555">?source=ID</span> (Google Sheet Base ID)</li>
-                                <li><span style="color:#555">&gid=ID</span> (Primary Data Tab ID)</li>
-                                <li><span style="color:#555">&bgid=ID</span> (Basemaps/Overlays Tab ID)</li>
-                                <li><span style="color:#555">&slide=X</span> (Target integer slide index bypass)</li>
-                                <li><span style="color:#555">&date=YYYY-MM-DD</span> (Temporal anchor bypass)</li>
-                                <li><span style="color:#555">&mapzoom=Z</span> (Initial geographic zoom override)</li>
+                                <li><span style="color:#555">&amp;gid=ID</span> (Primary Data Tab ID)</li>
+                                <li><span style="color:#555">&amp;bgid=ID</span> (Basemaps/Overlays Tab ID)</li>
+                                <li><span style="color:#555">&amp;slide=X</span> (Target integer slide index bypass)</li>
+                                <li><span style="color:#555">&amp;date=YYYY-MM-DD</span> (Temporal anchor bypass)</li>
+                                <li><span style="color:#555">&amp;mapzoom=Z</span> (Initial geographic zoom override)</li>
                             </ul>
                         </div>
                     </details>
@@ -2529,8 +2549,10 @@
             </div>
             `;
         };
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.2.2';
-        // === [ END MAJOR BLOCK ] ===        // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.3.0';
+        // === [ END MAJOR BLOCK ] ===
+		
+		// === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
         render(html`<${ErrorBoundary}><${App} /></${ErrorBoundary}>`, document.getElementById('root'));
         // === [ END MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
     </script>
