@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.7.0] - TimelineScrubber v25.1.0 & GlobalStyles v6.1.0
+
+    ✓ [Timeline Visibility] Fixed the issue where overlapping duration bars (the red/blue lines) blurred together. They now use a distinct "stepped" shape that gets darker as events overlap, acting like a heat-map to show you the busiest periods in history without squashing the rest of the app.
+    ✓ [Timeline Speed] Massive performance boost for older phones and computers. The timeline now completely stops trying to physically draw events that are currently scrolled off-screen, saving huge amounts of system memory.
+    ✓ [Timeline Readability] If an event title is too long and gets cut off (e.g. "The British and Ger..."), you can now simply hover your mouse over it and the hexagon will instantly pop open to reveal the full text.
+    ✓ [Timeline Navigation] Fixed an annoying bug where clicking and dragging to pan across the timeline would accidentally highlight text instead of moving the screen.
+    ✓ [Uncertain Dates] Events with approximate start or end dates (from the EDTF engine) now display a sharp gold edge on the timeline. Hovering over them turns your mouse into a magnifying glass, inviting you to click and auto-zoom to the actual length.
+	
 [v8.6.2] - AppOrchestrator v3.4.2
 
     ✓ [Search Interface] The search bar is now twice as fast at revealing results while you type. We optimized the background delay to 250ms, which perfectly balances a highly responsive, snappy feel with the necessary performance protections for slower mobile devices.

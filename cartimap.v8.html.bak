@@ -15,223 +15,242 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket-leaflet.min.js"></script>
     
-<!-- === [ MAJOR BLOCK: GlobalStyles v6.0.0 ] === -->
+<!-- === [ MAJOR BLOCK: GlobalStyles v6.1.0 ] === -->
 <style id="global-styles">
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
-  /* --- [ SubBlock: Root & Base ] --- */
-  :root { --bg: #fcfcfc; --paneBg: #fcfcfc; --border: #ccc; --text: #222; --accent: #007acc; }
-  body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw; max-height: 100vh; font-family: 'Noto Sans', system-ui, sans-serif; font-weight: 400; overflow: hidden; background: var(--bg); color: var(--text); box-sizing: border-box; }
-  *, *::before, *::after { box-sizing: inherit; }
+/* --- [ SubBlock: Root & Base ] --- */
+:root { --bg: #fcfcfc; --paneBg: #fcfcfc; --border: #ccc; --text: #222; --accent: #007acc; }
+body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw; max-height: 100vh; font-family: 'Noto Sans', system-ui, sans-serif; font-weight: 400; overflow: hidden; background: var(--bg); color: var(--text); box-sizing: border-box; }
 
-  /* Absolute hardware lock + rigid width/height limits to kill bleed */
-  #tm-root { position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%; max-width: 100%; max-height: 100%; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; }
+*, *::before, *::after { box-sizing: inherit; }
 
-  /* [FIX] Native Scrollbar Management - Suppress only where necessary */
-  .timeline-scroll-wrapper::-webkit-scrollbar, .media-carousel::-webkit-scrollbar { display: none !important; width: 0px; height: 0px; }
-  .timeline-scroll-wrapper, .media-carousel { scrollbar-width: none; -ms-overflow-style: none; }
-  
-  .tm-modal::-webkit-scrollbar, .content-scroll-area::-webkit-scrollbar { width: 8px; }
-  .tm-modal::-webkit-scrollbar-thumb, .content-scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-  /* --- [ End SubBlock: Root & Base ] --- */
+/* Absolute hardware lock + rigid width/height limits to kill bleed */
+#tm-root { position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%; max-width: 100%; max-height: 100%; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; }
 
-  /* --- [ SubBlock: VibeMonitor & Universal Modals ] --- */
-  #vibe-monitor { position: fixed; z-index: 9999; background: #1a1a1a; color: #eee; border: 1px solid #444; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; font-family: monospace; resize: both; min-width: 280px; min-height: 200px; width: 320px; height: auto; max-width: 95vw; max-height: 90vh; }
-  #vibe-header { background: #333; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #444; user-select: none; font-weight: 600; flex-shrink: 0; }
-  .vibe-close-btn { background: transparent; color: #aaa; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.2s; }
-  .vibe-close-btn:hover { color: #ff5555; }
-  #vibe-logs { flex-grow: 1; overflow-y: auto; padding: 10px; font-size: 0.75rem; background: #111; display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 50px; }
-  .log-time { color: #888; margin-right: 6px; }
-  .tm-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 9000; backdrop-filter: blur(2px); display: none; }
-  .tm-backdrop.open { display: block; }
-  /* --- [ End SubBlock ] --- */
+/* [FIX] Native Scrollbar Management - Suppress only where necessary */
+.timeline-scroll-wrapper::-webkit-scrollbar, .media-carousel::-webkit-scrollbar { display: none !important; width: 0px; height: 0px; }
+.timeline-scroll-wrapper, .media-carousel { scrollbar-width: none; -ms-overflow-style: none; }
+.tm-modal::-webkit-scrollbar, .content-scroll-area::-webkit-scrollbar { width: 8px; }
+.tm-modal::-webkit-scrollbar-thumb, .content-scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+/* --- [ End SubBlock: Root & Base ] --- */
 
-  /* --- [ SubBlock: CSS Button Reset ] --- */
-  .status-btn { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; padding: 0; margin: 0; background: transparent; border: 1px solid transparent; border-radius: 4px; color: #444; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; box-sizing: border-box; flex-shrink: 0; outline: none; line-height: 0; }
-  .status-btn svg { margin: 0; display: block; }
-  .status-btn:hover { background: #eee; border-color: #ccc; }
-  .status-btn.active { background: #007acc; color: #fff; border-color: #005a99; }
-  .status-btn::after { content: ''; position: absolute; top: -6px; bottom: -6px; left: -6px; right: -6px; z-index: 10; }
-  .status-btn-text { -webkit-appearance: none; appearance: none; height: 24px; padding: 0 6px; margin: 0; background: #fcfcfc; border: 1px solid #ccc; border-radius: 4px; color: #444; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; position: relative; transition: all 0.2s; box-sizing: border-box; font-family: inherit; font-size: 0.75rem; font-weight: 500; line-height: 0; }
-  .status-btn-text:hover:not(:disabled) { background: #eee; }
-  .status-btn-text:disabled { opacity: 0.4; cursor: not-allowed; }
-  .status-btn-text::after { content: ''; position: absolute; top: -4px; bottom: -4px; left: -4px; right: -4px; z-index: 10; }
-  .fab-btn { -webkit-appearance: none; appearance: none; position: fixed; right: 20px; bottom: max(20px, env(safe-area-inset-bottom)); width: 50px; height: 50px; border-radius: 25px; background: #007acc; color: #fff; border: 2px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2000; transition: transform 0.2s, background 0.2s; }
-  .fab-btn:hover { background: #005a99; transform: scale(1.05); }
-  /* --- [ End SubBlock ] --- */
+/* --- [ SubBlock: VibeMonitor & Universal Modals ] --- */
+#vibe-monitor { position: fixed; z-index: 9999; background: #1a1a1a; color: #eee; border: 1px solid #444; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; font-family: monospace; resize: both; min-width: 280px; min-height: 200px; width: 320px; height: auto; max-width: 95vw; max-height: 90vh; }
+#vibe-header { background: #333; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #444; user-select: none; font-weight: 600; flex-shrink: 0; }
+.vibe-close-btn { background: transparent; color: #aaa; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.2s; }
+.vibe-close-btn:hover { color: #ff5555; }
+#vibe-logs { flex-grow: 1; overflow-y: auto; padding: 10px; font-size: 0.75rem; background: #111; display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 50px; }
+.log-time { color: #888; margin-right: 6px; }
 
-  /* --- [ SubBlock: Splash & Loading ] --- */
-  .loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--paneBg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; opacity: 1; }
-  .loading-screen.fade-out { opacity: 0; pointer-events: none; }
-  .logo-stack-splash { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; }
-  .splash-icon-wrapper { width: 500px; max-width: 80vw; height: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15)); }
-  .splash-text { font-size: 2.2rem; color: #333; letter-spacing: -1px; line-height: 1.2; margin: 20px 0 0 0; text-align: center; max-width: 90vw; padding: 0 20px; box-sizing: border-box;}
-  .splash-version { font-size: 1rem; color: #888; font-family: monospace; margin-top: 8px; letter-spacing: 1px; text-align: center;}
-  .loading-bar-container { width: 250px; height: 4px; background: #ddd; border-radius: 2px; overflow: hidden; margin-top: 20px;}
-  .loading-bar-fill { height: 100%; background: #007acc; transition: width 0.4s ease; }
-  /* --- [ End SubBlock: Splash & Loading ] --- */
+.tm-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 9000; backdrop-filter: blur(2px); display: none; }
+.tm-backdrop.open { display: block; }
+/* --- [ End SubBlock ] --- */
 
-  /* --- [ SubBlock: Layout & Resizers ] --- */
-  #app-layout {
-    --primary-split: 50%; /* [FIX] Flex-Greed Base Landscape Ratio */
+/* --- [ SubBlock: CSS Button Reset ] --- */
+.status-btn { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; padding: 0; margin: 0; background: transparent; border: 1px solid transparent; border-radius: 4px; color: #444; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; box-sizing: border-box; flex-shrink: 0; outline: none; line-height: 0; }
+.status-btn svg { margin: 0; display: block; }
+.status-btn:hover { background: #eee; border-color: #ccc; }
+.status-btn.active { background: #007acc; color: #fff; border-color: #005a99; }
+.status-btn::after { content: ''; position: absolute; top: -6px; bottom: -6px; left: -6px; right: -6px; z-index: 10; }
+
+.status-btn-text { -webkit-appearance: none; appearance: none; height: 24px; padding: 0 6px; margin: 0; background: #fcfcfc; border: 1px solid #ccc; border-radius: 4px; color: #444; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; position: relative; transition: all 0.2s; box-sizing: border-box; font-family: inherit; font-size: 0.75rem; font-weight: 500; line-height: 0; }
+.status-btn-text:hover:not(:disabled) { background: #eee; }
+.status-btn-text:disabled { opacity: 0.4; cursor: not-allowed; }
+.status-btn-text::after { content: ''; position: absolute; top: -4px; bottom: -4px; left: -4px; right: -4px; z-index: 10; }
+
+.fab-btn { -webkit-appearance: none; appearance: none; position: fixed; right: 20px; bottom: max(20px, env(safe-area-inset-bottom)); width: 50px; height: 50px; border-radius: 25px; background: #007acc; color: #fff; border: 2px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2000; transition: transform 0.2s, background 0.2s; }
+.fab-btn:hover { background: #005a99; transform: scale(1.05); }
+/* --- [ End SubBlock ] --- */
+
+/* --- [ SubBlock: Splash & Loading ] --- */
+.loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--paneBg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; opacity: 1; }
+.loading-screen.fade-out { opacity: 0; pointer-events: none; }
+.logo-stack-splash { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; }
+.splash-icon-wrapper { width: 500px; max-width: 80vw; height: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15)); }
+.splash-text { font-size: 2.2rem; color: #333; letter-spacing: -1px; line-height: 1.2; margin: 20px 0 0 0; text-align: center; max-width: 90vw; padding: 0 20px; box-sizing: border-box;}
+.splash-version { font-size: 1rem; color: #888; font-family: monospace; margin-top: 8px; letter-spacing: 1px; text-align: center;}
+.loading-bar-container { width: 250px; height: 4px; background: #ddd; border-radius: 2px; overflow: hidden; margin-top: 20px;}
+.loading-bar-fill { height: 100%; background: #007acc; transition: width 0.4s ease; }
+/* --- [ End SubBlock: Splash & Loading ] --- */
+
+/* --- [ SubBlock: Layout & Resizers ] --- */
+#app-layout {
+    --primary-split: 50%; 
     --secondary-split: 50%;
     --timeline-height: 10%;
     display: flex; flex-direction: column; flex: 1; width: 100%; max-width: 100%; height: 100%; overflow: hidden; position: relative;
-  }
+}
 
-  /* [REF: UI-51] Desktop Flex-Greed Matrix */
-  .core-viewports {
+.core-viewports {
     display: flex; flex-direction: row;
     flex-grow: 1; height: calc(100% - var(--timeline-height) - 4px); width: 100%; max-width: 100%;
     overflow: visible; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; min-width: 0; position: relative; z-index: 10;
-  }
-  .content-slider-pane {
+}
+
+.content-slider-pane {
     background: var(--paneBg); overflow: hidden; display: flex; flex-direction: column;
     min-height: 0; min-width: 0; flex-shrink: 0; z-index: 15;
     order: 1; width: var(--primary-split); height: 100%;
-    max-width: 95ch; /* [FIX] Flex-Greed Absolute Typography Clamp */
-  }
-  .resizer-dyn-primary {
+    max-width: 95ch; 
+}
+
+.resizer-dyn-primary {
     background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none;
     order: 2; width: 4px; height: 100%; cursor: col-resize;
-  }
-  .visual-pane {
+}
+
+.visual-pane {
     display: flex; flex-direction: column;
     overflow: visible; min-height: 0; min-width: 0; flex-shrink: 0; position: relative; z-index: 20;
-    order: 3; flex: 1 1 0; width: auto; height: 100%; /* [FIX] Flex-Greed Infinite Consumption */
-  }
+    order: 3; flex: 1 1 0; width: auto; height: 100%; 
+}
+.visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
+.visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
+.visual-pane.no-media .media-pane { display: none !important; }
 
-  .visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
-  .visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
-  .visual-pane.no-media .media-pane { display: none !important; }
-  
-  .map-pane {
+.map-pane {
     background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible; z-index: 30;
     flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%;
-  }
-  .resizer-dyn-secondary {
+}
+.resizer-dyn-secondary {
     background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none;
     height: 4px; width: 100%; cursor: row-resize;
-  }
-  .media-pane {
-    position: relative; overflow: hidden; background-color: #1e1e1e; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px;
-    display: flex; flex-direction: column; min-height: 0; min-width: 0; flex: 1 1 auto; z-index: 10;
-    width: 100%; height: 100%;
-  }
-  .timeline-pane { background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; z-index: 5; width: 100%; max-width: 100%; box-sizing: border-box; }
+}
+.media-pane {
+    background: #111; overflow: hidden; position: relative; min-height: 0; min-width: 0; z-index: 30;
+    flex: 1 1 auto; height: auto; width: 100%;
+}
+.media-carousel {
+    display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    width: 100%; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+}
+.media-item-container {
+    flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative; overflow: hidden;
+}
 
-  /* Maximize Panes Matrix */
-  .core-viewports.max-text .visual-pane { display: none !important; }
-  .core-viewports.max-text .content-slider-pane { width: 100% !important; height: 100% !important; flex: 1 !important; max-width: none !important; }
-  .core-viewports.max-text .resizer-dyn-primary { display: none !important; }
-  .core-viewports.max-map .content-slider-pane { display: none !important; }
-  .core-viewports.max-map .media-pane { display: none !important; }
-  .core-viewports.max-map .visual-pane { width: 100% !important; height: 100% !important; flex: 1 !important; flex-direction: row !important; }
-  .core-viewports.max-map .map-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; }
-  .core-viewports.max-map .resizer-dyn-primary, .core-viewports.max-map .resizer-dyn-secondary { display: none !important; }
-  .core-viewports.max-media .content-slider-pane { display: none !important; }
-  .core-viewports.max-media .map-pane { display: none !important; }
-  .core-viewports.max-media .visual-pane { width: 100% !important; height: 100% !important; flex: 1 !important; flex-direction: row !important; }
-  .core-viewports.max-media .media-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; display: block !important; }
-  .core-viewports.max-media .resizer-dyn-primary, .core-viewports.max-media .resizer-dyn-secondary { display: none !important; }
+.global-status-bar {
+    height: 32px; min-height: 32px; flex-shrink: 0; background: #fff; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 40; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative;
+}
 
-  .is-expanded-timeline .resizer-dyn-timeline { display: none !important; }
-  .is-minimized-timeline .resizer-dyn-timeline { display: none !important; }
-  .is-minimized-timeline .core-viewports { height: 100% !important; }
+.timeline-pane { background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; z-index: 5; width: 100%; max-width: 100%; box-sizing: border-box; }
 
-  .resizer-dyn-primary::after, .resizer-dyn-secondary::after, .resizer-dyn-timeline::after { content: ''; position: absolute; top: -18px; bottom: -18px; left: -18px; right: -18px; z-index: 51; }
-  .resizer-dyn-primary:hover, .resizer-dyn-secondary:hover, .resizer-dyn-timeline:hover { background: var(--accent); }
-  .resizer-dyn-timeline { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
+/* Maximize Panes Matrix */
+.core-viewports.max-text .visual-pane { display: none !important; }
+.core-viewports.max-text .content-slider-pane { width: 100% !important; height: 100% !important; flex: 1 !important; max-width: none !important; }
+.core-viewports.max-text .resizer-dyn-primary { display: none !important; }
+.core-viewports.max-map .content-slider-pane { display: none !important; }
+.core-viewports.max-map .media-pane { display: none !important; }
+.core-viewports.max-map .visual-pane { width: 100% !important; height: 100% !important; flex: 1 !important; flex-direction: row !important; }
+.core-viewports.max-map .map-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; }
+.core-viewports.max-map .resizer-dyn-primary, .core-viewports.max-map .resizer-dyn-secondary { display: none !important; }
+.core-viewports.max-media .content-slider-pane { display: none !important; }
+.core-viewports.max-media .map-pane { display: none !important; }
+.core-viewports.max-media .visual-pane { width: 100% !important; height: 100% !important; flex: 1 !important; flex-direction: row !important; }
+.core-viewports.max-media .media-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; display: block !important; }
+.core-viewports.max-media .resizer-dyn-primary, .core-viewports.max-media .resizer-dyn-secondary { display: none !important; }
 
-  /* [REF: UI-51] Mobile Rotation Matrix (Visuals Top, Text Bottom) */
-  @media (max-width: 1023px) {
-    #app-layout { --primary-split: 55%; } /* [FIX] Portrait Absolute Protection */
+.resizer-dyn-primary:hover, .resizer-dyn-secondary:hover, .resizer-dyn-timeline:hover { background: var(--accent); }
+.resizer-dyn-timeline { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
+
+@media (max-width: 1023px) {
+    #app-layout { --primary-split: 55%; } 
     .core-viewports { flex-direction: column; }
     .visual-pane { width: 100%; height: calc(100% - var(--primary-split) - 4px); flex-direction: row; order: 1; flex: none; }
     .resizer-dyn-primary { width: 100%; height: 4px; cursor: row-resize; order: 2; }
-    .content-slider-pane { width: 100%; height: var(--primary-split); order: 3; max-width: none; } /* Mobile glass ceiling bypass */
+    .content-slider-pane { width: 100%; height: var(--primary-split); order: 3; max-width: none; } 
     .map-pane { flex: 0 0 var(--secondary-split); height: 100%; width: var(--secondary-split); }
     .resizer-dyn-secondary { width: 4px; height: 100%; cursor: col-resize; }
     .media-pane { flex: 1 1 auto; width: 100%; height: 100%; }
-  }
-  /* --- [ End SubBlock: Layout & Resizers ] --- */
+}
+/* --- [ End SubBlock: Layout & Resizers ] --- */
 
-  /* --- [ SubBlock: Leaflet Map & Spatial HUD ] --- */
-  .leaflet-tooltip { white-space: normal !important; word-wrap: break-word !important; width: max-content !important; max-width: 300px !important; text-align: left !important; font-size: 0.85rem; line-height: 1.4; padding: 6px 10px !important; }
-  .custom-map-pin { display: flex; align-items: flex-end; justify-content: center; width: 24px; height: 34px; position: relative; transition: transform 0.2s, opacity 0.3s ease;}
-  .pin-head { width: 14px; height: 14px; border-radius: 50%; background: #d32f2f; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.4); position: absolute; top: 0; }
-  .pin-stem { width: 2px; height: 20px; background: #333; position: absolute; bottom: 0; }
-  .custom-div-icon { background: transparent !important; border: none !important; }
-  .centered-tooltip { text-align: center; }
-  .layer-attribution-link a { color: #888; text-decoration: underline; text-decoration-color: #ccc; transition: all 0.2s; }
-  .layer-attribution-link a:hover { color: #007acc; text-decoration-color: #007acc; }
-  .tm-opacity-slider { -webkit-appearance: none; width: 100px; height: 4px; background: #ddd; border-radius: 2px; outline: none; }
-  .tm-opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; }
-  .tm-opacity-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; border: none; }
-  .minimap-container { position: absolute !important; bottom: 50px !important; left: 15px !important; width: 150px; height: 110px; min-width: 100px; min-height: 80px; max-width: 50vw; max-height: 50vh; z-index: 1000 !important; border: 2px solid #fff !important; box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; border-radius: 4px !important; overflow: hidden !important; background: #e0e0e0 !important; transition: box-shadow 0.2s !important; flex-shrink: 0 !important; resize: both; }
-  .minimap-container:hover { box-shadow: 0 6px 15px rgba(0,0,0,0.4) !important; }
-  @media (max-width: 1023px) { .minimap-container { width: 100px; height: 80px; bottom: 45px !important; left: 10px !important; border-width: 1px !important; } }
-  .marker-cluster-small { background-color: rgba(255, 180, 80, 0.6) !important; }
-  .marker-cluster-small div { background-color: rgba(240, 140, 40, 0.7) !important; color: white !important; }
-  .marker-cluster-medium { background-color: rgba(240, 130, 130, 0.6) !important; }
-  .marker-cluster-medium div { background-color: rgba(220, 80, 80, 0.7) !important; color: white !important; }
-  .marker-cluster-large { background-color: rgba(180, 100, 180, 0.6) !important; }
-  .marker-cluster-large div { background-color: rgba(150, 60, 150, 0.7) !important; color: white !important; }
-  /* --- [ End SubBlock: Leaflet Map & Spatial HUD ] --- */
+/* --- [ SubBlock: Leaflet Map & Spatial HUD ] --- */
+.leaflet-tooltip { white-space: normal !important; word-wrap: break-word !important; width: max-content !important; max-width: 300px !important; text-align: left !important; font-size: 0.85rem; line-height: 1.4; padding: 6px 10px !important; }
+.custom-map-pin { display: flex; align-items: flex-end; justify-content: center; width: 24px; height: 34px; position: relative; transition: transform 0.2s, opacity 0.3s ease;}
+.pin-head { width: 14px; height: 14px; border-radius: 50%; background: #d32f2f; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.4); position: absolute; top: 0; }
+.pin-stem { width: 2px; height: 20px; background: #333; position: absolute; bottom: 0; }
+.custom-div-icon { background: transparent !important; border: none !important; }
+.centered-tooltip { text-align: center; }
+.layer-attribution-link a { color: #888; text-decoration: underline; text-decoration-color: #ccc; transition: all 0.2s; }
+.layer-attribution-link a:hover { color: #007acc; text-decoration-color: #007acc; }
 
-  /* --- [ SubBlock: Narrative Content Slider ] --- */
-  .content-scroll-area { flex: 1; overflow-y: auto; display: flex; flex-direction: column; z-index: 5; scroll-behavior: smooth; width: 100%; }
-  .title-header-container { max-width: 90ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
-  .slide-desc { line-height: 1.6; font-size: 1.15rem; color: #333; width: 100%; max-width: 75ch; margin: 0 auto; }
-  .click-zone { position: absolute; top: 0; bottom: 0; width: 15%; z-index: 10; cursor: pointer; }
-  .click-zone-left { left: 0; }
-  .click-zone-right { right: 0; }
-  .metadata-ribbon { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 0.4rem; width: 100%; }
-  .metadata-date { font-weight: 600; color: #007acc; font-size: 0.9rem; flex-shrink: 0; white-space: nowrap; margin-top: 4px; }
-  .metadata-pills-wrapper { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end; }
-  .place-pill, .tag-pill { display: inline-flex; align-items: center; background: rgba(128,128,128,0.06); color: #444; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; border: 1px solid rgba(128,128,128,0.15); word-break: break-word; line-height: 1.2; text-align: left; }
-  /* --- [ End SubBlock: Narrative Content Slider ] --- */
+.tm-opacity-slider { -webkit-appearance: none; width: 100px; height: 4px; background: #ddd; border-radius: 2px; outline: none; }
+.tm-opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; }
+.tm-opacity-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; border: none; }
 
-  /* --- [ SubBlock: Status Bar & Modals ] --- */
-  .global-status-bar { position: relative; width: 100%; height: 32px; background: #fff; border-top: 1px solid #ddd; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-shadow: 0 -2px 5px rgba(0,0,0,0.02); z-index: 100; flex-shrink: 0; box-sizing: border-box; }
-  .status-left, .status-right { display: flex; align-items: center; gap: 4px; z-index: 2; }
-  .status-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; align-items: center; z-index: 1; }
-  .semantic-time-span { font-size: 0.75rem; color: #007acc; padding: 0; margin: 0 5px; display: flex; align-items: center; height: 20px; font-weight: 600;}
-  .tm-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 700px; max-height: 85vh; background: #fff; z-index: 10001; border-radius: 12px; padding: 30px; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; color: #222; font-size: 1.1rem; }
-  .modal-close { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #999; outline: none; }
-  .modal-close:hover { color: #222; }
-  .search-input { width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #ccc; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-  .search-input:focus { border-color: #007acc; }
-  .search-result-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
-  .search-result-item:hover { background: #f4f8fb; }
-  .search-result-title { font-weight: 600; font-size: 1rem; color: #222; }
-  .search-result-meta { font-size: 0.8rem; color: #666; margin-top: 4px; }
-  /* --- [ End SubBlock: Status Bar & Modals ] --- */
+.minimap-container { position: absolute; bottom: 20px; left: 20px; width: 150px; height: 150px; background: #fff; border: 2px solid #ccc; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; overflow: hidden; resize: both; min-width: 100px; min-height: 100px; max-width: 150px !important; max-height: 40vh; flex-shrink: 0 !important; }
+.minimap-container.hide { display: none; }
 
-  /* --- [ SubBlock: Timeline UI & Leaflet Controls ] --- */
-  .timeline-scroll-wrapper { width: 100%; height: 100%; overflow-y: hidden; overflow-x: auto; position: relative; display: block; cursor: grab; }
-  .timeline-scroll-wrapper:active { cursor: grabbing; }
-  .timeline-track-container { position: relative; min-width: 100%; display: block; min-height: 100%; }
-  .tag-lane { border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; box-sizing: border-box; width: 100%; position: absolute; left: 0; right: 0; }
-  .tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
-  .event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
-  .event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
-  .event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon( 0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px) ); }
-  .event-block:hover { filter: brightness(1.05); z-index: 40; }
-  .timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
-  .timeline-ruler-tick { position: absolute; bottom: 3px; display: flex; flex-direction: column; align-items: center; z-index: 5; transform: translateX(-50%); font-size: 0.7rem; color: #555;}
-  .timeline-control-cluster { position: absolute; right: 15px; z-index: 1000; display: flex; flex-direction: column; box-shadow: 0 1px 5px rgba(0,0,0,0.4); border-radius: 4px; background: #fff; border: 1px solid #ccc; overflow: hidden; }
-  .timeline-control-cluster .status-btn { display: flex; align-items: center; justify-content: center; }
-  .timeline-control-cluster .zoom-factor { display: flex; align-items: center; justify-content: center; }
-  @media (max-height: 500px) {
+.marker-cluster-small { background-color: rgba(240, 140, 40, 0.6) !important; }
+.marker-cluster-small div { background-color: rgba(255, 180, 80, 0.7) !important; color: white !important; }
+.marker-cluster-medium { background-color: rgba(240, 80, 80, 0.6) !important; }
+.marker-cluster-medium div { background-color: rgba(255, 100, 100, 0.7) !important; color: white !important; }
+.marker-cluster-large { background-color: rgba(180, 100, 180, 0.6) !important; }
+.marker-cluster-large div { background-color: rgba(150, 60, 150, 0.7) !important; color: white !important; }
+/* --- [ End SubBlock: Leaflet Map & Spatial HUD ] --- */
+
+/* --- [ SubBlock: Narrative Content Slider ] --- */
+.content-scroll-area { flex: 1; overflow-y: auto; display: flex; flex-direction: column; z-index: 5; scroll-behavior: smooth; width: 100%; }
+.title-header-container { max-width: 90ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+.slide-desc { line-height: 1.6; font-size: 1.15rem; color: #333; width: 100%; max-width: 75ch; margin: 0 auto; }
+.click-zone { position: absolute; top: 0; bottom: 0; width: 15%; z-index: 10; cursor: pointer; }
+.click-zone-left { left: 0; }
+.click-zone-right { right: 0; }
+
+.metadata-ribbon { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 0.4rem; width: 100%; }
+.metadata-date { font-weight: 600; color: #007acc; font-size: 0.9rem; flex-shrink: 0; white-space: nowrap; margin-top: 4px; }
+.metadata-pills-wrapper { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end; }
+.place-pill, .tag-pill { display: inline-flex; align-items: center; background: rgba(128,128,128,0.06); color: #444; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; border: 1px solid rgba(128,128,128,0.15); word-break: break-word; line-height: 1.2; text-align: left; }
+/* --- [ End SubBlock: Narrative Content Slider ] --- */
+
+/* --- [ SubBlock: Status Bar & Modals ] --- */
+.status-left, .status-right { display: flex; align-items: center; gap: 10px; flex: 1; }
+.status-right { justify-content: flex-end; }
+.status-center { display: flex; align-items: center; justify-content: center; gap: 15px; flex: 1; }
+.semantic-time-span { font-size: 0.75rem; color: #007acc; padding: 0; margin: 0 5px; display: flex; align-items: center; height: 20px; font-weight: 600;}
+
+.tm-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 700px; max-height: 85vh; background: #fff; z-index: 10001; border-radius: 12px; padding: 30px; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; color: #222; font-size: 1.1rem; }
+.modal-close { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #999; outline: none; }
+.modal-close:hover { color: #d32f2f; }
+
+.search-input { width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box; }
+.search-result-item { padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
+.search-result-item:hover { background: #f0f8ff; }
+.search-result-title { font-weight: 600; color: #222; font-size: 1rem; }
+.search-result-meta { font-size: 0.8rem; color: #666; margin-top: 4px; }
+/* --- [ End SubBlock: Status Bar & Modals ] --- */
+
+/* --- [ SubBlock: Timeline UI & Leaflet Controls ] --- */
+.timeline-scroll-wrapper { width: 100%; height: 100%; overflow-y: hidden; overflow-x: auto; position: relative; display: block; cursor: grab; user-select: none; -webkit-user-select: none; }
+.timeline-scroll-wrapper:active { cursor: grabbing; }
+.timeline-track-container { position: relative; min-width: 100%; display: block; min-height: 100%; }
+.tag-lane { border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; box-sizing: border-box; width: 100%; position: absolute; left: 0; right: 0; }
+.tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
+
+.event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
+.event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
+
+/* [REF: UI-185] Magnetic Hover Text */
+.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon( 0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px) ); }
+.event-block:hover { filter: brightness(1.05); z-index: 40 !important; width: max-content !important; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.25)); }
+
+.timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
+.timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
+.timeline-control-cluster { position: absolute; right: 15px; z-index: 1000; display: flex; flex-direction: column; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; }
+.timeline-control-cluster .status-btn { width: 32px; height: 32px; }
+.timeline-control-cluster .zoom-factor { display: flex; align-items: center; justify-content: center; }
+
+@media (max-height: 500px) {
     .timeline-control-cluster.temporal { flex-direction: row !important; top: 15px !important; right: 90px !important; }
     .timeline-control-cluster.temporal .status-btn { border-bottom: none !important; border-right: 1px solid #eee !important; width: 28px !important; height: 28px !important; }
     .timeline-control-cluster.temporal .zoom-factor { border-bottom: none !important; border-right: 1px solid #eee !important; width: 28px !important; height: 28px !important; }
-  }
-  /* --- [ End SubBlock: Timeline UI & Leaflet Controls ] --- */
+}
+/* --- [ End SubBlock: Timeline UI & Leaflet Controls ] --- */
 </style>
 <!-- === [ END MAJOR BLOCK ] === -->
 </head>
+
 <body>
     <div id="root"></div>
     <script type="module">
@@ -244,7 +263,7 @@
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.6.2';
+		const APP_VERSION = 'v8.7.0';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1110,614 +1129,609 @@
         MODULE_VERSIONS ["ContentSlider"] = 'v4.4.1';
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: TimelineScrubber v25.0.5 ] ===
+        // === [ MAJOR BLOCK: TimelineScrubber v25.1.0 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
-          const wrapperRef = useRef(null);
-          const [zoomLevel, setZoomLevel] = useState(1);
-          const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
-          const touchZoomRef = useRef({ initialDist: 0, initialZoom: 1 });
-          const prevActiveIndexRef = useRef(-1);
-          const scrollTargetRef = useRef(null);
-          const scrollTimeout = useRef(null);
-          const [containerHeight, setContainerHeight] = useState(200);
-          const [viewLeftEdge, setViewLeftEdge] = useState(0);
-
-          const safeStripHTML = (str) => {
-            if (!str) return '';
-            const withDashes = String(str).replace(/<p[^>]*>/gi, ' - ');
-            return withDashes.replace(/<[^>]*>?/gm, '').trim();
-          };
-
-          useEffect(() => {
-            const ro = new ResizeObserver(entries => {
-              const entry = entries.at(0);
-              if (entry && entry.target) {
-                setContainerHeight(entry.target.clientHeight);
-              }
-            });
-            if (wrapperRef.current) ro.observe(wrapperRef.current);
-            return () => ro.disconnect();
-          }, []);
-
-          const getParsedTags = (rawTagsArray) => {
-            if (!rawTagsArray || rawTagsArray.length === 0) return ['Untagged'];
-            const splitRegex = /[\r\n]+|\\n/;
-            let arr = [];
-            rawTagsArray.forEach(t => {
-              if (typeof t === 'string') arr.push(...t.split(splitRegex));
-              else arr.push(t);
-            });
-            arr = arr.map(s => String(s).trim()).filter(Boolean);
-            return arr.length > 0 ? arr : ['Untagged'];
-          };
-
-          const tagsMap = new Set();
-          const tagPairs = [];
-          data.forEach(d => {
-            if (!d.startDate || isNaN(d.startDate.min)) return;
-            const t = getParsedTags(d.tags);
-            t.forEach(tag => tagsMap.add(tag));
-            for (let i = 0; i < t.length - 1; i++) tagPairs.push([t.at(i), t.at(i + 1)]);
-          });
-
-          let orderedTags = [];
-          const remaining = Array.from(tagsMap);
-          if (remaining.length > 0) orderedTags.push(remaining.shift());
-          
-          while (remaining.length > 0) {
-            let placed = false;
-            for (let i = 0; i < remaining.length; i++) {
-              const r = remaining.at(i);
-              const firstTag = orderedTags.at(0);
-              const lastTag = orderedTags.at(-1);
-              const pairedWithFirst = tagPairs.some(p => (p.at(0) === r && p.at(1) === firstTag) || (p.at(1) === r && p.at(0) === firstTag));
-              const pairedWithLast = tagPairs.some(p => (p.at(0) === r && p.at(1) === lastTag) || (p.at(1) === r && p.at(0) === lastTag));
-              
-              if (pairedWithLast) {
-                orderedTags.push(r);
-                remaining.splice(i, 1);
-                placed = true;
-                break;
-              }
-              if (pairedWithFirst) {
-                orderedTags.unshift(r);
-                remaining.splice(i, 1);
-                placed = true;
-                break;
-              }
-            }
-            if (!placed) orderedTags.push(remaining.shift());
-          }
-
-          const laneCount = Math.max(1, orderedTags.length);
-          const laneHeight = Math.max(24, (containerHeight - 38) / laneCount);
-          const validData = data.filter(d => d.startDate && !isNaN(d.startDate.min));
-          const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
-          let maxTimeRaw = minTimeRaw;
-          
-          validData.forEach(d => {
-            if (d.endDate && !isNaN(d.endDate.max) && d.endDate.max > maxTimeRaw) {
-              maxTimeRaw = d.endDate.max;
-            } else if (d.startDate.min > maxTimeRaw) {
-              maxTimeRaw = d.startDate.min;
-            }
-          });
-
-          const rawTimeRange = Math.max(maxTimeRaw - minTimeRaw, 86400000);
-          const padMs = rawTimeRange * 0.05;
-          const renderMinTime = minTimeRaw - padMs;
-          const renderMaxTime = maxTimeRaw + padMs;
-          const renderTimeRange = renderMaxTime - renderMinTime;
-
-          const measureTextWidth = (text) => {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            context.font = '400 12px "Noto Sans", sans-serif';
-            return context.measureText(text).width;
-          };
-
-          const formatLabelSmart = (titleStr) => {
-            const maxPx = 300;
-            const words = titleStr.split(' ');
-            let targetLines = words.length > 1 ? (measureTextWidth(titleStr) > 280 ? 3 : 2) : 1;
-            if (targetLines === 1) return { lines: [titleStr], pxWidth: measureTextWidth(titleStr) + 35 };
-            let bestSplit = [];
-            let bestScore = Infinity;
-            if (targetLines === 2) {
-              for (let i = 1; i < words.length; i++) {
-                let l1 = words.slice(0, i).join(' '), l2 = words.slice(i).join(' ');
-                let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2);
-                let score = Math.max(w1, w2) + Math.abs(w1 - w2) * 0.8;
-                if (score < bestScore) { bestScore = score; bestSplit = [l1, l2]; }
-              }
-            } else {
-              for (let i = 1; i < words.length - 1; i++) {
-                for (let j = i + 1; j < words.length; j++) {
-                  let l1 = words.slice(0, i).join(' '), l2 = words.slice(i, j).join(' '), l3 = words.slice(j).join(' ');
-                  let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2), w3 = measureTextWidth(l3);
-                  let maxW = Math.max(w1, w2, w3), minW = Math.min(w1, w2, w3);
-                  let score = maxW + (maxW - minW) * 0.8;
-                  if (score < bestScore) { bestScore = score; bestSplit = [l1, l2, l3]; }
-                }
-              }
-            }
-            let lines = bestSplit.length ? bestSplit : [titleStr];
-            if (lines.length === 3) {
-              let last = lines.at(2);
-              if (measureTextWidth(last) > maxPx) {
-                while (measureTextWidth(last + '...') > maxPx && last.length > 0) last = last.slice(0, -1);
-                lines.splice(2, 1, last.trim() + '...');
-              }
-            } else if (lines.length === 2) {
-              let last = lines.at(1);
-              if (measureTextWidth(last) > maxPx * 1.3) {
-                while (measureTextWidth(last + '...') > maxPx * 1.3 && last.length > 0) last = last.slice(0, -1);
-                lines.splice(1, 1, last.trim() + '...');
-              }
-            }
-            return { lines, pxWidth: Math.max(60, Math.max(...lines.map(l => measureTextWidth(l))) + 35) };
-          };
-
-          useEffect(() => {
-            const visibleMs = renderTimeRange / zoomLevel;
-            const secs = visibleMs / 1000;
-            const mins = secs / 60;
-            const hrs = mins / 60;
-            const days = hrs / 24;
-            const mos = days / 30.44;
-            const yrs = days / 365.25;
-            let str = `${Math.round(mins)} Minutes`;
-            if (yrs >= 1) str = `${Math.round(yrs)} Years`;
-            else if (mos >= 1) str = `${Math.round(mos)} Months`;
-            else if (days >= 1) str = `${Math.round(days)} Days`;
-            else if (hrs >= 1) str = `${Math.round(hrs)} Hours`;
-            setVisibleTimeSpan(`Span: ${str}`);
-          }, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
-
-          useEffect(() => {
-            const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
-            if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
-              const activeNode = validData.at(activeDataIndex);
-              const sT = activeNode.startDate.min;
-              const { pxWidth } = formatLabelSmart(safeStripHTML(activeNode.title));
-              const containerW = wrapperRef.current.clientWidth || 1000;
-              const targetTrackW = Math.max(containerW, containerW * zoomLevel);
-              const scrollPos = ((sT - renderMinTime) / renderTimeRange * targetTrackW) + (pxWidth / 2) - (containerW / 2);
-              wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
-            }
-          }, [activeIndex]);
-
-          useEffect(() => {
-            if (validData.length > 1 && wrapperRef.current && !dragRef.current.isDragging && activeIndex !== prevActiveIndexRef.current) {
-              prevActiveIndexRef.current = activeIndex;
-              if (zoomLock === 'hard') return;
-              if (zoomLock === 'soft') setZoomLock('auto');
-              const timeoutId = setTimeout(() => {
-                const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
-                if (activeDataIndex >= 0) {
-                  let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
-                  let clusterMax = validData.at(Math.min(validData.length - 1, activeDataIndex + 2)).startDate.min;
-                  for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
-                    const node = validData.at(i);
-                    if (node.endDate && !isNaN(node.endDate.max)) {
-                      clusterMax = Math.max(clusterMax, node.endDate.max);
+            const wrapperRef = useRef(null);
+            const [zoomLevel, setZoomLevel] = useState(1);
+            const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
+            const touchZoomRef = useRef({ initialDist: 0, initialZoom: 1 });
+            const prevActiveIndexRef = useRef(-1);
+            const scrollTargetRef = useRef(null);
+            const scrollTimeout = useRef(null);
+            const [containerHeight, setContainerHeight] = useState(200);
+            const [viewLeftEdge, setViewLeftEdge] = useState(0);
+        
+            const safeStripHTML = (str) => {
+                if (!str) return '';
+                const withDashes = String(str).replace(/<p[^>]*>/gi, ' - ');
+                return withDashes.replace(/<[^>]*>?/gm, '').trim();
+            };
+        
+            useEffect(() => {
+                const ro = new ResizeObserver(entries => {
+                    const entry = entries.at(0);
+                    if (entry && entry.target) {
+                        setContainerHeight(entry.target.clientHeight);
                     }
-                    clusterMax = Math.max(clusterMax, node.startDate.min);
-                    clusterMin = Math.min(clusterMin, node.startDate.min);
-                  }
-                  const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
-                  const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
-                  const activeNode = validData.at(activeDataIndex);
-                  const sT = activeNode.startDate.min;
-                  const { pxWidth } = formatLabelSmart(safeStripHTML(activeNode.title));
-                  const containerW = wrapperRef.current.clientWidth || 1000;
-                  scrollTargetRef.current = (((sT - renderMinTime) / renderTimeRange * Math.max(containerW, containerW * clampedZoom)) + (pxWidth / 2)) - (containerW / 2);
-                  setZoomLevel(clampedZoom);
-                }
-              }, 500);
-              return () => clearTimeout(timeoutId);
-            }
-          }, [activeIndex, data, zoomLock, setZoomLock]);
-
-          useLayoutEffect(() => {
-            if (scrollTargetRef.current !== null && wrapperRef.current) {
-              wrapperRef.current.scrollTo({ left: scrollTargetRef.current, behavior: 'auto' });
-              scrollTargetRef.current = null;
-            }
-          }, [zoomLevel]);
-
-          const handleManualZoom = (newZoom, centerType = 'center', eventX = 0) => {
-            if (!wrapperRef.current) return;
-            const containerW = wrapperRef.current.clientWidth;
-            const scrollPos = wrapperRef.current.scrollLeft;
-            const anchorPx = centerType === 'mouse' ? scrollPos + eventX : scrollPos + (containerW / 2);
-            const centerPct = anchorPx / Math.max(containerW, containerW * zoomLevel);
-            scrollTargetRef.current = (centerPct * Math.max(containerW, containerW * newZoom)) - (centerType === 'mouse' ? eventX : (containerW / 2));
-            setZoomLevel(newZoom);
-          };
-
-          const onDown = (e) => {
-            if (zoomLock !== 'hard') setZoomLock('soft');
-            if (e.touches && e.touches.length === 2) {
-              const t1 = Array.from(e.touches).at(0);
-              const t2 = Array.from(e.touches).at(1);
-              touchZoomRef.current = {
-                initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY),
-                initialZoom: zoomLevel
-              };
-              return;
-            }
-            const t1 = e.touches ? Array.from(e.touches).at(0) : e;
-            const x = t1.clientX;
-            dragRef.current = { isDragging: true, startX: x - wrapperRef.current.offsetLeft, scrollLeft: wrapperRef.current.scrollLeft };
-            wrapperRef.current.classList.add('is-dragging');
-          };
-
-          const onUp = () => {
-            dragRef.current.isDragging = false;
-            wrapperRef.current?.classList.remove('is-dragging');
-          };
-
-          const onMove = (e) => {
-            if (e.touches && e.touches.length === 2) {
-              e.preventDefault();
-              const t1 = Array.from(e.touches).at(0);
-              const t2 = Array.from(e.touches).at(1);
-              const scale = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY) / touchZoomRef.current.initialDist;
-              handleManualZoom(Math.min(Math.max(touchZoomRef.current.initialZoom * scale, 1), 500), 'center');
-              return;
-            }
-            if (!dragRef.current.isDragging) return;
-            if (!e.touches) e.preventDefault();
-            const t1 = e.touches ? Array.from(e.touches).at(0) : e;
-            wrapperRef.current.scrollLeft = dragRef.current.scrollLeft - ((t1.clientX - wrapperRef.current.offsetLeft - dragRef.current.startX) * 2);
-          };
-
-          const onWheel = (e) => {
-            e.preventDefault();
-            if (zoomLock !== 'hard') setZoomLock('soft');
-            handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1), 'mouse', e.clientX - wrapperRef.current.getBoundingClientRect().left);
-          };
-
-          const onScroll = () => {
-            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-            scrollTimeout.current = setTimeout(() => {
-              if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft);
-            }, 100);
-          };
-
-          if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
-
-          const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
-          const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
-          const visibleTimeSpanMs = renderTimeRange / zoomLevel;
-          const spansMultipleDays = visibleTimeSpanMs > 86400000;
-          const targetMsPerMajorTick = Math.max((120 / containerW) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
-          const SECOND = 1000;
-          const MINUTE = 60 * SECOND;
-          const HOUR = 60 * MINUTE;
-          const DAY = 24 * HOUR;
-          const MONTH = 30 * DAY;
-          const YEAR = 365.25 * DAY;
-
-          const scaleConfigs = [
-            { ms: 1000 * YEAR, type: 'year', step: 1000, minorType: 'year', minorStep: 100, minorCount: 10 },
-            { ms: 100 * YEAR, type: 'year', step: 100, minorType: 'year', minorStep: 10, minorCount: 10 },
-            { ms: 10 * YEAR, type: 'year', step: 10, minorType: 'year', minorStep: 1, minorCount: 10 },
-            { ms: 2 * YEAR, type: 'year', step: 2, minorType: 'month', minorStep: 2, minorCount: 12 },
-            { ms: YEAR, type: 'year', step: 1, minorType: 'month', minorStep: 1, minorCount: 12 },
-            { ms: 6 * MONTH, type: 'month', step: 6, minorType: 'month', minorStep: 1, minorCount: 6 },
-            { ms: 3 * MONTH, type: 'month', step: 3, minorType: 'day', minorStep: 10, minorCount: 9 },
-            { ms: MONTH, type: 'month', step: 1, minorType: 'day', minorStep: 5, minorCount: 6 },
-            { ms: 14 * DAY, type: 'day', step: 14, minorType: 'day', minorStep: 2, minorCount: 7 },
-            { ms: 7 * DAY, type: 'day', step: 7, minorType: 'day', minorStep: 1, minorCount: 7 },
-            { ms: 2 * DAY, type: 'day', step: 2, minorType: 'hour', minorStep: 4, minorCount: 12 },
-            { ms: DAY, type: 'day', step: 1, minorType: 'hour', minorStep: 3, minorCount: 8 },
-            { ms: 12 * HOUR, type: 'hour', step: 12, minorType: 'hour', minorStep: 1, minorCount: 12 },
-            { ms: 6 * HOUR, type: 'hour', step: 6, minorType: 'hour', minorStep: 1, minorCount: 6 },
-            { ms: 2 * HOUR, type: 'hour', step: 2, minorType: 'minute', minorStep: 15, minorCount: 8 },
-            { ms: HOUR, type: 'hour', step: 1, minorType: 'minute', minorStep: 10, minorCount: 6 },
-            { ms: 30 * MINUTE, type: 'minute', step: 30, minorType: 'minute', minorStep: 5, minorCount: 6 },
-            { ms: 15 * MINUTE, type: 'minute', step: 15, minorType: 'minute', minorStep: 1, minorCount: 15 },
-            { ms: 10 * MINUTE, type: 'minute', step: 10, minorType: 'minute', minorStep: 1, minorCount: 10 },
-            { ms: 5 * MINUTE, type: 'minute', step: 5, minorType: 'minute', minorStep: 1, minorCount: 5 },
-            { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
-          ];
-
-          let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
-          
-          const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
-          const visibleRightMs = renderMinTime + ((viewLeftEdge + containerW) / trackWidthPx) * renderTimeRange;
-          const viewportCenterMs = visibleLeftMs + ((visibleRightMs - visibleLeftMs) / 2);
-
-          // [FIX] Phase 1 4D Telemetry Hoisting: Broadcast active bounds back to AppOrchestrator
-          useEffect(() => {
-            if (setVisibleTimeBounds && !isNaN(visibleLeftMs) && !isNaN(visibleRightMs)) {
-              setVisibleTimeBounds([visibleLeftMs, visibleRightMs]);
-            }
-          }, [visibleLeftMs, visibleRightMs, setVisibleTimeBounds]);
-
-          let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
-          iterDate.setMilliseconds(0);
-
-          if (activeScale.type === 'year') {
-            iterDate.setMonth(0, 1);
-            iterDate.setHours(0, 0, 0, 0);
-            iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step);
-          } else if (activeScale.type === 'month') {
-            iterDate.setDate(1);
-            iterDate.setHours(0, 0, 0, 0);
-            iterDate.setMonth(Math.floor(iterDate.getMonth() / activeScale.step) * activeScale.step);
-          } else if (activeScale.type === 'day') {
-            iterDate.setHours(0, 0, 0, 0);
-            iterDate.setDate(Math.floor((iterDate.getDate() - 1) / activeScale.step) * activeScale.step + 1);
-          } else if (activeScale.type === 'hour') {
-            iterDate.setMinutes(0, 0, 0);
-            iterDate.setHours(Math.floor(iterDate.getHours() / activeScale.step) * activeScale.step);
-          } else if (activeScale.type === 'minute') {
-            iterDate.setSeconds(0, 0);
-            iterDate.setMinutes(Math.floor(iterDate.getMinutes() / activeScale.step) * activeScale.step);
-          }
-
-          let safety = 0;
-          const stopTime = Math.min(renderMaxTime, visibleRightMs + (activeScale.ms * 2));
-          const majorTicksData = [];
-          const minorTicksData = [];
-
-          while (iterDate.getTime() <= stopTime && safety < 1000) {
-            safety++;
-            const t = iterDate.getTime();
-            if (t >= renderMinTime) {
-              const pctLeft = ((t - renderMinTime) / renderTimeRange) * 100;
-              majorTicksData.push({ t, pctLeft, date: new Date(iterDate) });
-            }
-
-            let nextMajor = new Date(iterDate);
-            if (activeScale.type === 'year') nextMajor.setFullYear(nextMajor.getFullYear() + activeScale.step);
-            else if (activeScale.type === 'month') nextMajor.setMonth(nextMajor.getMonth() + activeScale.step);
-            else if (activeScale.type === 'day') nextMajor.setDate(nextMajor.getDate() + activeScale.step);
-            else if (activeScale.type === 'hour') nextMajor.setHours(nextMajor.getHours() + activeScale.step);
-            else if (activeScale.type === 'minute') nextMajor.setMinutes(nextMajor.getMinutes() + activeScale.step);
-
-            let minorIter = new Date(iterDate);
-            let minorSafety = 0;
-            let minorIndex = 0;
-
-            while (minorSafety < 100) {
-              minorSafety++;
-              minorIndex++;
-              if (activeScale.minorType === 'year') minorIter.setFullYear(minorIter.getFullYear() + activeScale.minorStep);
-              else if (activeScale.minorType === 'month') minorIter.setMonth(minorIter.getMonth() + activeScale.minorStep);
-              else if (activeScale.minorType === 'day') minorIter.setDate(minorIter.getDate() + activeScale.minorStep);
-              else if (activeScale.minorType === 'hour') minorIter.setHours(minorIter.getHours() + activeScale.minorStep);
-              else if (activeScale.minorType === 'minute') minorIter.setMinutes(minorIter.getMinutes() + activeScale.minorStep);
-              else if (activeScale.minorType === 'second') minorIter.setSeconds(minorIter.getSeconds() + activeScale.minorStep);
-
-              if (minorIter.getTime() >= nextMajor.getTime()) break;
-
-              const minorT = minorIter.getTime();
-              if (minorT >= renderMinTime && minorT <= renderMaxTime) {
-                const minorTickPx = (((minorT - renderMinTime) / renderTimeRange)) * trackWidthPx;
-                const majorPx = ((t - renderMinTime) / renderTimeRange) * trackWidthPx;
-                const nextMajorPx = ((nextMajor.getTime() - renderMinTime) / renderTimeRange) * trackWidthPx;
-                minorTicksData.push({ t: minorT, px: minorTickPx, majorPx, nextMajorPx, date: new Date(minorIter), minorIndex });
-              }
-            }
-            iterDate = nextMajor;
-          }
-
-          let centerTickIndex = -1;
-          let minDist = Infinity;
-          majorTicksData.forEach((d, i) => {
-            if (d.t >= visibleLeftMs && d.t <= visibleRightMs) {
-              const dist = Math.abs(d.t - viewportCenterMs);
-              if (dist < minDist) { minDist = dist; centerTickIndex = i; }
-            }
-          });
-
-          const centerTickPx = centerTickIndex !== -1 ? (majorTicksData.at(centerTickIndex).pctLeft / 100) * trackWidthPx : -1000;
-          const centerKeepout = 65;
-
-          const rulerTicksHTML = majorTicksData.map((d, i) => {
-            let label = '';
-            const tickPx = (d.pctLeft / 100) * trackWidthPx;
-            
-            if (i === centerTickIndex) {
-              label = d.date.toLocaleString(dateLocale, {
-                day: '2-digit', month: 'short', year: 'numeric',
-                hour: (activeScale.type === 'hour' || activeScale.type === 'minute') ? '2-digit' : undefined,
-                minute: (activeScale.type === 'hour' || activeScale.type === 'minute') ? '2-digit' : undefined
-              });
-            } else if (Math.abs(tickPx - centerTickPx) > centerKeepout) {
-              if (activeScale.type === 'year') label = d.date.getFullYear();
-              else if (activeScale.type === 'month') label = d.date.toLocaleString(dateLocale, { month: 'short', year: 'numeric' });
-              else if (activeScale.type === 'day') label = d.date.toLocaleString(dateLocale, { day: 'numeric', month: 'short' });
-              else if (activeScale.type === 'hour' || activeScale.type === 'minute') {
-                if (spansMultipleDays && d.date.getHours() === 0 && d.date.getMinutes() === 0) {
-                  label = d.date.toLocaleString(dateLocale, { day: 'numeric', month: 'short' });
-                } else {
-                  label = d.date.getMinutes() === 0 ? d.date.getHours().toString() : ':' + d.date.getMinutes().toString().padStart(2, '0');
-                }
-              }
-            }
-            return html`
-              <div class="timeline-ruler-tick" style="left: ${d.pctLeft}%;">
-                <div style="width: 2px; height: 10px; background: #666; margin-bottom: 2px;"></div>
-                <div style="font-size: 0.75rem; white-space: nowrap; font-weight: normal; color: #444;">${label}</div>
-              </div>
-            `;
-          });
-
-          const minorTicksHTML = minorTicksData.map(m => {
-            const distCurrent = Math.abs(m.px - m.majorPx);
-            const distNext = Math.abs(m.px - m.nextMajorPx);
-            const distCenter = Math.abs(m.px - centerTickPx);
-            let hideMinor = distCurrent < 35 || distNext < 35;
-            let showLabelText = false;
-            
-            if (!hideMinor && distCurrent > 20) {
-              if (activeScale.minorCount % 2 === 0) {
-                showLabelText = (m.minorIndex % 2 === 0);
-              } else {
-                showLabelText = (m.minorIndex === Math.floor(activeScale.minorCount / 2));
-              }
-            }
-
-            let minorLabel = '';
-            if (showLabelText && distCenter > centerKeepout) {
-              if (activeScale.minorType === 'year') minorLabel = m.date.getFullYear();
-              else if (activeScale.minorType === 'month') minorLabel = m.date.toLocaleString(dateLocale, { month: 'short' });
-              else if (activeScale.minorType === 'day') minorLabel = m.date.getDate();
-              else if (activeScale.minorType === 'hour' || activeScale.minorType === 'minute') {
-                minorLabel = m.date.getMinutes() === 0 ? m.date.getHours().toString() : ':' + m.date.getMinutes().toString().padStart(2, '0');
-              }
-            }
-
-            if (m.px >= viewLeftEdge - 50 && m.px <= viewLeftEdge + containerW + 50) {
-              return html`
-                <div style="position: absolute; left: ${((m.t - renderMinTime) / renderTimeRange) * 100}%; top: 0; width: 1px; height: ${minorLabel ? '7px' : '5px'}; background: #aaa; z-index: 4;">
-                  ${minorLabel ? html`<div style="position: absolute; left: -20px; right: -20px; top: 7px; text-align: center; font-size: 0.6rem; color: #888; letter-spacing: -0.5px;">${minorLabel}</div>` : ''}
-                </div>
-              `;
-            }
-            return null;
-          });
-
-          const stackRegistry = {};
-          const markers = validData.map((item, index) => {
-            const globalIndex = data.findIndex(d => d.id === item.id);
-            const startPct = Number((((item.startDate.min - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-            const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
-            const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
-            
-            const stackKey = `${item.startDate.min}_${laneIdx}`;
-            if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
-            const stackDepth = stackRegistry[stackKey];
-            stackRegistry[stackKey]++;
-            const xOffset = stackDepth * 6;
-            const yOffset = stackDepth * 4;
-
-            let endPct = startPct;
-            if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > item.startDate.min) {
-              endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-            }
-            const hasDuration = (endPct - startPct) > 0.001;
-            const isActive = globalIndex === activeIndex;
-            const topPos = (laneIdx * laneHeight) + 5;
-            const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
-            
-            const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
-            const hasMedia = item.media && item.media.length > 0;
-
-            let xAxisMarker = '';
-            let isDashed = false;
-            let isApprox = false;
-
-            if (item.startDate.isEDTF) {
-              const obj = item.startDate.obj;
-              if (obj.approximate) isApprox = true;
-              if (obj.uncertain) isDashed = true;
-              if (obj.type === 'Set') {
-                const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-                xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 8px; background: rgba(255, 215, 0, 0.2); border: 1px dashed gold; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
-              } else if (obj.type === 'List') {
-                const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-                const subDots = obj.values.map(v => {
-                  const vPct = Number((((v.min - item.startDate.min) / renderTimeRange) * trackWidthPx).toFixed(2));
-                  return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: #cc0000; transform: translateX(-2px);"></div>`;
                 });
-                xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 1px; background: rgba(204,0,0,0.4); z-index: 900;">${subDots}</div>`;
-              }
+                if (wrapperRef.current) ro.observe(wrapperRef.current);
+                return () => ro.disconnect();
+            }, []);
+        
+            const getParsedTags = (rawTagsArray) => {
+                if (!rawTagsArray || rawTagsArray.length === 0) return [];
+                const splitRegex = /[\r\n]+|\\n/; let arr = [];
+                (Array.isArray(rawTagsArray) ? rawTagsArray : [rawTagsArray]).forEach(t => { if (typeof t === 'string') arr.push(...t.split(splitRegex)); else arr.push(t); });
+                return arr.map(s => String(s).trim()).filter(Boolean);
+            };
+        
+            const tagsMap = new Set();
+            const tagPairs = [];
+            data.forEach(d => {
+                if (!d.startDate || isNaN(d.startDate.min)) return;
+                const t = getParsedTags(d.tags);
+                t.forEach(tag => tagsMap.add(tag));
+                for (let i = 0; i < t.length - 1; i++) tagPairs.push([t.at(i), t.at(i + 1)]);
+            });
+        
+            let orderedTags = [];
+            const remaining = Array.from(tagsMap);
+            if (remaining.length > 0) orderedTags.push(remaining.shift());
+        
+            while (remaining.length > 0) {
+                let placed = false;
+                for (let i = 0; i < remaining.length; i++) {
+                    const r = remaining.at(i);
+                    const firstTag = orderedTags.at(0);
+                    const lastTag = orderedTags.at(-1);
+                    const pairedWithFirst = tagPairs.some(p => (p.at(0) === r && p.at(1) === firstTag) || (p.at(1) === r && p.at(0) === firstTag));
+                    const pairedWithLast = tagPairs.some(p => (p.at(0) === r && p.at(1) === lastTag) || (p.at(1) === r && p.at(0) === lastTag));
+                    
+                    if (pairedWithLast) {
+                        orderedTags.push(r);
+                        remaining.splice(i, 1);
+                        placed = true;
+                        break;
+                    }
+                    if (pairedWithFirst) {
+                        orderedTags.unshift(r);
+                        remaining.splice(i, 1);
+                        placed = true;
+                        break;
+                    }
+                }
+                if (!placed) orderedTags.push(remaining.shift());
             }
-
-            if (!xAxisMarker) {
-              if (hasDuration) {
-                const gradStyle = (item.endDate && item.endDate.isEDTF && item.endDate.isOpen)
-                  ? `background: linear-gradient(90deg, ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'} 0%, transparent 100%);`
-                  : `background: ${isActive ? 'rgba(0,122,204,0.4)' : 'rgba(204,0,0,0.3)'}; border: 1px solid ${isActive ? '#007acc' : '#cc0000'};`;
-                xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 2px; height: 6px; ${gradStyle} clip-path: polygon(0 0, 100% calc(100% - 5px), 100% 100%, 0 100%); z-index: 900;"></div>`;
-              } else {
-                let styleStr = `position: absolute; bottom: 0; left: -3px; width: 6px; height: 6px; border-radius: 50%; z-index: 900; box-sizing: content-box; `;
-                if (isApprox) styleStr += `background: radial-gradient(circle, gold 40%, transparent 100%); border: none; `;
-                else styleStr += `background: ${isActive ? '#007acc' : '#cc0000'}; `;
-                if (isDashed) styleStr += `border: 2px dashed #ff4500; background: transparent; `;
-                else if (!isApprox) styleStr += `border: 1px solid #fff; `;
-                xAxisMarker = html`<div style="${styleStr}"></div>`;
-              }
+        
+            const laneCount = Math.max(1, orderedTags.length);
+            const laneHeight = Math.max(24, (containerHeight - 38) / laneCount);
+            const validData = data.filter(d => d.startDate && !isNaN(d.startDate.min));
+            const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
+            let maxTimeRaw = minTimeRaw;
+        
+            validData.forEach(d => {
+                if (d.endDate && !isNaN(d.endDate.max) && d.endDate.max > maxTimeRaw) {
+                    maxTimeRaw = d.endDate.max;
+                } else if (d.startDate.min > maxTimeRaw) {
+                    maxTimeRaw = d.startDate.min;
+                }
+            });
+        
+            const rawTimeRange = Math.max(maxTimeRaw - minTimeRaw, 86400000);
+            const padMs = rawTimeRange * 0.05;
+            const renderMinTime = minTimeRaw - padMs;
+            const renderMaxTime = maxTimeRaw + padMs;
+            const renderTimeRange = renderMaxTime - renderMinTime;
+        
+            const measureTextWidth = (text) => {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                context.font = '400 12px "Noto Sans", sans-serif';
+                return context.measureText(text).width;
+            };
+        
+            const formatLabelSmart = (titleStr) => {
+                const maxPx = 300;
+                const words = titleStr.split(' ');
+                let targetLines = words.length > 1 ? (measureTextWidth(titleStr) > 280 ? 3 : 2) : 1;
+                if (targetLines === 1) return { lines: [titleStr], pxWidth: measureTextWidth(titleStr) + 35 };
+                
+                let bestSplit = [];
+                let bestScore = Infinity;
+                if (targetLines === 2) {
+                    for (let i = 1; i < words.length; i++) {
+                        let l1 = words.slice(0, i).join(' '), l2 = words.slice(i).join(' ');
+                        let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2);
+                        let score = Math.max(w1, w2) + Math.abs(w1 - w2) * 0.8;
+                        if (score < bestScore) { bestScore = score; bestSplit = [l1, l2]; }
+                    }
+                } else {
+                    for (let i = 1; i < words.length - 1; i++) {
+                        for (let j = i + 1; j < words.length; j++) {
+                            let l1 = words.slice(0, i).join(' '), l2 = words.slice(i, j).join(' '), l3 = words.slice(j).join(' ');
+                            let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2), w3 = measureTextWidth(l3);
+                            let maxW = Math.max(w1, w2, w3), minW = Math.min(w1, w2, w3);
+                            let score = maxW + (maxW - minW) * 0.8;
+                            if (score < bestScore) { bestScore = score; bestSplit = [l1, l2, l3]; }
+                        }
+                    }
+                }
+                
+                let lines = bestSplit.length ? bestSplit : [titleStr];
+                if (lines.length === 3) {
+                    let last = lines.at(2);
+                    if (measureTextWidth(last) > maxPx) {
+                        while (measureTextWidth(last + '...') > maxPx && last.length > 0) last = last.slice(0, -1);
+                        lines.splice(2, 1, last.trim() + '...');
+                    }
+                } else if (lines.length === 2) {
+                    let last = lines.at(1);
+                    if (measureTextWidth(last) > maxPx * 1.3) {
+                        while (measureTextWidth(last + '...') > maxPx * 1.3 && last.length > 0) last = last.slice(0, -1);
+                        lines.splice(1, 1, last.trim() + '...');
+                    }
+                }
+                return { lines, pxWidth: Math.max(60, Math.max(...lines.map(l => measureTextWidth(l))) + 35) };
+            };
+        
+            useEffect(() => {
+                const visibleMs = renderTimeRange / zoomLevel;
+                const secs = visibleMs / 1000;
+                const mins = secs / 60;
+                const hrs = mins / 60;
+                const days = hrs / 24;
+                const mos = days / 30.44;
+                const yrs = days / 365.25;
+                
+                let str = `${Math.round(mins)} Minutes`;
+                if (yrs >= 1) str = `${Math.round(yrs)} Years`;
+                else if (mos >= 1) str = `${Math.round(mos)} Months`;
+                else if (days >= 1) str = `${Math.round(days)} Days`;
+                else if (hrs >= 1) str = `${Math.round(hrs)} Hours`;
+                
+                setVisibleTimeSpan(`Span: ${str}`);
+            }, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
+        
+            useEffect(() => {
+                const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+                if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
+                    const activeNode = validData.at(activeDataIndex);
+                    const sT = activeNode.startDate.min;
+                    const { pxWidth } = formatLabelSmart(safeStripHTML(activeNode.title));
+                    const containerW = wrapperRef.current.clientWidth || 1000;
+                    const targetTrackW = Math.max(containerW, containerW * zoomLevel);
+                    const scrollPos = ((sT - renderMinTime) / renderTimeRange * targetTrackW) + (pxWidth / 2) - (containerW / 2);
+                    wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
+                }
+            }, [activeIndex]);
+        
+            useEffect(() => {
+                if (validData.length > 1 && wrapperRef.current && !dragRef.current.isDragging && activeIndex !== prevActiveIndexRef.current) {
+                    prevActiveIndexRef.current = activeIndex;
+                    if (zoomLock === 'hard') return;
+                    if (zoomLock === 'soft') setZoomLock('auto');
+                    
+                    const timeoutId = setTimeout(() => {
+                        const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+                        if (activeDataIndex >= 0) {
+                            let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
+                            let clusterMax = validData.at(Math.min(validData.length - 1, activeDataIndex + 2)).startDate.min;
+                            
+                            for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
+                                const node = validData.at(i);
+                                if (node.endDate && !isNaN(node.endDate.max)) { clusterMax = Math.max(clusterMax, node.endDate.max); }
+                                clusterMax = Math.max(clusterMax, node.startDate.min);
+                                clusterMin = Math.min(clusterMin, node.startDate.min);
+                            }
+                            
+                            const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
+                            const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
+                            const activeNode = validData.at(activeDataIndex);
+                            const sT = activeNode.startDate.min;
+                            const { pxWidth } = formatLabelSmart(safeStripHTML(activeNode.title));
+                            const containerW = wrapperRef.current.clientWidth || 1000;
+                            
+                            scrollTargetRef.current = (((sT - renderMinTime) / renderTimeRange * Math.max(containerW, containerW * clampedZoom)) + (pxWidth / 2)) - (containerW / 2);
+                            setZoomLevel(clampedZoom);
+                        }
+                    }, 500);
+                    return () => clearTimeout(timeoutId);
+                }
+            }, [activeIndex, data, zoomLock, setZoomLock]);
+        
+            useLayoutEffect(() => {
+                if (scrollTargetRef.current !== null && wrapperRef.current) {
+                    wrapperRef.current.scrollTo({ left: scrollTargetRef.current, behavior: 'auto' });
+                    scrollTargetRef.current = null;
+                }
+            }, [zoomLevel]);
+        
+            const handleManualZoom = (newZoom, centerType = 'center', eventX = 0) => {
+                if (!wrapperRef.current) return;
+                const containerW = wrapperRef.current.clientWidth;
+                const scrollPos = wrapperRef.current.scrollLeft;
+                const anchorPx = centerType === 'mouse' ? scrollPos + eventX : scrollPos + (containerW / 2);
+                const centerPct = anchorPx / Math.max(containerW, containerW * zoomLevel);
+                scrollTargetRef.current = (centerPct * Math.max(containerW, containerW * newZoom)) - (centerType === 'mouse' ? eventX : (containerW / 2));
+                setZoomLevel(newZoom);
+            };
+        
+            const onDown = (e) => {
+                if (zoomLock !== 'hard') setZoomLock('soft');
+                if (e.touches && e.touches.length === 2) {
+                    const t1 = Array.from(e.touches).at(0);
+                    const t2 = Array.from(e.touches).at(1);
+                    touchZoomRef.current = { initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY), initialZoom: zoomLevel };
+                    return;
+                }
+                const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+                const x = t1.clientX;
+                dragRef.current = { isDragging: true, startX: x - wrapperRef.current.offsetLeft, scrollLeft: wrapperRef.current.scrollLeft };
+                wrapperRef.current.classList.add('is-dragging');
+            };
+        
+            const onUp = () => {
+                dragRef.current.isDragging = false;
+                wrapperRef.current?.classList.remove('is-dragging');
+            };
+        
+            const onMove = (e) => {
+                if (e.touches && e.touches.length === 2) {
+                    e.preventDefault();
+                    const t1 = Array.from(e.touches).at(0);
+                    const t2 = Array.from(e.touches).at(1);
+                    const scale = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY) / touchZoomRef.current.initialDist;
+                    handleManualZoom(Math.min(Math.max(touchZoomRef.current.initialZoom * scale, 1), 500), 'center');
+                    return;
+                }
+                if (!dragRef.current.isDragging) return;
+                if (!e.touches) e.preventDefault();
+                const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+                wrapperRef.current.scrollLeft = dragRef.current.scrollLeft - ((t1.clientX - wrapperRef.current.offsetLeft - dragRef.current.startX) * 2);
+            };
+        
+            const onWheel = (e) => {
+                e.preventDefault();
+                if (zoomLock !== 'hard') setZoomLock('soft');
+                handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1), 'mouse', e.clientX - wrapperRef.current.getBoundingClientRect().left);
+            };
+        
+            const onScroll = () => {
+                if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+                scrollTimeout.current = setTimeout(() => {
+                    if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft);
+                }, 100);
+            };
+        
+            if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
+        
+            const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+            const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+            const visibleTimeSpanMs = renderTimeRange / zoomLevel;
+            const spansMultipleDays = visibleTimeSpanMs > 86400000;
+            const targetMsPerMajorTick = Math.max((120 / containerW) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
+        
+            const SECOND = 1000; const MINUTE = 60 * SECOND; const HOUR = 60 * MINUTE; const DAY = 24 * HOUR; const MONTH = 30 * DAY; const YEAR = 365.25 * DAY;
+            
+            const scaleConfigs = [
+                { ms: 1000 * YEAR, type: 'year', step: 1000, minorType: 'year', minorStep: 100, minorCount: 10 },
+                { ms: 100 * YEAR, type: 'year', step: 100, minorType: 'year', minorStep: 10, minorCount: 10 },
+                { ms: 10 * YEAR, type: 'year', step: 10, minorType: 'year', minorStep: 1, minorCount: 10 },
+                { ms: 2 * YEAR, type: 'year', step: 2, minorType: 'month', minorStep: 2, minorCount: 12 },
+                { ms: YEAR, type: 'year', step: 1, minorType: 'month', minorStep: 1, minorCount: 12 },
+                { ms: 6 * MONTH, type: 'month', step: 6, minorType: 'month', minorStep: 1, minorCount: 6 },
+                { ms: 3 * MONTH, type: 'month', step: 3, minorType: 'day', minorStep: 10, minorCount: 9 },
+                { ms: MONTH, type: 'month', step: 1, minorType: 'day', minorStep: 5, minorCount: 6 },
+                { ms: 14 * DAY, type: 'day', step: 14, minorType: 'day', minorStep: 2, minorCount: 7 },
+                { ms: 7 * DAY, type: 'day', step: 7, minorType: 'day', minorStep: 1, minorCount: 7 },
+                { ms: 2 * DAY, type: 'day', step: 2, minorType: 'hour', minorStep: 4, minorCount: 12 },
+                { ms: DAY, type: 'day', step: 1, minorType: 'hour', minorStep: 3, minorCount: 8 },
+                { ms: 12 * HOUR, type: 'hour', step: 12, minorType: 'hour', minorStep: 1, minorCount: 12 },
+                { ms: 6 * HOUR, type: 'hour', step: 6, minorType: 'hour', minorStep: 1, minorCount: 6 },
+                { ms: 2 * HOUR, type: 'hour', step: 2, minorType: 'minute', minorStep: 15, minorCount: 8 },
+                { ms: HOUR, type: 'hour', step: 1, minorType: 'minute', minorStep: 10, minorCount: 6 },
+                { ms: 30 * MINUTE, type: 'minute', step: 30, minorType: 'minute', minorStep: 5, minorCount: 6 },
+                { ms: 15 * MINUTE, type: 'minute', step: 15, minorType: 'minute', minorStep: 1, minorCount: 15 },
+                { ms: 10 * MINUTE, type: 'minute', step: 10, minorType: 'minute', minorStep: 1, minorCount: 10 },
+                { ms: 5 * MINUTE, type: 'minute', step: 5, minorType: 'minute', minorStep: 1, minorCount: 5 },
+                { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
+            ];
+        
+            let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
+            const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
+            const visibleRightMs = renderMinTime + ((viewLeftEdge + containerW) / trackWidthPx) * renderTimeRange;
+            const viewportCenterMs = visibleLeftMs + ((visibleRightMs - visibleLeftMs) / 2);
+        
+            useEffect(() => {
+                if (setVisibleTimeBounds && !isNaN(visibleLeftMs) && !isNaN(visibleRightMs)) {
+                    setVisibleTimeBounds([visibleLeftMs, visibleRightMs]);
+                }
+            }, [visibleLeftMs, visibleRightMs, setVisibleTimeBounds]);
+        
+            let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
+            iterDate.setMilliseconds(0);
+        
+            if (activeScale.type === 'year') {
+                iterDate.setMonth(0, 1);
+                iterDate.setHours(0, 0, 0, 0);
+                iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step);
+            } else if (activeScale.type === 'month') {
+                iterDate.setDate(1);
+                iterDate.setHours(0, 0, 0, 0);
+                iterDate.setMonth(Math.floor(iterDate.getMonth() / activeScale.step) * activeScale.step);
+            } else if (activeScale.type === 'day') {
+                iterDate.setHours(0, 0, 0, 0);
+                iterDate.setDate(Math.floor((iterDate.getDate() - 1) / activeScale.step) * activeScale.step + 1);
+            } else if (activeScale.type === 'hour') {
+                iterDate.setMinutes(0, 0, 0);
+                iterDate.setHours(Math.floor(iterDate.getHours() / activeScale.step) * activeScale.step);
+            } else if (activeScale.type === 'minute') {
+                iterDate.setSeconds(0, 0);
+                iterDate.setMinutes(Math.floor(iterDate.getMinutes() / activeScale.step) * activeScale.step);
             }
+        
+            let safety = 0;
+            const stopTime = Math.min(renderMaxTime, visibleRightMs + (activeScale.ms * 2));
+            const majorTicksData = [];
+            const minorTicksData = [];
+        
+            while (iterDate.getTime() <= stopTime && safety < 1000) {
+                safety++;
+                const t = iterDate.getTime();
+                if (t >= renderMinTime) {
+                    const pctLeft = ((t - renderMinTime) / renderTimeRange) * 100;
+                    majorTicksData.push({ t, pctLeft, date: new Date(iterDate) });
+                }
+                
+                let nextMajor = new Date(iterDate);
+                if (activeScale.type === 'year') nextMajor.setFullYear(nextMajor.getFullYear() + activeScale.step);
+                else if (activeScale.type === 'month') nextMajor.setMonth(nextMajor.getMonth() + activeScale.step);
+                else if (activeScale.type === 'day') nextMajor.setDate(nextMajor.getDate() + activeScale.step);
+                else if (activeScale.type === 'hour') nextMajor.setHours(nextMajor.getHours() + activeScale.step);
+                else if (activeScale.type === 'minute') nextMajor.setMinutes(nextMajor.getMinutes() + activeScale.step);
+                
+                let minorIter = new Date(iterDate);
+                let minorSafety = 0;
+                let minorIndex = 0;
+                
+                while (minorSafety < 100) {
+                    minorSafety++; minorIndex++;
+                    if (activeScale.minorType === 'year') minorIter.setFullYear(minorIter.getFullYear() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'month') minorIter.setMonth(minorIter.getMonth() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'day') minorIter.setDate(minorIter.getDate() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'hour') minorIter.setHours(minorIter.getHours() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'minute') minorIter.setMinutes(minorIter.getMinutes() + activeScale.minorStep);
+                    else if (activeScale.minorType === 'second') minorIter.setSeconds(minorIter.getSeconds() + activeScale.minorStep);
+                    
+                    if (minorIter.getTime() >= nextMajor.getTime()) break;
+                    
+                    const minorT = minorIter.getTime();
+                    if (minorT >= renderMinTime && minorT <= renderMaxTime) {
+                        const minorTickPx = (((minorT - renderMinTime) / renderTimeRange)) * trackWidthPx;
+                        const majorPx = ((t - renderMinTime) / renderTimeRange) * trackWidthPx;
+                        const nextMajorPx = ((nextMajor.getTime() - renderMinTime) / renderTimeRange) * trackWidthPx;
+                        minorTicksData.push({ t: minorT, px: minorTickPx, majorPx, nextMajorPx, date: new Date(minorIter), minorIndex });
+                    }
+                }
+                iterDate = nextMajor;
+            }
+        
+            let centerTickIndex = -1;
+            let minDist = Infinity;
+            majorTicksData.forEach((d, i) => {
+                if (d.t >= visibleLeftMs && d.t <= visibleRightMs) {
+                    const dist = Math.abs(d.t - viewportCenterMs);
+                    if (dist < minDist) { minDist = dist; centerTickIndex = i; }
+                }
+            });
+        
+            const centerTickPx = centerTickIndex !== -1 ? (majorTicksData.at(centerTickIndex).pctLeft / 100) * trackWidthPx : -1000;
+            const centerKeepout = 65;
+        
+            const rulerTicksHTML = majorTicksData.map((d, i) => {
+                let label = '';
+                const tickPx = (d.pctLeft / 100) * trackWidthPx;
+                if (i === centerTickIndex) {
+                    label = d.date.toLocaleString(dateLocale, {
+                        day: '2-digit', month: 'short', year: 'numeric',
+                        hour: (activeScale.type === 'hour' || activeScale.type === 'minute') ? '2-digit' : undefined,
+                        minute: (activeScale.type === 'hour' || activeScale.type === 'minute') ? '2-digit' : undefined
+                    });
+                } else if (Math.abs(tickPx - centerTickPx) > centerKeepout) {
+                    if (activeScale.type === 'year') label = d.date.getFullYear();
+                    else if (activeScale.type === 'month') label = d.date.toLocaleString(dateLocale, { month: 'short', year: 'numeric' });
+                    else if (activeScale.type === 'day') label = d.date.toLocaleString(dateLocale, { day: 'numeric', month: 'short' });
+                    else if (activeScale.type === 'hour' || activeScale.type === 'minute') {
+                        if (spansMultipleDays && d.date.getHours() === 0 && d.date.getMinutes() === 0) {
+                            label = d.date.toLocaleString(dateLocale, { day: 'numeric', month: 'short' });
+                        } else {
+                            label = d.date.getMinutes() === 0 ? d.date.getHours().toString() : ':' + d.date.getMinutes().toString().padStart(2, '0');
+                        }
+                    }
+                }
+                return html`<div class="timeline-ruler-tick" style="left: ${d.pctLeft}%;"><div style="width: 2px; height: 10px; background: #666; margin-bottom: 2px;"></div><div style="font-size: 0.75rem; white-space: nowrap; font-weight: normal; color: #444;">${label}</div></div>`;
+            });
+        
+            const minorTicksHTML = minorTicksData.map(m => {
+                const distCurrent = Math.abs(m.px - m.majorPx);
+                const distNext = Math.abs(m.px - m.nextMajorPx);
+                const distCenter = Math.abs(m.px - centerTickPx);
+                
+                let hideMinor = distCurrent < 35 || distNext < 35;
+                let showLabelText = false;
+                if (!hideMinor && distCurrent > 20) {
+                    if (activeScale.minorCount % 2 === 0) {
+                        showLabelText = (m.minorIndex % 2 === 0);
+                    } else {
+                        showLabelText = (m.minorIndex === Math.floor(activeScale.minorCount / 2));
+                    }
+                }
+                
+                let minorLabel = '';
+                if (showLabelText && distCenter > centerKeepout) {
+                    if (activeScale.minorType === 'year') minorLabel = m.date.getFullYear();
+                    else if (activeScale.minorType === 'month') minorLabel = m.date.toLocaleString(dateLocale, { month: 'short' });
+                    else if (activeScale.minorType === 'day') minorLabel = m.date.getDate();
+                    else if (activeScale.minorType === 'hour' || activeScale.minorType === 'minute') {
+                        minorLabel = m.date.getMinutes() === 0 ? m.date.getHours().toString() : ':' + m.date.getMinutes().toString().padStart(2, '0');
+                    }
+                }
+                
+                if (m.px >= viewLeftEdge - 50 && m.px <= viewLeftEdge + containerW + 50) {
+                    return html`<div style="position: absolute; left: ${((m.t - renderMinTime) / renderTimeRange) * 100}%; top: 0; width: 1px; height: ${minorLabel ? '7px' : '5px'}; background: #aaa; z-index: 4;">${minorLabel ? html`<div style="position: absolute; left: -20px; right: -20px; top: 7px; text-align: center; font-size: 0.6rem; color: #888; letter-spacing: -0.5px;">${minorLabel}</div>` : ''}</div>`;
+                }
+                return null;
+            });
+        
+            const stackRegistry = {};
+            const viewPadMs = visibleTimeSpanMs * 0.5; // [REF: PERF-40]
+        
+            const markers = validData.map((item, index) => {
+                const itemStartMs = item.startDate.min;
+                const itemEndMs = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : itemStartMs;
+                
+                // [REF: PERF-40] Off-Screen DOM Culling Matrix
+                if (itemEndMs < (visibleLeftMs - viewPadMs) || itemStartMs > (visibleRightMs + viewPadMs)) return null;
 
+                const globalIndex = data.findIndex(d => d.id === item.id);
+                const startPct = Number((((itemStartMs - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+                const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
+                const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
+                
+                const stackKey = `${itemStartMs}_${laneIdx}`;
+                if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
+                const stackDepth = stackRegistry[stackKey];
+                stackRegistry[stackKey]++;
+                const xOffset = stackDepth * 6;
+                const yOffset = stackDepth * 4;
+                
+                let endPct = startPct;
+                if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
+                    endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+                }
+                const hasDuration = (endPct - startPct) > 0.001;
+                const isActive = globalIndex === activeIndex;
+                const topPos = (laneIdx * laneHeight) + 5;
+                const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
+                const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
+                const hasMedia = item.media && item.media.length > 0;
+                
+                let xAxisMarker = '';
+                let isApproxStart = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.approximate;
+                let isApproxEnd = item.endDate && item.endDate.isEDTF && item.endDate.obj && item.endDate.obj.approximate;
+                let isDashed = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.uncertain;
+                
+                if (item.startDate.isEDTF && item.startDate.obj) {
+                    const obj = item.startDate.obj;
+                    if (obj.type === 'Set') {
+                        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 8px; background: rgba(255, 215, 0, 0.2); border: 1px dashed gold; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
+                    } else if (obj.type === 'List') {
+                        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+                        const subDots = obj.values.map(v => {
+                            const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
+                            return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: #cc0000; transform: translateX(-2px);"></div>`;
+                        });
+                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 1px; background: rgba(204,0,0,0.4); z-index: 900;">${subDots}</div>`;
+                    }
+                }
+                
+                if (!xAxisMarker) {
+                    if (hasDuration) {
+                        const gradStyle = (item.endDate && item.endDate.isEDTF && item.endDate.isOpen)
+                            ? `background: linear-gradient(90deg, ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'} 0%, transparent 100%);`
+                            : `background: ${isActive ? 'rgba(0,122,204,0.4)' : 'rgba(204,0,0,0.3)'};`;
+                            
+                        // [REF: TL-19] The 8px/4px Stepped Trapezoid & EDTF Uncertainty Ribbon
+                        const borderL = isApproxStart ? '3px solid #ffb300' : `2px solid ${isActive ? '#007acc' : '#cc0000'}`;
+                        const borderR = isApproxEnd ? '3px solid #ffb300' : 'none';
+                        const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
+                            
+                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 8px; ${gradStyle} border-left: ${borderL}; border-right: ${borderR}; ${cStyle} clip-path: polygon(0 0, 100% 4px, 100% 100%, 0 100%); mix-blend-mode: multiply; z-index: 900; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+                    } else {
+                        let styleStr = `position: absolute; bottom: 0; left: -3px; width: 6px; height: 6px; border-radius: 50%; z-index: 900; box-sizing: content-box; `;
+                        if (isApproxStart) styleStr += `background: #ffb300; border: none; cursor: zoom-in; `;
+                        else styleStr += `background: ${isActive ? '#007acc' : '#cc0000'}; `;
+                        
+                        if (isDashed) styleStr += `border: 2px dashed #ff4500; background: transparent; `;
+                        else if (!isApproxStart) styleStr += `border: 1px solid #fff; `;
+                        
+                        xAxisMarker = html`<div style="${styleStr}" title="${isApproxStart ? 'Approximate Date' : ''}"></div>`;
+                    }
+                }
+                
+                return html`
+                <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => setActiveIndex(globalIndex)}>
+                    ${isActive ? html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: #007acc; z-index: 999;"></div>` : ''}
+                    ${xAxisMarker}
+                    <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; background: ${isActive ? '#007acc' : '#f4f4f5'}; color: ${isActive ? '#fff' : '#444'}; z-index: 5; width: ${pxWidth}px;">
+                        ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>` : ''}
+                        <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
+                            ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+        
             return html`
-              <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => setActiveIndex(globalIndex)}>
-                ${isActive ? html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: #007acc; z-index: 999;"></div>` : ''}
-                ${xAxisMarker}
-                <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; background: ${isActive ? '#007acc' : '#f4f4f5'}; color: ${isActive ? '#fff' : '#444'}; z-index: 5; width: ${pxWidth}px;">
-                  ${hasMedia ? html`<svg style="position: absolute; left: 2px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>` : ''}
-                  <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
-                    ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
-                  </div>
-                </div>
-              </div>
-            `;
-          });
-
-          return html`
             <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="timeline-control-cluster" style="top: 15px; flex-direction: row;">
-                <button class="status-btn" style="border: none; border-right: 1px solid #eee; border-radius: 0;" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                <button class="status-btn" style="border: none; border-radius: 0;" onClick=${() => {
-                  if (!isTimelineExpanded) {
-                    const appNode = document.getElementById('app-layout');
-                    if (appNode) appNode.style.setProperty('--timeline-height', `${timelineRequiredHeight}px`);
-                    setIsTimelineExpanded(true);
-                  } else {
-                    const appNode = document.getElementById('app-layout');
-                    if (appNode) appNode.style.setProperty('--timeline-height', '10%');
-                    setIsTimelineExpanded(false);
-                  }
-                }} title=${isTimelineExpanded ? "Restore Height" : "Maximize Swimlanes"}>
-                  ${isTimelineExpanded
-                    ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="12" height="12" rx="1"></rect><path d="M9 3h9a1 1 0 0 1 1 1v9"></path></svg>`
-                    : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`
-                  }
-                </button>
-              </div>
-              <div class="timeline-control-cluster temporal" style="top: 52px;">
-                <button class="status-btn" style="border: none; border-bottom: 1px solid #eee; border-radius: 0;" onClick=${() => { if(zoomLock !== 'hard') setZoomLock('soft'); handleManualZoom(Math.min(zoomLevel * 1.5, 500), 'center'); }} title="Zoom In">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                <div class="zoom-factor" style="height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #222; background: #fff; border-bottom: 1px solid #eee; font-family: monospace; margin: 0; padding: 0;" title="Current Zoom Factor">${Math.round(zoomLevel)}x</div>
-                <button class="status-btn" style="border: none; border-bottom: 1px solid #eee; border-radius: 0;" onClick=${() => { if(zoomLock !== 'hard') setZoomLock('soft'); handleManualZoom(Math.max(zoomLevel / 1.5, 1), 'center'); }} title="Zoom Out">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                <button class="status-btn" style="border: none; border-radius: 0;" onClick=${() => setZoomLock(p => p === 'hard' ? 'auto' : 'hard')} title="Toggle Auto-Zoom Lock">
-                  ${zoomLock === 'hard'
-                    ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
-                    : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`
-                  }
-                </button>
-              </div>
-              <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
-                <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box;">
-                  <div style="position: absolute; top: 5px; left: 0; right: 0; bottom: 33px; pointer-events: none; z-index: 0;">
-                    ${orderedTags.map((tag, i) => html`
-                      <div class="tag-lane" style="top: ${i * laneHeight}px; height: ${laneHeight}px; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'transparent'};">
-                        <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; pointer-events: auto;">${tag}</div>
-                      </div>
-                    `)}
-                  </div>
-                  <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5;">
-                    ${rulerTicksHTML}
-                    ${minorTicksHTML}
-                  </div>
-                  ${markers}
+                <div class="timeline-control-cluster" style="top: 15px; flex-direction: row;">
+                    <button class="status-btn" style="border: none; border-right: 1px solid #eee; border-radius: 0;" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                    <button class="status-btn" style="border: none; border-radius: 0;" onClick=${() => {
+                        if (!isTimelineExpanded) {
+                            const appNode = document.getElementById('app-layout');
+                            if (appNode) appNode.style.setProperty('--timeline-height', `${timelineRequiredHeight}px`);
+                            setIsTimelineExpanded(true);
+                        } else {
+                            const appNode = document.getElementById('app-layout');
+                            if (appNode) appNode.style.setProperty('--timeline-height', '10%');
+                            setIsTimelineExpanded(false);
+                        }
+                    }} title=${isTimelineExpanded ? "Restore Height" : "Maximize Swimlanes"}>
+                        ${isTimelineExpanded
+                            ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="12" height="12" rx="1"></rect><path d="M9 3h9a1 1 0 0 1 1 1v9"></path></svg>`
+                            : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`
+                        }
+                    </button>
                 </div>
-              </div>
+                <div class="timeline-control-cluster temporal" style="top: 52px;">
+                    <button class="status-btn" style="border: none; border-bottom: 1px solid #eee; border-radius: 0;" onClick=${() => { if(zoomLock !== 'hard') setZoomLock('soft'); handleManualZoom(Math.min(zoomLevel * 1.5, 500), 'center'); }} title="Zoom In">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                    <div class="zoom-factor" style="height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #222; background: #fff; border-bottom: 1px solid #eee; font-family: monospace; margin: 0; padding: 0;" title="Current Zoom Factor">${Math.round(zoomLevel)}x</div>
+                    <button class="status-btn" style="border: none; border-bottom: 1px solid #eee; border-radius: 0;" onClick=${() => { if(zoomLock !== 'hard') setZoomLock('soft'); handleManualZoom(Math.max(zoomLevel / 1.5, 1), 'center'); }} title="Zoom Out">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                    <button class="status-btn" style="border: none; border-radius: 0;" onClick=${() => setZoomLock(p => p === 'hard' ? 'auto' : 'hard')} title="Toggle Auto-Zoom Lock">
+                        ${zoomLock === 'hard'
+                            ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
+                            : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`
+                        }
+                    </button>
+                </div>
+                <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
+                    <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box;">
+                        <div style="position: absolute; top: 5px; left: 0; right: 0; bottom: 33px; pointer-events: none; z-index: 0;">
+                            ${orderedTags.map((tag, i) => html`
+                                <div class="tag-lane" style="top: ${i * laneHeight}px; height: ${laneHeight}px; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'transparent'};">
+                                    <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; pointer-events: auto;">${tag}</div>
+                                </div>
+                            `)}
+                        </div>
+                        <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5;">
+                            ${rulerTicksHTML}
+                            ${minorTicksHTML}
+                        </div>
+                        ${markers}
+                    </div>
+                </div>
             </div>
-          `;
+            `;
         };
-        MODULE_VERSIONS['TimelineScrubber'] = 'v25.0.5';
+        MODULE_VERSIONS['TimelineScrubber'] = 'v25.1.0';
         // === [ END MAJOR BLOCK ] ===
 		
         // === [ MAJOR BLOCK: AppOrchestrator v3.4.2 ] ===

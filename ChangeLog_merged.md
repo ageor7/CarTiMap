@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+
+[v8.7.1] - TimelineScrubber v25.2.0
+
+    ✓ [Timeline Navigation] The timeline camera is now buttery-smooth. We fixed a frustrating bug where clicking an event would cause the timeline to "bounce" erratically or throw the event entirely off-screen while the magnification changed.
+    ✓ [Timeline Readability] Fixed a visual glitch where the red duration ribbons at the very bottom of the timeline would overlap and cover up the text label of the lowest category lane.
+    ✓ [Timeline Clarity] Momentary events (like a single battle or speech) no longer get hidden or camouflaged when they overlap a long-duration ribbon (like a prolonged war). They now render as a clean, sharp vertical line cutting straight down to the time-ruler, making them instantly visible.
+	
 [v8.7.0] - TimelineScrubber v25.1.0 & GlobalStyles v6.1.0
 
     ✓ [Timeline Visibility] Fixed the issue where overlapping duration bars (the red/blue lines) blurred together. They now use a distinct "stepped" shape that gets darker as events overlap, acting like a heat-map to show you the busiest periods in history without squashing the rest of the app.

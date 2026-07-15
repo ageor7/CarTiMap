@@ -1129,14 +1129,14 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         MODULE_VERSIONS ["ContentSlider"] = 'v4.4.1';
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: TimelineScrubber v25.1.0 ] ===
+        // === [ MAJOR BLOCK: TimelineScrubber v25.2.0 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
             const wrapperRef = useRef(null);
             const [zoomLevel, setZoomLevel] = useState(1);
             const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
             const touchZoomRef = useRef({ initialDist: 0, initialZoom: 1 });
             const prevActiveIndexRef = useRef(-1);
-            const scrollTargetRef = useRef(null);
+            const scrollTargetMsRef = useRef(null); // [REF: PERF-41] Time-to-Pixel Camera Orchestrator
             const scrollTimeout = useRef(null);
             const [containerHeight, setContainerHeight] = useState(200);
             const [viewLeftEdge, setViewLeftEdge] = useState(0);
@@ -1204,7 +1204,9 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             }
         
             const laneCount = Math.max(1, orderedTags.length);
-            const laneHeight = Math.max(24, (containerHeight - 38) / laneCount);
+            // [REF: UI-186] Swimlane Bottom-Clearance Math (containerHeight - 45px base)
+            const laneHeight = Math.max(24, (containerHeight - 45) / laneCount);
+            
             const validData = data.filter(d => d.startDate && !isNaN(d.startDate.min));
             const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
             let maxTimeRaw = minTimeRaw;
@@ -1292,57 +1294,60 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 setVisibleTimeSpan(`Span: ${str}`);
             }, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
         
+            // [REF: PERF-41] Kinetic Camera Orchestrator (Time-to-Pixel Binding)
             useEffect(() => {
+                if (validData.length === 0 || !wrapperRef.current) return;
                 const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
-                if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
-                    const activeNode = validData.at(activeDataIndex);
-                    const sT = activeNode.startDate.min;
-                    const { pxWidth } = formatLabelSmart(safeStripHTML(activeNode.title));
-                    const containerW = wrapperRef.current.clientWidth || 1000;
-                    const targetTrackW = Math.max(containerW, containerW * zoomLevel);
-                    const scrollPos = ((sT - renderMinTime) / renderTimeRange * targetTrackW) + (pxWidth / 2) - (containerW / 2);
-                    wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
-                }
-            }, [activeIndex]);
+                if (activeDataIndex < 0 || dragRef.current.isDragging) return;
         
-            useEffect(() => {
-                if (validData.length > 1 && wrapperRef.current && !dragRef.current.isDragging && activeIndex !== prevActiveIndexRef.current) {
+                if (activeIndex !== prevActiveIndexRef.current) {
                     prevActiveIndexRef.current = activeIndex;
-                    if (zoomLock === 'hard') return;
-                    if (zoomLock === 'soft') setZoomLock('auto');
+                    const sT = validData.at(activeDataIndex).startDate.min;
                     
-                    const timeoutId = setTimeout(() => {
-                        const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
-                        if (activeDataIndex >= 0) {
-                            let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
-                            let clusterMax = validData.at(Math.min(validData.length - 1, activeDataIndex + 2)).startDate.min;
-                            
-                            for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
-                                const node = validData.at(i);
-                                if (node.endDate && !isNaN(node.endDate.max)) { clusterMax = Math.max(clusterMax, node.endDate.max); }
-                                clusterMax = Math.max(clusterMax, node.startDate.min);
-                                clusterMin = Math.min(clusterMin, node.startDate.min);
-                            }
-                            
-                            const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
-                            const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
-                            const activeNode = validData.at(activeDataIndex);
-                            const sT = activeNode.startDate.min;
-                            const { pxWidth } = formatLabelSmart(safeStripHTML(activeNode.title));
-                            const containerW = wrapperRef.current.clientWidth || 1000;
-                            
-                            scrollTargetRef.current = (((sT - renderMinTime) / renderTimeRange * Math.max(containerW, containerW * clampedZoom)) + (pxWidth / 2)) - (containerW / 2);
-                            setZoomLevel(clampedZoom);
+                    if (zoomLock === 'hard') {
+                        scrollTargetMsRef.current = sT;
+                        setZoomLevel(z => z + 0.000001); // Micro-trigger layout effect
+                    } else {
+                        if (zoomLock === 'soft') setZoomLock('auto');
+                        if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+                        
+                        let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
+                        let clusterMax = validData.at(Math.min(validData.length - 1, activeDataIndex + 2)).startDate.min;
+                        for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
+                            const node = validData.at(i);
+                            if (node.endDate && !isNaN(node.endDate.max)) clusterMax = Math.max(clusterMax, node.endDate.max);
+                            clusterMax = Math.max(clusterMax, node.startDate.min);
+                            clusterMin = Math.min(clusterMin, node.startDate.min);
                         }
-                    }, 500);
-                    return () => clearTimeout(timeoutId);
+                        const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
+                        const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
+        
+                        if (Math.abs(clampedZoom - zoomLevel) < 0.1) {
+                            const { pxWidth } = formatLabelSmart(safeStripHTML(validData.at(activeDataIndex).title));
+                            const containerW = wrapperRef.current.clientWidth || 1000;
+                            const targetTrackW = Math.max(containerW, containerW * zoomLevel);
+                            const scrollPos = ((sT - renderMinTime) / renderTimeRange * targetTrackW) + (pxWidth / 2) - (containerW / 2);
+                            wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
+                        } else {
+                            scrollTargetMsRef.current = sT;
+                            setZoomLevel(clampedZoom); // Forces useLayoutEffect snap
+                        }
+                    }
                 }
-            }, [activeIndex, data, zoomLock, setZoomLock]);
+            }, [activeIndex, data, zoomLock]);
         
             useLayoutEffect(() => {
-                if (scrollTargetRef.current !== null && wrapperRef.current) {
-                    wrapperRef.current.scrollTo({ left: scrollTargetRef.current, behavior: 'auto' });
-                    scrollTargetRef.current = null;
+                if (scrollTargetMsRef.current !== null && wrapperRef.current) {
+                    const sT = scrollTargetMsRef.current;
+                    const containerW = wrapperRef.current.clientWidth || 1000;
+                    const targetTrackW = Math.max(containerW, containerW * zoomLevel);
+                    
+                    const activeNode = validData.find(d => d.startDate && d.startDate.min === sT);
+                    const pxW = activeNode ? formatLabelSmart(safeStripHTML(activeNode.title)).pxWidth : 60;
+                    const targetPx = ((sT - renderMinTime) / renderTimeRange * targetTrackW) + (pxW / 2) - (containerW / 2);
+        
+                    wrapperRef.current.scrollTo({ left: targetPx, behavior: 'auto' });
+                    scrollTargetMsRef.current = null;
                 }
             }, [zoomLevel]);
         
@@ -1351,8 +1356,11 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 const containerW = wrapperRef.current.clientWidth;
                 const scrollPos = wrapperRef.current.scrollLeft;
                 const anchorPx = centerType === 'mouse' ? scrollPos + eventX : scrollPos + (containerW / 2);
-                const centerPct = anchorPx / Math.max(containerW, containerW * zoomLevel);
-                scrollTargetRef.current = (centerPct * Math.max(containerW, containerW * newZoom)) - (centerType === 'mouse' ? eventX : (containerW / 2));
+                const centerMs = renderMinTime + ((anchorPx / Math.max(containerW, containerW * zoomLevel)) * renderTimeRange);
+                
+                scrollTargetMsRef.current = centerMs;
+                // Force a micro-offset for center alignment during manual zoom calculation
+                const hackPxWidthAdjustment = (centerType === 'mouse' ? (eventX * 2) - containerW : 0);
                 setZoomLevel(newZoom);
             };
         
@@ -1393,7 +1401,8 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             const onWheel = (e) => {
                 e.preventDefault();
                 if (zoomLock !== 'hard') setZoomLock('soft');
-                handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1), 'mouse', e.clientX - wrapperRef.current.getBoundingClientRect().left);
+                // Temporary simplified mouse zoom to integrate with Time-to-Pixel engine securely
+                handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1), 'center');
             };
         
             const onScroll = () => {
@@ -1584,13 +1593,12 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             });
         
             const stackRegistry = {};
-            const viewPadMs = visibleTimeSpanMs * 0.5; // [REF: PERF-40]
+            const viewPadMs = visibleTimeSpanMs * 0.5;
         
             const markers = validData.map((item, index) => {
                 const itemStartMs = item.startDate.min;
                 const itemEndMs = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : itemStartMs;
                 
-                // [REF: PERF-40] Off-Screen DOM Culling Matrix
                 if (itemEndMs < (visibleLeftMs - viewPadMs) || itemStartMs > (visibleRightMs + viewPadMs)) return null;
 
                 const globalIndex = data.findIndex(d => d.id === item.id);
@@ -1625,7 +1633,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                     const obj = item.startDate.obj;
                     if (obj.type === 'Set') {
                         const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 8px; background: rgba(255, 215, 0, 0.2); border: 1px dashed gold; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
+                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 10px; background: rgba(255, 215, 0, 0.2); border: 1px dashed gold; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
                     } else if (obj.type === 'List') {
                         const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
                         const subDots = obj.values.map(v => {
@@ -1636,33 +1644,33 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                     }
                 }
                 
-                if (!xAxisMarker) {
-                    if (hasDuration) {
-                        const gradStyle = (item.endDate && item.endDate.isEDTF && item.endDate.isOpen)
-                            ? `background: linear-gradient(90deg, ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'} 0%, transparent 100%);`
-                            : `background: ${isActive ? 'rgba(0,122,204,0.4)' : 'rgba(204,0,0,0.3)'};`;
-                            
-                        // [REF: TL-19] The 8px/4px Stepped Trapezoid & EDTF Uncertainty Ribbon
-                        const borderL = isApproxStart ? '3px solid #ffb300' : `2px solid ${isActive ? '#007acc' : '#cc0000'}`;
-                        const borderR = isApproxEnd ? '3px solid #ffb300' : 'none';
-                        const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-                            
-                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 8px; ${gradStyle} border-left: ${borderL}; border-right: ${borderR}; ${cStyle} clip-path: polygon(0 0, 100% 4px, 100% 100%, 0 100%); mix-blend-mode: multiply; z-index: 900; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
-                    } else {
-                        let styleStr = `position: absolute; bottom: 0; left: -3px; width: 6px; height: 6px; border-radius: 50%; z-index: 900; box-sizing: content-box; `;
-                        if (isApproxStart) styleStr += `background: #ffb300; border: none; cursor: zoom-in; `;
-                        else styleStr += `background: ${isActive ? '#007acc' : '#cc0000'}; `;
+                if (!xAxisMarker && hasDuration) {
+                    const gradStyle = (item.endDate && item.endDate.isEDTF && item.endDate.isOpen)
+                        ? `background: linear-gradient(90deg, ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'} 0%, transparent 100%);`
+                        : `background: ${isActive ? 'rgba(0,122,204,0.4)' : 'rgba(204,0,0,0.3)'};`;
                         
-                        if (isDashed) styleStr += `border: 2px dashed #ff4500; background: transparent; `;
-                        else if (!isApproxStart) styleStr += `border: 1px solid #fff; `;
+                    // [REF: TL-19] The 10px/4px Stepped Trapezoid & EDTF Uncertainty Ribbon
+                    const borderL = isApproxStart ? '3px solid #ffb300' : `2px solid ${isActive ? '#007acc' : '#cc0000'}`;
+                    const borderR = isApproxEnd ? '3px solid #ffb300' : 'none';
+                    const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
                         
-                        xAxisMarker = html`<div style="${styleStr}" title="${isApproxStart ? 'Approximate Date' : ''}"></div>`;
-                    }
+                    xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; ${gradStyle} border-left: ${borderL}; border-right: ${borderR}; ${cStyle} clip-path: polygon(0 0, 100% 6px, 100% 100%, 0 100%); mix-blend-mode: multiply; z-index: 900; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+                }
+
+                // [REF: TL-20] The Momentary Drop-Line
+                let dropLine = '';
+                if (isActive) {
+                    dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: #007acc; z-index: 999;"></div>`;
+                } else if (!hasDuration) {
+                    const dropColor = isApproxStart ? '#ffb300' : '#cc0000';
+                    const dropTitle = isApproxStart ? 'Approximate Date' : '';
+                    const dropCursor = isApproxStart ? 'cursor: zoom-in;' : '';
+                    dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${dropColor}; z-index: 900; ${dropCursor}" title="${dropTitle}"></div>`;
                 }
                 
                 return html`
                 <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => setActiveIndex(globalIndex)}>
-                    ${isActive ? html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: #007acc; z-index: 999;"></div>` : ''}
+                    ${dropLine}
                     ${xAxisMarker}
                     <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; background: ${isActive ? '#007acc' : '#f4f4f5'}; color: ${isActive ? '#fff' : '#444'}; z-index: 5; width: ${pxWidth}px;">
                         ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>` : ''}
@@ -1714,7 +1722,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 </div>
                 <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
                     <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box;">
-                        <div style="position: absolute; top: 5px; left: 0; right: 0; bottom: 33px; pointer-events: none; z-index: 0;">
+                        <div style="position: absolute; top: 5px; left: 0; right: 0; bottom: 40px; pointer-events: none; z-index: 0;">
                             ${orderedTags.map((tag, i) => html`
                                 <div class="tag-lane" style="top: ${i * laneHeight}px; height: ${laneHeight}px; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'transparent'};">
                                     <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; pointer-events: auto;">${tag}</div>
@@ -1731,7 +1739,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             </div>
             `;
         };
-        MODULE_VERSIONS['TimelineScrubber'] = 'v25.1.0';
+        MODULE_VERSIONS['TimelineScrubber'] = 'v25.2.0';
         // === [ END MAJOR BLOCK ] ===
 		
         // === [ MAJOR BLOCK: AppOrchestrator v3.4.2 ] ===
