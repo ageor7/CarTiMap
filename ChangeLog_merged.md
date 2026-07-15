@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.8.0] - TimelineScrubber v25.3.0
+
+    ✓ [Timeline Swimlanes] Fixed an issue where tags related to the same event were placed far apart, causing event boundaries to stretch massively. The engine now expertly maps all related categories and groups them tightly together.
+    ✓ [Timeline Clipping] Fixed a bug where the topmost labels were clipped by the top status bar, and deeply stacked events pushed downwards over the time ruler at the bottom.
+    ✓ [Timeline Clarity] Radically reduced visual noise. Long-duration events that have nothing to do with the specific event you are currently viewing now fade into the background as a thin, unobtrusive dotted line. They instantly "inflate" back to full size when you navigate to them.
+    ✓ [Timeline Geometry] Adjusted the shape of the duration overlap markers to be exactly 10 pixels high at the start and 3 pixels high at the end, as requested.
+	
 [v8.7.2] - TimelineScrubber v25.2.1
 
     ✓ [Timeline Focus Bug] Fixed a critical error where clicking on an event that happened at the exact same minute as another event (e.g., multiple concurrent events on December 24th, 1944) would cause the timeline camera to aim at the wrong item.

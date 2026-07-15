@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.7.2] - TimelineScrubber v25.2.1
+
+    ✓ [Timeline Focus Bug] Fixed a critical error where clicking on an event that happened at the exact same minute as another event (e.g., multiple concurrent events on December 24th, 1944) would cause the timeline camera to aim at the wrong item.
+    ✓ [The Vanishing Node Fix] Solved the extreme "zoomed-in vanishing" bug. Because the camera was previously aiming slightly off-center (ignoring the width of overlapping events), it was accidentally pushing the active event into the high-performance memory-culling zone, causing it to literally disappear from ultra-wide screens. The camera is now mathematically locked to the exact geometric center of your specific selection.
 
 [v8.7.1] - TimelineScrubber v25.2.0
 

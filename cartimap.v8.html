@@ -263,7 +263,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.7.0';
+		const APP_VERSION = 'v8.8.0';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1129,15 +1129,14 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         MODULE_VERSIONS ["ContentSlider"] = 'v4.4.1';
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: TimelineScrubber v25.2.1 ] ===
+        // === [ MAJOR BLOCK: TimelineScrubber v25.3.0 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
             const wrapperRef = useRef(null);
             const [zoomLevel, setZoomLevel] = useState(1);
             const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
             const touchZoomRef = useRef({ initialDist: 0, initialZoom: 1 });
             const prevActiveIndexRef = useRef(-1);
-            const scrollTargetMsRef = useRef(null); // [REF: PERF-41] Time-to-Pixel Camera Orchestrator
-            const scrollTargetPayloadRef = useRef(null); // [REF: PERF-41] Absolute ID Camera Payload
+            const scrollTargetPayloadRef = useRef(null);
             const scrollTimeout = useRef(null);
             const [containerHeight, setContainerHeight] = useState(200);
             const [viewLeftEdge, setViewLeftEdge] = useState(0);
@@ -1172,7 +1171,12 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 if (!d.startDate || isNaN(d.startDate.min)) return;
                 const t = getParsedTags(d.tags);
                 t.forEach(tag => tagsMap.add(tag));
-                for (let i = 0; i < t.length - 1; i++) tagPairs.push([t.at(i), t.at(i + 1)]);
+                // [REF: TL-22] Full-Matrix Tag Adjacency Generation
+                for (let i = 0; i < t.length - 1; i++) {
+                    for (let j = i + 1; j < t.length; j++) {
+                        tagPairs.push([t.at(i), t.at(j)]);
+                    }
+                }
             });
         
             let orderedTags = [];
@@ -1205,7 +1209,8 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             }
         
             const laneCount = Math.max(1, orderedTags.length);
-            const laneHeight = Math.max(24, (containerHeight - 45) / laneCount);
+            // [REF: UI-187] Height Clamping with deeper bottom margin 
+            const laneHeight = Math.max(24, (containerHeight - 55) / laneCount);
             
             const validData = data.filter(d => d.startDate && !isNaN(d.startDate.min));
             const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
@@ -1294,7 +1299,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 setVisibleTimeSpan(`Span: ${str}`);
             }, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
             
-            // [REF: PERF-42] Exact Node Geometry Sub-Pixel Math
             const getExactNodeScrollPos = (nodeGlobalIdx, trackW, containerW) => {
                 const activeNode = data[nodeGlobalIdx];
                 if (!activeNode || !activeNode.startDate) return 0;
@@ -1329,7 +1333,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                     prevActiveIndexRef.current = activeIndex;
                     
                     if (zoomLock === 'hard') {
-                        scrollTargetPayloadRef.current = activeIndex; // absolute ID payload
+                        scrollTargetPayloadRef.current = activeIndex; 
                         setZoomLevel(z => z + 0.000001); 
                     } else {
                         if (zoomLock === 'soft') setZoomLock('auto');
@@ -1618,6 +1622,16 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         
             const stackRegistry = {};
             const viewPadMs = visibleTimeSpanMs * 0.5;
+            
+            // [REF: TL-21] Temporal Focus Extraction
+            const activeItemData = data[activeIndex];
+            const activeDataNode = validData.find(d => d.id === activeItemData?.id);
+            let activeFocusStart = -Infinity;
+            let activeFocusEnd = -Infinity;
+            if (activeDataNode) {
+                activeFocusStart = activeDataNode.startDate.min;
+                activeFocusEnd = (activeDataNode.endDate && !isNaN(activeDataNode.endDate.max)) ? activeDataNode.endDate.max : activeFocusStart;
+            }
         
             const markers = validData.map((item, index) => {
                 const itemStartMs = item.startDate.min;
@@ -1635,7 +1649,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 const stackDepth = stackRegistry[stackKey];
                 stackRegistry[stackKey]++;
                 const xOffset = stackDepth * 6;
-                const yOffset = stackDepth * 4;
+                const yOffset = stackDepth * 2; // Reduced sink rate
                 
                 let endPct = startPct;
                 if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
@@ -1643,7 +1657,8 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 }
                 const hasDuration = (endPct - startPct) > 0.001;
                 const isActive = globalIndex === activeIndex;
-                const topPos = (laneIdx * laneHeight) + 5;
+                const isIntersecting = (itemStartMs <= activeFocusEnd && itemEndMs >= activeFocusStart); // Temporal Focus Logic
+                const topPos = (laneIdx * laneHeight) + 15; // Increased top margin
                 const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
                 const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
                 const hasMedia = item.media && item.media.length > 0;
@@ -1651,7 +1666,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 let xAxisMarker = '';
                 let isApproxStart = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.approximate;
                 let isApproxEnd = item.endDate && item.endDate.isEDTF && item.endDate.obj && item.endDate.obj.approximate;
-                let isDashed = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.uncertain;
                 
                 if (item.startDate.isEDTF && item.startDate.obj) {
                     const obj = item.startDate.obj;
@@ -1669,15 +1683,21 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 }
                 
                 if (!xAxisMarker && hasDuration) {
-                    const gradStyle = (item.endDate && item.endDate.isEDTF && item.endDate.isOpen)
-                        ? `background: linear-gradient(90deg, ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'} 0%, transparent 100%);`
-                        : `background: ${isActive ? 'rgba(0,122,204,0.4)' : 'rgba(204,0,0,0.3)'};`;
-                        
-                    const borderL = isApproxStart ? '3px solid #ffb300' : `2px solid ${isActive ? '#007acc' : '#cc0000'}`;
-                    const borderR = isApproxEnd ? '3px solid #ffb300' : 'none';
-                    const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-                        
-                    xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; ${gradStyle} border-left: ${borderL}; border-right: ${borderR}; ${cStyle} clip-path: polygon(0 0, 100% 6px, 100% 100%, 0 100%); mix-blend-mode: multiply; z-index: 900; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+                    if (isActive || isIntersecting) {
+                        const gradStyle = (item.endDate && item.endDate.isEDTF && item.endDate.isOpen)
+                            ? `background: linear-gradient(90deg, ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'} 0%, transparent 100%);`
+                            : `background: ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'};`;
+                            
+                        const borderL = isApproxStart ? '3px solid #ffb300' : `2px solid ${isActive ? '#007acc' : '#cc0000'}`;
+                        const borderR = isApproxEnd ? '3px solid #ffb300' : 'none';
+                        const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
+                            
+                        // [REF: TL-19] 10px to 3px Trapezoid
+                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; ${gradStyle} border-left: ${borderL}; border-right: ${borderR}; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); mix-blend-mode: multiply; z-index: 900; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+                    } else {
+                        // [REF: TL-21] Minimalist Suppressed Ribbon
+                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 3px; border-bottom: 2px dotted rgba(204,0,0,0.3); border-left: 2px solid rgba(204,0,0,0.3); z-index: 800; box-sizing: border-box;" title="Peripheral Event"></div>`;
+                    }
                 }
 
                 let dropLine = '';
@@ -1744,7 +1764,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 </div>
                 <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
                     <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box;">
-                        <div style="position: absolute; top: 5px; left: 0; right: 0; bottom: 40px; pointer-events: none; z-index: 0;">
+                        <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 50px; pointer-events: none; z-index: 0;">
                             ${orderedTags.map((tag, i) => html`
                                 <div class="tag-lane" style="top: ${i * laneHeight}px; height: ${laneHeight}px; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'transparent'};">
                                     <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; pointer-events: auto;">${tag}</div>
@@ -1761,7 +1781,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             </div>
             `;
         };
-        MODULE_VERSIONS['TimelineScrubber'] = 'v25.2.1';
+        MODULE_VERSIONS['TimelineScrubber'] = 'v25.3.0';
         // === [ END MAJOR BLOCK ] ===
 
         // === [ MAJOR BLOCK: AppOrchestrator v3.4.2 ] ===
