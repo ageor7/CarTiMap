@@ -263,7 +263,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v8.8.0';
+		const APP_VERSION = 'v8.9.0';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1129,7 +1129,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         MODULE_VERSIONS ["ContentSlider"] = 'v4.4.1';
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: TimelineScrubber v25.3.0 ] ===
+        // === [ MAJOR BLOCK: TimelineScrubber v26.0.0 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
             const wrapperRef = useRef(null);
             const [zoomLevel, setZoomLevel] = useState(1);
@@ -1140,6 +1140,10 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             const scrollTimeout = useRef(null);
             const [containerHeight, setContainerHeight] = useState(200);
             const [viewLeftEdge, setViewLeftEdge] = useState(0);
+            
+            // [REF: TL-24] Interaction-Time Tooltip State
+            const [caliperTooltip, setCaliperTooltip] = useState(null);
+            const hoverTimeoutRef = useRef(null);
         
             const safeStripHTML = (str) => {
                 if (!str) return '';
@@ -1171,7 +1175,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 if (!d.startDate || isNaN(d.startDate.min)) return;
                 const t = getParsedTags(d.tags);
                 t.forEach(tag => tagsMap.add(tag));
-                // [REF: TL-22] Full-Matrix Tag Adjacency Generation
                 for (let i = 0; i < t.length - 1; i++) {
                     for (let j = i + 1; j < t.length; j++) {
                         tagPairs.push([t.at(i), t.at(j)]);
@@ -1209,7 +1212,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             }
         
             const laneCount = Math.max(1, orderedTags.length);
-            // [REF: UI-187] Height Clamping with deeper bottom margin 
             const laneHeight = Math.max(24, (containerHeight - 55) / laneCount);
             
             const validData = data.filter(d => d.startDate && !isNaN(d.startDate.min));
@@ -1339,14 +1341,22 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                         if (zoomLock === 'soft') setZoomLock('auto');
                         if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
                         
+                        // [REF: PERF-43] Active-Only Duration Clamp
                         let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
                         let clusterMax = validData.at(Math.min(validData.length - 1, activeDataIndex + 2)).startDate.min;
+                        
                         for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
                             const node = validData.at(i);
-                            if (node.endDate && !isNaN(node.endDate.max)) clusterMax = Math.max(clusterMax, node.endDate.max);
                             clusterMax = Math.max(clusterMax, node.startDate.min);
                             clusterMin = Math.min(clusterMin, node.startDate.min);
                         }
+                        
+                        // ONLY the active event injects its EndDate to prevent peripheral duration bleed
+                        const actualActiveNode = validData.at(activeDataIndex);
+                        if (actualActiveNode.endDate && !isNaN(actualActiveNode.endDate.max)) {
+                            clusterMax = Math.max(clusterMax, actualActiveNode.endDate.max);
+                        }
+                        
                         const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
                         const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
         
@@ -1405,6 +1415,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 const x = t1.clientX;
                 dragRef.current = { isDragging: true, startX: x - wrapperRef.current.offsetLeft, scrollLeft: wrapperRef.current.scrollLeft };
                 wrapperRef.current.classList.add('is-dragging');
+                if (caliperTooltip) setCaliperTooltip(null);
             };
         
             const onUp = () => {
@@ -1431,6 +1442,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 e.preventDefault();
                 if (zoomLock !== 'hard') setZoomLock('soft');
                 handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1), 'center');
+                if (caliperTooltip) setCaliperTooltip(null);
             };
         
             const onScroll = () => {
@@ -1438,6 +1450,39 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 scrollTimeout.current = setTimeout(() => {
                     if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft);
                 }, 100);
+            };
+            
+            // [REF: TL-24] Interaction-Time Intersection Generator
+            const handleCaliperEnter = (e, item) => {
+                const rect = e.target.getBoundingClientRect();
+                const clientX = e.clientX;
+                const clientY = rect.top;
+                
+                hoverTimeoutRef.current = setTimeout(() => {
+                    const itemStart = item.startDate.min;
+                    const itemEnd = item.endDate && !isNaN(item.endDate.max) ? item.endDate.max : itemStart;
+                    
+                    const overlaps = validData.filter(d => {
+                        if (d.id === item.id) return false;
+                        const dStart = d.startDate.min;
+                        const dEnd = d.endDate && !isNaN(d.endDate.max) ? d.endDate.max : dStart;
+                        // Mathematical chronological intersection
+                        return (dStart <= itemEnd && dEnd >= itemStart);
+                    });
+                    
+                    setCaliperTooltip({
+                        x: clientX,
+                        y: clientY,
+                        title: safeStripHTML(item.title),
+                        durationMs: itemEnd - itemStart,
+                        overlaps: overlaps.map(o => safeStripHTML(o.title))
+                    });
+                }, 400); // The 400ms Generous Latency Delay
+            };
+            
+            const handleCaliperLeave = () => {
+                if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+                setCaliperTooltip(null);
             };
         
             if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
@@ -1622,16 +1667,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         
             const stackRegistry = {};
             const viewPadMs = visibleTimeSpanMs * 0.5;
-            
-            // [REF: TL-21] Temporal Focus Extraction
-            const activeItemData = data[activeIndex];
-            const activeDataNode = validData.find(d => d.id === activeItemData?.id);
-            let activeFocusStart = -Infinity;
-            let activeFocusEnd = -Infinity;
-            if (activeDataNode) {
-                activeFocusStart = activeDataNode.startDate.min;
-                activeFocusEnd = (activeDataNode.endDate && !isNaN(activeDataNode.endDate.max)) ? activeDataNode.endDate.max : activeFocusStart;
-            }
         
             const markers = validData.map((item, index) => {
                 const itemStartMs = item.startDate.min;
@@ -1648,8 +1683,10 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
                 const stackDepth = stackRegistry[stackKey];
                 stackRegistry[stackKey]++;
+                
                 const xOffset = stackDepth * 6;
-                const yOffset = stackDepth * 2; // Reduced sink rate
+                const topPos = (laneIdx * laneHeight) + 15;
+                const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
                 
                 let endPct = startPct;
                 if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
@@ -1657,9 +1694,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 }
                 const hasDuration = (endPct - startPct) > 0.001;
                 const isActive = globalIndex === activeIndex;
-                const isIntersecting = (itemStartMs <= activeFocusEnd && itemEndMs >= activeFocusStart); // Temporal Focus Logic
-                const topPos = (laneIdx * laneHeight) + 15; // Increased top margin
-                const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
                 const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
                 const hasMedia = item.media && item.media.length > 0;
                 
@@ -1667,7 +1701,10 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 let isApproxStart = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.approximate;
                 let isApproxEnd = item.endDate && item.endDate.isEDTF && item.endDate.obj && item.endDate.obj.approximate;
                 
-                if (item.startDate.isEDTF && item.startDate.obj) {
+                // [REF: TL-23] Stratified Ghost-Caliper Matrix
+                const caliperBottom = stackDepth * 4; 
+
+                if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
                     const obj = item.startDate.obj;
                     if (obj.type === 'Set') {
                         const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
@@ -1683,20 +1720,31 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 }
                 
                 if (!xAxisMarker && hasDuration) {
-                    if (isActive || isIntersecting) {
-                        const gradStyle = (item.endDate && item.endDate.isEDTF && item.endDate.isOpen)
-                            ? `background: linear-gradient(90deg, ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'} 0%, transparent 100%);`
-                            : `background: ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'};`;
-                            
-                        const borderL = isApproxStart ? '3px solid #ffb300' : `2px solid ${isActive ? '#007acc' : '#cc0000'}`;
+                    if (isActive) {
+                        const gradStyle = `background: rgba(0,122,204,0.5);`;
+                        const borderL = isApproxStart ? '3px solid #ffb300' : `2px solid #007acc`;
                         const borderR = isApproxEnd ? '3px solid #ffb300' : 'none';
                         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
                             
-                        // [REF: TL-19] 10px to 3px Trapezoid
-                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; ${gradStyle} border-left: ${borderL}; border-right: ${borderR}; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); mix-blend-mode: multiply; z-index: 900; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+                        xAxisMarker = html`<div style="position: absolute; bottom: ${caliperBottom}px; left: 0; width: 100%; min-width: 4px; height: 10px; ${gradStyle} border-left: ${borderL}; border-right: ${borderR}; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
                     } else {
-                        // [REF: TL-21] Minimalist Suppressed Ribbon
-                        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 3px; border-bottom: 2px dotted rgba(204,0,0,0.3); border-left: 2px solid rgba(204,0,0,0.3); z-index: 800; box-sizing: border-box;" title="Peripheral Event"></div>`;
+                        // The Ghost-Hatch Inverted Π Caliper
+                        const borderL = isApproxStart ? '3px solid rgba(255,179,0,0.6)' : `2px solid rgba(204,0,0,0.4)`;
+                        const borderR = isApproxEnd ? '3px solid rgba(255,179,0,0.6)' : `2px solid rgba(204,0,0,0.4)`;
+                        const borderB = `2px solid rgba(204,0,0,0.4)`;
+                        const hatchStyle = `background: repeating-linear-gradient(45deg, rgba(204,0,0,0.05), rgba(204,0,0,0.05) 2px, transparent 2px, transparent 6px);`;
+                        
+                        // [REF: UI-188] Asymmetrical Hit-Box decoupling
+                        xAxisMarker = html`
+                        <div style="position: absolute; bottom: ${caliperBottom}px; left: 0; width: 100%; height: 10px; z-index: 900;">
+                            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: ${borderB}; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box;"></div>
+                            <div class="hover-bridge-hitbox"
+                                 style="position: absolute; top: 0; bottom: -15px; left: -2px; right: -2px; z-index: 10; cursor: help;"
+                                 onMouseEnter=${(e) => handleCaliperEnter(e, item)}
+                                 onMouseLeave=${handleCaliperLeave}>
+                            </div>
+                        </div>
+                        `;
                     }
                 }
 
@@ -1711,7 +1759,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                 }
                 
                 return html`
-                <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => setActiveIndex(globalIndex)}>
+                <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => setActiveIndex(globalIndex)}>
                     ${dropLine}
                     ${xAxisMarker}
                     <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; background: ${isActive ? '#007acc' : '#f4f4f5'}; color: ${isActive ? '#fff' : '#444'}; z-index: 5; width: ${pxWidth}px;">
@@ -1762,6 +1810,22 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
                         }
                     </button>
                 </div>
+                
+                ${caliperTooltip && html`
+                    <div style="position: fixed; left: ${caliperTooltip.x}px; top: ${caliperTooltip.y - 12}px; transform: translate(-50%, -100%); background: #222; color: #fff; padding: 8px 12px; border-radius: 6px; z-index: 10005; pointer-events: none; font-size: 0.75rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 250px; white-space: normal; line-height: 1.4;">
+                        <div style="font-weight: bold; color: #8be9fd; margin-bottom: 4px;">${caliperTooltip.title}</div>
+                        <div style="color: #aaa; margin-bottom: ${caliperTooltip.overlaps.length ? '6px' : '0'}; border-bottom: ${caliperTooltip.overlaps.length ? '1px solid #444' : 'none'}; padding-bottom: ${caliperTooltip.overlaps.length ? '4px' : '0'};">Duration: ${Math.round(caliperTooltip.durationMs / 86400000)} Days</div>
+                        ${caliperTooltip.overlaps.length > 0 ? html`
+                            <div style="font-size: 0.65rem; color: #ccc;">
+                                Overlaps with ${caliperTooltip.overlaps.length} event(s):<br/>
+                                ${caliperTooltip.overlaps.slice(0, 3).map(t => html`<span style="display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">• ${t}</span>`)}
+                                ${caliperTooltip.overlaps.length > 3 ? html`<span>+ ${caliperTooltip.overlaps.length - 3} more</span>` : ''}
+                            </div>
+                        ` : ''}
+                        <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid #222;"></div>
+                    </div>
+                `}
+
                 <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
                     <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box;">
                         <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 50px; pointer-events: none; z-index: 0;">
@@ -1781,7 +1845,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
             </div>
             `;
         };
-        MODULE_VERSIONS['TimelineScrubber'] = 'v25.3.0';
+        MODULE_VERSIONS['TimelineScrubber'] = 'v26.0.0';
         // === [ END MAJOR BLOCK ] ===
 
         // === [ MAJOR BLOCK: AppOrchestrator v3.4.2 ] ===
