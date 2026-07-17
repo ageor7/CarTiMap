@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.9.0] - TimelineScrubber v26.0.0
+
+    ✓ [Timeline Clarity] Overlapping duration events no longer drown each other out in a solid, unreadable blur. Background events are now cleanly "hollowed out" with a faint diagonal hatch pattern, allowing you to see exactly where they begin and end while letting standard momentary events pierce right through them.
+    ✓ [Timeline Layout] If multiple duration events happen at the exact same time, their bottom lines now elegantly stack into individual "mini-lanes" right above the time ruler like a musical staff.
+    ✓ [Smart Hover Tooltips] Hovering over any duration line for a split second brings up a sleek tooltip detailing the exact duration (e.g., 14 Days) and automatically lists every other event that occurred during that specific timespan.
+    ✓ [Precision Auto-Zooming] Fixed a bug where clicking a short event (like a battle) would accidentally zoom way out to show a 2-month background event (like a war). The camera now strictly focuses only on the duration of the event you explicitly click.
+    ✓ [Touch Optimization] The new hover/click zones for the duration lines extend downwards into the safe area of the time ruler, ensuring you don't accidentally tap the wrong text label on mobile screens.
+	
 [v8.8.0] - TimelineScrubber v25.3.0
 
     ✓ [Timeline Swimlanes] Fixed an issue where tags related to the same event were placed far apart, causing event boundaries to stretch massively. The engine now expertly maps all related categories and groups them tightly together.

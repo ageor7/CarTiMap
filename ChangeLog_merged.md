@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.9.1] - TimelineScrubber v26.1.0
+
+    ✓ [Precision Centering] Fixed a bug where long text labels caused the timeline to physically offset its center point. The camera now snaps the timeline drop-line exactly to the dead-center of your screen every time, guaranteeing perfect chronological alignment.
+    ✓ [Scroll Protection] Fixed a "ghost click" bug where clicking and dragging the timeline to scroll would accidentally load a new slide if your mouse released over a text label. The timeline now smartly detects panning and ignores false clicks.
+    ✓ [Visual Overlaps] Overlapping inactive durations are now incredibly easy to distinguish. They automatically alternate between dashed, dotted, and solid lines, and change their background hatch angles so you can instantly follow a specific timeline span without confusion.
+    ✓ [Label Clicking] Fixed a bug where text labels in crowded spaces couldn't be clicked because invisible hover-areas from background events were blocking the mouse.
+	
 [v8.9.0] - TimelineScrubber v26.0.0
 
     ✓ [Timeline Clarity] Overlapping duration events no longer drown each other out in a solid, unreadable blur. Background events are now cleanly "hollowed out" with a faint diagonal hatch pattern, allowing you to see exactly where they begin and end while letting standard momentary events pierce right through them.
