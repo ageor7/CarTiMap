@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.1] - AppOrchestrator v8.11.1 / UI Stabilization
+User Experience (Experiential):
+
+    ✓ [UI Layout Restored] Reverted the highly compressed 22px experimental UI back to the mathematically stable 24x24px Universal Standard. This immediately restores the breathing room and visual balance of the global status bar.
+    ✓ [Zoom Button Distortion Fixed] Resolved a major geometric fracture where the [+] and [-] zoom controls inside the Map and Timeline panes were stretching horizontally and breaking their boundaries.
+    ✓ [Media Icons Uncrushed] Scrubbed a rogue padding property that was invisibly suffocating the Media Viewer's "Open External Link" icon, restoring it to crisp, full visibility.
+    ✓ [Unified Maximize Experience] The "Maximize/Restore" toggle now utilizes the exact same 4-corner expansion SVG icon uniformly across all three panes (Map, Text, Media, and Timeline).
+	
 [v8.11.0] - Universal Overhaul (Phase 1)
 
     ✓ [Universal Button Standardization] Executed a global UI reset locking utility and status buttons to a mathematically perfect 22x22px footprint, ensuring absolute interface consistency across all viewports.

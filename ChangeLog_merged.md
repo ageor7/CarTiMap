@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.2] - AppOrchestrator v8.11.2 / Final Layout Polish
+User Experience (Experiential):
+
+    ✓ [Timeline Controls Centered] The [+], [-], and [Minimize] buttons floating over the Timeline are now perfectly center-aligned. We eradicated a legacy piece of CSS that was secretly forcing them to render at 32px, which was overflowing their new 24px column.
+    ✓ [Scrollbar Clearance] The Maximize toggle in the middle Text Pane (ContentSlider) no longer hides beneath the operating system's vertical scrollbar. It has been physically shifted inward to clear the native scroll gutter.
+	
 [v8.11.1] - AppOrchestrator v8.11.1 / UI Stabilization
 User Experience (Experiential):
 

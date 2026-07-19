@@ -260,7 +260,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
 .timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
 .timeline-control-cluster { position: absolute; right: 15px; z-index: 1000; display: flex; flex-direction: column; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; }
-.timeline-control-cluster .status-btn { width: 32px; height: 32px; }
 .timeline-control-cluster .zoom-factor { display: flex; align-items: center; justify-content: center; }
 
 @media (max-height: 500px) {
@@ -412,460 +411,8 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         MODULE_VERSIONS ["VibeMonitor"] = 'v2.1.16';
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: MapViewer v6.3.9 ] ===
-        const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
-          const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
-          const mapInstance = useRef(null); const miniMapInstance = useRef(null);
-          const rectBoundsRef = useRef(null); const markerLayer = useRef(null);
-          const clusterLayer = useRef(null); const gridLayerRef = useRef(null);
-          const markersRef = useRef({}); const hasFitBounds = useRef(false);
-          const [mapZoom, setMapZoom] = useState(2); const [showGrid, setShowGrid] = useState(false);
-          const [showLayersMenu, setShowLayersMenu] = useState(false);
-          const [activeBasemap, setActiveBasemap] = useState(null);
-          const [activeOverlays, setActiveOverlays] = useState([]);
-          const [overlayOpacities, setOverlayOpacities] = useState({});
-          const initialLoadRef = useRef(false); const baseLayerRef = useRef(null);
-          const miniBaseLayerRef = useRef(null); const overlayLayersRef = useRef({});
-          const minimapOffsetRef = useRef(minimapOffset || -4);
-          const isSyncingRef = useRef(false);
-
-          const safeStripHTML = (str) => {
-            if (!str) return '';
-            return String(str).replace(/<p[^>]*>/gi, ' - ').replace(/<[^>]*>?/gm, '').trim();
-          };
-
-          const loadScript = (src) => new Promise((resolve, reject) => {
-            if (document.querySelector(`script[src="${src}"]`)) return resolve();
-            const script = document.createElement('script'); script.src = src; script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
-          });
-
-          const loadStyle = (href) => {
-            if (document.querySelector(`link[href="${href}"]`)) return;
-            const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = href; document.head.appendChild(link);
-          };
-
-          const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
-
-          useEffect(() => {
-            if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
-              const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
-              if (defaultBase) setActiveBasemap(defaultBase.id);
-              const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
-              setActiveOverlays(defaultOverlays);
-              const initOpac = {}; basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => { initOpac[o.id] = o.defaultOpacity ?? 1.0; });
-              setOverlayOpacities(initOpac); initialLoadRef.current = true;
-            }
-          }, [basemapsRegistry]);
-
-          useEffect(() => {
-            minimapOffsetRef.current = minimapOffset;
-            if (mapInstance.current && miniMapInstance.current) {
-              let targetMiniZoom = Math.max(0, mapInstance.current.getZoom() + minimapOffset);
-              miniMapInstance.current.setView(mapInstance.current.getCenter(), targetMiniZoom, { animate: true });
-            }
-          }, [minimapOffset]);
-
-          const createPinHtml = (isActive, isVip) => {
-            const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
-            return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'};"><div class="pin-head" style="background: ${color};"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'};"></div></div>`;
-          };
-
-          const extractLayers = (layerObj) => {
-            let layers = [];
-            if (Array.isArray(layerObj)) layerObj.forEach(l => layers = layers.concat(extractLayers(l)));
-            else if (layerObj && layerObj.eachLayer) layerObj.eachLayer(l => layers = layers.concat(extractLayers(l)));
-            else if (layerObj) layers.push(layerObj);
-            return layers;
-          };
-
-          const parseGeometryCollection = (wktStr) => {
-            const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\s*\(/i, '').replace(/\)\s*$/, '');
-            let inParen = 0; let currentGeom = ''; const geometries = [];
-            for (let i = 0; i < cleanStr.length; i++) {
-              const char = cleanStr[i];
-              if (char === '(') inParen++; if (char === ')') inParen--;
-              if (char === ',' && inParen === 0) { geometries.push(currentGeom.trim()); currentGeom = ''; }
-              else currentGeom += char;
-            }
-            if (currentGeom.trim()) geometries.push(currentGeom.trim());
-            
-            let extractedLayers = [];
-            geometries.forEach(geomStr => {
-              try {
-                const wkt = new window.Wkt.Wkt(); wkt.read(geomStr);
-                extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
-              } catch (e) {
-                const upper = geomStr.toUpperCase();
-                if (upper.startsWith('POINT')) {
-                  const m = geomStr.match(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/);
-                  if (m) extractedLayers.push(L.marker(new L.LatLng(parseFloat(m.at(1)), parseFloat(m.at(2)))));
-                } else if (upper.startsWith('LINESTRING') || upper.startsWith('POLYGON')) {
-                  const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
-                  if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))));
-                }
-              }
-            });
-            return extractedLayers;
-          };
-
-          useEffect(() => {
-            if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
-              const urlParams = new URLSearchParams(window.location.search);
-              const initialZoom = urlParams.get('mapzoom') ? parseInt(urlParams.get('mapzoom')) : 2;
-              setMapZoom(initialZoom);
-              
-              const map = L.map(mapDomRef.current, { zoomControl: false, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), initialZoom);
-              L.control.scale({ position: 'bottomleft', imperial: true, metric: true }).addTo(map);
-              map.on('zoomend', () => setMapZoom(map.getZoom()));
-              markerLayer.current = L.featureGroup().addTo(map);
-
-              clusterLayer.current = L.markerClusterGroup({ 
-                maxClusterRadius: 40, 
-                spiderfyOnMaxZoom: true,
-                zoomToBoundsOnClick: false,
-                iconCreateFunction: function(cluster) {
-                  const children = cluster.getAllChildMarkers();
-                  const firstLatLng = children.at(0).getLatLng();
-                  const isExactSame = children.every(m => m.getLatLng().equals(firstLatLng));
-                  
-                  if (isExactSame) {
-                    const count = children.length;
-                    const html = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;">
-                                    <div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4);"></div>
-                                    <div class="pin-stem" style="background: #333; width: 2px;"></div>
-                                    <div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">${count}</div>
-                                  </div>`;
-                    return L.divIcon({ className: 'custom-div-icon', html: html, iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
-                  }
-                  
-                  let c = ' marker-cluster-';
-                  if (children.length < 10) c += 'small';
-                  else if (children.length < 100) c += 'medium';
-                  else c += 'large';
-                  return new L.DivIcon({ html: '<div><span>' + children.length + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
-                }
-              }).addTo(map);
-
-              clusterLayer.current.on('clusterclick', (c) => {
-                const m = mapInstance.current;
-                if (m.getZoom() < 10) {
-                  m.fitBounds(c.layer.getBounds(), { padding: new L.Point(40, 40) });
-                } else {
-                  c.layer.spiderfy();
-                }
-              });
-
-              gridLayerRef.current = L.layerGroup().addTo(map);
-
-              clusterLayer.current.on('clustermouseover', (c) => {
-                const children = c.layer.getAllChildMarkers();
-                const places = [...new Set(children.map(m => m.itemPlace).filter(Boolean))];
-                const titles = [...new Set(children.map(m => m.itemTitle).filter(Boolean))];
-
-                let displayHtml = '';
-                if (places.length > 0) {
-                  displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center;">${places.slice(0, 2).join(' / ')}${places.length > 2 ? '...' : ''}</div>`;
-                }
-                displayHtml += `<div style="text-align: left; line-height: 1.3;">`;
-                displayHtml += titles.slice(0, 5).map(t => `• ${t}`).join('<br/>');
-                if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%;">+${titles.length - 5} more events...</em>`;
-                displayHtml += `</div>`;
-
-                c.layer.bindTooltip(displayHtml, { direction: 'top', className: 'custom-cluster-tooltip' }).openTooltip();
-              });
-              clusterLayer.current.on('clustermouseout', (c) => c.layer.unbindTooltip());
-
-              const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: true, scrollWheelZoom: true, doubleClickZoom: true, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), 0);
-              const boundsRect = L.rectangle(map.getBounds(), { color: '#007acc', weight: 2, fillOpacity: 0.15 }).addTo(miniMap);
-              rectBoundsRef.current = boundsRect;
-
-              map.on('move', () => {
-                isSyncingRef.current = true;
-                let targetMiniZoom = Math.max(0, map.getZoom() + minimapOffsetRef.current);
-                miniMap.setView(map.getCenter(), targetMiniZoom, { animate: false });
-                const mapBounds = map.getBounds(); const center = map.getCenter();
-                const nw = miniMap.project(mapBounds.getNorthWest(), targetMiniZoom);
-                const se = miniMap.project(mapBounds.getSouthEast(), targetMiniZoom);
-                const w = Math.abs(se.x - nw.x); const h = Math.abs(se.y - nw.y);
-                const MIN_PX = 30;
-                if (w < MIN_PX || h < MIN_PX) {
-                  const cPx = miniMap.project(center, targetMiniZoom);
-                  const adjW = Math.max(w, MIN_PX); const adjH = Math.max(h, MIN_PX);
-                  boundsRect.setBounds(L.latLngBounds(miniMap.unproject(L.point(cPx.x - adjW / 2, cPx.y - adjH / 2), targetMiniZoom), miniMap.unproject(L.point(cPx.x + adjW / 2, cPx.y + adjH / 2), targetMiniZoom)));
-                } else boundsRect.setBounds(mapBounds);
-                isSyncingRef.current = false;
-              });
-
-              miniMap.on('zoomend', () => {
-                if (!isSyncingRef.current && setMinimapOffset) {
-                  let newOffset = miniMap.getZoom() - mapInstance.current.getZoom();
-                  newOffset = Math.max(-10, Math.min(2, newOffset));
-                  setMinimapOffset(newOffset);
-                  minimapOffsetRef.current = newOffset; 
-                }
-              });
-
-              mapInstance.current = map; miniMapInstance.current = miniMap;
-              if (window.ResizeObserver) {
-                const ro = new ResizeObserver(() => { setTimeout(() => { if (mapInstance.current) mapInstance.current.invalidateSize(); if (miniMapInstance.current) miniMapInstance.current.invalidateSize(); }, 50); });
-                ro.observe(mapDomRef.current.parentElement);
-                ro.observe(miniMapDomRef.current);
-              }
-            }
-          }, [basemapsRegistry]);
-
-          useEffect(() => {
-            const map = mapInstance.current; if (!map || !gridLayerRef.current) return;
-            const updateGrid = () => {
-              gridLayerRef.current.clearLayers(); if (!showGrid) return;
-              const z = map.getZoom(); let step = z > 15 ? 0.01 : z > 13 ? 0.05 : z > 11 ? 0.1 : z > 9 ? 0.5 : z > 7 ? 1 : z > 5 ? 5 : z > 3 ? 10 : 20;
-              const b = map.getBounds();
-              const w = Math.floor(b.getWest() / step) * step - step; const e = Math.ceil(b.getEast() / step) * step + step;
-              const s = Math.floor(b.getSouth() / step) * step - step; const n = Math.ceil(b.getNorth() / step) * step + step;
-              const style = { color: '#007acc', weight: 1, opacity: 0.25, dashArray: '2, 6', interactive: false };
-              for (let lat = s; lat <= n; lat += step) if (lat >= -90 && lat <= 90) L.polyline([new L.LatLng(lat, w), new L.LatLng(lat, e)], style).addTo(gridLayerRef.current);
-              for (let lng = w; lng <= e; lng += step) L.polyline([new L.LatLng(-90, lng), new L.LatLng(90, lng)], style).addTo(gridLayerRef.current);
-            };
-            updateGrid(); map.on('moveend', updateGrid); return () => map.off('moveend', updateGrid);
-          }, [showGrid]);
-
-          useEffect(() => {
-            const map = mapInstance.current; const miniMap = miniMapInstance.current;
-            if (!map || !miniMap || !basemapsRegistry || !activeBasemap) return;
-            const config = basemapsRegistry.find(b => b.id === activeBasemap) || basemapsRegistry;
-            const renderBasemap = () => {
-              if (baseLayerRef.current) map.removeLayer(baseLayerRef.current);
-              if (miniBaseLayerRef.current) miniMap.removeLayer(miniBaseLayerRef.current);
-              const isVector = config.format === "pbf" || config.format === "mvt";
-              if (isVector && window.L.maplibreGL) {
-                baseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0 }).addTo(map);
-                miniBaseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: false, zIndex: 0 }).addTo(miniMap);
-              } else {
-                baseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0, keepBuffer: 4, updateWhenZooming: false }).addTo(map);
-                miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: false, zIndex: 0, keepBuffer: 4, updateWhenZooming: false }).addTo(miniMap);
-              }
-            };
-            if ((config.format === "pbf" || config.format === "mvt") && !window.L.maplibreGL) {
-              loadStyle('https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css');
-              Promise.all([loadScript('https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js')]).then(() => loadScript('https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js')).then(() => renderBasemap()).catch(e => console.error("Vector Library Failed", e));
-            } else renderBasemap();
-          }, [activeBasemap, basemapsRegistry, maxGlobalZoom]);
-
-          useEffect(() => {
-            const map = mapInstance.current; const miniMap = miniMapInstance.current;
-            if (!map || !miniMap || !basemapsRegistry) return;
-            Object.keys(overlayLayersRef.current).forEach(id => {
-              if (!activeOverlays.includes(id)) { map.removeLayer(overlayLayersRef.current[id]); delete overlayLayersRef.current[id]; }
-            });
-            activeOverlays.forEach((id, idx) => {
-              if (!overlayLayersRef.current[id]) {
-                const config = basemapsRegistry.find(b => b.id === id);
-                if (config) {
-                  const z = idx + 10; const op = overlayOpacities[id] !== undefined ? overlayOpacities[id] : (config.defaultOpacity ?? 1.0);
-                  const isWms = config.format === "wms" || config.url.toLowerCase().includes("wms");
-                  // [FIX] Slow Proxy Armor Inject: updateWhenZooming: false, updateWhenIdle: true
-                  if (isWms) {
-                    overlayLayersRef.current[id] = L.tileLayer.wms(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, layers: config.wmsLayer || "default", format: "image/png", transparent: true, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
-                  } else {
-                    overlayLayersRef.current[id] = L.tileLayer(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, transparent: true, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
-                  }
-                }
-              }
-            });
-          }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
-
-          useEffect(() => {
-            Object.keys(overlayOpacities).forEach(id => {
-              if (overlayLayersRef.current[id]) overlayLayersRef.current[id].setOpacity(overlayOpacities[id]);
-            });
-          }, [overlayOpacities]);
-
-          useEffect(() => {
-            const map = mapInstance.current; if (!map || data.length === 0) return;
-            markerLayer.current.clearLayers(); clusterLayer.current.clearLayers();
-            markersRef.current = {}; let validMarkers = 0;
-            
-            data.forEach((item, idx) => {
-              const locStr = String(item.location || '').trim(); if (!locStr) return;
-              const activeLayersArray = []; let featureLayers = [];
-              try {
-                if (locStr.match(/^GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(locStr);
-                else if (locStr.match(/^[A-Z]+\s*\(/)) { const wkt = new window.Wkt.Wkt(); wkt.read(locStr); featureLayers = extractLayers(wkt.toObject()); }
-                else if (locStr.startsWith('{') && locStr.includes('"type"')) featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
-                else { 
-                  const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/); 
-                  if (coordMatch) featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch.at(1)), parseFloat(coordMatch.at(2))))); 
-                }
-
-                const uniqueSignatures = new Set(); const validFeatureLayers = [];
-                featureLayers.forEach(layer => {
-                  if (!layer) return; let sig = null;
-                  if (layer.getLatLng) {
-                    const ll = layer.getLatLng();
-                    if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return; 
-                    sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
-                  } else if (layer.getBounds) {
-                    const b = layer.getBounds();
-                    if (!b || !b.isValid()) return;
-                    sig = `B_${b.toBBoxString()}`;
-                  }
-                  if (sig) { if (uniqueSignatures.has(sig)) return; uniqueSignatures.add(sig); }
-                  validFeatureLayers.push(layer);
-                });
-
-                const subLabels = item.subLabels ? item.subLabels.split(/[|\-·;\n]/).map(s => s.trim()).filter(Boolean) : [];
-                const places = item.place ? item.place.split(/[|\-·;\n]/).map(s => s.trim()).filter(Boolean) : [];
-                const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
-
-                validFeatureLayers.forEach((layer, layerIdx) => {
-                  if (layer instanceof L.Polygon) layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: polygonOpacity });
-                  else if (layer instanceof L.Polyline) layer.setStyle({ color: '#007acc', weight: 2, dashArray: '8, 8' });
-                  else if (layer.setStyle) layer.setStyle({ color: '#007acc', weight: 4 });
-                  
-                  if (layer instanceof L.Marker) { layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) })); layer.isVip = isVip; }
-                  
-                  const safeSubLabel = subLabels.length > layerIdx ? subLabels[layerIdx] : null;
-                  const safePlace = places.length > layerIdx ? places[layerIdx] : null;
-                  let labelToUse = safeSubLabel || safePlace || item.title;
-                  
-                  layer.itemPlace = safeStripHTML(labelToUse);
-                  layer.itemTitle = safeStripHTML(item.title);
-                  
-                  layer.bindTooltip(layer.itemPlace, { direction: 'top', offset: new L.Point(0, -34), className: 'centered-tooltip' });
-                  
-                  layer.on('click', () => setActiveIndex(idx));
-                  if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer); else markerLayer.current.addLayer(layer);
-                  activeLayersArray.push(layer); validMarkers++;
-                });
-                
-                if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
-              } catch(e) { console.error("Map Error Row", idx, e); }
-            });
-
-            setTimeout(() => {
-              if (map && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
-                const bounds = L.latLngBounds();
-                markerLayer.current.eachLayer(l => { if (l.getLatLng) bounds.extend(l.getLatLng()); else if (l.getBounds) bounds.extend(l.getBounds()); });
-                clusterLayer.current.eachLayer(l => bounds.extend(l.getLatLng()));
-                if (bounds.isValid()) { map.fitBounds(bounds, { padding: new L.Point(6, 6), maxZoom: 6 }); hasFitBounds.current = true; }
-              }
-            }, 100);
-          }, [data, polygonOpacity]);
-
-          useEffect(() => {
-            const map = mapInstance.current; const markers = markersRef.current;
-            if (!map || Object.keys(markers).length === 0) return;
-            const visibleBounds = visibleTimeBounds || new Array(0, Infinity);
-            const vLeft = visibleBounds.at(0); const vRight = visibleBounds.at(1);
-
-            let clusterAdd = [];
-            let clusterRemove = [];
-
-            Object.keys(markers).forEach(idxStr => {
-              const idx = parseInt(idxStr, 10);
-              const item = data[idx];
-              const isTarget = activeIndex === idx;
-
-              // [REF: MAP-06] Narrative-First Default: Undated pins default to false (ghosted) 
-              // unless they are the actively selected slide (isTarget)
-              let inWindow = false; 
-
-              if (item && item.startDate && !isNaN(item.startDate.min)) {
-                if (item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List') && Array.isArray(item.startDate.obj.values)) {
-                  inWindow = item.startDate.obj.values.some(v => v.max >= vLeft && v.min <= vRight);
-                } else {
-                  const sMin = item.startDate.min;
-                  const eMax = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : sMin;
-                  inWindow = (eMax >= vLeft && sMin <= vRight);
-                }
-              }
-
-              markers[idxStr].forEach(l => {
-                if (l instanceof L.Polygon) {
-                  l.setStyle({ stroke: false, fillColor: isTarget ? '#28a745' : '#007acc', fillOpacity: isTarget ? Math.min(polygonOpacity + 0.2, 1) : (inWindow ? polygonOpacity : 0.1), opacity: inWindow ? 1 : 0.2 });
-                  if (isTarget && l.bringToFront) l.bringToFront();
-                }
-                else if (l instanceof L.Polyline) {
-                  l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 3 : 2, dashArray: '8, 8', opacity: inWindow ? 1 : 0.2 });
-                  if (isTarget && l.bringToFront) l.bringToFront();
-                }
-                else if (l instanceof L.Marker) {
-                  l.setOpacity(inWindow ? 1 : 0.2);
-                  if (isTarget) {
-                    l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(true, l.isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-                    if (!l.isVip) { clusterLayer.current.removeLayer(l); markerLayer.current.addLayer(l); }
-                    l.setZIndexOffset(1000);
-                  } else {
-                    l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, l.isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-                    l.setZIndexOffset(0);
-                    if (!l.isVip) {
-                      if (inWindow && !clusterLayer.current.hasLayer(l)) {
-                        markerLayer.current.removeLayer(l);
-                        clusterAdd.push(l);
-                      } else if (!inWindow && clusterLayer.current.hasLayer(l)) {
-                        clusterRemove.push(l);
-                        markerLayer.current.addLayer(l);
-                      }
-                    }
-                  }
-                } else if (l.setStyle) {
-                  l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 5 : 4, opacity: inWindow ? 1 : 0.2 });
-                  if (isTarget && l.bringToFront) l.bringToFront();
-                }
-              });
-            });
-
-            if (clusterRemove.length > 0) clusterLayer.current.removeLayers(clusterRemove);
-            if (clusterAdd.length > 0) clusterLayer.current.addLayers(clusterAdd);
-
-            const activeLayers = markers[activeIndex];
-            if (activeLayers && activeLayers.length > 0) {
-              const activeFeatureGroup = L.featureGroup(activeLayers);
-              setTimeout(() => {
-                try {
-                  const bounds = activeFeatureGroup.getBounds();
-                  if (bounds.isValid()) { map.flyToBounds(bounds, { animate: true, duration: 2.5, maxZoom: maxAutoZoom }); hasFitBounds.current = true; }
-                  activeLayers.forEach(l => { if (l.openTooltip) l.openTooltip(); });
-                } catch(err) {}
-              }, 250);
-            }
-          }, [activeIndex, data, maxAutoZoom, polygonOpacity, visibleTimeBounds]);
-
-          const bases = basemapsRegistry.filter(b => b.type !== 'overlay'); const overlays = basemapsRegistry.filter(b => b.type === 'overlay');
-
-          return html`
-            <div style="position: relative; width:100%; height:100%;">
-              <div style="overflow: hidden; width:100%; height:100%; position: absolute; top:0; left:0; z-index:1;"><div ref=${mapDomRef} style="width:100%; height:100%;"></div></div>
-              <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
-                <div style="display: flex; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;"><button class="status-btn ${maxPane === 'map' ? 'active' : ''}" onClick=${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">${maxPane === 'map' ? html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>` : html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`}</button></div>
-                <div style="display: flex; flex-direction: column; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-                  <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                  <div title="Current Zoom Level" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: monospace;">${mapZoom}z</div>
-                  <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                </div>
-                <div style="display: flex; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;"><button class="status-btn ${showGrid ? 'active' : ''}" onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></button></div>
-                <div style="display: flex; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;"><button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 17 22 12"></polyline></svg></button></div>
-                ${showLayersMenu ? html`
-                  <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: relative; z-index: 2000;">
-                    <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-                      ${bases.map(b => html`<div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="radio" id="base_${b.id}" name="basemap_radio" checked=${activeBasemap === b.id} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}</div></div>`)}
-                    </div>
-                    <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                      ${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_${o.id}" checked=${activeOverlays.includes(o.id)} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}</div></div>${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
-                    </div>
-                  </div>
-                ` : ''}
-              </div>
-              <div class="minimap-container" ref=${miniMapDomRef}></div>
-            </div>
-          `;
-        };
-        
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.0 ] 🔽🔽🔽
-
-// === [ MAJOR BLOCK: MapViewer v6.4.0 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.1 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v6.4.1 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
     const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
     const mapInstance = useRef(null); const miniMapInstance = useRef(null);
@@ -950,10 +497,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 const upper = geomStr.toUpperCase();
                 if (upper.startsWith('POINT')) {
                     const m = geomStr.match(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/);
-                    if (m) extractedLayers.push(L.marker(new L.LatLng(parseFloat(m[1]), parseFloat(m[2]))));
+                    if (m) extractedLayers.push(L.marker(new L.LatLng(parseFloat(m.at(1)), parseFloat(m.at(2)))));
                 } else if (upper.startsWith('LINESTRING') || upper.startsWith('POLYGON')) {
                     const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
-                    if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))));
+                    if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))));
                 }
             }
         });
@@ -1131,7 +678,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 else if (locStr.startsWith('{') && locStr.includes('"type"')) featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
                 else {
                     const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
-                    if (coordMatch) featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch[1]), parseFloat(coordMatch[2]))));
+                    if (coordMatch) featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch.at(1)), parseFloat(coordMatch.at(2)))));
                 }
 
                 const uniqueSignatures = new Set(); const validFeatureLayers = [];
@@ -1192,7 +739,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
         if (!map || Object.keys(markers).length === 0) return;
 
         const visibleBounds = visibleTimeBounds || new Array(0, Infinity);
-        const vLeft = visibleBounds; const vRight = visibleBounds[1];
+        const vLeft = visibleBounds.at(0); const vRight = visibleBounds.at(1);
         let clusterAdd = []; let clusterRemove = [];
 
         Object.keys(markers).forEach(idxStr => {
@@ -1309,200 +856,199 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     </div>
     `;
 };
-MODULE_VERSIONS['MapViewer'] = 'v6.4.0';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.1';
 // === [ END MAJOR BLOCK ] ===
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
-2. Replace the entire MediaViewer Block
-Replace // === [ MAJOR BLOCK: MediaViewer v2.12.5 ] === through to its // === [ END MAJOR BLOCK ] === with this:
-// 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.0 ] 🔽🔽🔽
 
-// === [ MAJOR BLOCK: MediaViewer v2.13.0 ] ===
-		const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
-			const carouselRef = useRef(null);
-			const carouselWidthRef = useRef(0);
-			const [activeMediaIdx, setActiveMediaIdx] = useState(0);
-			const dragRef = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
+// 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.1 ] 🔽🔽🔽
 
-			useEffect(() => {
-				if (!carouselRef.current) return;
-				carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-				setActiveMediaIdx(0);
-				carouselWidthRef.current = carouselRef.current.clientWidth;
-				if (window.ResizeObserver) {
-					const ro = new ResizeObserver(entries => {
-						const entry = entries.at(0);
-						if (entry) carouselWidthRef.current = entry.contentRect.width;
-					});
-					ro.observe(carouselRef.current);
-					return () => ro.disconnect();
-				}
-			}, [activeSlide]);
+// === [ MAJOR BLOCK: MediaViewer v2.13.1 ] ===
+const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
+    const carouselRef = useRef(null);
+    const carouselWidthRef = useRef(0);
+    const [activeMediaIdx, setActiveMediaIdx] = useState(0);
+    const dragRef = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
 
-			if (!activeSlide || !activeSlide.media || activeSlide.media.length === 0) return null;
+    useEffect(() => {
+        if (!carouselRef.current) return;
+        carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        setActiveMediaIdx(0);
+        carouselWidthRef.current = carouselRef.current.clientWidth;
+        if (window.ResizeObserver) {
+            const ro = new ResizeObserver(entries => {
+                const entry = entries.at(0);
+                if (entry) carouselWidthRef.current = entry.contentRect.width;
+            });
+            ro.observe(carouselRef.current);
+            return () => ro.disconnect();
+        }
+    }, [activeSlide]);
 
-			const splitRegex = /[\r\n]+|\\n/;
-			let mediaItems = []; let captions = []; let credits = [];
-			(Array.isArray(activeSlide.media) ? activeSlide.media : [activeSlide.media || '']).forEach(m => { if (typeof m === 'string') mediaItems.push(...m.split(splitRegex)); else mediaItems.push(m); });
-			mediaItems = mediaItems.map(s => String(s).trim()).filter(Boolean);
-			(Array.isArray(activeSlide.mediaCaption) ? activeSlide.mediaCaption : [activeSlide.mediaCaption || '']).forEach(c => { if (typeof c === 'string') captions.push(...c.split(splitRegex)); else captions.push(c); });
-			captions = captions.map(s => String(s).trim());
-			(Array.isArray(activeSlide.mediaCredit) ? activeSlide.mediaCredit : [activeSlide.mediaCredit || '']).forEach(c => { if (typeof c === 'string') credits.push(...c.split(splitRegex)); else credits.push(c); });
-			credits = credits.map(s => String(s).trim());
+    if (!activeSlide || !activeSlide.media || activeSlide.media.length === 0) return null;
 
-			const getCleanUrl = (rawUrl) => {
-				const url = rawUrl.trim();
-				if (url.toLowerCase().startsWith('<iframe')) { const match = url.match(/src=["']([^"']+)["']/); return match ? match[1] : '#'; }
-				return url;
-			};
+    const splitRegex = /[\r\n]+|\\n/;
+    let mediaItems = []; let captions = []; let credits = [];
+    (Array.isArray(activeSlide.media) ? activeSlide.media : [activeSlide.media || '']).forEach(m => { if (typeof m === 'string') mediaItems.push(...m.split(splitRegex)); else mediaItems.push(m); });
+    mediaItems = mediaItems.map(s => String(s).trim()).filter(Boolean);
+    (Array.isArray(activeSlide.mediaCaption) ? activeSlide.mediaCaption : [activeSlide.mediaCaption || '']).forEach(c => { if (typeof c === 'string') captions.push(...c.split(splitRegex)); else captions.push(c); });
+    captions = captions.map(s => String(s).trim());
+    (Array.isArray(activeSlide.mediaCredit) ? activeSlide.mediaCredit : [activeSlide.mediaCredit || '']).forEach(c => { if (typeof c === 'string') credits.push(...c.split(splitRegex)); else credits.push(c); });
+    credits = credits.map(s => String(s).trim());
 
-			const handleScroll = (e) => {
-				if (dragRef.current.isDown) return;
-				const width = carouselWidthRef.current || e.target.clientWidth;
-				const idx = Math.round(e.target.scrollLeft / width);
-				if (idx !== activeMediaIdx) setActiveMediaIdx(idx);
-			};
+    const getCleanUrl = (rawUrl) => {
+        const url = rawUrl.trim();
+        if (url.toLowerCase().startsWith('<iframe')) { const match = url.match(/src=["']([^"']+)["']/); return match ? match.at(1) : '#'; }
+        return url;
+    };
 
-			const handleChevronClick = (e, direction) => {
-				e.preventDefault(); e.stopPropagation();
-				if (!carouselRef.current) return;
-				const newIdx = activeMediaIdx + direction;
-				if (newIdx >= 0 && newIdx < mediaItems.length) {
-					const width = carouselWidthRef.current || carouselRef.current.clientWidth;
-					carouselRef.current.scrollTo({ left: newIdx * width, behavior: 'smooth' });
-				}
-			};
+    const handleScroll = (e) => {
+        if (dragRef.current.isDown) return;
+        const width = carouselWidthRef.current || e.target.clientWidth;
+        const idx = Math.round(e.target.scrollLeft / width);
+        if (idx !== activeMediaIdx) setActiveMediaIdx(idx);
+    };
 
-			const onMouseDown = (e) => {
-				dragRef.current.isDown = true;
-				carouselRef.current.classList.add('is-dragging');
-				dragRef.current.startX = e.pageX - carouselRef.current.offsetLeft;
-				dragRef.current.scrollLeft = carouselRef.current.scrollLeft;
-			};
+    const handleChevronClick = (e, direction) => {
+        e.preventDefault(); e.stopPropagation();
+        if (!carouselRef.current) return;
+        const newIdx = activeMediaIdx + direction;
+        if (newIdx >= 0 && newIdx < mediaItems.length) {
+            const width = carouselWidthRef.current || carouselRef.current.clientWidth;
+            carouselRef.current.scrollTo({ left: newIdx * width, behavior: 'smooth' });
+        }
+    };
 
-			const onMouseLeave = () => {
-				if (!dragRef.current.isDown) return;
-				dragRef.current.isDown = false;
-				carouselRef.current.classList.remove('is-dragging');
-			};
+    const onMouseDown = (e) => {
+        dragRef.current.isDown = true;
+        carouselRef.current.classList.add('is-dragging');
+        dragRef.current.startX = e.pageX - carouselRef.current.offsetLeft;
+        dragRef.current.scrollLeft = carouselRef.current.scrollLeft;
+    };
 
-			const onMouseUp = () => {
-				if (!dragRef.current.isDown) return;
-				dragRef.current.isDown = false;
-				carouselRef.current.classList.remove('is-dragging');
-				const width = carouselWidthRef.current || carouselRef.current.clientWidth;
-				const idx = Math.round(carouselRef.current.scrollLeft / width);
-				setActiveMediaIdx(idx);
-				carouselRef.current.scrollTo({ left: idx * width, behavior: 'smooth' });
-			};
+    const onMouseLeave = () => {
+        if (!dragRef.current.isDown) return;
+        dragRef.current.isDown = false;
+        carouselRef.current.classList.remove('is-dragging');
+    };
 
-			const onMouseMove = (e) => {
-				if (!dragRef.current.isDown) return;
-				e.preventDefault();
-				const x = e.pageX - carouselRef.current.offsetLeft;
-				const walk = (x - dragRef.current.startX) * 1.5;
-				carouselRef.current.scrollLeft = dragRef.current.scrollLeft - walk;
-			};
+    const onMouseUp = () => {
+        if (!dragRef.current.isDown) return;
+        dragRef.current.isDown = false;
+        carouselRef.current.classList.remove('is-dragging');
+        const width = carouselWidthRef.current || carouselRef.current.clientWidth;
+        const idx = Math.round(carouselRef.current.scrollLeft / width);
+        setActiveMediaIdx(idx);
+        carouselRef.current.scrollTo({ left: idx * width, behavior: 'smooth' });
+    };
 
-			const renderMedia = (rawUrl) => {
-				const url = getCleanUrl(rawUrl);
-				const lowUrl = url.toLowerCase();
-				const evalUrl = lowUrl.split('?').at(0).split('#').at(0);
+    const onMouseMove = (e) => {
+        if (!dragRef.current.isDown) return;
+        e.preventDefault();
+        const x = e.pageX - carouselRef.current.offsetLeft;
+        const walk = (x - dragRef.current.startX) * 1.5;
+        carouselRef.current.scrollLeft = dragRef.current.scrollLeft - walk;
+    };
 
-				if (evalUrl.startsWith('<iframe')) {
-					return html`<div dangerouslySetInnerHTML=${{ __html: url }} style="flex-grow: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; pointer-events: auto;"></div>`;
-				}
-				if (evalUrl.includes('youtube.com') || evalUrl.includes('youtu.be')) {
-					let embedUrl = url;
-					if (lowUrl.includes('youtu.be/')) embedUrl = url.replace(/youtu\.be\//i, 'youtube.com/embed/');
-					else if (lowUrl.includes('watch?v=')) embedUrl = url.replace(/watch\?v=/i, 'embed/').replace(/&/g, '?');
-					const tMatch = url.match(/[?&]t=(\d+)s?/i);
-					if (tMatch && tMatch[1]) {
-						const seconds = tMatch[1];
-						embedUrl = embedUrl.replace(/[?&]t=\d+s?/i, '');
-						embedUrl += (embedUrl.includes('?') ? '&' : '?') + `start=${seconds}`;
-					}
-					return html`<iframe src="${embedUrl}" loading="lazy" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
-				}
+    const renderMedia = (rawUrl) => {
+        const url = getCleanUrl(rawUrl);
+        const lowUrl = url.toLowerCase();
+        const evalUrl = lowUrl.split('?').at(0).split('#').at(0);
 
-				const isHttpBlocked = lowUrl.startsWith('http://') && window.location.protocol === 'https:';
-				if (evalUrl.endsWith('.pdf') || isHttpBlocked) {
-					return html`
-					<div style="position: relative; width: 100%; height: 100%; background: #222; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
-						<div style="position: absolute; z-index: 1; color: #ccc; font-size: 0.95rem; max-width: 80%; line-height: 1.5;">
-							${isHttpBlocked ? html`Browser security prevents loading unencrypted (HTTP) content inline.<br/><br/>Please use the <b style="color: #fff;">[↗]</b> button top-right to open it safely in a new tab.` : html`PDF inline rendering is device-dependent.<br/><br/>If the document does not appear, please use the <b style="color: #fff;">[↗]</b> button top-right to open it natively.`}
-						</div>
-						${!isHttpBlocked ? html`<iframe src="${url}" loading="lazy" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 2; background: transparent;"></iframe>` : ''}
-					</div>
-					`;
-				}
-				if (evalUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/)) {
-					return html`<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
-				}
-				return html`<iframe src="${url}" loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
-			};
+        if (evalUrl.startsWith('<iframe')) {
+            return html`<div dangerouslySetInnerHTML=${{ __html: url }} style="flex-grow: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; pointer-events: auto;"></div>`;
+        }
+        if (evalUrl.includes('youtube.com') || evalUrl.includes('youtu.be')) {
+            let embedUrl = url;
+            if (lowUrl.includes('youtu.be/')) embedUrl = url.replace(/youtu\.be\//i, 'youtube.com/embed/');
+            else if (lowUrl.includes('watch?v=')) embedUrl = url.replace(/watch\?v=/i, 'embed/').replace(/&/g, '?');
+            const tMatch = url.match(/[?&]t=(\d+)s?/i);
+            if (tMatch && tMatch.at(1)) {
+                const seconds = tMatch.at(1);
+                embedUrl = embedUrl.replace(/[?&]t=\d+s?/i, '');
+                embedUrl += (embedUrl.includes('?') ? '&' : '?') + `start=${seconds}`;
+            }
+            return html`<iframe src="${embedUrl}" loading="lazy" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+        }
 
-			const currentCleanUrl = getCleanUrl(mediaItems[activeMediaIdx] || '');
-			const btnStyle = "background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 4px; cursor: pointer; backdrop-filter: blur(4px); transition: background 0.2s; pointer-events: auto; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.3);";
+        const isHttpBlocked = lowUrl.startsWith('http://') && window.location.protocol === 'https:';
+        if (evalUrl.endsWith('.pdf') || isHttpBlocked) {
+            return html`
+            <div style="position: relative; width: 100%; height: 100%; background: #222; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
+                <div style="position: absolute; z-index: 1; color: #ccc; font-size: 0.95rem; max-width: 80%; line-height: 1.5;">
+                    ${isHttpBlocked ? html`Browser security prevents loading unencrypted (HTTP) content inline.<br/><br/>Please use the <b style="color: #fff;">[↗]</b> button top-right to open it safely in a new tab.` : html`PDF inline rendering is device-dependent.<br/><br/>If the document does not appear, please use the <b style="color: #fff;">[↗]</b> button top-right to open it natively.`}
+                </div>
+                ${!isHttpBlocked ? html`<iframe src="${url}" loading="lazy" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 2; background: transparent;"></iframe>` : ''}
+            </div>
+            `;
+        }
+        if (evalUrl.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)$/)) {
+            return html`<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
+        }
+        return html`<iframe src="${url}" loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
+    };
 
-			return html`
-			<div style="position: relative; height: 100%; width: 100%;">
-				<div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
-					<button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle}">
-						${maxPane === 'media'
-							? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
-							: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
-						}
-					</button>
-					${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
-					${mediaItems.length > 1 ? html`<div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
-				</div>
-				
-				${mediaItems.length > 1 ? html`
-					${activeMediaIdx > 0 ? html`
-						<button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} style="${btnStyle} position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Previous Media">
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-						</button>
-					` : ''}
-					${activeMediaIdx < mediaItems.length - 1 ? html`
-						<button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} style="${btnStyle} position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Next Media">
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-						</button>
-					` : ''}
-				` : ''}
+    const currentCleanUrl = getCleanUrl(mediaItems[activeMediaIdx] || '');
+    const btnStyle = "background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 4px; cursor: pointer; backdrop-filter: blur(4px); transition: background 0.2s; pointer-events: auto; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.3);";
 
-				<style>
-					.media-carousel::-webkit-scrollbar { display: none !important; }
-					.media-carousel.is-dragging { scroll-snap-type: none !important; cursor: grabbing !important; }
-					.media-carousel { cursor: grab; }
-				</style>
+    return html`
+    <div style="position: relative; height: 100%; width: 100%;">
+        <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+            <button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle}">
+                ${maxPane === 'media'
+                    ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
+                    : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
+                }
+            </button>
+            ${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
+            ${mediaItems.length > 1 ? html`<div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
+        </div>
+        
+        ${mediaItems.length > 1 ? html`
+            ${activeMediaIdx > 0 ? html`
+                <button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} style="${btnStyle} position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Previous Media">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+            ` : ''}
+            ${activeMediaIdx < mediaItems.length - 1 ? html`
+                <button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} style="${btnStyle} position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Next Media">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            ` : ''}
+        ` : ''}
 
-				<div class="media-carousel" ref=${carouselRef} onScroll=${handleScroll} onMouseDown=${onMouseDown} onMouseLeave=${onMouseLeave} onMouseUp=${onMouseUp} onMouseMove=${onMouseMove} style="scrollbar-width: none; height: 100%; width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory;">
-					${mediaItems.map((rawUrl, i) => {
-						const itemCaption = captions[i] || '';
-						const itemCredit = credits[i] || '';
-						const cUrl = getCleanUrl(rawUrl);
-						const isCreditUrl = /^https?:\/\//i.test(itemCredit);
-						return html`
-						<div class="media-item" key=${i} style="flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative;">
-							<div style="flex: 1 1 auto; position: relative; overflow: hidden; min-height: 0;">
-								${renderMedia(rawUrl)}
-							</div>
-							${(itemCaption || itemCredit) ? html`
-								<div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px;">
-									${itemCaption ? html`<div style="color: #ddd;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
-									${itemCredit ? html`<div style="font-size: 0.75rem; color: #888;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
-								</div>
-							` : ''}
-						</div>
-						`;
-					})}
-				</div>
-			</div>
-			`;
-		};
-		MODULE_VERSIONS['MediaViewer'] = 'v2.13.0';
-		// === [ END MAJOR BLOCK ] ===
+        <style>
+            .media-carousel::-webkit-scrollbar { display: none !important; }
+            .media-carousel.is-dragging { scroll-snap-type: none !important; cursor: grabbing !important; }
+            .media-carousel { cursor: grab; }
+        </style>
+
+        <div class="media-carousel" ref=${carouselRef} onScroll=${handleScroll} onMouseDown=${onMouseDown} onMouseLeave=${onMouseLeave} onMouseUp=${onMouseUp} onMouseMove=${onMouseMove} style="scrollbar-width: none; height: 100%; width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory;">
+            ${mediaItems.map((rawUrl, i) => {
+                const itemCaption = captions[i] || '';
+                const itemCredit = credits[i] || '';
+                const cUrl = getCleanUrl(rawUrl);
+                const isCreditUrl = /^https?:\/\//i.test(itemCredit);
+                return html`
+                <div class="media-item" key=${i} style="flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative;">
+                    <div style="flex: 1 1 auto; position: relative; overflow: hidden; min-height: 0;">
+                        ${renderMedia(rawUrl)}
+                    </div>
+                    ${(itemCaption || itemCredit) ? html`
+                        <div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px;">
+                            ${itemCaption ? html`<div style="color: #ddd;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
+                            ${itemCredit ? html`<div style="font-size: 0.75rem; color: #888;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+                `;
+            })}
+        </div>
+    </div>
+    `;
+};
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.1';
+// === [ END MAJOR BLOCK ] ===
 
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
@@ -1534,7 +1080,7 @@ Replace // === [ MAJOR BLOCK: MediaViewer v2.12.5 ] === through to its // === [ 
             return html`
                 <div class="content-pane-wrapper" style="display: flex; flex-direction: column; height: 100%; position: relative; width: 100%;">
 
-                    <div style="position: absolute; top: 15px; right: 15px; z-index: 1000;">
+                    <div style="position: absolute; top: 15px; right: 28px; z-index: 1000;">
                         <button class="status-btn ${maxPane === 'text' ? 'active' : ''}" style="background: rgba(255,255,255,0.9); border: 1px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onClick=${() => setMaxPane (maxPane === 'text' ? null : 'text')} title="Toggle Maximize">
                             ${maxPane === 'text'
                                 ? html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
@@ -1576,535 +1122,646 @@ Replace // === [ MAJOR BLOCK: MediaViewer v2.12.5 ] === through to its // === [ 
         MODULE_VERSIONS ["ContentSlider"] = 'v4.4.1';
         // === [ END MAJOR BLOCK ] ===
 
-// 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.0 ] 🔽🔽🔽
+// 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.1 ] 🔽🔽🔽
 
-		// === [ MAJOR BLOCK: TimelineScrubber v26.11.0 ] ===
-		const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
-			const wrapperRef = useRef(null);
-			const [zoomLevel, setZoomLevel] = useState(1);
-			const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
-			const touchZoomRef = useRef({ initialDist: 0, initialZoom: 1 });
-			const prevActiveIndexRef = useRef(-1);
-			const scrollTargetRef = useRef(null);
-			const scrollTimeout = useRef(null);
-			const [containerHeight, setContainerHeight] = useState(200);
-			const [viewLeftEdge, setViewLeftEdge] = useState(0);
+// === [ MAJOR BLOCK: TimelineScrubber v26.11.1 ] ===
+const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
+    // --- [ SubBlock: Scrubber State & Hooks ] ---
+    const wrapperRef = useRef(null);
+    const [zoomLevel, setZoomLevel] = useState(1);
+    const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0, hasDragged: false });
+    const touchZoomRef = useRef({ initialDist: 0, initialZoom: 1 });
+    const prevActiveIndexRef = useRef(-1);
+    const scrollTargetPayloadRef = useRef(null);
+    const scrollTimeout = useRef(null);
+    const [containerHeight, setContainerHeight] = useState(200);
+    const [viewLeftEdge, setViewLeftEdge] = useState(0);
+    const [caliperTooltip, setCaliperTooltip] = useState(null);
+    const hoverTimeoutRef = useRef(null);
+    const lastMouseXRef = useRef(0);
 
-			const safeStripHTML = (str) => {
-				if (!str) return '';
-				const withDashes = String(str).replace(/<p[^>]*>/gi, ' - ');
-				return withDashes.replace(/<[^>]*>?/gm, '').trim();
-			};
+    useEffect(() => {
+        const ro = new ResizeObserver(entries => {
+            const entry = entries.at(0);
+            if (entry && entry.target) {
+                setContainerHeight(entry.target.clientHeight);
+            }
+        });
+        if (wrapperRef.current) ro.observe(wrapperRef.current);
+        return () => ro.disconnect();
+    }, []);
 
-			useEffect(() => {
-				const ro = new ResizeObserver(entries => {
-					const entry = entries.at(0);
-					if (entry && entry.target) setContainerHeight(entry.target.clientHeight);
-				});
-				if (wrapperRef.current) ro.observe(wrapperRef.current);
-				return () => ro.disconnect();
-			}, []);
+    const safeStripHTML = (str) => {
+        if (!str) return '';
+        const withDashes = String(str).replace(/<p[^>]*>/gi, ' - ');
+        return withDashes.replace(/<[^>]*>?/gm, '').trim();
+    };
 
-			const getParsedTags = (rawTagsArray) => {
-				if (!rawTagsArray || rawTagsArray.length === 0) return ['Untagged'];
-				const splitRegex = /[\r\n]+|\\n/; let arr = [];
-				rawTagsArray.forEach(t => { if (typeof t === 'string') arr.push(...t.split(splitRegex)); else arr.push(t); });
-				arr = arr.map(s => String(s).trim()).filter(Boolean); return arr.length > 0 ? arr : ['Untagged'];
-			};
+    // --- [ SubBlock: Tag Gravity Matrix ] ---
+    const getParsedTags = (rawTagsArray) => {
+        if (!rawTagsArray || rawTagsArray.length === 0) return [];
+        const splitRegex = /[\r\n]+|\\n/; let arr = [];
+        (Array.isArray(rawTagsArray) ? rawTagsArray : [rawTagsArray]).forEach(t => { if (typeof t === 'string') arr.push(...t.split(splitRegex)); else arr.push(t); });
+        return arr.map(s => String(s).trim()).filter(Boolean);
+    };
 
-			const tagsMap = new Set(); const tagPairs = [];
-			data.forEach(d => {
-				if (!d.startDate || isNaN(d.startDate.min)) return;
-				const t = getParsedTags(d.tags); t.forEach(tag => tagsMap.add(tag));
-				for (let i = 0; i < t.length - 1; i++) tagPairs.push([t.at(i), t.at(i + 1)]);
-			});
+    const tagsMap = new Map(); const tagPairs = new Map();
+    data.forEach(d => {
+        if (!d.startDate || isNaN(d.startDate.min)) return;
+        const t = getParsedTags(d.tags);
+        t.forEach(tag => tagsMap.set(tag, (tagsMap.get(tag) || 0) + 1));
+        for (let i = 0; i < t.length - 1; i++) {
+            for (let j = i + 1; j < t.length; j++) {
+                const pair = [t.at(i), t.at(j)].sort().join('|');
+                tagPairs.set(pair, (tagPairs.get(pair) || 0) + 1);
+            }
+        }
+    });
 
-			let orderedTags = []; const remaining = Array.from(tagsMap);
-			if (remaining.length > 0) orderedTags.push(remaining.shift());
-			while (remaining.length > 0) {
-				let placed = false;
-				for (let i = 0; i < remaining.length; i++) {
-					const r = remaining.at(i);
-					const firstTag = orderedTags.at(0); const lastTag = orderedTags.at(-1);
-					const pairedWithFirst = tagPairs.some(p => (p.at(0) === r && p.at(1) === firstTag) || (p.at(1) === r && p.at(0) === firstTag));
-					const pairedWithLast = tagPairs.some(p => (p.at(0) === r && p.at(1) === lastTag) || (p.at(1) === r && p.at(0) === lastTag));
-					if (pairedWithLast) { orderedTags.push(r); remaining.splice(i, 1); placed = true; break; }
-					if (pairedWithFirst) { orderedTags.unshift(r); remaining.splice(i, 1); placed = true; break; }
-				}
-				if (!placed) orderedTags.push(remaining.shift());
-			}
-			const laneCount = Math.max(1, orderedTags.length);
-			const laneHeight = Math.max(24, (containerHeight - 38) / laneCount);
+    let orderedTags = []; const remaining = Array.from(tagsMap.keys()).sort((a, b) => tagsMap.get(b) - tagsMap.get(a));
+    if (remaining.length > 0) { orderedTags.push(remaining.at(0)); remaining.splice(0, 1); }
 
-			const validData = data.filter(d => d.startDate && !isNaN(d.startDate.min));
-			const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
-			let maxTimeRaw = minTimeRaw;
-			validData.forEach(d => {
-				if (d.endDate && !isNaN(d.endDate.max) && d.endDate.max > maxTimeRaw) maxTimeRaw = d.endDate.max;
-				else if (d.startDate.min > maxTimeRaw) maxTimeRaw = d.startDate.min;
-			});
+    while (remaining.length > 0) {
+        let bestMatchIdx = 0; let bestScore = -1; let insertPos = 'push';
+        for (let i = 0; i < remaining.length; i++) {
+            const r = remaining.at(i);
+            const firstTag = orderedTags.at(0); const lastTag = orderedTags.at(-1);
+            const scoreWithFirst = tagPairs.get([r, firstTag].sort().join('|')) || 0;
+            const scoreWithLast = tagPairs.get([r, lastTag].sort().join('|')) || 0;
+            const baseFreq = tagsMap.get(r) || 0;
+            
+            const totalScoreFirst = (scoreWithFirst * 1000) + baseFreq;
+            const totalScoreLast = (scoreWithLast * 1000) + baseFreq;
 
-			const rawTimeRange = Math.max(maxTimeRaw - minTimeRaw, 86400000);
-			const padMs = rawTimeRange * 0.05;
-			const renderMinTime = minTimeRaw - padMs;
-			const renderMaxTime = maxTimeRaw + padMs;
-			const renderTimeRange = renderMaxTime - renderMinTime;
+            if (totalScoreLast > bestScore) { bestScore = totalScoreLast; bestMatchIdx = i; insertPos = 'push'; }
+            if (totalScoreFirst > bestScore) { bestScore = totalScoreFirst; bestMatchIdx = i; insertPos = 'unshift'; }
+        }
+        if (insertPos === 'push') { orderedTags.push(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
+        else { orderedTags.unshift(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
+    }
+    const laneCount = Math.max(1, orderedTags.length);
+    const laneHeight = Math.max(24, (containerHeight - 55) / laneCount);
 
-			const measureTextWidth = (text) => {
-				const canvas = document.createElement('canvas'); const context = canvas.getContext('2d');
-				context.font = '400 12px "Noto Sans", sans-serif'; return context.measureText(text).width;
-			};
+    // --- [ SubBlock: Chrono Bounds & Smart Labels ] ---
+    const validData = data.filter(d => d.startDate && !isNaN(d.startDate.min));
+    const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
+    let maxTimeRaw = minTimeRaw;
+    
+    validData.forEach(d => {
+        if (d.endDate && !isNaN(d.endDate.max) && d.endDate.max > maxTimeRaw) maxTimeRaw = d.endDate.max;
+        else if (d.startDate.min > maxTimeRaw) maxTimeRaw = d.startDate.min;
+    });
 
-			const formatLabelSmart = (titleStr) => {
-				const maxPx = 300; const words = titleStr.split(' ');
-				let targetLines = words.length > 1 ? (measureTextWidth(titleStr) > 280 ? 3 : 2) : 1;
-				if (targetLines === 1) return { lines: [titleStr], pxWidth: measureTextWidth(titleStr) + 35 };
+    const uniqueStarts = Array.from(new Set(validData.map(d => d.startDate.min))).sort((a, b) => a - b);
+    const rawTimeRange = Math.max(maxTimeRaw - minTimeRaw, 86400000);
+    const padMs = rawTimeRange * 0.05;
+    const renderMinTime = minTimeRaw - padMs;
+    const renderMaxTime = maxTimeRaw + padMs;
+    const renderTimeRange = renderMaxTime - renderMinTime;
 
-				let bestSplit = []; let bestScore = Infinity;
-				if (targetLines === 2) {
-					for (let i = 1; i < words.length; i++) {
-						let l1 = words.slice(0, i).join(' '), l2 = words.slice(i).join(' ');
-						let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2);
-						let score = Math.max(w1, w2) + Math.abs(w1 - w2) * 0.8;
-						if (score < bestScore) { bestScore = score; bestSplit = [l1, l2]; }
-					}
-				} else {
-					for (let i = 1; i < words.length - 1; i++) {
-						for (let j = i + 1; j < words.length; j++) {
-							let l1 = words.slice(0, i).join(' '), l2 = words.slice(i, j).join(' '), l3 = words.slice(j).join(' ');
-							let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2), w3 = measureTextWidth(l3);
-							let maxW = Math.max(w1, w2, w3), minW = Math.min(w1, w2, w3);
-							let score = maxW + (maxW - minW) * 0.8;
-							if (score < bestScore) { bestScore = score; bestSplit = [l1, l2, l3]; }
-						}
-					}
-				}
+    const measureTextWidth = (text) => {
+        const canvas = document.createElement('canvas'); const context = canvas.getContext('2d');
+        context.font = '400 12px "Noto Sans", sans-serif'; return context.measureText(text).width;
+    };
 
-				let lines = bestSplit.length ? bestSplit : [titleStr];
-				if (lines.length === 3) {
-					let last = lines.at(2);
-					if (measureTextWidth(last) > maxPx) {
-						while (measureTextWidth(last + '...') > maxPx && last.length > 0) last = last.slice(0, -1);
-						lines.splice(2, 1, last.trim() + '...');
-					}
-				} else if (lines.length === 2) {
-					let last = lines.at(1);
-					if (measureTextWidth(last) > maxPx * 1.3) {
-						while (measureTextWidth(last + '...') > maxPx * 1.3 && last.length > 0) last = last.slice(0, -1);
-						lines.splice(1, 1, last.trim() + '...');
-					}
-				}
-				return { lines, pxWidth: Math.max(60, Math.max(...lines.map(l => measureTextWidth(l))) + 35) };
-			};
+    const formatLabelSmart = (titleStr) => {
+        const maxPx = 300; const words = titleStr.split(' ');
+        let targetLines = words.length > 1 ? (measureTextWidth(titleStr) > 280 ? 3 : 2) : 1;
+        if (targetLines === 1) return { lines: [titleStr], pxWidth: measureTextWidth(titleStr) + 35 };
 
-			useEffect(() => {
-				const visibleMs = renderTimeRange / zoomLevel;
-				const secs = visibleMs / 1000; const mins = secs / 60; const hrs = mins / 60; const days = hrs / 24; const mos = days / 30.44; const yrs = days / 365.25;
-				let str = `${Math.round(mins)} Minutes`;
-				if (yrs >= 1) str = `${Math.round(yrs)} Years`;
-				else if (mos >= 1) str = `${Math.round(mos)} Months`;
-				else if (days >= 1) str = `${Math.round(days)} Days`;
-				else if (hrs >= 1) str = `${Math.round(hrs)} Hours`;
-				setVisibleTimeSpan(`Span: ${str}`);
-			}, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
+        let bestSplit = []; let bestScore = Infinity;
+        if (targetLines === 2) {
+            for (let i = 1; i < words.length; i++) {
+                let l1 = words.slice(0, i).join(' '), l2 = words.slice(i).join(' ');
+                let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2);
+                let score = Math.max(w1, w2) + Math.abs(w1 - w2) * 0.8;
+                if (score < bestScore) { bestScore = score; bestSplit = [l1, l2]; }
+            }
+        } else {
+            for (let i = 1; i < words.length - 1; i++) {
+                for (let j = i + 1; j < words.length; j++) {
+                    let l1 = words.slice(0, i).join(' '), l2 = words.slice(i, j).join(' '), l3 = words.slice(j).join(' ');
+                    let w1 = measureTextWidth(l1), w2 = measureTextWidth(l2), w3 = measureTextWidth(l3);
+                    let maxW = Math.max(w1, w2, w3), minW = Math.min(w1, w2, w3);
+                    let score = maxW + (maxW - minW) * 0.8;
+                    if (score < bestScore) { bestScore = score; bestSplit = [l1, l2, l3]; }
+                }
+            }
+        }
 
-			useEffect(() => {
-				const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
-				if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
-					const activeNode = validData.at(activeDataIndex);
-					const sT = activeNode.startDate.min;
-					const { pxWidth } = formatLabelSmart(safeStripHTML(activeNode.title));
-					const containerW = wrapperRef.current.clientWidth || 1000;
-					const targetTrackW = Math.max(containerW, containerW * zoomLevel);
-					const scrollPos = ((sT - renderMinTime) / renderTimeRange * targetTrackW) + (pxWidth / 2) - (containerW / 2);
-					wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
-				}
-			}, [activeIndex]);
+        let lines = bestSplit.length ? bestSplit : [titleStr];
+        if (lines.length === 3) {
+            let last = lines.at(2);
+            if (measureTextWidth(last) > maxPx) {
+                while (measureTextWidth(last + '...') > maxPx && last.length > 0) last = last.slice(0, -1);
+                lines.splice(2, 1, last.trim() + '...');
+            }
+        } else if (lines.length === 2) {
+            let last = lines.at(1);
+            if (measureTextWidth(last) > maxPx * 1.3) {
+                while (measureTextWidth(last + '...') > maxPx * 1.3 && last.length > 0) last = last.slice(0, -1);
+                lines.splice(1, 1, last.trim() + '...');
+            }
+        }
+        return { lines, pxWidth: Math.max(60, Math.max(...lines.map(l => measureTextWidth(l))) + 35) };
+    };
 
-			useEffect(() => {
-				if (validData.length > 1 && wrapperRef.current && !dragRef.current.isDragging && activeIndex !== prevActiveIndexRef.current) {
-					prevActiveIndexRef.current = activeIndex;
-					if (zoomLock === 'hard') return;
-					if (zoomLock === 'soft') setZoomLock('auto');
+    // --- [ SubBlock: Kinetic Camera ] ---
+    useEffect(() => {
+        const visibleMs = renderTimeRange / zoomLevel;
+        const secs = visibleMs / 1000; const mins = secs / 60; const hrs = mins / 60; const days = hrs / 24; const mos = days / 30.44; const yrs = days / 365.25;
+        let str = `${Math.round(mins)} Minutes`;
+        if (yrs >= 1) str = `${Math.round(yrs)} Years`; else if (mos >= 1) str = `${Math.round(mos)} Months`; else if (days >= 1) str = `${Math.round(days)} Days`; else if (hrs >= 1) str = `${Math.round(hrs)} Hours`;
+        setVisibleTimeSpan(`Span: ${str}`);
+    }, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
 
-					const timeoutId = setTimeout(() => {
-						const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
-						if (activeDataIndex >= 0) {
-							let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
-							let clusterMax = validData.at(Math.min(validData.length - 1, activeDataIndex + 2)).startDate.min;
-							for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
-								const node = validData.at(i);
-								if (node.endDate && !isNaN(node.endDate.max)) clusterMax = Math.max(clusterMax, node.endDate.max);
-								clusterMax = Math.max(clusterMax, node.startDate.min);
-								clusterMin = Math.min(clusterMin, node.startDate.min);
-							}
-							const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
-							const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
-							const activeNode = validData.at(activeDataIndex);
-							const sT = activeNode.startDate.min;
-							const { pxWidth } = formatLabelSmart(safeStripHTML(activeNode.title));
-							const containerW = wrapperRef.current.clientWidth || 1000;
-							scrollTargetRef.current = (((sT - renderMinTime) / renderTimeRange * Math.max(containerW, containerW * clampedZoom)) + (pxWidth / 2)) - (containerW / 2);
-							setZoomLevel(clampedZoom);
-						}
-					}, 500);
-					return () => clearTimeout(timeoutId);
-				}
-			}, [activeIndex, data, zoomLock, setZoomLock]);
+    const getExactNodeScrollPos = (nodeGlobalIdx, trackW, containerW) => {
+        const activeNode = data[nodeGlobalIdx];
+        if (!activeNode || !activeNode.startDate) return 0;
+        const basePx = ((activeNode.startDate.min - renderMinTime) / renderTimeRange) * trackW;
+        return basePx - (containerW / 2);
+    };
 
-			useLayoutEffect(() => {
-				if (scrollTargetRef.current !== null && wrapperRef.current) {
-					wrapperRef.current.scrollTo({ left: scrollTargetRef.current, behavior: 'auto' });
-					scrollTargetRef.current = null;
-				}
-			}, [zoomLevel]);
+    useEffect(() => {
+        const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+        if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
+            const containerW = wrapperRef.current.clientWidth || 1000;
+            const targetTrackW = Math.max(containerW, containerW * zoomLevel);
+            const scrollPos = getExactNodeScrollPos(activeIndex, targetTrackW, containerW);
+            wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
+        }
+    }, [activeIndex]);
 
-			const handleManualZoom = (newZoom, centerType = 'center', eventX = 0) => {
-				if (!wrapperRef.current) return;
-				const containerW = wrapperRef.current.clientWidth; const scrollPos = wrapperRef.current.scrollLeft;
-				const anchorPx = centerType === 'mouse' ? scrollPos + eventX : scrollPos + (containerW / 2);
-				const centerPct = anchorPx / Math.max(containerW, containerW * zoomLevel);
-				scrollTargetRef.current = (centerPct * Math.max(containerW, containerW * newZoom)) - (centerType === 'mouse' ? eventX : (containerW / 2));
-				setZoomLevel(newZoom);
-			};
+    useEffect(() => {
+        if (validData.length > 1 && wrapperRef.current && !dragRef.current.isDragging && activeIndex !== prevActiveIndexRef.current) {
+            prevActiveIndexRef.current = activeIndex;
+            if (zoomLock === 'hard') return; 
+            
+            const timeoutId = setTimeout(() => {
+                const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+                if (activeDataIndex >= 0) {
+                    if (zoomLock === 'auto') {
+                        let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
+                        let clusterMax = validData.at(activeDataIndex).endDate && !isNaN(validData.at(activeDataIndex).endDate.max) ? validData.at(activeDataIndex).endDate.max : validData.at(activeDataIndex).startDate.min;
+                        for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
+                            const node = validData.at(i);
+                            clusterMax = Math.max(clusterMax, node.startDate.min);
+                            clusterMin = Math.min(clusterMin, node.startDate.min);
+                        }
+                        const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
+                        const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
+                        scrollTargetPayloadRef.current = activeIndex;
+                        setZoomLevel(clampedZoom);
+                    } else {
+                        if (zoomLock === 'soft') setZoomLock('auto');
+                        scrollTargetPayloadRef.current = activeIndex;
+                        setZoomLevel(z => z + 0.000001);
+                    }
+                }
+            }, 500);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [activeIndex, data, zoomLock, setZoomLock]);
 
-			const onDown = (e) => {
-				if (zoomLock !== 'hard') setZoomLock('soft');
-				if (e.touches && e.touches.length === 2) {
-					const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
-					touchZoomRef.current = { initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY), initialZoom: zoomLevel };
-					return;
-				}
-				const t1 = e.touches ? Array.from(e.touches).at(0) : e;
-				const x = t1.clientX;
-				dragRef.current = { isDragging: true, startX: x - wrapperRef.current.offsetLeft, scrollLeft: wrapperRef.current.scrollLeft };
-				wrapperRef.current.classList.add('is-dragging');
-			};
+    useLayoutEffect(() => {
+        if (scrollTargetPayloadRef.current !== null && wrapperRef.current) {
+            const containerW = wrapperRef.current.clientWidth;
+            const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+            let targetScrollPos = 0;
+            if (typeof scrollTargetPayloadRef.current === 'number') {
+                targetScrollPos = getExactNodeScrollPos(scrollTargetPayloadRef.current, trackWidthPx, containerW);
+            } else {
+                targetScrollPos = scrollTargetPayloadRef.current;
+            }
+            wrapperRef.current.scrollTo({ left: targetScrollPos, behavior: 'auto' });
+            scrollTargetPayloadRef.current = null;
+        }
+    }, [zoomLevel]);
 
-			const onUp = () => { dragRef.current.isDragging = false; wrapperRef.current?.classList.remove('is-dragging'); };
+    const handleManualZoom = (newZoom, centerType = 'center', eventX = 0) => {
+        if (!wrapperRef.current) return;
+        const containerW = wrapperRef.current.clientWidth; const scrollPos = wrapperRef.current.scrollLeft;
+        const anchorPx = centerType === 'mouse' ? scrollPos + eventX : scrollPos + (containerW / 2);
+        const centerPct = anchorPx / Math.max(containerW, containerW * zoomLevel);
+        scrollTargetPayloadRef.current = (centerPct * Math.max(containerW, containerW * newZoom)) - (centerType === 'mouse' ? eventX : (containerW / 2));
+        setZoomLevel(newZoom);
+    };
 
-			const onMove = (e) => {
-				if (e.touches && e.touches.length === 2) {
-					e.preventDefault();
-					const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
-					const scale = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY) / touchZoomRef.current.initialDist;
-					handleManualZoom(Math.min(Math.max(touchZoomRef.current.initialZoom * scale, 1), 500), 'center');
-					return;
-				}
-				if (!dragRef.current.isDragging) return;
-				if (!e.touches) e.preventDefault();
-				const t1 = e.touches ? Array.from(e.touches).at(0) : e;
-				wrapperRef.current.scrollLeft = dragRef.current.scrollLeft - ((t1.clientX - wrapperRef.current.offsetLeft - dragRef.current.startX) * 2);
-			};
+    const handleNodeClick = (globalIdx) => { if (!dragRef.current.hasDragged) setActiveIndex(globalIdx); };
 
-			const onWheel = (e) => {
-				e.preventDefault();
-				if (zoomLock !== 'hard') setZoomLock('soft');
-				handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1), 'mouse', e.clientX - wrapperRef.current.getBoundingClientRect().left);
-			};
+    const onDown = (e) => {
+        if (zoomLock !== 'hard') setZoomLock('soft');
+        if (e.touches && e.touches.length === 2) {
+            const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
+            touchZoomRef.current = { initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY), initialZoom: zoomLevel };
+            return;
+        }
+        const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+        dragRef.current = { isDragging: true, startX: t1.clientX, scrollLeft: wrapperRef.current.scrollLeft, hasDragged: false };
+        wrapperRef.current.classList.add('is-dragging');
+        if (caliperTooltip) setCaliperTooltip(null);
+    };
 
-			const onScroll = () => {
-				if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-				scrollTimeout.current = setTimeout(() => { if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft); }, 100);
-			};
+    const onUp = () => { dragRef.current.isDragging = false; wrapperRef.current?.classList.remove('is-dragging'); };
 
-			if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
+    const onMove = (e) => {
+        if (e.touches && e.touches.length === 2) {
+            e.preventDefault();
+            const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
+            const scale = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY) / touchZoomRef.current.initialDist;
+            handleManualZoom(Math.min(Math.max(touchZoomRef.current.initialZoom * scale, 1), 500), 'center');
+            return;
+        }
+        if (!dragRef.current.isDragging) return;
+        if (!e.touches) e.preventDefault();
+        const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+        const deltaX = t1.clientX - dragRef.current.startX;
+        if (Math.abs(deltaX) > 5) dragRef.current.hasDragged = true;
+        wrapperRef.current.scrollLeft = dragRef.current.scrollLeft - (deltaX * 2);
+    };
 
-			const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
-			const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
-			const visibleTimeSpanMs = renderTimeRange / zoomLevel;
-			const spansMultipleDays = visibleTimeSpanMs > 86400000;
-			const targetMsPerMajorTick = Math.max((120 / containerW) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
-			const SECOND = 1000; const MINUTE = 60 * SECOND; const HOUR = 60 * MINUTE; const DAY = 24 * HOUR; const MONTH = 30 * DAY; const YEAR = 365.25 * DAY;
+    const onWheel = (e) => {
+        e.preventDefault();
+        if (zoomLock !== 'hard') setZoomLock('soft');
+        handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 500) : Math.max(zoomLevel / 1.5, 1), 'mouse', e.clientX - wrapperRef.current.getBoundingClientRect().left);
+    };
 
-			const scaleConfigs = [
-				{ ms: 1000 * YEAR, type: 'year', step: 1000, minorType: 'year', minorStep: 100, minorCount: 10 },
-				{ ms: 100 * YEAR, type: 'year', step: 100, minorType: 'year', minorStep: 10, minorCount: 10 },
-				{ ms: 10 * YEAR, type: 'year', step: 10, minorType: 'year', minorStep: 1, minorCount: 10 },
-				{ ms: 2 * YEAR, type: 'year', step: 2, minorType: 'month', minorStep: 2, minorCount: 12 },
-				{ ms: YEAR, type: 'year', step: 1, minorType: 'month', minorStep: 1, minorCount: 12 },
-				{ ms: 6 * MONTH, type: 'month', step: 6, minorType: 'month', minorStep: 1, minorCount: 6 },
-				{ ms: 3 * MONTH, type: 'month', step: 3, minorType: 'day', minorStep: 10, minorCount: 9 },
-				{ ms: MONTH, type: 'month', step: 1, minorType: 'day', minorStep: 5, minorCount: 6 },
-				{ ms: 14 * DAY, type: 'day', step: 14, minorType: 'day', minorStep: 2, minorCount: 7 },
-				{ ms: 7 * DAY, type: 'day', step: 7, minorType: 'day', minorStep: 1, minorCount: 7 },
-				{ ms: 2 * DAY, type: 'day', step: 2, minorType: 'hour', minorStep: 4, minorCount: 12 },
-				{ ms: DAY, type: 'day', step: 1, minorType: 'hour', minorStep: 3, minorCount: 8 },
-				{ ms: 12 * HOUR, type: 'hour', step: 12, minorType: 'hour', minorStep: 1, minorCount: 12 },
-				{ ms: 6 * HOUR, type: 'hour', step: 6, minorType: 'hour', minorStep: 1, minorCount: 6 },
-				{ ms: 2 * HOUR, type: 'hour', step: 2, minorType: 'minute', minorStep: 15, minorCount: 8 },
-				{ ms: HOUR, type: 'hour', step: 1, minorType: 'minute', minorStep: 10, minorCount: 6 },
-				{ ms: 30 * MINUTE, type: 'minute', step: 30, minorType: 'minute', minorStep: 5, minorCount: 6 },
-				{ ms: 15 * MINUTE, type: 'minute', step: 15, minorType: 'minute', minorStep: 1, minorCount: 15 },
-				{ ms: 10 * MINUTE, type: 'minute', step: 10, minorType: 'minute', minorStep: 1, minorCount: 10 },
-				{ ms: 5 * MINUTE, type: 'minute', step: 5, minorType: 'minute', minorStep: 1, minorCount: 5 },
-				{ ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
-			];
+    const onScroll = () => {
+        if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        scrollTimeout.current = setTimeout(() => { if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft); }, 100);
+    };
 
-			let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
+    // [REF: TL-34] Cursor-Relative Tooltip Clamping
+    const handleCaliperEnter = (e, item) => {
+        lastMouseXRef.current = e.clientX;
+        hoverTimeoutRef.current = setTimeout(() => {
+            if (!wrapperRef.current) return;
+            const containerWidth = wrapperRef.current.clientWidth;
+            const rect = wrapperRef.current.getBoundingClientRect();
+            let trackX = lastMouseXRef.current - rect.left;
+            trackX = Math.max(125, Math.min(trackX, containerWidth - 125));
+            const absoluteX = wrapperRef.current.scrollLeft + trackX;
+            const itemStart = item.startDate.min;
+            const itemEnd = item.endDate && !isNaN(item.endDate.max) ? item.endDate.max : itemStart;
+            const overlaps = validData.filter(d => {
+                if (d.id === item.id) return false;
+                const dStart = d.startDate.min;
+                const dEnd = d.endDate && !isNaN(d.endDate.max) ? d.endDate.max : dStart;
+                return (dStart <= itemEnd && dEnd >= itemStart);
+            });
+            setCaliperTooltip({ id: item.id, x: absoluteX, title: safeStripHTML(item.title), durationMs: itemEnd - itemStart, overlaps: overlaps.map(o => safeStripHTML(o.title)) });
+        }, 350);
+    };
 
-			const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
-			const visibleRightMs = renderMinTime + ((viewLeftEdge + containerW) / trackWidthPx) * renderTimeRange;
-			const viewportCenterMs = visibleLeftMs + ((visibleRightMs - visibleLeftMs) / 2);
+    const handleCaliperMove = (e, item) => {
+        lastMouseXRef.current = e.clientX;
+        if (caliperTooltip && caliperTooltip.id === item.id && wrapperRef.current) {
+            const containerWidth = wrapperRef.current.clientWidth;
+            const rect = wrapperRef.current.getBoundingClientRect();
+            let trackX = e.clientX - rect.left;
+            trackX = Math.max(125, Math.min(trackX, containerWidth - 125));
+            setCaliperTooltip(prev => ({...prev, x: wrapperRef.current.scrollLeft + trackX}));
+        }
+    };
 
-			useEffect(() => {
-				if (setVisibleTimeBounds && !isNaN(visibleLeftMs) && !isNaN(visibleRightMs)) {
-					setVisibleTimeBounds([visibleLeftMs, visibleRightMs]);
-				}
-			}, [visibleLeftMs, visibleRightMs, setVisibleTimeBounds]);
+    const handleCaliperLeave = () => {
+        if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+        setCaliperTooltip(null);
+    };
 
-			let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
-			iterDate.setMilliseconds(0);
+    // --- [ SubBlock: Axes & Tick Geometry ] ---
+    if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
 
-			if (activeScale.type === 'year') {
-				iterDate.setMonth(0, 1); iterDate.setHours(0, 0, 0, 0); iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step);
-			} else if (activeScale.type === 'month') {
-				iterDate.setDate(1); iterDate.setHours(0, 0, 0, 0); iterDate.setMonth(Math.floor(iterDate.getMonth() / activeScale.step) * activeScale.step);
-			} else if (activeScale.type === 'day') {
-				iterDate.setHours(0, 0, 0, 0); iterDate.setDate(Math.floor((iterDate.getDate() - 1) / activeScale.step) * activeScale.step + 1);
-			} else if (activeScale.type === 'hour') {
-				iterDate.setMinutes(0, 0, 0); iterDate.setHours(Math.floor(iterDate.getHours() / activeScale.step) * activeScale.step);
-			} else if (activeScale.type === 'minute') {
-				iterDate.setSeconds(0, 0); iterDate.setMinutes(Math.floor(iterDate.getMinutes() / activeScale.step) * activeScale.step);
-			}
+    const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+    const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+    const visibleTimeSpanMs = renderTimeRange / zoomLevel;
+    const spansMultipleDays = visibleTimeSpanMs > 86400000;
+    const targetMsPerMajorTick = Math.max((120 / containerW) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
+    const SECOND = 1000; const MINUTE = 60 * SECOND; const HOUR = 60 * MINUTE; const DAY = 24 * HOUR; const MONTH = 30 * DAY; const YEAR = 365.25 * DAY;
 
-			let safety = 0;
-			const stopTime = Math.min(renderMaxTime, visibleRightMs + (activeScale.ms * 2));
-			const majorTicksData = []; const minorTicksData = [];
+    const scaleConfigs = [
+        { ms: 1000 * YEAR, type: 'year', step: 1000, minorType: 'year', minorStep: 100, minorCount: 10 },
+        { ms: 100 * YEAR, type: 'year', step: 100, minorType: 'year', minorStep: 10, minorCount: 10 },
+        { ms: 10 * YEAR, type: 'year', step: 10, minorType: 'year', minorStep: 1, minorCount: 10 },
+        { ms: 2 * YEAR, type: 'year', step: 2, minorType: 'month', minorStep: 2, minorCount: 12 },
+        { ms: YEAR, type: 'year', step: 1, minorType: 'month', minorStep: 1, minorCount: 12 },
+        { ms: 6 * MONTH, type: 'month', step: 6, minorType: 'month', minorStep: 1, minorCount: 6 },
+        { ms: 3 * MONTH, type: 'month', step: 3, minorType: 'day', minorStep: 10, minorCount: 9 },
+        { ms: MONTH, type: 'month', step: 1, minorType: 'day', minorStep: 5, minorCount: 6 },
+        { ms: 14 * DAY, type: 'day', step: 14, minorType: 'day', minorStep: 2, minorCount: 7 },
+        { ms: 7 * DAY, type: 'day', step: 7, minorType: 'day', minorStep: 1, minorCount: 7 },
+        { ms: 2 * DAY, type: 'day', step: 2, minorType: 'hour', minorStep: 4, minorCount: 12 },
+        { ms: DAY, type: 'day', step: 1, minorType: 'hour', minorStep: 3, minorCount: 8 },
+        { ms: 12 * HOUR, type: 'hour', step: 12, minorType: 'hour', minorStep: 1, minorCount: 12 },
+        { ms: 6 * HOUR, type: 'hour', step: 6, minorType: 'hour', minorStep: 1, minorCount: 6 },
+        { ms: 2 * HOUR, type: 'hour', step: 2, minorType: 'minute', minorStep: 15, minorCount: 8 },
+        { ms: HOUR, type: 'hour', step: 1, minorType: 'minute', minorStep: 10, minorCount: 6 },
+        { ms: 30 * MINUTE, type: 'minute', step: 30, minorType: 'minute', minorStep: 5, minorCount: 6 },
+        { ms: 15 * MINUTE, type: 'minute', step: 15, minorType: 'minute', minorStep: 1, minorCount: 15 },
+        { ms: 10 * MINUTE, type: 'minute', step: 10, minorType: 'minute', minorStep: 1, minorCount: 10 },
+        { ms: 5 * MINUTE, type: 'minute', step: 5, minorType: 'minute', minorStep: 1, minorCount: 5 },
+        { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
+    ];
 
-			while (iterDate.getTime() <= stopTime && safety < 1000) {
-				safety++; const t = iterDate.getTime();
-				if (t >= renderMinTime) {
-					const pctLeft = ((t - renderMinTime) / renderTimeRange) * 100;
-					majorTicksData.push({ t, pctLeft, date: new Date(iterDate) });
-				}
-				let nextMajor = new Date(iterDate);
-				if (activeScale.type === 'year') nextMajor.setFullYear(nextMajor.getFullYear() + activeScale.step);
-				else if (activeScale.type === 'month') nextMajor.setMonth(nextMajor.getMonth() + activeScale.step);
-				else if (activeScale.type === 'day') nextMajor.setDate(nextMajor.getDate() + activeScale.step);
-				else if (activeScale.type === 'hour') nextMajor.setHours(nextMajor.getHours() + activeScale.step);
-				else if (activeScale.type === 'minute') nextMajor.setMinutes(nextMajor.getMinutes() + activeScale.step);
+    let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
 
-				let minorIter = new Date(iterDate); let minorSafety = 0; let minorIndex = 0;
-				while (minorSafety < 100) {
-					minorSafety++; minorIndex++;
-					if (activeScale.minorType === 'year') minorIter.setFullYear(minorIter.getFullYear() + activeScale.minorStep);
-					else if (activeScale.minorType === 'month') minorIter.setMonth(minorIter.getMonth() + activeScale.minorStep);
-					else if (activeScale.minorType === 'day') minorIter.setDate(minorIter.getDate() + activeScale.minorStep);
-					else if (activeScale.minorType === 'hour') minorIter.setHours(minorIter.getHours() + activeScale.minorStep);
-					else if (activeScale.minorType === 'minute') minorIter.setMinutes(minorIter.getMinutes() + activeScale.minorStep);
-					else if (activeScale.minorType === 'second') minorIter.setSeconds(minorIter.getSeconds() + activeScale.minorStep);
+    const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
+    const visibleRightMs = renderMinTime + ((viewLeftEdge + containerW) / trackWidthPx) * renderTimeRange;
+    const viewportCenterMs = visibleLeftMs + ((visibleRightMs - visibleLeftMs) / 2);
 
-					if (minorIter.getTime() >= nextMajor.getTime()) break;
-					const minorT = minorIter.getTime();
-					if (minorT >= renderMinTime && minorT <= renderMaxTime) {
-						const minorTickPx = (((minorT - renderMinTime) / renderTimeRange)) * trackWidthPx;
-						const majorPx = ((t - renderMinTime) / renderTimeRange) * trackWidthPx;
-						const nextMajorPx = ((nextMajor.getTime() - renderMinTime) / renderTimeRange) * trackWidthPx;
-						minorTicksData.push({ t: minorT, px: minorTickPx, majorPx, nextMajorPx, date: new Date(minorIter), minorIndex });
-					}
-				}
-				iterDate = nextMajor;
-			}
+    useEffect(() => {
+        if (setVisibleTimeBounds && !isNaN(visibleLeftMs) && !isNaN(visibleRightMs)) setVisibleTimeBounds([visibleLeftMs, visibleRightMs]);
+    }, [visibleLeftMs, visibleRightMs, setVisibleTimeBounds]);
 
-			let centerTickIndex = -1; let minDist = Infinity;
-			majorTicksData.forEach((d, i) => {
-				if (d.t >= visibleLeftMs && d.t <= visibleRightMs) {
-					const dist = Math.abs(d.t - viewportCenterMs);
-					if (dist < minDist) { minDist = dist; centerTickIndex = i; }
-				}
-			});
+    let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
+    iterDate.setMilliseconds(0);
 
-			const centerTickPx = centerTickIndex !== -1 ? (majorTicksData.at(centerTickIndex).pctLeft / 100) * trackWidthPx : -1000;
-			const centerKeepout = 65;
+    if (activeScale.type === 'year') { iterDate.setMonth(0, 1); iterDate.setHours(0, 0, 0, 0); iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step); }
+    else if (activeScale.type === 'month') { iterDate.setDate(1); iterDate.setHours(0, 0, 0, 0); iterDate.setMonth(Math.floor(iterDate.getMonth() / activeScale.step) * activeScale.step); }
+    else if (activeScale.type === 'day') { iterDate.setHours(0, 0, 0, 0); iterDate.setDate(Math.floor((iterDate.getDate() - 1) / activeScale.step) * activeScale.step + 1); }
+    else if (activeScale.type === 'hour') { iterDate.setMinutes(0, 0, 0); iterDate.setHours(Math.floor(iterDate.getHours() / activeScale.step) * activeScale.step); }
+    else if (activeScale.type === 'minute') { iterDate.setSeconds(0, 0); iterDate.setMinutes(Math.floor(iterDate.getMinutes() / activeScale.step) * activeScale.step); }
 
-			const rulerTicksHTML = majorTicksData.map((d, i) => {
-				let label = ''; const tickPx = (d.pctLeft / 100) * trackWidthPx;
-				if (i === centerTickIndex) {
-					label = d.date.toLocaleString(dateLocale, {
-						day: '2-digit', month: 'short', year: 'numeric',
-						hour: (activeScale.type === 'hour' || activeScale.type === 'minute') ? '2-digit' : undefined,
-						minute: (activeScale.type === 'hour' || activeScale.type === 'minute') ? '2-digit' : undefined
-					});
-				} else if (Math.abs(tickPx - centerTickPx) > centerKeepout) {
-					if (activeScale.type === 'year') label = d.date.getFullYear();
-					else if (activeScale.type === 'month') label = d.date.toLocaleString(dateLocale, { month: 'short', year: 'numeric' });
-					else if (activeScale.type === 'day') label = d.date.toLocaleString(dateLocale, { day: 'numeric', month: 'short' });
-					else if (activeScale.type === 'hour' || activeScale.type === 'minute') {
-						if (spansMultipleDays && d.date.getHours() === 0 && d.date.getMinutes() === 0) label = d.date.toLocaleString(dateLocale, { day: 'numeric', month: 'short' });
-						else label = d.date.getMinutes() === 0 ? d.date.getHours().toString() : ':' + d.date.getMinutes().toString().padStart(2, '0');
-					}
-				}
-				return html`
-				<div class="timeline-ruler-tick" style="left: ${d.pctLeft}%;">
-					<div style="width: 2px; height: 10px; background: #666; margin-bottom: 2px;"></div>
-					<div style="font-size: 0.75rem; white-space: nowrap; font-weight: normal; color: #444;">${label}</div>
-				</div>
-				`;
-			});
+    let safety = 0;
+    const stopTime = Math.min(renderMaxTime, visibleRightMs + (activeScale.ms * 2));
+    const majorTicksData = []; const minorTicksData = [];
 
-			const minorTicksHTML = minorTicksData.map(m => {
-				const distCurrent = Math.abs(m.px - m.majorPx); const distNext = Math.abs(m.px - m.nextMajorPx); const distCenter = Math.abs(m.px - centerTickPx);
-				let hideMinor = distCurrent < 35 || distNext < 35;
-				let showLabelText = false;
-				if (!hideMinor && distCurrent > 20) {
-					if (activeScale.minorCount % 2 === 0) showLabelText = (m.minorIndex % 2 === 0);
-					else showLabelText = (m.minorIndex === Math.floor(activeScale.minorCount / 2));
-				}
-				let minorLabel = '';
-				if (showLabelText && distCenter > centerKeepout) {
-					if (activeScale.minorType === 'year') minorLabel = m.date.getFullYear();
-					else if (activeScale.minorType === 'month') minorLabel = m.date.toLocaleString(dateLocale, { month: 'short' });
-					else if (activeScale.minorType === 'day') minorLabel = m.date.getDate();
-					else if (activeScale.minorType === 'hour' || activeScale.minorType === 'minute') {
-						minorLabel = m.date.getMinutes() === 0 ? m.date.getHours().toString() : ':' + m.date.getMinutes().toString().padStart(2, '0');
-					}
-				}
-				if (m.px >= viewLeftEdge - 50 && m.px <= viewLeftEdge + containerW + 50) {
-					return html`
-					<div style="position: absolute; left: ${((m.t - renderMinTime) / renderTimeRange) * 100}%; top: 0; width: 1px; height: ${minorLabel ? '7px' : '5px'}; background: #aaa; z-index: 4;">
-						${minorLabel ? html`<div style="position: absolute; left: -20px; right: -20px; top: 7px; text-align: center; font-size: 0.6rem; color: #888; letter-spacing: -0.5px;">${minorLabel}</div>` : ''}
-					</div>
-					`;
-				}
-				return null;
-			});
+    while (iterDate.getTime() <= stopTime && safety < 1000) {
+        safety++; const t = iterDate.getTime();
+        if (t >= renderMinTime) majorTicksData.push({ t, pctLeft: ((t - renderMinTime) / renderTimeRange) * 100, date: new Date(iterDate) });
 
-			const stackRegistry = {};
-			const markers = validData.map((item, index) => {
-				const globalIndex = data.findIndex(d => d.id === item.id);
-				const startPct = Number((((item.startDate.min - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-				const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
-				const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
+        let nextMajor = new Date(iterDate);
+        if (activeScale.type === 'year') nextMajor.setFullYear(nextMajor.getFullYear() + activeScale.step);
+        else if (activeScale.type === 'month') nextMajor.setMonth(nextMajor.getMonth() + activeScale.step);
+        else if (activeScale.type === 'day') nextMajor.setDate(nextMajor.getDate() + activeScale.step);
+        else if (activeScale.type === 'hour') nextMajor.setHours(nextMajor.getHours() + activeScale.step);
+        else if (activeScale.type === 'minute') nextMajor.setMinutes(nextMajor.getMinutes() + activeScale.step);
 
-				const stackKey = `${item.startDate.min}_${laneIdx}`;
-				if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
-				const stackDepth = stackRegistry[stackKey];
-				stackRegistry[stackKey]++;
-				const xOffset = stackDepth * 6; const yOffset = stackDepth * 4;
+        let minorIter = new Date(iterDate); let minorSafety = 0; let minorIndex = 0;
+        while (minorSafety < 100) {
+            minorSafety++; minorIndex++;
+            if (activeScale.minorType === 'year') minorIter.setFullYear(minorIter.getFullYear() + activeScale.minorStep);
+            else if (activeScale.minorType === 'month') minorIter.setMonth(minorIter.getMonth() + activeScale.minorStep);
+            else if (activeScale.minorType === 'day') minorIter.setDate(minorIter.getDate() + activeScale.minorStep);
+            else if (activeScale.minorType === 'hour') minorIter.setHours(minorIter.getHours() + activeScale.minorStep);
+            else if (activeScale.minorType === 'minute') minorIter.setMinutes(minorIter.getMinutes() + activeScale.minorStep);
+            else if (activeScale.minorType === 'second') minorIter.setSeconds(minorIter.getSeconds() + activeScale.minorStep);
 
-				let endPct = startPct;
-				if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > item.startDate.min) {
-					endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-				}
+            if (minorIter.getTime() >= nextMajor.getTime()) break;
+            const minorT = minorIter.getTime();
+            if (minorT >= renderMinTime && minorT <= renderMaxTime) {
+                const minorTickPx = (((minorT - renderMinTime) / renderTimeRange)) * trackWidthPx;
+                const majorPx = ((t - renderMinTime) / renderTimeRange) * trackWidthPx;
+                const nextMajorPx = ((nextMajor.getTime() - renderMinTime) / renderTimeRange) * trackWidthPx;
+                minorTicksData.push({ t: minorT, px: minorTickPx, majorPx, nextMajorPx, date: new Date(minorIter), minorIndex });
+            }
+        }
+        iterDate = nextMajor;
+    }
 
-				const hasDuration = (endPct - startPct) > 0.001;
-				const isActive = globalIndex === activeIndex;
-				const topPos = (laneIdx * laneHeight) + 5;
-				const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
-				const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
-				const hasMedia = item.media && item.media.length > 0;
+    let centerTickIndex = -1; let minDist = Infinity;
+    majorTicksData.forEach((d, i) => {
+        if (d.t >= visibleLeftMs && d.t <= visibleRightMs) {
+            const dist = Math.abs(d.t - viewportCenterMs);
+            if (dist < minDist) { minDist = dist; centerTickIndex = i; }
+        }
+    });
 
-				let xAxisMarker = ''; let isDashed = false; let isApprox = false;
+    const centerTickPx = centerTickIndex !== -1 ? (majorTicksData.at(centerTickIndex).pctLeft / 100) * trackWidthPx : -1000;
+    const centerKeepout = 65;
 
-				if (item.startDate.isEDTF) {
-					const obj = item.startDate.obj;
-					if (obj.approximate) isApprox = true;
-					if (obj.uncertain) isDashed = true;
-					if (obj.type === 'Set') {
-						const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-						xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 8px; background: rgba(255, 215, 0, 0.2); border: 1px dashed gold; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
-					} else if (obj.type === 'List') {
-						const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-						const subDots = obj.values.map(v => {
-							const vPct = Number((((v.min - item.startDate.min) / renderTimeRange) * trackWidthPx).toFixed(2));
-							return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: #cc0000; transform: translateX(-2px);"></div>`;
-						});
-						xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 1px; background: rgba(204,0,0,0.4); z-index: 900;">${subDots}</div>`;
-					}
-				}
+    const rulerTicksHTML = majorTicksData.map((d, i) => {
+        let label = ''; const tickPx = (d.pctLeft / 100) * trackWidthPx;
+        if (i === centerTickIndex) {
+            label = d.date.toLocaleString(dateLocale, {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: (activeScale.type === 'hour' || activeScale.type === 'minute') ? '2-digit' : undefined,
+                minute: (activeScale.type === 'hour' || activeScale.type === 'minute') ? '2-digit' : undefined
+            });
+        } else if (Math.abs(tickPx - centerTickPx) > centerKeepout) {
+            if (activeScale.type === 'year') label = d.date.getFullYear();
+            else if (activeScale.type === 'month') label = d.date.toLocaleString(dateLocale, { month: 'short', year: 'numeric' });
+            else if (activeScale.type === 'day') label = d.date.toLocaleString(dateLocale, { day: 'numeric', month: 'short' });
+            else if (activeScale.type === 'hour' || activeScale.type === 'minute') {
+                if (spansMultipleDays && d.date.getHours() === 0 && d.date.getMinutes() === 0) label = d.date.toLocaleString(dateLocale, { day: 'numeric', month: 'short' });
+                else label = d.date.getMinutes() === 0 ? d.date.getHours().toString() : ':' + d.date.getMinutes().toString().padStart(2, '0');
+            }
+        }
+        return html`<div class="timeline-ruler-tick" style="left: ${d.pctLeft}%;"><div style="width: 2px; height: 10px; background: #666; margin-bottom: 2px;"></div><div style="font-size: 0.75rem; white-space: nowrap; font-weight: normal; color: #444;">${label}</div></div>`;
+    });
 
-				if (!xAxisMarker) {
-					if (hasDuration) {
-						const gradStyle = (item.endDate && item.endDate.isEDTF && item.endDate.isOpen)
-							? `background: linear-gradient(90deg, ${isActive ? 'rgba(0,122,204,0.6)' : 'rgba(204,0,0,0.4)'} 0%, transparent 100%);`
-							: `background: ${isActive ? 'rgba(0,122,204,0.4)' : 'rgba(204,0,0,0.3)'}; border: 1px solid ${isActive ? '#007acc' : '#cc0000'};`;
-						xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 2px; height: 6px; ${gradStyle} clip-path: polygon(0 0, 100% calc(100% - 5px), 100% 100%, 0 100%); z-index: 900;"></div>`;
-					} else {
-						let styleStr = `position: absolute; bottom: 0; left: -3px; width: 6px; height: 6px; border-radius: 50%; z-index: 900; box-sizing: content-box; `;
-						if (isApprox) styleStr += `background: radial-gradient(circle, gold 40%, transparent 100%); border: none; `;
-						else styleStr += `background: ${isActive ? '#007acc' : '#cc0000'}; `;
-						if (isDashed) styleStr += `border: 2px dashed #ff4500; background: transparent; `;
-						else if (!isApprox) styleStr += `border: 1px solid #fff; `;
-						xAxisMarker = html`<div style="${styleStr}"></div>`;
-					}
-				}
+    const minorTicksHTML = minorTicksData.map(m => {
+        const distCurrent = Math.abs(m.px - m.majorPx); const distNext = Math.abs(m.px - m.nextMajorPx); const distCenter = Math.abs(m.px - centerTickPx);
+        let hideMinor = distCurrent < 35 || distNext < 35; let showLabelText = false;
+        if (!hideMinor && distCurrent > 20) {
+            if (activeScale.minorCount % 2 === 0) showLabelText = (m.minorIndex % 2 === 0);
+            else showLabelText = (m.minorIndex === Math.floor(activeScale.minorCount / 2));
+        }
+        let minorLabel = '';
+        if (showLabelText && distCenter > centerKeepout) {
+            if (activeScale.minorType === 'year') minorLabel = m.date.getFullYear();
+            else if (activeScale.minorType === 'month') minorLabel = m.date.toLocaleString(dateLocale, { month: 'short' });
+            else if (activeScale.minorType === 'day') minorLabel = m.date.getDate();
+            else if (activeScale.minorType === 'hour' || activeScale.minorType === 'minute') minorLabel = m.date.getMinutes() === 0 ? m.date.getHours().toString() : ':' + m.date.getMinutes().toString().padStart(2, '0');
+        }
+        if (m.px >= viewLeftEdge - 50 && m.px <= viewLeftEdge + containerW + 50) {
+            return html`<div style="position: absolute; left: ${((m.t - renderMinTime) / renderTimeRange) * 100}%; top: 0; width: 1px; height: ${minorLabel ? '7px' : '5px'}; background: #aaa; z-index: 4;">${minorLabel ? html`<div style="position: absolute; left: -20px; right: -20px; top: 7px; text-align: center; font-size: 0.6rem; color: #888; letter-spacing: -0.5px;">${minorLabel}</div>` : ''}</div>`;
+        }
+        return null;
+    });
 
-				return html`
-				<div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => setActiveIndex(globalIndex)}>
-					${isActive ? html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: #007acc; z-index: 999;"></div>` : ''}
-					${xAxisMarker}
-					<div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; background: ${isActive ? '#007acc' : '#f4f4f5'}; color: ${isActive ? '#fff' : '#444'}; z-index: 5; width: ${pxWidth}px;">
-						${hasMedia ? html`<svg style="position: absolute; left: 2px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>` : ''}
-						<div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
-							${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
-						</div>
-					</div>
-				</div>
-				`;
-			});
+    // --- [ SubBlock: DOM Markers & Heat-Glow ] ---
+    const stackRegistry = {};
+    const viewPadMs = visibleTimeSpanMs * 0.5;
+    const activeItemData = data[activeIndex];
+    const activeDataNode = validData.find(d => d.id === activeItemData?.id);
+    const isSuspended = !activeDataNode;
 
-			return html`
-			<div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
-				<div class="timeline-control-cluster" style="top: 15px; flex-direction: row; height: 24px;">
-					<button class="status-btn" style="border: none; border-right: 1px solid #eee; border-radius: 0;" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-					</button>
-					<button class="status-btn ${isTimelineExpanded ? 'active' : ''}" style="border: none; border-radius: 0;" onClick=${() => {
-						if (!isTimelineExpanded) {
-							const appNode = document.getElementById('app-layout');
-							if(appNode) appNode.style.setProperty('--timeline-height', `${timelineRequiredHeight}px`);
-							setIsTimelineExpanded(true);
-						} else {
-							const appNode = document.getElementById('app-layout');
-							if(appNode) appNode.style.setProperty('--timeline-height', '10%');
-							setIsTimelineExpanded(false);
-						}
-					}} title=${isTimelineExpanded ? "Restore Layout" : "Maximize Timeline"}>
-						${isTimelineExpanded
-							? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
-							: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
-						}
-					</button>
-				</div>
+    const markers = validData.map((item, index) => {
+        const itemStartMs = item.startDate.min;
+        const itemEndMs = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : itemStartMs;
+        if (itemEndMs < (visibleLeftMs - viewPadMs) || itemStartMs > (visibleRightMs + viewPadMs)) return null;
 
-				<div class="timeline-control-cluster temporal" style="top: 45px; width: 24px;">
-					<button class="status-btn" style="border: none; border-bottom: 1px solid #eee; border-radius: 0;" onClick=${() => { if(zoomLock!=='hard') setZoomLock('soft'); handleManualZoom(Math.min(zoomLevel * 1.5, 500), 'center'); }} title="Zoom In">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-					</button>
-					<div class="zoom-factor" style="height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #222; background: #fff; border-bottom: 1px solid #eee; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px; margin: 0; padding: 0;" title="Current Zoom Factor">${Math.round(zoomLevel)}x</div>
-					<button class="status-btn" style="border: none; border-bottom: 1px solid #eee; border-radius: 0;" onClick=${() => { if(zoomLock!=='hard') setZoomLock('soft'); handleManualZoom(Math.max(zoomLevel / 1.5, 1), 'center'); }} title="Zoom Out">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-					</button>
-					<button class="status-btn" style="border: none; border-radius: 0;" onClick=${() => setZoomLock(p => p === 'hard' ? 'auto' : 'hard')} title="Toggle Auto-Zoom Lock">
-						${zoomLock === 'hard'
-							? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
-							: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`
-						}
-					</button>
-				</div>
+        const globalIndex = data.findIndex(d => d.id === item.id);
+        const startPct = Number((((itemStartMs - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
+        const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
+        
+        const stackKey = `${itemStartMs}_${laneIdx}`;
+        if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
+        const stackDepth = stackRegistry[stackKey];
+        stackRegistry[stackKey]++;
+        
+        const labelXOffset = stackDepth * 6;
+        const topPos = (laneIdx * laneHeight) + 15;
+        const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
 
-				<div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
-					<div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box;">
-						<div style="position: absolute; top: 5px; left: 0; right: 0; bottom: 33px; pointer-events: none; z-index: 0;">
-							${orderedTags.map((tag, i) => html`
-							<div class="tag-lane" style="top: ${i * laneHeight}px; height: ${laneHeight}px; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'transparent'};">
-								<div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; pointer-events: auto;">${tag}</div>
-							</div>
-							`)}
-						</div>
-						<div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5;">
-							${rulerTicksHTML}
-							${minorTicksHTML}
-						</div>
-						${markers}
-					</div>
-				</div>
-			</div>
-			`;
-		};
-		MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.0';
-		// === [ END MAJOR BLOCK ] ===
+        let endPct = startPct;
+        if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        const hasDuration = (endPct - startPct) > 0.001;
+
+        const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
+        const hasMedia = item.media && item.media.length > 0;
+        const isApproxStart = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.approximate;
+        const isApproxEnd = item.endDate && item.endDate.isEDTF && item.endDate.obj && item.endDate.obj.approximate;
+        const isActive = globalIndex === activeIndex;
+
+        // [REF: UI-193] CSS Hex Variables (Anti-Black Line Bug)
+        const colActive = 'var(--tm-active, #0066cc)';
+        const colApprox = 'var(--tm-approx, #E65100)';
+        const colInactive = 'var(--tm-inactive, #78909C)';
+
+        // [REF: TL-35] Luminous Shadow Matrix
+        const glowShadowRGBVar = isApproxStart ? 'var(--tm-approx-shadow-rgb, 255, 183, 77)' : (isActive ? 'var(--tm-active-shadow-rgb, 102, 178, 255)' : 'var(--tm-inactive-shadow-rgb, 176, 190, 197)');
+        const heatShadow = stackDepth > 0 ? `box-shadow: 0 0 ${stackDepth * 2}px ${stackDepth * 0.25}px rgba(${glowShadowRGBVar}, 0.8);` : '';
+
+        let xAxisMarker = '';
+        if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
+            const obj = item.startDate.obj;
+            if (obj.type === 'Set') {
+                const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+                xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 10px; background: rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.1); border: 1px dashed ${colApprox}; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
+            } else if (obj.type === 'List') {
+                const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+                const subDots = obj.values.map(v => {
+                    const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
+                    return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: ${colInactive}; transform: translateX(-2px);"></div>`;
+                });
+                xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 1px; background: rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.4); z-index: 900;">${subDots}</div>`;
+            }
+        }
+
+        if (!xAxisMarker && hasDuration) {
+            if (isActive) {
+                const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
+                const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
+                const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
+                xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+            } else {
+                const styleIdx = uniqueStarts.indexOf(itemStartMs) % 4;
+                const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
+                const borderL = isApproxStart ? `3px solid rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.6)` : `2px solid rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.6)`;
+                const borderR = isApproxEnd ? `3px solid rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.6)` : `2px solid rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.6)`;
+                const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
+                const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
+                xAxisMarker = html`
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply;">
+                    <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}"></div>
+                    <div class="hover-bridge-hitbox" 
+                         style="position: absolute; top: 0; bottom: -15px; left: -2px; right: -2px; z-index: 10; cursor: help;"
+                         onMouseEnter=${(e) => handleCaliperEnter(e, item)} 
+                         onMouseMove=${(e) => handleCaliperMove(e, item)} 
+                         onMouseLeave=${handleCaliperLeave}>
+                    </div>
+                </div>
+                `;
+            }
+        }
+
+        let dropLine = '';
+        if (isActive) {
+            if (isApproxStart) dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colApprox}; ${heatShadow} z-index: 999;"></div>`;
+            else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colActive}; ${heatShadow} z-index: 999;"></div>`;
+        } else if (!hasDuration) {
+            if (isApproxStart) dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colApprox}; ${heatShadow} z-index: 900; cursor: zoom-in;" title="Approximate Date"></div>`;
+            else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colInactive}; ${heatShadow} z-index: 900;"></div>`;
+        }
+
+        return html`
+        <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: ${startPct}%; top: calc(${topPos}px); bottom: 28px; ${hasDuration ? `width: ${endPct - startPct}%; min-width: 4px;` : `width: 0;`}" onClick=${() => handleNodeClick(globalIndex)}>
+            ${dropLine}
+            ${xAxisMarker}
+            <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: ${labelXOffset}px; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? colActive : 'var(--tm-tooltip-bg, #ffffff)'}; color: ${isActive ? '#fff' : 'var(--tm-tooltip-text, #333333)'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
+                ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>` : ''}
+                <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
+                    ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
+                </div>
+            </div>
+        </div>
+        `;
+    });
+
+    // --- [ SubBlock: Render Return ] ---
+    return html`
+    <style>
+        .event-block:hover { width: max-content !important; min-width: var(--calc-w) !important; z-index: 40 !important; }
+    </style>
+    <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
+        
+        <div class="timeline-control-cluster" style="top: 15px; flex-direction: row; height: 24px;">
+            <button class="status-btn" style="border: none; border-right: 1px solid #eee; border-radius: 0;" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <button class="status-btn ${isTimelineExpanded ? 'active' : ''}" style="border: none; border-radius: 0;" onClick=${() => {
+                if (!isTimelineExpanded) {
+                    const appNode = document.getElementById('app-layout');
+                    if(appNode) appNode.style.setProperty('--timeline-height', `${timelineRequiredHeight}px`);
+                    setIsTimelineExpanded(true);
+                } else {
+                    const appNode = document.getElementById('app-layout');
+                    if(appNode) appNode.style.setProperty('--timeline-height', '10%');
+                    setIsTimelineExpanded(false);
+                }
+            }} title=${isTimelineExpanded ? "Restore Layout" : "Maximize Timeline"}>
+                ${isTimelineExpanded
+                    ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="12" height="12" rx="1"></rect><path d="M9 3h9a1 1 0 0 1 1 1v9"></path></svg>`
+                    : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`
+                }
+            </button>
+        </div>
+
+        <div class="timeline-control-cluster temporal" style="top: 45px; width: 24px;">
+            <button class="status-btn" style="border: none; border-bottom: 1px solid #eee; border-radius: 0;" onClick=${() => { if(zoomLock!=='hard') setZoomLock('soft'); handleManualZoom(Math.min(zoomLevel * 1.5, 500), 'center'); }} title="Zoom In">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <div class="zoom-factor" style="height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #222; background: #fff; border-bottom: 1px solid #eee; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px; margin: 0; padding: 0;" title="Current Zoom Factor">${Math.round(zoomLevel)}x</div>
+            <button class="status-btn" style="border: none; border-bottom: 1px solid #eee; border-radius: 0;" onClick=${() => { if(zoomLock!=='hard') setZoomLock('soft'); handleManualZoom(Math.max(zoomLevel / 1.5, 1), 'center'); }} title="Zoom Out">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <button class="status-btn" style="border: none; border-radius: 0;" onClick=${() => setZoomLock(p => p === 'hard' ? 'auto' : 'hard')} title="Toggle Auto-Zoom Lock">
+                ${zoomLock === 'hard'
+                    ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
+                    : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`
+                }
+            </button>
+        </div>
+
+        <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
+            <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box; opacity: ${isSuspended ? '0.3' : '1'}; filter: ${isSuspended ? 'grayscale(1)' : 'none'}; pointer-events: ${isSuspended ? 'none' : 'auto'}; transition: opacity 0.5s ease, filter 0.5s ease;">
+                <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 50px; pointer-events: none; z-index: 0;">
+                    ${orderedTags.map((tag, i) => html`
+                    <div class="tag-lane" style="top: ${i * laneHeight}px; height: ${laneHeight}px; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.04)' : 'transparent'};">
+                        <div class="tag-lane-label" style="background: var(--tm-ribbon-floor, #ffffff); pointer-events: auto;">${tag}</div>
+                    </div>
+                    `)}
+                </div>
+                <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: var(--tm-ribbon-floor, #ffffff); border-top: 2px solid #999; z-index: 5;">
+                    ${rulerTicksHTML}
+                    ${minorTicksHTML}
+                </div>
+                ${markers}
+                ${caliperTooltip && html`
+                <div style="position: absolute; left: ${caliperTooltip.x}px; top: 15px; transform: translateX(-50%); background: var(--tm-tooltip-bg, #ffffff); color: var(--tm-tooltip-text, #333333); border: 1px solid #ccc; padding: 8px 12px; border-radius: 6px; z-index: 10005; font-size: 0.75rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15); max-width: 250px; white-space: normal; line-height: 1.4; max-height: calc(100% - 45px); overflow-y: auto; pointer-events: auto;">
+                    <div style="position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid var(--tm-tooltip-bg, #ffffff);"></div>
+                    <div style="font-weight: bold; color: var(--tm-active, #0066cc); margin-bottom: 4px;">${caliperTooltip.title}</div>
+                    <div style="color: #666; margin-bottom: ${caliperTooltip.overlaps.length ? '6px' : '0'}; border-bottom: ${caliperTooltip.overlaps.length ? '1px solid #eee' : 'none'}; padding-bottom: ${caliperTooltip.overlaps.length ? '4px' : '0'};">Duration: ${Math.round(caliperTooltip.durationMs / 86400000)} Days</div>
+                    ${caliperTooltip.overlaps.length > 0 ? html`
+                    <div style="font-size: 0.65rem; color: #888;">
+                        Overlaps with ${caliperTooltip.overlaps.length} event(s):<br/>
+                        ${caliperTooltip.overlaps.slice(0, 3).map(t => html`<span style="display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">• ${t}</span>`)}
+                        ${caliperTooltip.overlaps.length > 3 ? html`<span>+ ${caliperTooltip.overlaps.length - 3} more</span>` : ''}
+                    </div>
+                    ` : ''}
+                </div>
+                `}
+            </div>
+            ${isSuspended ? html`<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2000; pointer-events: none;"><div style="background: rgba(0,0,0,0.7); color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">NARRATIVE INTERLUDE</div></div>` : ''}
+        </div>
+    </div>
+    `;
+};
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
+// === [ END MAJOR BLOCK ] ===
 
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
