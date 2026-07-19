@@ -1,6 +1,20 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.0] - Universal Overhaul (Phase 1)
+
+    ✓ [Universal Button Standardization] Executed a global UI reset locking utility and status buttons to a mathematically perfect 22x22px footprint, ensuring absolute interface consistency across all viewports.
+    ✓ [Fitts's Law Mobile Protection] Implemented the "Phantom Hitbox" across all interactive elements. A pure CSS ::after pseudo-element permanently projects an invisible +8px interactive perimeter, guaranteeing flawless touch detection on small screens without bloating the visual aesthetic.
+    ✓ [Typography & Fitts's Law Upgrades] The ContentSlider has been entirely rebuilt. Invisible touch-zones (which routinely blocked native OS scrollbars) are eradicated. Narrative navigation is now driven by distinct, frosted-glass 36x36px floating chevrons anchored safely away from the scroll track.
+    ✓ [Pure Typographic Compaction] When scrolling the narrative pane, the sticky header now relies purely on aggressive typography scaling (Title shrinks to 0.95rem, Date to 0.75rem) to maximize reading space, abandoning the clunky structural resizing that previously caused janky morphing.
+    ✓ [Academic Hanging Indents] Resolved browser alignment failures within the Google Sheet's native HTML <p> tags. Lines beginning with bullet points (•, -) or conversation bubbles (💬) are automatically pulled into the left margin via a CSS text-indent engine, natively supporting tiered nested text.
+    ✓ [Title Hyperlinking] The slide's Title is now dynamically wrapped in a clean, non-obtrusive hyperlink. (Will fully activate upon Phase 2 AppOrchestrator URL integration).
+	
+[v8.10.9] - Historical Reconciliation Entry
+
+    ✓ [Baseline Lock & Version Reconciliation] This entry serves as a formal historical lock for the CarTiMap engine at Global v8.10.9, ContentSlider v4.6.1, and TimelineScrubber v26.10.0.
+    ✓ [Semantic Continuity] Future repository auditors should note that due to rapid, iterative vibe-coding and architectural prototyping in versions prior to v8.10.9, the Git commit history contains gaps and spent version numbers (e.g., v8.10.6). Under our Strict Semantic Versioning protocol [REF: VER-01], version increments generated for theoretical or retracted payloads were permanently "spent" to prevent chronological fragmentation, even if the code was ultimately vetoed prior to deployment.
+	
 [v8.10.9] - ContentSlider v4.6.1
 
     ✓ [Fitts's Law Scrollbar Fix] Resolved the phantom "dead zone" on desktop screens. The engine now dynamically detects the width of the operating system's native scrollbar and geometrically shifts the invisible tap-to-advance boundaries, guaranteeing you can cleanly grab the scrollbar on Windows without accidentally changing slides.

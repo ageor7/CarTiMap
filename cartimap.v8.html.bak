@@ -2922,7 +2922,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 		import edtf from 'https://esm.sh/edtf@4.11.0';
 
 		const html = htm.bind(h);
-		const APP_VERSION = 'v9.0.0';
+		const APP_VERSION = 'v8.11.0';
 		document.title = `CarTiMap Core - ${APP_VERSION}`;
 		const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
 		const TM_CONFIG = { paneBackground: '#fcfcfc' };
