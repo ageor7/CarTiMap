@@ -284,7 +284,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.11.5';
+        const APP_VERSION = 'v8.11.6';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1052,9 +1052,9 @@ MODULE_VERSIONS['MediaViewer'] = 'v2.13.1';
 
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: ContentSlider v5.4.1 ] 🔽🔽🔽
+// 🔽🔽🔽 [ START_INJECT: ContentSlider v5.4.2 ] 🔽🔽🔽
 
-// === [ MAJOR BLOCK: ContentSlider v5.4.1 ] ===
+// === [ MAJOR BLOCK: ContentSlider v5.4.2 ] ===
 const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, dateLocale, formatSmartDate}) => {
     const touchStartX = useRef(0);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -1077,7 +1077,8 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
         return arr.map(s => String(s).trim()).filter(Boolean);
     };
 
-    const formatPlaces = (str) => { return str ? str.split(/[|\-·;]/).map(s => s.split(',').trim()).filter(Boolean).join(' | ') : ''; };
+    // [REF: CRASH-07] Bracket Immunity via .shift()
+    const formatPlaces = (str) => { return str ? str.split(/[|\-·;]/).map(s => s.split(',').shift().trim()).filter(Boolean).join(' | ') : ''; };
 
     const tags = getParsedTags(slide.tags);
     const hasLocation = slide.place && String(slide.place).trim() !== '';
@@ -1085,15 +1086,15 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     const goPrev = () => { if (activeIndex > 0) setActiveIndex(activeIndex - 1); };
     const goNext = () => { if (activeIndex < data.length - 1) setActiveIndex(activeIndex + 1); };
 
-    // [REF: CRASH-06] The TouchList Prototype Trap (Bracket notation mandatory)
+    // [REF: CRASH-06] The TouchList Prototype Trap (Bracket Immunity via .item(0))
     const handleTouchStart = (e) => { 
         if(e.changedTouches && e.changedTouches.length > 0) {
-            touchStartX.current = e.changedTouches.screenX; 
+            touchStartX.current = e.changedTouches.item(0).screenX; 
         }
     };
     const handleTouchEnd = (e) => {
         if(e.changedTouches && e.changedTouches.length > 0) {
-            const x = e.changedTouches.screenX;
+            const x = e.changedTouches.item(0).screenX;
             if (touchStartX.current - x > 50) goNext();
             if (x - touchStartX.current > 50) goPrev();
         }
@@ -1166,10 +1167,11 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
     `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.4.1';
+MODULE_VERSIONS['ContentSlider'] = 'v5.4.2';
 // === [ END MAJOR BLOCK ] ===
 
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
+
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.1 ] 🔽🔽🔽
 
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.1 ] ===

@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.5] - ContentSlider v5.4.1 / Array Index Hotfix
+System Integrity & UX:
+
+    ✓ [Crash Fixed] Resolved the fatal TypeError: s.split(...).trim is not a function loop that was triggering the React ErrorBoundary on boot.
+    ✓ [Tablet Swipe Repaired] Mathematically corrected the TouchList coordinate extraction loop, fully restoring native left/right swipe pagination on mobile and tablet touchscreens.
+	
 [v8.11.4] - ContentSlider v5.4.0 / Narrative Architecture Finalization
 System Integrity & UI:
 
