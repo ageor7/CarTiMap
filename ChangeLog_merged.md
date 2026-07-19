@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.8] - ContentSlider v5.7.0 / Frontend Typography Purge
+System Integrity & UX:
+
+    ✓ [Zero Frontend HTML Cleaning] The frontend has completely surrendered typographical and routing control to the upstream Google Sheet. The JavaScript Title hyperlinking logic (renderTitle()) and Paragraph styling (processDescription()) have been completely uninstalled. The ContentSlider now acts as a pure, transparent rendering vessel for your native ExtractsCombinedV HTML payloads, guaranteeing 100% layout consistency.
+	
 [v8.11.7] - ContentSlider v5.5.0 / Narrative Typographic Anchoring
 System Integrity & UX:
 

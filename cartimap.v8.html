@@ -284,8 +284,8 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.11.6';
-        document.title = `CarTiMap Core - ${APP_VERSION}`;
+        const APP_VERSION = 'v8.11.8';
+        document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
         // === [ END MAJOR BLOCK ] ===
@@ -1052,9 +1052,9 @@ MODULE_VERSIONS['MediaViewer'] = 'v2.13.1';
 
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: ContentSlider v5.4.2 ] 🔽🔽🔽
+// 🔽🔽🔽 [ START_INJECT: ContentSlider v5.7.0 ] 🔽🔽🔽
 
-// === [ MAJOR BLOCK: ContentSlider v5.4.2 ] ===
+// === [ MAJOR BLOCK: ContentSlider v5.7.0 ] ===
 const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, dateLocale, formatSmartDate}) => {
     const touchStartX = useRef(0);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -1106,22 +1106,6 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
         else if (s <= 40 && isScrolled) setIsScrolled(false);
     };
 
-    // [REF: UI-196] ETL-Synced Hanging Indents
-    const processDescription = (htmlStr) => {
-        if (!htmlStr) return '';
-        let processed = htmlStr.replace(/<p([^>]*)>\s*([💬📜🕰📍💭👥🎬📝•\-])/gi, '<p$1 style="padding-left: 1.5rem; text-indent: -1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">$2');
-        processed = processed.replace(/<br\s*\/?>\s*([💬📜🕰📍💭👥🎬📝•\-])/gi, '</p><p style="padding-left: 1.5rem; text-indent: -1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">$1');
-        return processed;
-    };
-
-    const renderTitle = () => {
-        const safeHtml = { __html: slide.title };
-        if (slide.webPage && slide.webPage.trim() !== '') {
-            return html`<a href="${slide.webPage}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 122, 204, 0.4); text-underline-offset: 4px; pointer-events: auto;"><span dangerouslySetInnerHTML=${safeHtml}></span></a>`;
-        }
-        return html`<span dangerouslySetInnerHTML=${safeHtml}></span>`;
-    };
-
     const isDateValid = slide.startDate && !isNaN(slide.startDate.min);
 
     return html`
@@ -1154,20 +1138,18 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
                         </div>
                     </div>
                     <div class="title-header-container" style="width: 100%; padding: 0; box-sizing: border-box;">
-                        <h2 style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease; color: #222;">
-                            ${renderTitle()}
-                        </h2>
+                        <h2 style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease; color: #222;" dangerouslySetInnerHTML=${{"__html": slide.title}}></h2>
                     </div>
                 </div>
             </div>
             <div style="flex-grow: 1; padding: 0.5rem 1.5rem 2rem 1.5rem; display: flex; justify-content: center; width: 100%; box-sizing: border-box;">
-                <div class="slide-desc" style="max-width: 65ch; width: 100%; margin: 0 auto;" dangerouslySetInnerHTML=${{"__html": processDescription(slide.description)}}></div>
+                <div class="slide-desc" style="max-width: 65ch; width: 100%; margin: 0 auto;" dangerouslySetInnerHTML=${{"__html": slide.description}}></div>
             </div>
         </div>
     </div>
     `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.4.2';
+MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 // === [ END MAJOR BLOCK ] ===
 
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
