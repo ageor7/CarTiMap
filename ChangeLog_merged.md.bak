@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.4] - ContentSlider v5.4.0 / Narrative Architecture Finalization
+System Integrity & UI:
+
+    ✓ [Mobile Swipe Restored] Fixed a TouchList prototype bug that was paralyzing touch-swipe pagination on tablets. Native swipe interactions (left/right) are now fully operational.
+    ✓ [Title Hyperlinks Fixed] Resolved a Virtual DOM collision preventing Titles from acting as clickable links. Titles bound to a valid Web Page now successfully open in a new tab, indicated by a subtle blue underline.
+    ✓ [ETL-Synced Hanging Indents] Applied absolute hanging indents to all paragraphs and metadata lines beginning with an emoji. This is mathematically synchronized with the Google Sheets ExtractsCombinedV string output matrix, converting <br> injections into perfectly flush, block-level hanging indents automatically.
+	
 [v8.11.3] - ContentSlider v5.2.0 / Narrative Polish
 System Integrity & UI:
 

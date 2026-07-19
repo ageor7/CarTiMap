@@ -284,7 +284,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.11.3';
+        const APP_VERSION = 'v8.11.4';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1052,9 +1052,9 @@ MODULE_VERSIONS['MediaViewer'] = 'v2.13.1';
 
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: ContentSlider v5.2.0 ] 🔽🔽🔽
+// 🔽🔽🔽 [ START_INJECT: ContentSlider v5.4.0 ] 🔽🔽🔽
 
-// === [ MAJOR BLOCK: ContentSlider v5.2.0 ] ===
+// === [ MAJOR BLOCK: ContentSlider v5.4.0 ] ===
 const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, dateLocale, formatSmartDate}) => {
     const touchStartX = useRef(0);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -1077,7 +1077,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
         return arr.map(s => String(s).trim()).filter(Boolean);
     };
 
-    const formatPlaces = (str) => { return str ? str.split(/[|\-·;]/).map(s => s.split(',').at(0).trim()).filter(Boolean).join(' | ') : ''; };
+    const formatPlaces = (str) => { return str ? str.split(/[|\-·;]/).map(s => s.split(',').trim()).filter(Boolean).join(' | ') : ''; };
 
     const tags = getParsedTags(slide.tags);
     const hasLocation = slide.place && String(slide.place).trim() !== '';
@@ -1085,11 +1085,18 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     const goPrev = () => { if (activeIndex > 0) setActiveIndex(activeIndex - 1); };
     const goNext = () => { if (activeIndex < data.length - 1) setActiveIndex(activeIndex + 1); };
 
-    const handleTouchStart = (e) => { touchStartX.current = e.changedTouches.at(0).screenX; };
+    // [REF: CRASH-06] The TouchList Prototype Trap (Bracket notation mandatory)
+    const handleTouchStart = (e) => { 
+        if(e.changedTouches && e.changedTouches.length > 0) {
+            touchStartX.current = e.changedTouches.screenX; 
+        }
+    };
     const handleTouchEnd = (e) => {
-        const x = e.changedTouches.at(0).screenX;
-        if (touchStartX.current - x > 50) goNext();
-        if (x - touchStartX.current > 50) goPrev();
+        if(e.changedTouches && e.changedTouches.length > 0) {
+            const x = e.changedTouches.screenX;
+            if (touchStartX.current - x > 50) goNext();
+            if (x - touchStartX.current > 50) goPrev();
+        }
     };
 
     const handleScroll = (e) => {
@@ -1098,28 +1105,30 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
         else if (s <= 40 && isScrolled) setIsScrolled(false);
     };
 
-    // [REF: UI-196] Absolute Anchor Hanging Indents
+    // [REF: UI-196] ETL-Synced Hanging Indents
     const processDescription = (htmlStr) => {
         if (!htmlStr) return '';
-        let processed = htmlStr.replace(/<p([^>]*)>\s*([💬])\s*(.*?)<\/p>/gi, '<p$1 style="padding-left: 1.5rem; text-indent: -1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">$2 $3</p>');
-        processed = processed.replace(/<p([^>]*)>\s*([•\-])\s*(.*?)<\/p>/gi, '<p$1 style="padding-left: 3.0rem; text-indent: -1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">$2 $3</p>');
+        let processed = htmlStr.replace(/<p([^>]*)>\s*([💬📜🕰📍💭👥🎬📝•\-])/gi, '<p$1 style="padding-left: 1.5rem; text-indent: -1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">$2');
+        processed = processed.replace(/<br\s*\/?>\s*([💬📜🕰📍💭👥🎬📝•\-])/gi, '</p><p style="padding-left: 1.5rem; text-indent: -1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">$1');
         return processed;
     };
 
     const renderTitle = () => {
-        const titleHtml = { __html: slide.title };
-        if (slide.webPage) {
-            return html`<a href="${slide.webPage}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;" dangerouslySetInnerHTML=${titleHtml}></a>`;
+        const safeHtml = { __html: slide.title };
+        if (slide.webPage && slide.webPage.trim() !== '') {
+            return html`<a href="${slide.webPage}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 122, 204, 0.4); text-underline-offset: 4px; pointer-events: auto;"><span dangerouslySetInnerHTML=${safeHtml}></span></a>`;
         }
-        return html`<span dangerouslySetInnerHTML=${titleHtml}></span>`;
+        return html`<span dangerouslySetInnerHTML=${safeHtml}></span>`;
     };
+
+    const isDateValid = slide.startDate && !isNaN(slide.startDate.min);
 
     return html`
     <div class="content-pane-wrapper" style="display: flex; flex-direction: column; height: 100%; position: relative; width: 100%;">
         <div style="position: absolute; top: 15px; right: 28px; z-index: 1000;">
             <button class="status-btn ${maxPane === 'text' ? 'active' : ''}" style="background: rgba(255,255,255,0.9); border: 1px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onClick=${() => setMaxPane(maxPane === 'text' ? null : 'text')} title="Toggle Maximize">
                 ${maxPane === 'text'
-                    ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
+                    ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
                     : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
                 }
             </button>
@@ -1137,14 +1146,14 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
             <div style="flex-shrink: 0; position: sticky; top: 0; background: var(--paneBg, #ffffff); z-index: 10; padding-top: ${isScrolled ? '0.6rem' : '1.2rem'}; padding-bottom: ${isScrolled ? '0.4rem' : '0.5rem'}; border-bottom: 1px solid rgba(128,128,128,0.2); box-shadow: ${isScrolled ? '0 4px 12px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.04)'}; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 100%; padding-left: 1.5rem; padding-right: 55px; box-sizing: border-box;">
                 <div style="max-width: 85ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column;">
                     <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
-                        ${slide.startDate && !isNaN(slide.startDate.min) ? html`<div class="metadata-date" style="font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</div>` : ''}
+                        ${isDateValid ? html`<div class="metadata-date" style="font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</div>` : ''}
                         <div class="metadata-pills-wrapper">
                             ${hasLocation ? html`<span class="place-pill"><span style="margin-right: 4px;">📍</span> ${formatPlaces(slide.place)}</span>` : ''}
                             ${tags.map(tag => html`<span class="tag-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span>${tag}</span></span>`)}
                         </div>
                     </div>
                     <div class="title-header-container" style="width: 100%; padding: 0; box-sizing: border-box;">
-                        <h2 style="margin: 0; font-size: ${isScrolled ? '0.95rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.2s ease; color: #222;">
+                        <h2 style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease; color: #222;">
                             ${renderTitle()}
                         </h2>
                     </div>
@@ -1157,7 +1166,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
     `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.2.0';
+MODULE_VERSIONS['ContentSlider'] = 'v5.4.0';
 // === [ END MAJOR BLOCK ] ===
 
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
