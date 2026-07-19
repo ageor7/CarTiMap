@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.10.7] - TimelineScrubber v26.9.0
+
+    ✓ [Codebase Security] We structurally rebuilt the internal architecture of the Timeline engine into cleanly defined "SubBlocks". This ensures future UI tweaks will never accidentally break the zoom or scroll physics.
+    ✓ [Theme Engine Preparation] The Timeline is now mathematically prepared to accept custom color palettes dynamically from Google Sheets. It uses a "Defensive CSS" structure, meaning if you haven't set a custom theme yet, it elegantly falls back to the default professional colors without crashing.
+    ✓ [Density "Matte" Glow] We softened the visual indicator for highly overlapping historical events. Instead of a bright, digital neon glow, the vertical timeline marker now utilizes a microscopic 0.25px spread. When multiple events happen at the exact same time, the line simply looks like denser, thicker ink bleeding onto paper.
+	
+[v8.10.6] - Unsanctioned architecture. Retracted prior to deployment. Valid spatial and chronological physics rolled into v8.10.7.
+	
 [v8.10.5] - TimelineScrubber v26.7.0
 
     ✓ [Visual Readability & Accessibility] Completely overhauled the timeline's color palette to a professional standard. We purged the aggressive reds and low-contrast golds, replacing them with a sleek combination of Sapphire Blue for active events, Slate Grey for inactive ones, and Burnt Amber for uncertain dates. The timeline now sits on a pure white background, drastically reducing eye strain and improving overall clarity.

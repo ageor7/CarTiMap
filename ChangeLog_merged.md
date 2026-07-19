@@ -1,11 +1,21 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.10.8] - TimelineScrubber v26.10.0
+
+    ✓ [Theme Engine & White-Labeling] We shifted the application closer to a fully decoupled "White-Label" state. The tooltip and timeline ribbon floor now respond to dynamic theme variables, defaulting to a clean, professional Light Theme instead of the harsh dark mode.
+    ✓ [Browser Compatibility & "Black Line" Fix] Resolved a critical rendering bug where certain browsers interpreted nested CSS color variables as syntax errors, resulting in solid black timeline drop-lines. The engine now uses bulletproof, standard hex fallbacks.
+    ✓ [Magnetic HUD & Anti-Clipping] Fixed a geometric flaw where tooltips for long-duration events would attempt to render entirely off-screen if the event's start date was out of view. The tooltip now acts as a magnetic HUD, anchoring strictly to your cursor and intelligently dodging the screen edges so it is always 100% visible.
+    ✓ [Luminous Heat-Glow] Enhanced the visual density markers for overlapping events. Instead of applying a dark shadow that created visual "mud," the timeline now emits a luminous, high-contrast sub-pixel glow (e.g., Soft Cyan for Blue pins) to accurately simulate light radiation.
+	
 [v8.10.7] - TimelineScrubber v26.9.0
 
     ✓ [Codebase Security] We structurally rebuilt the internal architecture of the Timeline engine into cleanly defined "SubBlocks". This ensures future UI tweaks will never accidentally break the zoom or scroll physics.
     ✓ [Theme Engine Preparation] The Timeline is now mathematically prepared to accept custom color palettes dynamically from Google Sheets. It uses a "Defensive CSS" structure, meaning if you haven't set a custom theme yet, it elegantly falls back to the default professional colors without crashing.
     ✓ [Density "Matte" Glow] We softened the visual indicator for highly overlapping historical events. Instead of a bright, digital neon glow, the vertical timeline marker now utilizes a microscopic 0.25px spread. When multiple events happen at the exact same time, the line simply looks like denser, thicker ink bleeding onto paper.
+	
+[v8.10.6] - Unsanctioned architecture. Retracted prior to deployment. Valid spatial and chronological physics rolled into v8.10.7.
+*** This is not always noted in similar cases ***
 	
 [v8.10.5] - TimelineScrubber v26.7.0
 
