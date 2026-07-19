@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.7] - ContentSlider v5.5.0 / Narrative Typographic Anchoring
+System Integrity & UX:
+
+    ✓ [Title Hyperlinks Fixed] Resolved a Virtual DOM htm collision by explicitly removing string-quotes from the interpolation array and injecting an absolute Z-index override. Titles bound to a valid Web Page now successfully intercept clicks over the narrative viewport.
+    ✓ [Hanging Indents Perfected] Completely abandoned block-splitting regex replacements. The engine now utilizes Absolute Cartesian Anchoring, mathematically hanging the emojis at the precise 1.8rem and 3.6rem padding margins while strictly preserving your exact Google Sheets HTML spacing, font sizes, and line heights.
+	
 [v8.11.6] - ContentSlider v5.4.2 / Structural Typo Fix
 System Integrity & UX:
 

@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.6] - ContentSlider v5.4.2 / Structural Typo Fix
+System Integrity & UX:
+
+    ✓ [Crash Fixed] Resolved the fatal .trim is not a function error. We abandoned volatile numeric arrays (``) in favor of native .shift() manipulation to securely extract metadata strings.
+    ✓ [Tablet Swipe Restored] The swipe-touch mechanism has been fortified using the DOM's native .item(0) method. This correctly pulls touch coordinates on all mobile and tablet browsers.
+	
 [v8.11.5] - ContentSlider v5.4.1 / Array Index Hotfix
 System Integrity & UX:
 
