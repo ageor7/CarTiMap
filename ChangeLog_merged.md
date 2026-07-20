@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.18] - AppOrchestrator v3.4.6 / EDTF Proxy Mask Expansion
+System Integrity & Debugging:
+
+    ✓ [Time-Qualifier Interceptor] The edtf.js parser mathematically rejects ISO 8601-2 uncertainty qualifiers (~, ?, %) when placed inside clock boundaries (e.g., T~19:00). The Proxy Mask RegExp now mathematically annihilates these qualifiers strictly within the time segment before parser injection, completely resolving the phantom "X-related" crashes while preserving the unadulterated string for the UI.
+    ✓ [Telemetry Transparency] Upgraded the Chrono-Engine error logger to output both the raw database string and the post-Proxy mathematical payload. This eliminates developer gaslighting by exposing the exact string that shattered the AST parser.
+	
 [v8.11.17] - AppOrchestrator v3.4.5 / Multi-T Matrix Fix
 Data Pipeline Integrity:
 

@@ -284,7 +284,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.11.17';
+        const APP_VERSION = 'v8.11.18';
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2215,21 +2215,22 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
                     for (let k in row) norm[k.toLowerCase().trim()] = row[k];
                     const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
         
-			// 🔽🔽🔽 [ START_INJECT: AppOrchestrator - parseChronoNode v3.4.5 ] 🔽🔽🔽
+			// 🔽🔽🔽 [ START_INJECT: AppOrchestrator - parseChronoNode v3.4.6 ] 🔽🔽🔽
 
 					const parseChronoNode = (legacyStr, edtfStr) => {
 						const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
 						const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
 
 						if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
+							let mathEdtf = cleanEdtf; // Hoist for telemetry access
 							try {
 								if (cleanEdtf) {
-									// [REF: ETL-08] The Semantic/Mathematical Split (Clock-X Proxy)
-									let mathEdtf = cleanEdtf;
+									// [REF: ETL-08] The Semantic/Mathematical Split (Clock Proxy Mask)
 									if (mathEdtf.includes('T')) {
-										// [FIX] Surgically isolate EVERY clock segment in Intervals/Sets via RegExp to prevent X-leakage
-										mathEdtf = mathEdtf.replace(/(T[0-9X:~.]+(?:[+\-Z][0-9:]*)?)/gi, (match) => {
-											return match.replace(/X/gi, '0');
+										// Surgically isolate EVERY clock segment. 
+										// Convert X->0, and annihilate AST-crashing qualifiers (~, ?, %) strictly inside the time bounds.
+										mathEdtf = mathEdtf.replace(/(T[0-9X:~.?%]+(?:[+\-Z][0-9:]*)?)/gi, (match) => {
+											return match.replace(/X/gi, '0').replace(/[~?%]/g, '');
 										});
 									}
 
@@ -2239,11 +2240,11 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
 										min: parsed.min,
 										max: parsed.max,
 										obj: parsed,
-										text: cleanEdtf // Preserve unadulterated string with :XX for the UI
+										text: cleanEdtf // Preserve unadulterated string with :XX and T~ for the UI
 									};
 								}
 							} catch (e) {
-								addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure on "${cleanEdtf}". Rerouted to Legacy fallback.`, 'warning');
+								addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}" | Math Payload: "${mathEdtf}". Rerouted to Legacy.`, 'warning');
 							}
 						}
 
