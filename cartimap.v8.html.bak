@@ -284,7 +284,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.11.13';
+        const APP_VERSION = 'v8.11.16';
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2215,7 +2215,7 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
                     for (let k in row) norm[k.toLowerCase().trim()] = row[k];
                     const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
         
-			// 🔽🔽🔽 [ START_INJECT: AppOrchestrator - parseChronoNode v3.4.3 ] 🔽🔽🔽
+			// 🔽🔽🔽 [ START_INJECT: AppOrchestrator - parseChronoNode v3.4.4 ] 🔽🔽🔽
 
 					const parseChronoNode = (legacyStr, edtfStr) => {
 						const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
@@ -2228,10 +2228,11 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
 									let mathEdtf = cleanEdtf;
 									if (mathEdtf.includes('T')) {
 										const parts = mathEdtf.split('T');
-										// Surgically coerce X to 0 ONLY in the clock subset to prevent parser crash,
-										// while leaving Date X's untouched for native EDTF span generation.
-										parts[1] = parts[1].replace(/X/gi, '0');
-										mathEdtf = parts.join('T');
+										// [FIX] Surgically target the Clock subset array index to prevent TypeError
+										if (parts.length > 1) {
+											parts[1] = parts[1].replace(/X/gi, '0');
+											mathEdtf = parts.join('T');
+										}
 									}
 
 									const parsed = edtf(mathEdtf);

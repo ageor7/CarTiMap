@@ -284,7 +284,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.11.16';
+        const APP_VERSION = 'v8.11.17';
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2215,7 +2215,7 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
                     for (let k in row) norm[k.toLowerCase().trim()] = row[k];
                     const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
         
-			// 🔽🔽🔽 [ START_INJECT: AppOrchestrator - parseChronoNode v3.4.4 ] 🔽🔽🔽
+			// 🔽🔽🔽 [ START_INJECT: AppOrchestrator - parseChronoNode v3.4.5 ] 🔽🔽🔽
 
 					const parseChronoNode = (legacyStr, edtfStr) => {
 						const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
@@ -2227,12 +2227,10 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
 									// [REF: ETL-08] The Semantic/Mathematical Split (Clock-X Proxy)
 									let mathEdtf = cleanEdtf;
 									if (mathEdtf.includes('T')) {
-										const parts = mathEdtf.split('T');
-										// [FIX] Surgically target the Clock subset array index to prevent TypeError
-										if (parts.length > 1) {
-											parts[1] = parts[1].replace(/X/gi, '0');
-											mathEdtf = parts.join('T');
-										}
+										// [FIX] Surgically isolate EVERY clock segment in Intervals/Sets via RegExp to prevent X-leakage
+										mathEdtf = mathEdtf.replace(/(T[0-9X:~.]+(?:[+\-Z][0-9:]*)?)/gi, (match) => {
+											return match.replace(/X/gi, '0');
+										});
 									}
 
 									const parsed = edtf(mathEdtf);
@@ -2299,7 +2297,7 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
 					};
 
 			// 🔼🔼🔼 [ END_INJECT: AppOrchestrator - parseChronoNode ] 🔼🔼🔼
-        
+
                     const locStr = exactGet(norm, 'location');
                     return {
                         id: index,

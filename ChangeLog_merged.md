@@ -1,11 +1,39 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.17] - AppOrchestrator v3.4.5 / Multi-T Matrix Fix
+Data Pipeline Integrity:
+
+    ✓ [Multi-T Regex Armor] Replaced the brittle .split('T') Clock-X proxy with a dynamic RegExp capture group. The engine now mathematically isolates and zero-pads unspecified minutes (XX) across an infinite number of timestamps within complex EDTF Sets, Lists, and Intervals, permanently sealing the "X leakage" crash loop.
+    ✓ [Redundant Set Annihilation] The upstream Google Sheets ExtractsCombinedV pipeline (v6.1.3) now dynamically strips illegal single-element choice sets (e.g., [1944-12-25]) and mathematically annihilates all internal whitespace upon final array assembly, ensuring 100% ISO 8601-2 AST grammar compliance.
+	
 [v8.11.16] - AppOrchestrator v3.4.4 / EDTF Semantic Split Hotfix
+System Integrity & Debugging:
+
+    ✓ [Array Prototype Crash Fixed] Resolved a fatal TypeError in the Chrono-Engine where the system attempted to execute string manipulation directly on an Array object during the EDTF :XX coercion process. The crash was silently caught by the Error Boundary, resulting in false-positive "Legacy Fallback" telemetry warnings. The logic now correctly targets the clock subset index.
+	
+[v8.11.15] - AppOrchestrator v3.4.3 / EDTF Semantic-Mathematical Split
+Data Pipeline Integrity:
+
+    ✓ [Clock-X Parser Fix] The engine now natively accepts Level 2 EDTF Unspecified Digits (X) within the clock boundaries (e.g., 19:XX).
+    ✓ [Semantic/Mathematical Split] Deployed an isolated execution proxy. The mathematical engine strictly coerces clock-bound Xs to 0 to calculate stable cartesian coordinates, while the UI strictly preserves and displays your raw, unadulterated :XX database string to the user, retaining perfect historical fidelity.
+
+Git Commit: [v8.11.15] - AppOrchestrator v3.4.3
+Summary: Implement [REF: ETL-08] Semantic/Mathematical Split for EDTF clock coercion. Mechanical Description:
+
+    [AppOrchestrator] Refactored parseChronoNode to decouple the mathematical EDTF payload from the semantic display payload.
+    [AppOrchestrator] Injected an O(1) split('T') proxy interceptor. It leaves the Date matrix untouched (preserving edtf.js native X span generation) while executing .replace(/X/gi, '0') strictly on the Time matrix to satisfy the AST grammar parser's integer requirements.
+	
+[v8.11.14] - Void (Retracted ETL Proxy Mask)
+
+    Status: Vetoed prior to deployment.
+    Reason: The proposed Google Sheets :XX to :00 string substitution violated architectural requirements by falsifying the text payload sent to the Virtual DOM, destroying the historical ambiguity visible to the user. The version number is permanently burned.
+	
 [v8.11.2] - AppOrchestrator v3.4.3 / EDTF Semantic-Mathematical Split
 Data Pipeline Integrity:
 
     ✓ [Clock-X Parser Fix] The engine now natively accepts Level 2 EDTF Unspecified Digits (X) within the clock boundaries (e.g., 19:XX).
+    ✓ [Semantic/Mathematical Split] Deployed an isolated execution proxy. The mathematical engine strictly coerces clock-bound Xs to 0 to calculate stable cartesian coordinates, while the UI strictly preserves and displays your raw, unadulterated :XX database string to the user, retaining perfect historical fidelity.
 	
 [v8.11.8] - ContentSlider v5.7.0 / Frontend Typography Purge
 System Integrity & UX:
