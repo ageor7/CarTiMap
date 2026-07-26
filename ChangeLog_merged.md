@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.11.26] - AST Order of Operations & Qualified Durations
+System Integrity & Physics:
+
+    ✓ [Array Hierarchy Restored] Resolved a fatal Order of Operations bug where the AST Decorator split Range Expansions (..) before parsing Choice Sets ([]). This previously caused the engine to orphan commas and feed grammatically shattered strings into the native parser. The engine now mathematically isolates array elements first, perfectly evaluating complex mixed-geometry strings like [1944-12-25, 1944-12-25T~16:00+02..PT08H] and Choice Set expansions like [1944-08-26..1944-10-11].
+    ✓ [Qualified Duration Support] Deployed an explicit interceptor to extract ~ and ? qualifiers from standalone durational scalars (e.g., PT30~M). This bypasses the edtf.js Level 2 parser limitation regarding explicit explicit duration qualification, mapping the visual approximations accurately to the timeline geometry.
+	
 [v8.11.25] - Syntax Recovery
 System Integrity & Physics:
 

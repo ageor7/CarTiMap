@@ -284,7 +284,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.11.23';
+        const APP_VERSION = 'v8.11.25';
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2738,7 +2738,7 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.1';
             </div>
             `;
         };
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.1;
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.1';
         // === [ END MAJOR BLOCK ] ===
         
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
