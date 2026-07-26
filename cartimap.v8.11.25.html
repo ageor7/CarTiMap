@@ -284,7 +284,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.11.26';
+        const APP_VERSION = 'v8.11.25';
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.0.0', Globals: 'v2.0.5' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -295,17 +295,30 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         // Localized regex closures (safeStripHTML) now handle strings natively inside components.
         // === [ END MAJOR BLOCK ] ===
 		
-		// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.0 ] 🔽🔽🔽
+		// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.1.0 ] 🔽🔽🔽
 
-		// === [ MAJOR BLOCK: CarTiMap AST Compiler v1.2.0 ] ===
+		// === [ MAJOR BLOCK: CarTiMap AST Compiler v1.1.0 ] ===
 		// [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
 		const compileCartiMapAST = (str) => {
 			if (!str) return null;
+			
+			// [FIX] Absolute String Coercion Armor to prevent Array-Prototype crashes
 			let clean = String(str).trim();
 
-			// 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
+			// 1. Array Geometry: Choice Sets []
 			if (clean.startsWith('[') && clean.endsWith(']')) {
 				const inner = clean.slice(1, -1);
+				
+				// Duration Range Expansion [Date1..Date2]
+				if (inner.includes('..')) {
+					 const parts = inner.split('..');
+					 // [FIX] Surgically target isolated string indices
+					 const v1 = compileCartiMapAST(parts);
+					 const v2 = compileCartiMapAST(parts[1]);
+					 if (!v1 || !v2) return null;
+					 return { type: 'Set', values: [v1, v2], min: Math.min(v1.min || 0, v2.min || 0), max: Math.max(v1.max || 0, v2.max || 0) };
+				}
+				
 				const parts = inner.split(',');
 				const values = parts.map(p => compileCartiMapAST(p)).filter(Boolean);
 				if (values.length === 0) return null;
@@ -331,16 +344,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 				};
 			}
 
-			// 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
-			if (clean.includes('..')) {
-				 const parts = clean.split('..');
-				 const v1 = compileCartiMapAST(parts);
-				 const v2 = compileCartiMapAST(parts[1]);
-				 if (!v1 || !v2) return null;
-				 return { type: 'Set', values: [v1, v2], min: Math.min(v1.min || 0, v2.min || 0), max: Math.max(v1.max || 0, v2.max || 0) };
-			}
-
-			// 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
+			// 3. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
 			let mathStr = clean;
 			let isApprox = false;
 			let isUncertain = false;
@@ -354,29 +358,11 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 				 });
 			}
 
-			// 5. Qualified Durations (PT30~M)
-			// Extract qualifiers from explicit duration strings to prevent AST grammar crashes
-			if (mathStr.startsWith('P') || mathStr.startsWith('-P')) {
-				 if (mathStr.includes('~')) {
-					 isApprox = true;
-					 mathStr = mathStr.replace(/~/g, '');
-				 }
-				 if (mathStr.includes('?')) {
-					 isUncertain = true;
-					 mathStr = mathStr.replace(/\?/g, '');
-				 }
-			}
-
-			// 6. Native AST Evaluation (Level 3 for Season/Summer compliance)
-			let parsed = null;
-			try {
-				parsed = edtf(mathStr, { level: 3 });
-			} catch (e) {
-				return null;
-			}
+			// 4. Native AST Evaluation (Level 3 for Season/Summer compliance)
+			const parsed = edtf(mathStr, { level: 3 });
 			
 			// Safety check: Only attach properties if the EDTF object is extensible
-			if (parsed && typeof parsed === 'object' && Object.isExtensible(parsed)) {
+			if (parsed && Object.isExtensible(parsed)) {
 				if (isApprox) parsed.approximate = true;
 				if (isUncertain) parsed.uncertain = true;
 			}
