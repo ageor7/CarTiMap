@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.42 - 2026-08-25] - Scrubber Scope & Telemetry Calibration
+**Refinements & Specifications:**
+   ✓ **[4D Telemetry Hoisting]** Restored `setVisibleTimeBounds` effect array inside `TimelineScrubber` [REF: TL-19]. This enables Map temporal intersections to dynamically update coordinate opacities (Temporal Ghosting) during timeline pans.
+   ✓ **[Outer Scope Resolution]** Resolved compile crash by properly hoisting `visibleTimeSpanMs` and `spansMultipleDays` variables from the tick rendering matrix back into the outer parent execution thread.
+   ✓ **[EDTF Approximation Restoration]** Repaired a silent visual regression where `isApproxStart` and `isApproxEnd` properties were evaluated as undefined on legacy dates. Restored full `startDate.isEDTF` and `startDate.obj` parsing [REF: TL-29].
+   ✓ **[DOM Gutter Optimization]** Purged experimental responsive hooks in favor of direct, zero-build `clientWidth` queries on render, completely sealing the scrubber against resize-action loops.
+
 #### Changelog: [v8.12.40 - 2026-08-25] - Scrubber Scope & ContainerWidth Hotfix
 **Refinements & Specifications:**
    ✓ **[Timeline Scrubber Scope Fix]** Declared explicit local `containerWidth` component state to prevent fatal `ReferenceError: containerW is not defined` crash.

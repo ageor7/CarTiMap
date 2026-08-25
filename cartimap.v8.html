@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.40';
+        const APP_VERSION = 'v8.12.42';
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1418,7 +1418,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber ] 🔽🔽🔽
-		// === [ MAJOR BLOCK: TimelineScrubber v26.11.2 ] ===
+		// === [ MAJOR BLOCK: TimelineScrubber v26.11.3 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
           const wrapperRef = useRef(null);
           const [zoomLevel, setZoomLevel] = useState(1);
@@ -1428,7 +1428,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const scrollTargetPayloadRef = useRef(null);
           const scrollTimeout = useRef(null);
           const [containerHeight, setContainerHeight] = useState(200);
-          const [containerWidth, setContainerWidth] = useState(1000);
           const [viewLeftEdge, setViewLeftEdge] = useState(0);
           const [caliperTooltip, setCaliperTooltip] = useState(null);
           const hoverTimeoutRef = useRef(null);
@@ -1439,7 +1438,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               const entry = entries.at(0);
               if (entry && entry.target) {
                 setContainerHeight(entry.target.clientHeight);
-                setContainerWidth(entry.target.clientWidth);
               }
             });
             if (wrapperRef.current) ro.observe(wrapperRef.current);
@@ -1578,10 +1576,24 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
           ];
         
-          const containerW = containerWidth;
-          const trackWidthPx = Math.max(containerW || 1000, (containerW || 1000) * zoomLevel);
-          const targetMsPerMajorTick = Math.max((120 / (containerW || 1000)) * renderTimeRange / zoomLevel, (renderTimeRange / zoomLevel) / 12);
-          let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs[scaleConfigs.length - 1];
+          if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
+        
+          const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+          const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+          const visibleTimeSpanMs = renderTimeRange / zoomLevel;
+          const spansMultipleDays = visibleTimeSpanMs > 86400000;
+          const targetMsPerMajorTick = Math.max((120 / containerW) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
+          let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
+        
+          const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
+          const visibleRightMs = renderMinTime + ((viewLeftEdge + containerW) / trackWidthPx) * renderTimeRange;
+          const viewportCenterMs = visibleLeftMs + ((visibleRightMs - visibleLeftMs) / 2);
+        
+          useEffect(() => {
+            if (setVisibleTimeBounds && !isNaN(visibleLeftMs) && !isNaN(visibleRightMs)) {
+              setVisibleTimeBounds([visibleLeftMs, visibleRightMs]);
+            }
+          }, [visibleLeftMs, visibleRightMs, setVisibleTimeBounds]);
         
           useEffect(() => {
             const visibleMs = renderTimeRange / zoomLevel;
@@ -1629,11 +1641,11 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
                     const clampedZoom = Math.min(Math.max(1, idealZoom), 300);
                     
-                    scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
+                    scrollTargetPayloadRef.current = activeIndex;
                     setZoomLevel(clampedZoom);
                   } else {
                     if (zoomLock === 'soft') setZoomLock('auto');
-                    scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
+                    scrollTargetPayloadRef.current = activeIndex;
                     setZoomLevel(z => z + 0.000001);
                   }
                 }
@@ -1649,10 +1661,10 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               let targetScrollPos = 0;
               const payload = scrollTargetPayloadRef.current;
               
-              if (payload.type === 'node') {
-                targetScrollPos = getExactNodeScrollPos(payload.value, trackWidthPx, containerW);
-              } else if (payload.type === 'raw') {
-                targetScrollPos = payload.value;
+              if (typeof payload === 'number') {
+                targetScrollPos = getExactNodeScrollPos(payload, trackWidthPx, containerW);
+              } else {
+                targetScrollPos = payload;
               }
               
               wrapperRef.current.scrollTo({ left: targetScrollPos, behavior: 'auto' });
@@ -1666,10 +1678,9 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const scrollPos = wrapperRef.current.scrollLeft;
             const anchorPx = centerType === 'mouse' ? scrollPos + eventX : scrollPos + (containerW / 2);
             const centerPct = anchorPx / Math.max(containerW, containerW * zoomLevel);
-            const newTrackW = Math.max(containerW, containerW * newZoom);
-            const targetScrollPos = (centerPct * newTrackW) - (centerType === 'mouse' ? eventX : (containerW / 2));
+            const targetScrollPos = (centerPct * Math.max(containerW, containerW * newZoom)) - (centerType === 'mouse' ? eventX : (containerW / 2));
             
-            scrollTargetPayloadRef.current = { type: 'raw', value: targetScrollPos };
+            scrollTargetPayloadRef.current = targetScrollPos;
             setZoomLevel(newZoom);
           };
         
@@ -1749,9 +1760,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             setCaliperTooltip(null);
           };
         
-          const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
-          const visibleRightMs = renderMinTime + ((viewLeftEdge + (containerW || 1000)) / trackWidthPx) * renderTimeRange;
-          const viewportCenterMs = visibleLeftMs + ((visibleRightMs - visibleLeftMs) / 2);
           let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
           iterDate.setMilliseconds(0);
           if (activeScale.type === 'year') { iterDate.setMonth(0, 1); iterDate.setHours(0, 0, 0, 0); iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step); }
@@ -1838,13 +1846,12 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             return null;
           });
         
-          const visibleLeftMsVal = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
-          const visibleRightMsVal = renderMinTime + ((viewLeftEdge + (containerW || 1000)) / trackWidthPx) * renderTimeRange;
-          const viewPadMs = (visibleRightMsVal - visibleLeftMsVal) * 0.5;
+          const viewPadMs = visibleTimeSpanMs * 0.5;
           const activeItemData = data[activeIndex];
           const activeDataNode = validData.find(d => d.id === activeItemData?.id);
           const isSuspended = !activeDataNode;
         
+          const stackRegistry = {};
           const markers = validData.map((item, index) => {
             const itemStartMs = item.startDate.min;
             const itemEndMs = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : itemStartMs;
@@ -1873,8 +1880,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const colApprox = 'var(--tm-approx, #ffb300)';
             const heatShadow = stackDepth > 0 ? `box-shadow: 0 0 ${stackDepth * 2}px ${stackDepth * 0.25}px var(--tm-glow, rgba(102, 178, 255, 0.4));` : '';
         
-            const isApproxStart = item.startDate && item.startDate.approximate;
-            const isApproxEnd = item.endDate && item.endDate.approximate;
+            const isApproxStart = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.approximate;
+            const isApproxEnd = item.endDate && item.endDate.isEDTF && item.endDate.obj && item.endDate.obj.approximate;
         
             let xAxisMarker = '';
             if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
@@ -1884,7 +1891,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 10px; background: rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.1); border: 1px dashed ${colApprox}; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
               } else if (obj.type === 'List') {
                 const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-                const subDots = obj.values.map((v, lIdx) => {
+                const subDots = obj.values.map(v => {
                   const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
                   return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: ${colInactive}; transform: translateX(-2px);"></div>`;
                 });
@@ -1929,10 +1936,10 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const hasMedia = item.media && item.media.length > 0;
         
             return html`
-              <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)}>
+              <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: ${startPct}%; top: calc(${topPos}px); bottom: 28px; ${hasDuration ? `width: ${endPct - startPct}%; min-width: 4px;` : `width: 0;`}" onClick=${() => handleNodeClick(globalIndex)}>
                 ${dropLine}
                 ${xAxisMarker}
-                <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? colActive : 'var(--tm-tooltip-bg, #ffffff)'}; color: ${isActive ? '#fff' : 'var(--tm-tooltip-text, #333333)'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
+                <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0px; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? colActive : 'var(--tm-tooltip-bg, #ffffff)'}; color: ${isActive ? '#fff' : 'var(--tm-tooltip-text, #333333)'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
                   ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>` : ''}
                   <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
                     ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
@@ -2020,7 +2027,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.2';
+        MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.3';
 		// === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
