@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.54';
+        const APP_VERSION = 'v8.12.55';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1098,7 +1098,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer ] 🔽🔽🔽
-        // === [ MAJOR BLOCK: MediaViewer v8.12.54 ] ===
+        // === [ MAJOR BLOCK: MediaViewer v2.13.4 ] ===
         const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
           const carouselRef = useRef(null);
           const carouselWidthRef = useRef(0);
@@ -1255,8 +1255,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
         
           return html`
             <div style="position: relative; height: 100%; width: 100%; background: #111; overflow: hidden;">
-              <!-- Absolute Utility Cluster: Stuck to the top-right, well clear of top/right native toolbars -->
-              <div style="position: absolute; top: 60px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+              <!-- Absolute Utility Cluster: Moved to top: 60px, right: 60px to leave plenty of room on the right for native/browser scrollbars -->
+              <div style="position: absolute; top: 60px; right: 60px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
                 <button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle} width: 28px; height: 28px;">
                   ${maxPane === 'media'
                     ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
@@ -1264,7 +1264,6 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
                   }
                 </button>
                 ${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle} width: 28px; height: 28px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
-                ${mediaItems.length > 1 ? html`<div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
               </div>
         
               <!-- Invisible Ergonomic Touch Zones (Static Slides only) -->
@@ -1273,18 +1272,17 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
                 <div class="click-zone click-zone-right" onClick=${(e) => handleChevronClick(e, 1)} style="position: absolute; right: 0; top: 0; bottom: 0; width: 25%; z-index: 900; cursor: ew-resize;" title="Next Slide"></div>
               ` : ''}
         
-              <!-- Visible Chevron HUD (Over interactive media) -->
+              <!-- Visible Chevron HUD (Over interactive media) - Moved to bottom center with clearance -->
               ${mediaItems.length > 1 ? html`
-                ${activeMediaIdx > 0 ? html`
-                  <button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} style="${btnStyle} position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Previous Media">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <div style="position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; align-items: center; gap: 8px; pointer-events: auto;">
+                  <button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} disabled=${prevDisabled} style="${btnStyle} width: 28px; height: 28px; padding: 0; ${prevDisabled ? 'opacity: 0.25; pointer-events: none;' : ''}" title="Previous Media">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                   </button>
-                ` : ''}
-                ${activeMediaIdx < mediaItems.length - 1 ? html`
-                  <button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} style="${btnStyle} position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Next Media">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  <span style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.3); user-select: none;">${activeMediaIdx + 1}/${mediaItems.length}</span>
+                  <button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} disabled=${nextDisabled} style="${btnStyle} width: 28px; height: 28px; padding: 0; ${nextDisabled ? 'opacity: 0.25; pointer-events: none;' : ''}" title="Next Media">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                   </button>
-                ` : ''}
+                </div>
               ` : ''}
         
               <style>
@@ -1319,7 +1317,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
           `;
         };
         
-        MODULE_VERSIONS['MediaViewer'] = 'v2.13.3';
+        MODULE_VERSIONS['MediaViewer'] = 'v2.13.4';
         // === [ END MAJOR BLOCK: MediaViewer ] ===
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 

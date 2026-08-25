@@ -517,3 +517,9 @@ Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pa
 
 ---
 
+## 11. Media Playback & Camera Focus Controls ↓↓
+
+*   **[REF: MED-11] Asynchronous video pausing [UPDATED]:** Rather than destroying iframe contexts on carousel sliding, inactive `<iframe>` elements configured with `?enablejsapi=1` are sent an asynchronous postMessage post with "pauseVideo" command. Native video targets execute a synchronous `.pause()` to ensure background audio is terminated without resetting buffering pipelines.
+*   **[REF: UI-221] Color Synchronicity [NEW]:** Action states representing rigid binary locks (Map Grid and Timeline Zoom Lock) utilize synchronized color markers. Engaging Timeline Zoom Lock forces its SVG path and border to transition to Sapphire Blue (#007acc).
+
+
