@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.50';
+        const APP_VERSION = 'v8.12.52';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1098,7 +1098,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer ] 🔽🔽🔽
-        // === [ MAJOR BLOCK: MediaViewer v8.12.50 ] ===
+        // === [ MAJOR BLOCK: MediaViewer v8.12.52 ] ===
         const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
           const carouselRef = useRef(null);
           const carouselWidthRef = useRef(0);
@@ -1260,8 +1260,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
         
           return html`
             <div style="position: relative; height: 100%; width: 100%; display: flex; flex-direction: column; overflow: hidden; background: #111;">
-              <!-- Absolute Utility Cluster: Moved INWARD and DOWNWARD to leave a pristine top-right clearance of at least 60x60px -->
-              <div style="position: absolute; top: 60px; right: 60px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+              <!-- Absolute Utility Cluster: Stuck to the top-right, but shifted inward horizontally to clear vertical scrollbars and downward vertically to clear top headers / toolbars -->
+              <div style="position: absolute; top: 60px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
                 <button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle} width: 28px; height: 28px;">
                   ${maxPane === 'media'
                     ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
@@ -1322,7 +1322,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
           `;
         };
         
-        MODULE_VERSIONS['MediaViewer'] = 'v2.13.2';
+        MODULE_VERSIONS['MediaViewer'] = 'v2.13.3';
         // === [ END MAJOR BLOCK: MediaViewer ] ===
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
