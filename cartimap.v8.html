@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.42';
+        const APP_VERSION = 'v8.12.43';
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1861,6 +1861,13 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const startPct = Number((((itemStartMs - renderMinTime) / renderTimeRange) * 100).toFixed(4));
             const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
             const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
+            
+            // Hoisted to prevent Temporal Dead Zone ReferenceError
+            const topPos = (laneIdx * laneHeight) + 5;
+            const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
+            const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
+            const hasMedia = item.media && item.media.length > 0;
+        
             const stackKey = `${itemStartMs}_${laneIdx}`;
         
             if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
@@ -1930,16 +1937,11 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colInactive}; ${heatShadow} z-index: 900;"></div>`;
             }
         
-            const topPos = (laneIdx * laneHeight) + 5;
-            const blockHeight = ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight;
-            const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
-            const hasMedia = item.media && item.media.length > 0;
-        
             return html`
-              <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: ${startPct}%; top: calc(${topPos}px); bottom: 28px; ${hasDuration ? `width: ${endPct - startPct}%; min-width: 4px;` : `width: 0;`}" onClick=${() => handleNodeClick(globalIndex)}>
+              <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)}>
                 ${dropLine}
                 ${xAxisMarker}
-                <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0px; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? colActive : 'var(--tm-tooltip-bg, #ffffff)'}; color: ${isActive ? '#fff' : 'var(--tm-tooltip-text, #333333)'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
+                <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? colActive : 'var(--tm-tooltip-bg, #ffffff)'}; color: ${isActive ? '#fff' : 'var(--tm-tooltip-text, #333333)'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
                   ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>` : ''}
                   <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
                     ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
@@ -1956,7 +1958,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
               <div class="timeline-control-cluster" style="top: 15px; flex-direction: row; height: 24px;">
                 <button class="status-btn" style="border: none; border-right: 1px solid #eee; border-radius: 0;" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
                 </button>
                 <button class="status-btn ${isTimelineExpanded ? 'active' : ''}" style="border: none; border-radius: 0;" onClick=${() => {
                   if (!isTimelineExpanded) {
@@ -2027,8 +2029,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.3';
-		// === [ END MAJOR BLOCK ] ===
+        MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.3';		// === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
         // === [ MAJOR BLOCK: AppOrchestrator v3.4.3 ] ===
