@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.43 - 2026-08-25] - TDZ Elimination & Stacking Reconstruction
+**Refinements & Specifications:**
+*   ✓ **[TDZ Reference Error Resolved]** Hoisted `topPos`, `blockHeight`, `lines`, `pxWidth`, and `hasMedia` declarations to the beginning of the `validData.map` callback, permanently shielding the runtime from lexical compile-time failures.
+*   ✓ **[Stacking Geometry Restoration]** Fully restored diagonal coordinate offsets `xOffset`/`yOffset` and fallback box measurements `pxWidth` inside the main marker styling loop. This guarantees multi-event z-stacking offsets render with mathematically perfect diagonal ink bleed.
+
 #### Changelog: [v8.12.42 - 2026-08-25] - Scrubber Scope & Telemetry Calibration
 **Refinements & Specifications:**
    ✓ **[4D Telemetry Hoisting]** Restored `setVisibleTimeBounds` effect array inside `TimelineScrubber` [REF: TL-19]. This enables Map temporal intersections to dynamically update coordinate opacities (Temporal Ghosting) during timeline pans.
