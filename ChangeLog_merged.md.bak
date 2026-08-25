@@ -1,6 +1,15 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.39 - 2026-08-25] - Chrono-Kinetics & Swipe Pass-Through
+**Refinements & Specifications:**
+   ✓ **[Viewport-Center HUD Zoom]** Configured zoom buttons to center on current visual midpoint instead of active slide coordinate [REF: TL-18b].
+   ✓ **[Cursor-to-Midpoint Zoom]** Mouse wheel scroll zooming captures local cursor timestamp and snaps it directly to visual screen center [REF: TL-18b].
+   ✓ **[Wave Dimming]** Integrated coordinate-specific timestamp caching to animate cohort waves inside EDTF Sets/Lists independently [REF: MAP-12b].
+  ✓ **[Centered Pass-Through Hole]** Carved out a 160x120px interactive window in the swipe overlay to restore native play/speed toolbar clicks [REF: UI-201c].
+   ✓ **[Chevron Relocation]** Shifted media chevrons bottom-left, padding the caption text container to prevent overlap [REF: UI-201c].
+
+
 [v8.12.38 - 2026-08-25] - Kinetics, Interface & Dimming Sprints
 Map & Timeline Engineering:
 
