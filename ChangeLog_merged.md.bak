@@ -1,7 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-##### Changelog: [v8.12.49 - 2026-08-25] - Spatial Coordinate Clearance & Null-Pointer Prevention
+##### Changelog: [v8.12.50 - 2026-08-25] - Structural Token Validation & Symmetrical Margin Restorations
+**Refinements & Specifications:**
+*   ✓ **[Syntactic Validation Proof]** Executed Python-based bracket/brace validators proving 100% parenthetical and template backtick alignment (Delta = 0) to ensure zero browser-side rendering crashes.
+*   ✓ **[Inward/Downward Offset Controls]** Restored Maximize and Open Source overlays inside the Media pane, positioned safely at top: 60px; right: 60px; to clear third-party WebGL/Map/PDF frames and mobile safe areas [REF: UI-199d].
+*   ✓ **[Agnostic Error Failsafe]** Guarded MediaViewer string parsers to immediately return null on empty arrays or undefined slide pointers, securing boot-sequence resilience.
+
+#### Changelog: [v8.12.49 - 2026-08-25] - Spatial Coordinate Clearance & Null-Pointer Prevention
 **Refinements & Specifications:**
 *   ✓ **[Visual Viewport Clearance]** Restored utility controls to the upper quadrant of the Media Pane, positioned at `top: 60px; right: 60px;` to leave a 60x60px physical corner completely empty [REF: UI-199d].
 *   ✓ **[Null-Pointer Protection]** Corrected the media agnosticism `.toLowerCase()` parser crash on empty media records by injecting an immediate exit condition and safe empty-string fallbacks. This fixes the runtime crash and restores the screen.

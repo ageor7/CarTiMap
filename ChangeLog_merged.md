@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.52 - 2026-08-25] - Coordinate Restorations & Isolated Gutter Mechanics
+**Refinements & Specifications:**
+*   ✓ **[Offset Floating Layout]** Pinned Maximize and Open Source [↗] buttons to the top-right of the Media Pane (`top: 60px; right: 20px;`) keeping them well clear of browser-native top toolbars and horizontal clipping boundaries.
+*   ✓ **[Symmetrical Separation of Concerns]** Restored full slide metadata (Captions/Credits/Carousel Counters) strictly to the bottom-most stationary gutter, making viewport mechanics completely independent of content states.
+*   ✓ **[Ergonomic Collapse Rules]** Kept the bottom gutter conditional. For records lacking captions, credits, and multiple frames, the bottom gutter collapses to zero height, maximizing media canvas scaling.
+
 ##### Changelog: [v8.12.50 - 2026-08-25] - Structural Token Validation & Symmetrical Margin Restorations
 **Refinements & Specifications:**
 *   ✓ **[Syntactic Validation Proof]** Executed Python-based bracket/brace validators proving 100% parenthetical and template backtick alignment (Delta = 0) to ensure zero browser-side rendering crashes.
