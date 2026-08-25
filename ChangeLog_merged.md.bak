@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.56 - 2026-08-25] - Micro-Event Playback Interceptors & Timeline Track Centering
+**Refinements & Specifications:**
+*   ✓ **[Media Playback "Just Pause"]** Configured synchronous `.pause()` for native HTML5 video layers and integrated enablejsapi=1 postMessage calls for un-focused YouTube frames, killing background leaks on navigation [REF: MED-11].
+*   ✓ **[Timeline Track Center-Focus]** Repositioned handleNodeClick scroll targets to force exact sub-pixel centering immediately on timeline label click, neutralizing state-racing autofocus offsets [REF: PERF-41].
+*   ✓ **[Visual State Sync]** Colored the active "Zoom Lock" button toggle in Sapphire Blue (#007acc) to maintain control-bar aesthetic consistency with Map Pane coordinate switches [REF: UI-221].
+
 #### Changelog: [v8.12.55 - 2026-08-25] - Clear Sidebar Margins & Consolidated Bottom-Center Navigation HUD
 **Refinements & Specifications:**
 *   ✓ **[Right Margin Safe Zone]** Relocated the floating utility toolbar stack (`Maximize` / `Open Source File [↗]`) horizontally leftward to `right: 60px` of the Media viewport, guaranteeing zero layout collision with browser scrollbars or PDF native tools.

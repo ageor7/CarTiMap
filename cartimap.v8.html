@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.56';
+        const APP_VERSION = 'v8.12.57';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1098,7 +1098,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer ] 🔽🔽🔽
-        // === [ MAJOR BLOCK: MediaViewer v2.13.5 ] ===
+        // === [ MAJOR BLOCK: MediaViewer v2.13.6 ] ===
         const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
           const carouselRef = useRef(null);
           const carouselWidthRef = useRef(0);
@@ -1238,7 +1238,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
             if (lowUrl.includes('youtube.com') || lowUrl.includes('youtu.be')) {
               const videoId = lowUrl.includes('v=') ? url.split('v=').at(1).split('&').at(0) : url.split('/').at(-1).split('?').at(0);
               let embedUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
-              const tMatch = url.match(/[?&]t=([^&]/);
+              const tMatch = url.match(/[?&]t=([^&]+)/);
               if (tMatch) {
                 const tVal = tMatch.at(1);
                 let seconds = parseInt(tVal, 10);
@@ -1342,7 +1342,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
           `;
         };
         
-        MODULE_VERSIONS['MediaViewer'] = 'v2.13.5';
+        MODULE_VERSIONS['MediaViewer'] = 'v2.13.6';
         // === [ END MAJOR BLOCK: MediaViewer ] ===
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
