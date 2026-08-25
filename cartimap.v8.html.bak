@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.49;
+        const APP_VERSION = 'v8.12.50;
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1098,7 +1098,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer ] 🔽🔽🔽
-        // === [ MAJOR BLOCK: MediaViewer v8.12.49 ] ===
+        // === [ MAJOR BLOCK: MediaViewer v8.12.50 ] ===
         const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
           const carouselRef = useRef(null);
           const carouselWidthRef = useRef(0);
@@ -1429,7 +1429,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber ] 🔽🔽🔽
-        // === [ MAJOR BLOCK: TimelineScrubber v8.12.49 ] ===
+        // === [ MAJOR BLOCK: TimelineScrubber v8.12.50 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
           const wrapperRef = useRef(null);
           const [zoomLevel, setZoomLevel] = useState(1);
@@ -1909,7 +1909,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 10px; background: rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.1); border: 1px dashed ${colApprox}; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
               } else if (obj.type === 'List') {
                 const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-                const subDots = obj.values.map(v => {
+                const subDots = (obj.values || []).map(v => {
                   const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
                   return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: ${colInactive}; transform: translateX(-2px);"></div>`;
                 });
@@ -1979,7 +1979,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
               <div class="timeline-control-cluster" style="top: 15px; flex-direction: row; height: 24px;">
                 <button class="status-btn" style="border: none; border-right: 1px solid #eee; border-radius: 0;" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
                 </button>
                 <button class="status-btn ${isTimelineExpanded ? 'active' : ''}" style="border: none; border-radius: 0;" onClick=${() => {
                   if (!isTimelineExpanded) {
