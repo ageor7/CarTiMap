@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.45';
+        const APP_VERSION = 'v8.12.46';
         document.title = `CarTiMap ore - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1249,6 +1249,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
         
           const prevDisabled = activeMediaIdx === 0;
           const nextDisabled = activeMediaIdx === mediaItems.length - 1;
+          const isStatic = !mediaItems[activeMediaIdx]?.toLowerCase().includes('youtube.com') && !mediaItems[activeMediaIdx]?.toLowerCase().includes('youtu.be') && !mediaItems[activeMediaIdx]?.toLowerCase().endsWith('.pdf');
         
           return html`
             <div style="position: relative; height: 100%; width: 100%;">
@@ -1260,16 +1261,12 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
                   }
                 </button>
                 ${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
-                ${mediaItems.length > 1 ? html`<div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
               </div>
         
-              ${mediaItems.length > 1 ? html`
-                <button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} disabled=${prevDisabled} style="${btnStyle} position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0; ${prevDisabled ? 'opacity: 0.25; pointer-events: none; cursor: not-allowed;' : ''}" title="Previous Media">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-                <button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} disabled=${nextDisabled} style="${btnStyle} position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0; ${nextDisabled ? 'opacity: 0.25; pointer-events: none; cursor: not-allowed;' : ''}" title="Next Media">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
+              <!-- Invisible Ergonomic Touch Zones (Static Slides only) -->
+              ${(mediaItems.length > 1 && isStatic) ? html`
+                <div class="click-zone click-zone-left" onClick=${(e) => handleChevronClick(e, -1)} style="position: absolute; left: 0; top: 0; bottom: 50px; width: 25%; z-index: 900; cursor: ew-resize;" title="Previous Slide"></div>
+                <div class="click-zone click-zone-right" onClick=${(e) => handleChevronClick(e, 1)} style="position: absolute; right: 0; top: 0; bottom: 50px; width: 25%; z-index: 900; cursor: ew-resize;" title="Next Slide"></div>
               ` : ''}
         
               <style>
@@ -1290,12 +1287,29 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
                       <div style="flex: 1 1 auto; position: relative; overflow: hidden; min-height: 0;">
                         ${renderMedia(rawUrl)}
                       </div>
-                      ${(itemCaption || itemCredit) ? html`
-                        <div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px; text-align: right; align-items: flex-end; width: 100%; box-sizing: border-box;">
-                          ${itemCaption ? html`<div style="color: #ddd; width: 100%;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
-                          ${itemCredit ? html`<div style="font-size: 0.75rem; color: #888; width: 100%;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
+                      
+                      <!-- Bottom Gutter: Unified controls left, right-aligned meta -->
+                      <div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+                        
+                        <!-- Left Aligned anchored controllers (multi-media only) -->
+                        <div style="display: flex; align-items: center; gap: 8px; min-width: 80px;">
+                          ${mediaItems.length > 1 ? html`
+                            <button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} disabled=${prevDisabled} style="${btnStyle} width: 24px; height: 24px; padding: 0; ${prevDisabled ? 'opacity: 0.25; pointer-events: none;' : ''}" title="Previous Media">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </button>
+                            <span style="font-size: 0.72rem; font-family: monospace; color: #aaa; user-select: none;">${activeMediaIdx + 1}/${mediaItems.length}</span>
+                            <button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} disabled=${nextDisabled} style="${btnStyle} width: 24px; height: 24px; padding: 0; ${nextDisabled ? 'opacity: 0.25; pointer-events: none;' : ''}" title="Next Media">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                          ` : ''}
                         </div>
-                      ` : ''}
+                        
+                        <!-- Right Aligned Captions / Credits -->
+                        <div style="display: flex; flex-direction: column; gap: 2px; text-align: right; align-items: flex-end; max-width: 70%;">
+                          ${itemCaption ? html`<div style="color: #ddd; width: 100%; font-weight: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
+                          ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
+                        </div>
+                      </div>
                     </div>
                   `;
                 })}
@@ -1304,7 +1318,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
           `;
         };
         
-        MODULE_VERSIONS['MediaViewer'] = 'v2.13.2';// 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
+        MODULE_VERSIONS['MediaViewer'] = 'v2.13.2';
+// 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: ContentSlider ] 🔽🔽🔽
 // === [ MAJOR BLOCK: ContentSlider v5.7.0 ] ===
@@ -1900,7 +1915,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
                 const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
                 const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-                xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+                xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}\"></div>`;
               } else {
                 const styleIdx = uniqueStarts.indexOf(itemStartMs) % 4;
                 const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
@@ -1910,7 +1925,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
                 xAxisMarker = html`
                   <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply;">
-                    <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}"></div>
+                    <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}\"></div>
                     <div class="hover-bridge-hitbox" style="position: absolute; top: 0; bottom: -15px; left: -2px; right: -2px; z-index: 10; cursor: help;" onMouseEnter=${(e) => handleCaliperEnter(e, item)} onMouseMove=${(e) => handleCaliperMove(e, item)} onMouseLeave=${handleCaliperLeave}></div>
                   </div>
                 `;
@@ -2004,11 +2019,11 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   <!-- Event Markers -->
                   ${markers}
         
-                  <!-- Elevated Sticky Lane Labels (Z-Index 45) -->
-                  <div style="position: absolute; top: 15px; left: 0; bottom: 50px; width: 100%; pointer-events: none; z-index: 45;">
+                  <!-- Elevated Sticky Lane Labels (Z-Index 45 - Restored Full width Stretch) -->
+                  <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 50px; pointer-events: none; z-index: 45;">
                     ${orderedTags.map((tag, i) => html`
-                      <div style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; pointer-events: none; display: flex; align-items: center;">
-                        <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05); pointer-events: auto; height: 100%; display: flex; align-items: center; padding: 0 10px; font-size: 0.75rem; color: #555;">${tag}</div>
+                      <div style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; pointer-events: none; display: flex; align-items: center;">
+                        <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05); pointer-events: auto; position: sticky; left: 0; height: 100%; display: flex; align-items: center; padding: 0 10px; font-size: 0.75rem; color: #555;">${tag}</div>
                       </div>
                     `)}
                   </div>
@@ -2035,7 +2050,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         };
         
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.5';
-
 		// === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 

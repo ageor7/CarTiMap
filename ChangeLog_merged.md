@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.48 - 2026-08-25] - Stationary Gutter Docking, Zoom-2000 & CSS Hover Fanning
+**Refinements & Specifications:**
+*   ✓ **[Clean Media Viewport Ceiling]** Extracted all utility and maximize buttons completely out of the top and right margins of the Media Frame. Viewport margins are 100% clean and clear of button clutter.
+*   ✓ **[Stationary Control Docking]** Relocated the Maximize and Open Source File [↗] controllers into the non-scrolling bottom utility bar, cleanly anchored as static elements to the left of the captions and credits [REF: UI-199c].
+*   ✓ **[2000x Zoom Scale Factor]** Safely extended the maximum safety ceiling of the manual zoom scrubber from 500x to 2000x, allowing fine-grained sub-hour event separation on dense multi-month sheets.
+*   ✓ **[CSS Hover Unstacking]** Injected a hardware-accelerated CSS hover fanning selector on .event-group markers, dynamically hoisting active stacked cards to z-index: 99999 and scaling them up on pointer entry.
+*   ✓ **[Major Block Resumptions]** Fully resumed major block and version comments inside code structures as specified.
+
 ##### Changelog: [v8.12.46 - 2026-08-25] - UI Gutter Reconstruction & Sticky Bounds Override
 **Refinements & Specifications:**
 *   ✓ **[Ancoring Media Chevrons]** Refactored Media Carousel pagination chevrons to render unconditionally for multi-media events, disabling them with opacity (0.25) and pointer-events constraints at array bounds. This removes button-shifting dead-zones [REF: UI-199b].
