@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.52';
+        const APP_VERSION = 'v8.12.54';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1098,7 +1098,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer ] 🔽🔽🔽
-        // === [ MAJOR BLOCK: MediaViewer v8.12.52 ] ===
+        // === [ MAJOR BLOCK: MediaViewer v8.12.54 ] ===
         const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
           const carouselRef = useRef(null);
           const carouselWidthRef = useRef(0);
@@ -1253,14 +1253,9 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
           const nextDisabled = activeMediaIdx === mediaItems.length - 1;
           const isStatic = !currentMediaItem.toLowerCase().includes('youtube.com') && !currentMediaItem.toLowerCase().includes('youtu.be') && !currentMediaItem.toLowerCase().endsWith('.pdf');
         
-          const itemCaption = captions[activeMediaIdx] || '';
-          const itemCredit = credits[activeMediaIdx] || '';
-          const cUrl = getCleanUrl(currentMediaItem);
-          const isCreditUrl = /^https?:\/\//i.test(itemCredit);
-        
           return html`
-            <div style="position: relative; height: 100%; width: 100%; display: flex; flex-direction: column; overflow: hidden; background: #111;">
-              <!-- Absolute Utility Cluster: Stuck to the top-right, but shifted inward horizontally to clear vertical scrollbars and downward vertically to clear top headers / toolbars -->
+            <div style="position: relative; height: 100%; width: 100%; background: #111; overflow: hidden;">
+              <!-- Absolute Utility Cluster: Stuck to the top-right, well clear of top/right native toolbars -->
               <div style="position: absolute; top: 60px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;">
                 <button class="status-btn" onClick=${(e) => { e.stopPropagation(); setMaxPane(maxPane === 'media' ? null : 'media'); }} title="Toggle Maximize" style="${btnStyle} width: 28px; height: 28px;">
                   ${maxPane === 'media'
@@ -1269,12 +1264,27 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
                   }
                 </button>
                 ${currentCleanUrl !== '#' ? html`<a href=${currentCleanUrl} target="_blank" rel="noopener noreferrer" title="Open Source File" class="status-btn" style="${btnStyle} width: 28px; height: 28px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
+                ${mediaItems.length > 1 ? html`<div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(4px); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${activeMediaIdx + 1}/${mediaItems.length}</div>` : ''}
               </div>
         
               <!-- Invisible Ergonomic Touch Zones (Static Slides only) -->
               ${(mediaItems.length > 1 && isStatic) ? html`
-                <div class="click-zone click-zone-left" onClick=${(e) => handleChevronClick(e, -1)} style="position: absolute; left: 0; top: 0; bottom: 50px; width: 25%; z-index: 900; cursor: ew-resize;" title="Previous Slide"></div>
-                <div class="click-zone click-zone-right" onClick=${(e) => handleChevronClick(e, 1)} style="position: absolute; right: 0; top: 0; bottom: 50px; width: 25%; z-index: 900; cursor: ew-resize;" title="Next Slide"></div>
+                <div class="click-zone click-zone-left" onClick=${(e) => handleChevronClick(e, -1)} style="position: absolute; left: 0; top: 0; bottom: 0; width: 25%; z-index: 900; cursor: ew-resize;" title="Previous Slide"></div>
+                <div class="click-zone click-zone-right" onClick=${(e) => handleChevronClick(e, 1)} style="position: absolute; right: 0; top: 0; bottom: 0; width: 25%; z-index: 900; cursor: ew-resize;" title="Next Slide"></div>
+              ` : ''}
+        
+              <!-- Visible Chevron HUD (Over interactive media) -->
+              ${mediaItems.length > 1 ? html`
+                ${activeMediaIdx > 0 ? html`
+                  <button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} style="${btnStyle} position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Previous Media">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  </button>
+                ` : ''}
+                ${activeMediaIdx < mediaItems.length - 1 ? html`
+                  <button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} style="${btnStyle} position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 1000; width: 36px; height: 36px; border-radius: 50%; padding: 0;" title="Next Media">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </button>
+                ` : ''}
               ` : ''}
         
               <style>
@@ -1284,40 +1294,27 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
               </style>
         
               <!-- Scrollable Carousel Wrapper (Only horizontal-scrolls the media frames themselves) -->
-              <div class="media-carousel" ref=${carouselRef} onScroll=${handleScroll} onMouseDown=${onMouseDown} onMouseLeave=${onMouseLeave} onMouseUp=${onMouseUp} onMouseMove=${onMouseMove} style="scrollbar-width: none; flex: 1 1 auto; width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; min-height: 0;">
-                ${mediaItems.map((rawUrl, i) => html`
-                  <div class="media-item" key=${i} style="flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative;">
-                    <div style="flex: 1 1 auto; position: relative; overflow: hidden; min-height: 0;">
-                      ${renderMedia(rawUrl)}
+              <div class="media-carousel" ref=${carouselRef} onScroll=${handleScroll} onMouseDown=${onMouseDown} onMouseLeave=${onMouseLeave} onMouseUp=${onMouseUp} onMouseMove=${onMouseMove} style="scrollbar-width: none; height: 100%; width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory;">
+                ${mediaItems.map((rawUrl, i) => {
+                  const itemCaption = captions[i] || '';
+                  const itemCredit = credits[i] || '';
+                  const cUrl = getCleanUrl(rawUrl);
+                  const isCreditUrl = /^https?:\/\//i.test(itemCredit);
+                  return html`
+                    <div class="media-item" key=${i} style="flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative;">
+                      <div style="flex: 1 1 auto; position: relative; overflow: hidden; min-height: 0;">
+                        ${renderMedia(rawUrl)}
+                      </div>
+                      ${(itemCaption || itemCredit) ? html`
+                        <div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px; pointer-events: auto;">
+                          ${itemCaption ? html`<div style="color: #ddd; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
+                          ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
+                        </div>
+                      ` : ''}
                     </div>
-                  </div>
-                `)}
+                  `;
+                })}
               </div>
-              
-              <!-- Stationary Bottom Gutter (Captions, Credits, and Carousel chevrons - fully isolated from carousel scroll) -->
-              ${(itemCaption || itemCredit || mediaItems.length > 1) ? html`
-                <div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
-                  
-                  <!-- Left Aligned Controllers (Anchored, completely stationary) -->
-                  <div style="display: flex; align-items: center; gap: 8px; min-width: 80px;">
-                    ${mediaItems.length > 1 ? html`
-                      <button class="status-btn" onClick=${(e) => handleChevronClick(e, -1)} disabled=${prevDisabled} style="${btnStyle} width: 24px; height: 24px; padding: 0; ${prevDisabled ? 'opacity: 0.25; pointer-events: none;' : ''}" title="Previous Media">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                      </button>
-                      <span style="font-size: 0.72rem; font-family: monospace; color: #aaa; user-select: none;">${activeMediaIdx + 1}/${mediaItems.length}</span>
-                      <button class="status-btn" onClick=${(e) => handleChevronClick(e, 1)} disabled=${nextDisabled} style="${btnStyle} width: 24px; height: 24px; padding: 0; ${nextDisabled ? 'opacity: 0.25; pointer-events: none;' : ''}" title="Next Media">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </button>
-                    ` : ''}
-                  </div>
-                  
-                  <!-- Right Aligned Captions / Credits (Smoothly updates, permanently stationary) -->
-                  <div style="display: flex; flex-direction: column; gap: 2px; text-align: right; align-items: flex-end; max-width: 70%;">
-                    ${itemCaption ? html`<div style="color: #ddd; width: 100%; font-weight: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
-                    ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
-                  </div>
-                </div>
-              ` : ''}
             </div>
           `;
         };
@@ -1325,6 +1322,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
         MODULE_VERSIONS['MediaViewer'] = 'v2.13.3';
         // === [ END MAJOR BLOCK: MediaViewer ] ===
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
+
 
 
 // 🔽🔽🔽 [ START_INJECT: ContentSlider ] 🔽🔽🔽

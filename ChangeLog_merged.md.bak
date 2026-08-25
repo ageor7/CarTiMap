@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.54 - 2026-08-25] - Symmetrical Slide Isolation & Structural Gutter Clearance
+**Refinements & Specifications:**
+*   ✓ **[Zero Floating Overlay Conflict]** Re-integrated the caption and credit elements into the horizontal mapping routine. Each individual media slide maintains its own vertical flex column container, forcing text to sit perfectly below the media frame.
+*   ✓ **[Top Gutter Cleared]** Pinned Maximize and Open Source [↗] buttons to `top: 60px; right: 20px` as pure absolute overlays, leaving the top-most 48px completely clear of physical interface coordinates.
+
 #### Changelog: [v8.12.52 - 2026-08-25] - Coordinate Restorations & Isolated Gutter Mechanics
 **Refinements & Specifications:**
 *   ✓ **[Offset Floating Layout]** Pinned Maximize and Open Source [↗] buttons to the top-right of the Media Pane (`top: 60px; right: 20px;`) keeping them well clear of browser-native top toolbars and horizontal clipping boundaries.

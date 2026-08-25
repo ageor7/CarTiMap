@@ -338,6 +338,8 @@ Interactive media iframes (e.g., YouTube, PDFs, embedded WebGL maps) fundamental
 ### [REF: SEARCH-02] Advanced Normalization & Agnosticism (Search Engine)
 To ensure a frictionless retrieval experience—especially critical for Polytonic Greek historical archives—the search indexer is explicitly decoupled from raw data strings. The AppOrchestrator utilizes a specialized `stripAndNormalize` regex closure. This engine sequentially: 1) Purges invisible HTML tags to prevent users from accidentally matching CSS classes or href attributes hidden in the dataset. 2) Executes NFD Unicode decomposition to mathematically separate base characters from their diacritics. 3) Strips the tonal markers (`/[̀-ͯ]/g`), enforcing a perfect case-and-accent-agnostic search matrix.
 
+### [REF: UI-201c] Centered Click-Window Pattern [NEW - 2026-08-25] 
+To bypass browser CORS/Clickjacking constraints when embedding third-party interactive media (such as YouTube iframes or PDF players), the media viewport swipe overlay must utilize a physical pass-through coordinate. Rather than using complex hover toggles, the system must deploy an absolute-centered window measuring 160px by 120px (top: 50%; left: 50%; transform: translate(-50%, -50%)) configured with pointer-events: none and carved out using a CSS clip-path polygon. This allows natural center clicks to fall through directly to the underlying media player, while the surrounding outer canvas boundaries retain pointer-events: auto to process swipe navigation gestures cleanly. Symmetrically, to prevent layout collisions, all media navigation chevrons are relocated to the bottom-left corner of the container (left: 16px; bottom: 12px;), and if a caption exists, a padding-left: 110px; is dynamically applied to the caption wrapper to prevent any visual overlapping.
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>
@@ -433,6 +435,12 @@ To circumvent the CPU cost of mathematically recalculating long-string widths du
 
 ### [REF: UI-188] Asymmetrical Hit-Boxes [NEW]
 To protect Fitts's Law on touch devices, the CSS `clip-path` bounding the Ghost Calipers is decoupled from interactive listeners. An invisible sibling node (`.hover-bridge-hitbox`) handles the `onMouseEnter` logic. This node is uniquely biased downwards (`bottom: -15px`), pushing the interaction target safely past the `.event-block` typography and directly into the dead-space of the 28px X-Axis timeline track.
+
+### [REF: TL-18b] Viewport-Center HUD Button Fallback [NEW - 2026-08-25]: 
+To prevent vertical axis and layout scroll-snapping errors during timeline scaling shifts, the timeline scroll system must distinguish between slide-initiated autofocus events and manual scale modifications. Manual zoom triggers (mouse wheel, touchpad pinches, or HUD zoom buttons) must explicitly reject snapping to the active slide index. For cursor wheel zooms (onWheel), the exact timeline time under the cursor (eventX) must be captured and centered in the viewport post-zoom. For manual HUD buttons (center zooms), the current visual midpoint of the screen (containerW / 2) serves as the mathematical anchor, applying the scale transform, and adjusting scrollLeft to snap the identical time coordinate back to the center of the viewport, preserving the user's focus.
+
+### [REF: MAP-12b] Granular Wave-Date Dimming (Quantum Sets) [NEW - 2026-08-25]: 
+To support micro-chronological geographic modeling—such as military or diplomatic forces arriving in distinct waves inside an inclusive EDTF Set or List {}—the mapping engine must decouple coordinate highlights from slide-level states. During data ingestion, the engine maps the individual elements of a Set/List of dates 1:1 to the individual features in the coordinate geometry, caching the specific date limit onto each Leaflet layer object as layerDate. During active timeline scrubbing, the temporal filter loops through each layer of the active slide. Any layer whose cached layerDate intersects the scrubber viewport bounds receives 100% opacity, while layers representing future or past dates are attenuated to 20% opacity (Temporal Ghosting), allowing the map to physically animate strategic spatial expansions on the fly.
 
 ---
 

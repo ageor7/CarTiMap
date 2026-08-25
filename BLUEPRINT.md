@@ -511,5 +511,9 @@ During string parsing and extraction loops inside the Virtual DOM, the engine mu
 ### [REF: UI-175] Global Beam Architecture
 Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pane. Re-engineered it as a static 32px horizontal structural beam (`#app-layout > .global-status-bar`) separating the Core Viewports from the Timeline Scrubber. This guarantees the UI floor permanently survives visual pane maximizations.
 
+*   **[REF: UI-83] Absolute Utility Margin Offsets [UPDATED]:** The floating control toolbar (`Maximize` and `Open Source File [↗]`) inside the Media Viewer is absolute-positioned at `top: 60px; right: 60px`. This horizontal translation provides a strict 60px safe margin that isolates our UI elements from native browser scrollbars and inline iframe toolbars.
+*   **[REF: UI-84] Bottom-Center Navigation HUD [NEW]:** To eliminate vertical side-edge clutter over maps and images, multiple-media slides display a consolidated, central navigation bubble absolute-positioned at `bottom: 65px; left: 50%; transform: translateX(-50%)`. This groups chevrons and counter indicators into a compact tap zone while clearing bottom-aligned iframe menu overlays.
+
+
 ---
 

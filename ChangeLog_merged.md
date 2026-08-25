@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.55 - 2026-08-25] - Clear Sidebar Margins & Consolidated Bottom-Center Navigation HUD
+**Refinements & Specifications:**
+*   ✓ **[Right Margin Safe Zone]** Relocated the floating utility toolbar stack (`Maximize` / `Open Source File [↗]`) horizontally leftward to `right: 60px` of the Media viewport, guaranteeing zero layout collision with browser scrollbars or PDF native tools.
+*   ✓ **[Horizontal Navigation HUD Consolidation]** Extracted the carousel prev/next buttons from the left and right screen edges. Consolidated them into a floating bottom-center overlay bubble positioned safely at `bottom: 65px` to keep navigation clean and central.
+
 #### Changelog: [v8.12.54 - 2026-08-25] - Symmetrical Slide Isolation & Structural Gutter Clearance
 **Refinements & Specifications:**
 *   ✓ **[Zero Floating Overlay Conflict]** Re-integrated the caption and credit elements into the horizontal mapping routine. Each individual media slide maintains its own vertical flex column container, forcing text to sit perfectly below the media frame.
