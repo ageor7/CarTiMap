@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.44 - 2026-08-25] - Typography String Alignment & Index Repair
+**Refinements & Specifications:**
+*   ✓ **[Label Splicing Hotfix]** Resolved fatal browser thread crash `TypeError: last.trim is not a function` inside label wrapper formatting logic [REF: TL-20b].
+*   ✓ **[Footnote Shielding Compliance]** Targeted string lookups inside wrap array strictly via ES6 `.at(1)` index coercion rather than bracket indexing `[1]`, maintaining the rigorous anti-footnote parser shielding defined in global spec v8.3.4.
+*   ✓ **[Static-Analysis Hardening]** Run comprehensive script verification to guarantee compilation block is entirely free of Temporal Dead Zones, missing state assignments, or dangling references.
+
 #### Changelog: [v8.12.43 - 2026-08-25] - TDZ Elimination & Stacking Reconstruction
 **Refinements & Specifications:**
 *   ✓ **[TDZ Reference Error Resolved]** Hoisted `topPos`, `blockHeight`, `lines`, `pxWidth`, and `hasMedia` declarations to the beginning of the `validData.map` callback, permanently shielding the runtime from lexical compile-time failures.
