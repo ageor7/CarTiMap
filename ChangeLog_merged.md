@@ -1,6 +1,18 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.12.38 - 2026-08-25] - Kinetics, Interface & Dimming Sprints
+Map & Timeline Engineering:
+
+    ✓ [Viewport-Center HUD Zoom] Configured zoom buttons to center on current visual midpoint instead of active slide coordinate.
+    ✓ [Cursor-to-Midpoint Zoom] Mouse wheel scroll zooming captures local cursor timestamp and snaps it directly to visual screen center.
+    ✓ [Wave Dimming] Integrated coordinate-specific timestamp caching to animate cohort waves inside EDTF Sets/Lists independently.
+
+Layout & Usability:
+
+    ✓ [Centered Pass-Through Hole] Carved out a 160x120px interactive window in the swipe overlay to restore native play/speed toolbar clicks.
+    ✓ [Chevron Relocation] Shifted media chevrons bottom-left, padding the caption text container to prevent overlap.
+
 [v8.11.26] - AST Order of Operations & Qualified Durations
 System Integrity & Physics:
 
