@@ -1,7 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-#### Changelog: [v8.12.45 - 2026-08-25] - Chevron Anchoring, Metadata Real-Alignment & Swimlane Z-Elevation
+##### Changelog: [v8.12.46 - 2026-08-25] - UI Gutter Reconstruction & Sticky Bounds Override
+**Refinements & Specifications:**
+*   ✓ **[Ancoring Media Chevrons]** Refactored Media Carousel pagination chevrons to render unconditionally for multi-media events, disabling them with opacity (0.25) and pointer-events constraints at array bounds. This removes button-shifting dead-zones [REF: UI-199b].
+*   ✓ **[Right-Aligned Gutter Metadata]** Aligned Caption and Credit sub-elements to the far right with right text-alignment, establishing an immutable bottom-edge grid anchor that eliminates structural shifting as media aspect ratios scale.
+*   ✓ **[Z-Axis Swimlane Overrides]** Hoisted `.tag-lane-label` nodes to an isolated sibling layer sitting at `z-index: 45` over standard event groups. Sticky tags now remain permanently visible and fully interactive above passing timeline nodes.
+*   ✓ **[Duration Lane High-Contrast Band]** Injected a solid white horizontal band at `bottom: 28px` directly beneath the xAxisMarker path. This protects the visibility of complex, hatched, and multi-layered duration trapezoids from background gray-lane interference.
+
+### Changelog: [v8.12.45 - 2026-08-25] - Chevron Anchoring, Metadata Real-Alignment & Swimlane Z-Elevation
 **Refinements & Specifications:**
 *   ✓ **[Ancoring Media Chevrons]** Refactored Media Carousel pagination chevrons to render unconditionally for multi-media events, disabling them with opacity (0.25) and pointer-events constraints at array bounds. This removes button-shifting dead-zones [REF: UI-199b].
 *   ✓ **[Right-Aligned Gutter Metadata]** Aligned Caption and Credit sub-elements to the far right with right text-alignment, establishing an immutable bottom-edge grid anchor that eliminates structural shifting as media aspect ratios scale.
