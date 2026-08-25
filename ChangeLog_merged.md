@@ -1,7 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-#### Changelog: [v8.12.48 - 2026-08-25] - Stationary Gutter Docking, Zoom-2000 & CSS Hover Fanning
+##### Changelog: [v8.12.49 - 2026-08-25] - Spatial Coordinate Clearance & Null-Pointer Prevention
+**Refinements & Specifications:**
+*   ✓ **[Visual Viewport Clearance]** Restored utility controls to the upper quadrant of the Media Pane, positioned at `top: 60px; right: 60px;` to leave a 60x60px physical corner completely empty [REF: UI-199d].
+*   ✓ **[Null-Pointer Protection]** Corrected the media agnosticism `.toLowerCase()` parser crash on empty media records by injecting an immediate exit condition and safe empty-string fallbacks. This fixes the runtime crash and restores the screen.
+*   ✓ **[2000x Sub-Hour Zoom]** Scaled maximum manual zoom limit from 500x to 2000x for precise event rendering.
+*   ✓ **[Hover Stack Fanning]** Integrated hardware-accelerated CSS hover elevators (`z-index: 99999` and `scale(1.08)`) on dense marker lanes.
+
+### Changelog: [v8.12.48 - 2026-08-25] - Stationary Gutter Docking, Zoom-2000 & CSS Hover Fanning
 **Refinements & Specifications:**
 *   ✓ **[Clean Media Viewport Ceiling]** Extracted all utility and maximize buttons completely out of the top and right margins of the Media Frame. Viewport margins are 100% clean and clear of button clutter.
 *   ✓ **[Stationary Control Docking]** Relocated the Maximize and Open Source File [↗] controllers into the non-scrolling bottom utility bar, cleanly anchored as static elements to the left of the captions and credits [REF: UI-199c].
