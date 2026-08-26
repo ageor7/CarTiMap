@@ -221,6 +221,10 @@ Map initialization forces a strict execution latency. The generic `fitBounds` pa
 ### [REF: BOOT-CRASH-02b] Hardcoded Pin Dimensions [UPDATED]
 Custom HTML CSS markers physically measure `24px` by `34px`. To insulate the geometry against documentation/markdown parsers inadvertently swallowing bracketed arrays, the engine mathematically enforces these pixel boundaries by declaring strict Leaflet constructor objects (`iconSize: new L.Point(24, 34)`, `iconAnchor: new L.Point(12, 34)`) instead of shorthand arrays.
 
+*   **[REF: DOC-02] Sub-Block Surgical Landmarks [UPDATED]:** Logical sub-blocks within major components are strictly isolated using physical comment boundaries (START_SUBBLOCK and END_SUBBLOCK). Patching scripts must target these boundaries exclusively to preserve bracket parity.
+*   **[REF: MAP-03b] Decoupled Kinetic Camera Flight [NEW]:** To eliminate camera jitter during timeline scrubs, marker opacities (Temporal Ghosting) are calculated within a lightweight effect, while heavy flyToBounds transitions are bound to an isolated effect triggered strictly when activeIndex mutates.
+*   **[REF: BOOT-CRASH-03] Character Class Range Bounds [NEW]:** RegExp character classes containing literal dashes or backslashes must explicitly escape these tokens to prevent the compiler from evaluating ASCII ranges and throwing fatal SyntaxError halts on boot.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>
