@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.60 - 2026-08-26] - Chronological Regex Defenses
+**Bug Fixes & System Stability:**
+*   ✓ **[Strict-Mode Tokenizer Crash]** Surgically escaped forward slashes inside regular expression character classes in the `parseChronoNode` date tokenizer. This prevents premature literal closures and subsequent strict-mode escape sequence compilation halts [REF: BOOT-CRASH-03].
+
 #### Changelog: [v8.12.59c - 2026-08-26] - SIB Landmarking and Rendering Decoupling
 **Bug Fixes & Architectural Upgrades:**
 *   ✓ **[Surgical Landmarks]** Implemented physical `START_SUBBLOCK` and `END_SUBBLOCK` comment boundaries inside `TimelineScrubber`, `MapViewer`, and `AppOrchestrator` components to enable safe patching [REF: DOC-02].

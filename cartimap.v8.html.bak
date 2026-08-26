@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.57';
+        const APP_VERSION = 'v8.12.59c';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2206,7 +2206,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 }
                 const parts = cleanLegacy.split(' ');
                 if (parts.length < 1) return null;
-                const dParts = parts.at(0).split(/[\/\\.-]/);
+                const dParts = parts.at(0).split(\/[\/\\.-]/);
                 const tParts = parts.length > 1 ? parts.at(1).split(':') : null;
                 const secParts = tParts && tParts.length > 2 ? String(tParts.at(2)).split('.') : null;
                 

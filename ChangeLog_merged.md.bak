@@ -1,7 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-#### Changelog: [v8.12.59 - 2026-08-26] - Regular Expression Character Class Security
+#### Changelog: [v8.12.59c - 2026-08-26] - SIB Landmarking and Rendering Decoupling
+**Bug Fixes & Architectural Upgrades:**
+*   ✓ **[Surgical Landmarks]** Implemented physical `START_SUBBLOCK` and `END_SUBBLOCK` comment boundaries inside `TimelineScrubber`, `MapViewer`, and `AppOrchestrator` components to enable safe patching [REF: DOC-02].
+*   ✓ **[Decoupled Map Physics]** Decoupled temporal opacities from camera flight transitions to achieve 60fps kinetic scrolling [REF: MAP-03b].
+*   ✓ **[Dynamic Ingestion Filters]** Added multi-lane storyline popovers with null-viewport safety locks on deselect actions [REF: ETL-14b].
+*   ✓ **[Character Class Security]** Rebuilt ASCII regex character classes to stop lowercase letter swallowing and prevent fatal boot-time SyntaxErrors [REF: BOOT-CRASH-03].
+
+#### Changelog: [v8.12.59b - 2026-08-26] - Regular Expression Character Class Security
 **Bug Fixes & System Stability:**
 *   ✓ **[RegExp Boot Crash]** Corrected a fatal SyntaxError in `parseChronoNode` by sanitizing character-class ranges [REF: BOOT-CRASH-03].
 *   ✓ **[formatPlaces Corruption]** Re-anchored place-splitting delimiters to stop lowercase character swallowing and resolved a fatal `.trim()` array TypeError.
