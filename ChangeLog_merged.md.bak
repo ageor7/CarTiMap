@@ -1,6 +1,16 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.59 - 2026-08-26] - Ingestion Scope Resolution
+**Bug Fixes & System Stability:**
+*   ✓ **[Lexical Scope Leak]** Re-anchored `omniSplitRegex` to the root boundary of the AppOrchestrator data-ingest hook, correcting a ReferenceError crash that caused a blank screen [REF: MED-08].
+
+3. Master Blueprint Entries (CarTiMap Analysis Doc)
+
+### ## 2. Data Schema & The Upstream ETL Pipeline ↓↓
+
+*   **[REF: MED-08] Lexical Scope Isolation [UPDATED]:** The regex delimiter `omniSplitRegex` (`/\||\r?\n/`) must remain bound directly to the root frame of the parent `useEffect` block inside the AppOrchestrator. Localizing this constant inside mapping callbacks isolates it from downstream execution phases, causing runtime engine halts during subsequent tag-splitting loops.
+
 #### Changelog: [v8.12.58 - 2026-08-25] - Integrated Swimlane Filters & Consolidated Chronological Telemetry
 **Functional Enhancements & Specifications:**
 *   ✓ **[Horizontal Swimlane Filters]** Added an interactive popover tag controller to the taskbar left edge, allowing real-time multi-theater filtering [REF: ETL-14b].

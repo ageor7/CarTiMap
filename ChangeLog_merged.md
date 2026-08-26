@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.59 - 2026-08-26] - Regular Expression Character Class Security
+**Bug Fixes & System Stability:**
+*   ✓ **[RegExp Boot Crash]** Corrected a fatal SyntaxError in `parseChronoNode` by sanitizing character-class ranges [REF: BOOT-CRASH-03].
+*   ✓ **[formatPlaces Corruption]** Re-anchored place-splitting delimiters to stop lowercase character swallowing and resolved a fatal `.trim()` array TypeError.
+
 #### Changelog: [v8.12.59 - 2026-08-26] - Ingestion Scope Resolution
 **Bug Fixes & System Stability:**
 *   ✓ **[Lexical Scope Leak]** Re-anchored `omniSplitRegex` to the root boundary of the AppOrchestrator data-ingest hook, correcting a ReferenceError crash that caused a blank screen [REF: MED-08].
