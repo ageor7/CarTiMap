@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.58 - 2026-08-25] - Integrated Swimlane Filters & Consolidated Chronological Telemetry
+**Functional Enhancements & Specifications:**
+*   ✓ **[Horizontal Swimlane Filters]** Added an interactive popover tag controller to the taskbar left edge, allowing real-time multi-theater filtering [REF: ETL-14b].
+*   ✓ **[Filter State Protection]** Implemented an administrative toggle lock. If only one active swimlane remains, the system blocks deselect actions and logs a warning to prevent Virtual DOM crashes.
+*   ✓ **[Un-tagged Event Bypass]** Bypassed temporal filtering for data records without explicit tags (e.g., the "About" slide) to safeguard overall story continuity.
+*   ✓ **[Unified Chrono-Telemetry]** Shifted active timeline zoom metrics directly into the taskbar `.semantic-time-span` string (e.g., "Span: 7 Months (Zoom: 15x)"), purging the redundant `.zoom-factor` container from the timeline track [REF: UI-164b].
+
 #### Changelog: [v8.12.57 - 2026-08-25] - Syntax Restoration & Regular Expression Compilation Fix
 **Refinements & Specifications:**
 *   ✓ **[Syntactic Validation]** Corrected the timestamp capture group `/[?&]t=([^&]+)/` inside MediaViewer, resolving the fatal unclosed parenthetical SyntaxError [REF: CRASH-05].

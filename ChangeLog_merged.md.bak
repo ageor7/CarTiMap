@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.57 - 2026-08-25] - Syntax Restoration & Regular Expression Compilation Fix
+**Refinements & Specifications:**
+*   ✓ **[Syntactic Validation]** Corrected the timestamp capture group `/[?&]t=([^&]+)/` inside MediaViewer, resolving the fatal unclosed parenthetical SyntaxError [REF: CRASH-05].
+*   ✓ **[Balanced Compilation]** Re-ran multi-pass balance scripts to verify complete parity of braces, bracket coordinates, and backticks across the operational Preact pipeline.
+
 #### Changelog: [v8.12.56 - 2026-08-25] - Micro-Event Playback Interceptors & Timeline Track Centering
 **Refinements & Specifications:**
 *   ✓ **[Media Playback "Just Pause"]** Configured synchronous `.pause()` for native HTML5 video layers and integrated enablejsapi=1 postMessage calls for un-focused YouTube frames, killing background leaks on navigation [REF: MED-11].
