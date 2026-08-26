@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.57';
+        const APP_VERSION = 'v8.12.58';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -527,574 +527,455 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         // === [ END MAJOR BLOCK ] ===
 
 // 🔽🔽🔽 [ START_INJECT: MapViewer ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v6.5.0 ] ===
-const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
-  const mapDomRef = useRef(null);
-  const miniMapDomRef = useRef(null);
-  const mapInstance = useRef(null);
-  const miniMapInstance = useRef(null);
-  const rectBoundsRef = useRef(null);
-  const markerLayer = useRef(null);
-  const clusterLayer = useRef(null);
-  const gridLayerRef = useRef(null);
-  const markersRef = useRef({});
-  const hasFitBounds = useRef(false);
-  const [mapZoom, setMapZoom] = useState(2);
-  const [showGrid, setShowGrid] = useState(false);
-  const [showLayersMenu, setShowLayersMenu] = useState(false);
-  const [activeBasemap, setActiveBasemap] = useState(null);
-  const [activeOverlays, setActiveOverlays] = useState([]);
-  const [overlayOpacities, setOverlayOpacities] = useState({});
-  const initialLoadRef = useRef(false);
-  const baseLayerRef = useRef(null);
-  const miniBaseLayerRef = useRef(null);
-  const overlayLayersRef = useRef({});
-  const miniOverlayLayersRef = useRef({});
-  const minimapOffsetRef = useRef(minimapOffset || -4);
-  const isSyncingRef = useRef(false);
-
-  const safeStripHTML = (str) => {
-    if (!str) return '';
-    return String(str).replace(/<p[^>]*>/gi, ' - ').replace(/<[^>]*>?/gm, '').trim();
-  };
-
-  const formatPlaces = (str) => {
-    if (!str) return '';
-    return str.split(/[|\\-·;]/).map(s => s.split(',').trim()).filter(Boolean).join(' | ');
-  };
-
-  const loadScript = (src) => new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) return resolve();
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-
-  const loadStyle = (href) => {
-    if (document.querySelector(`link[href="${href}"]`)) return;
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  };
-
-  const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
-
-  useEffect(() => {
-    if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
-      const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
-      if (defaultBase) setActiveBasemap(defaultBase.id);
-      const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
-      setActiveOverlays(defaultOverlays);
-      const initOpac = {};
-      basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
-        initOpac[o.id] = o.defaultOpacity ?? 1.0;
-      });
-      setOverlayOpacities(initOpac);
-      initialLoadRef.current = true;
-    }
-  }, [basemapsRegistry]);
-
-  useEffect(() => {
-    minimapOffsetRef.current = minimapOffset;
-    if (mapInstance.current && miniMapInstance.current) {
-      let targetMiniZoom = Math.max(0, mapInstance.current.getZoom() + minimapOffset);
-      miniMapInstance.current.setView(mapInstance.current.getCenter(), targetMiniZoom, { animate: true });
-    }
-  }, [minimapOffset]);
-
-  const createPinHtml = (isActive, isVip) => {
-    const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
-    return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'};"><div class="pin-head" style="background: ${color};"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'};"></div></div>`;
-  };
-
-  const extractLayers = (layerObj) => {
-    let layers = [];
-    if (Array.isArray(layerObj)) layerObj.forEach(l => layers = layers.concat(extractLayers(l)));
-    else if (layerObj && layerObj.eachLayer) layerObj.eachLayer(l => layers = layers.concat(extractLayers(l)));
-    else if (layerObj) layers.push(layerObj);
-    return layers;
-  };
-
-  const parseGeometryCollection = (wktStr) => {
-    const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\s*\(/i, '').replace(/\)\s*\$/, '');
-    let inParen = 0;
-    let currentGeom = '';
-    const geometries = [];
-    for (let i = 0; i < cleanStr.length; i++) {
-      const char = cleanStr[i];
-      if (char === '(') inParen++;
-      if (char === ')') inParen--;
-      if (char === ',' && inParen === 0) {
-        geometries.push(currentGeom.trim());
-        currentGeom = '';
-      } else currentGeom += char;
-    }
-    if (currentGeom.trim()) geometries.push(currentGeom.trim());
-    let extractedLayers = [];
-    geometries.forEach(geomStr => {
-      try {
-        const wkt = new window.Wkt.Wkt();
-        wkt.read(geomStr);
-        extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
-      } catch (e) {
-        const upper = geomStr.toUpperCase();
-        if (upper.startsWith('POINT')) {
-          const m = geomStr.match(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/);
-          if (m) extractedLayers.push(L.marker([parseFloat(m[1]), parseFloat(m[2])]));
-        } else if (upper.startsWith('LINESTRING') || upper.startsWith('POLYGON')) {
-          const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
-          if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => [parseFloat(x[1]), parseFloat(x[2])])) : L.polyline(m.map(x => [parseFloat(x[1]), parseFloat(x[2])])));
-        }
-      }
-    });
-    return extractedLayers;
-  };
-
-  useEffect(() => {
-    if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const initialZoom = urlParams.get('mapzoom') ? parseInt(urlParams.get('mapzoom')) : 2;
-      setMapZoom(initialZoom);
-      const map = L.map(mapDomRef.current, { zoomControl: false, maxZoom: maxGlobalZoom }).setView([37.9838, 23.7275], initialZoom);
-      L.control.scale({ position: 'bottomleft', imperial: true, metric: true }).addTo(map);
-      map.on('zoomend', () => setMapZoom(map.getZoom()));
-
-      markerLayer.current = L.featureGroup().addTo(map);
-      clusterLayer.current = L.markerClusterGroup({
-        maxClusterRadius: 40,
-        spiderfyOnMaxZoom: true,
-        zoomToBoundsOnClick: false,
-        iconCreateFunction: function(cluster) {
-          const children = cluster.getAllChildMarkers();
-          const firstLatLng = children.at(0).getLatLng();
-          const isExactSame = children.every(m => m.getLatLng().equals(firstLatLng));
-          if (isExactSame) {
-            const count = children.length;
-            const htmlValue = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;"><div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4);"></div><div class="pin-stem" style="background: #333; width: 2px;"></div><div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">${count}</div></div>`;
-            return L.divIcon({ className: 'custom-div-icon', html: htmlValue, iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
-          }
-          let c = ' marker-cluster-';
-          if (children.length < 10) c += 'small';
-          else if (children.length < 100) c += 'medium';
-          else c += 'large';
-          return new L.DivIcon({ html: '<div><span>' + children.length + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
-        }
-      }).addTo(map);
-
-      clusterLayer.current.on('clusterclick', (c) => {
-        const m = mapInstance.current;
-        if (m.getZoom() < 10) {
-          m.fitBounds(c.layer.getBounds(), { padding: new L.Point(40, 40) });
-        } else {
-          c.layer.spiderfy();
-        }
-      });
-
-      gridLayerRef.current = L.layerGroup().addTo(map);
-      clusterLayer.current.on('clustermouseover', (c) => {
-        const children = c.layer.getAllChildMarkers();
-        const places = [...new Set(children.map(m => m.itemPlace).filter(Boolean))];
-        const titles = [...new Set(children.map(m => m.itemTitle).filter(Boolean))];
-        let displayHtml = '';
-        if (places.length > 0) {
-          displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center;">${places.slice(0, 2).join(' / ')}${places.length > 2 ? '...' : ''}</div>`;
-        }
-        displayHtml += `<div style="text-align: left; line-height: 1.3;">`;
-        displayHtml += titles.slice(0, 5).map(t => `• ${t}`).join('<br/>');
-        if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%;">+${titles.length - 5} more events...</em>`;
-        displayHtml += `</div>`;
-        c.layer.bindTooltip(displayHtml, { direction: 'top', className: 'custom-cluster-tooltip' }).openTooltip();
-      });
-      clusterLayer.current.on('clustermouseout', (c) => c.layer.unbindTooltip());
-
-      const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: true, scrollWheelZoom: true, doubleClickZoom: true, maxZoom: maxGlobalZoom }).setView([37.9838, 23.7275], 0);
-      const boundsRect = L.rectangle(map.getBounds(), { color: '#007acc', weight: 2, fillOpacity: 0.15 }).addTo(miniMap);
-      rectBoundsRef.current = boundsRect;
-
-      map.on('move', () => {
-        isSyncingRef.current = true;
-        let targetMiniZoom = Math.max(0, map.getZoom() + minimapOffsetRef.current);
-        miniMap.setView(map.getCenter(), targetMiniZoom, { animate: false });
-        const mapBounds = map.getBounds();
-        const center = map.getCenter();
-        const nw = miniMap.project(mapBounds.getNorthWest(), targetMiniZoom);
-        const se = miniMap.project(mapBounds.getSouthEast(), targetMiniZoom);
-        const w = Math.abs(se.x - nw.x);
-        const h = Math.abs(se.y - nw.y);
-        const MIN_PX = 30;
-        if (w < MIN_PX || h < MIN_PX) {
-          const cPx = miniMap.project(center, targetMiniZoom);
-          const adjW = Math.max(w, MIN_PX);
-          const adjH = Math.max(h, MIN_PX);
-          boundsRect.setBounds(L.latLngBounds(miniMap.unproject(L.point(cPx.x - adjW / 2, cPx.y - adjH / 2), targetMiniZoom), miniMap.unproject(L.point(cPx.x + adjW / 2, cPx.y + adjH / 2), targetMiniZoom)));
-        } else {
-          boundsRect.setBounds(mapBounds);
-        }
-        isSyncingRef.current = false;
-      });
-
-      miniMap.on('zoomend', () => {
-        if (!isSyncingRef.current && setMinimapOffset) {
-          let newOffset = miniMap.getZoom() - mapInstance.current.getZoom();
-          newOffset = Math.max(-10, Math.min(2, newOffset));
-          setMinimapOffset(newOffset);
-          minimapOffsetRef.current = newOffset;
-        }
-      });
-
-      mapInstance.current = map;
-      miniMapInstance.current = miniMap;
-
-      if (window.ResizeObserver) {
-        const ro = new ResizeObserver(() => {
-          setTimeout(() => {
-            if (mapInstance.current) mapInstance.current.invalidateSize();
-            if (miniMapInstance.current) miniMapInstance.current.invalidateSize();
-          }, 50);
-        });
-        ro.observe(mapDomRef.current.parentElement);
-        ro.observe(miniMapDomRef.current);
-      }
-    }
-  }, [basemapsRegistry]);
-
-  useEffect(() => {
-    const map = mapInstance.current;
-    if (!map || !gridLayerRef.current) return;
-    const updateGrid = () => {
-      gridLayerRef.current.clearLayers();
-      if (!showGrid) return;
-      const z = map.getZoom();
-      let step = z > 15 ? 0.01 : z > 13 ? 0.05 : z > 11 ? 0.1 : z > 9 ? 0.5 : z > 7 ? 1 : z > 5 ? 5 : z > 3 ? 10 : 20;
-      const b = map.getBounds();
-      const w = Math.floor(b.getWest() / step) * step - step;
-      const e = Math.ceil(b.getEast() / step) * step + step;
-      const s = Math.floor(b.getSouth() / step) * step - step;
-      const n = Math.ceil(b.getNorth() / step) * step + step;
-      const style = { color: '#007acc', weight: 1, opacity: 0.25, dashArray: '2, 6', interactive: false };
-      for (let lat = s; lat <= n; lat += step) {
-        if (lat >= -90 && lat <= 90) L.polyline([new L.LatLng(lat, w), new L.LatLng(lat, e)], style).addTo(gridLayerRef.current);
-      }
-      for (let lng = w; lng <= e; lng += step) {
-        L.polyline([new L.LatLng(-90, lng), new L.LatLng(90, lng)], style).addTo(gridLayerRef.current);
-      }
-    };
-    updateGrid();
-    map.on('moveend', updateGrid);
-    return () => map.off('moveend', updateGrid);
-  }, [showGrid]);
-
-  useEffect(() => {
-    const map = mapInstance.current;
-    const miniMap = miniMapInstance.current;
-    if (!map || !miniMap || !basemapsRegistry || !activeBasemap) return;
-    const config = basemapsRegistry.find(b => b.id === activeBasemap) || basemapsRegistry;
-    const renderBasemap = () => {
-      if (baseLayerRef.current) map.removeLayer(baseLayerRef.current);
-      if (miniBaseLayerRef.current) miniMap.removeLayer(miniBaseLayerRef.current);
-      const isVector = config.format === "pbf" || config.format === "mvt";
-      if (isVector && window.L.maplibreGL) {
-        baseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0 }).addTo(map);
-        miniBaseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: false, zIndex: 0 }).addTo(miniMap);
-      } else {
-        baseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0, keepBuffer: 4, updateWhenZooming: false }).addTo(map);
-        miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: false, zIndex: 0, keepBuffer: 4, updateWhenZooming: false }).addTo(miniMap);
-      }
-    };
-    if ((config.format === "pbf" || config.format === "mvt") && !window.L.maplibreGL) {
-      loadStyle('https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css');
-      Promise.all([loadScript('https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js')]).then(() => {
-        return loadScript('https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js');
-      }).then(() => { renderBasemap(); }).catch(e => console.error("Vector Library Load Failed", e));
-    } else {
-      renderBasemap();
-    }
-  }, [activeBasemap, basemapsRegistry, maxGlobalZoom]);
-
-  useEffect(() => {
-    const map = mapInstance.current;
-    const miniMap = miniMapInstance.current;
-    if (!map || !miniMap || !basemapsRegistry) return;
-    Object.keys(overlayLayersRef.current).forEach(id => {
-      if (!activeOverlays.includes(id)) {
-        map.removeLayer(overlayLayersRef.current[id]);
-        delete overlayLayersRef.current[id];
-      }
-    });
-    activeOverlays.forEach((id, idx) => {
-      if (!overlayLayersRef.current[id]) {
-        const config = basemapsRegistry.find(b => b.id === id);
-        if (config) {
-          const z = idx + 10;
-          const op = overlayOpacities[id] !== undefined ? overlayOpacities[id] : (config.defaultOpacity ?? 1.0);
-          const isWms = config.format === "wms" || config.url.toLowerCase().includes("wms");
-          if (isWms) {
-            overlayLayersRef.current[id] = L.tileLayer.wms(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, layers: config.wmsLayer || "default", format: "image/png", transparent: true, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true }).addTo(map);
-          } else {
-            overlayLayersRef.current[id] = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, transparent: true, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true }).addTo(map);
-          }
-        }
-      }
-    });
-  }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
-
-  useEffect(() => {
-    Object.keys(overlayOpacities).forEach(id => {
-      if (overlayLayersRef.current[id]) overlayLayersRef.current[id].setOpacity(overlayOpacities[id]);
-    });
-  }, [overlayOpacities]);
-
-  useEffect(() => {
-    const map = mapInstance.current;
-    if (!map || data.length === 0) return;
-    markerLayer.current.clearLayers();
-    clusterLayer.current.clearLayers();
-    markersRef.current = {};
-    let validMarkers = 0;
-    const uniqueSignatures = new Set();
-
-    data.forEach((item, idx) => {
-      const locStr = String(item.location || '').trim();
-      if (!locStr) return;
-      const activeLayersArray = [];
-      let featureLayers = [];
-      try {
-        if (locStr.match(/^GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(locStr);
-        else if (locStr.match(/^[A-Z]+\s*\(/)) {
-          const wkt = new window.Wkt.Wkt();
-          wkt.read(locStr);
-          featureLayers = extractLayers(wkt.toObject());
-        } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
-          featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
-        } else {
-          const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
-          if (coordMatch) featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch[1]), parseFloat(coordMatch[2]))));
-        }
-
-        const validFeatureLayers = [];
-        featureLayers.forEach(layer => {
-          let sig = null;
-          if (layer.getLatLng) {
-            const ll = layer.getLatLng();
-            if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
-            sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
-          } else if (layer.getBounds) {
-            const b = layer.getBounds();
-            if (!b || !b.isValid()) return;
-            sig = `B_${b.toBBoxString()}`;
-          }
-          if (sig) {
-            if (uniqueSignatures.has(sig)) return;
-            uniqueSignatures.add(sig);
-          }
-          validFeatureLayers.push(layer);
-        });
-
-        const subLabels = item.subLabels ? item.subLabels.split(/[|\-·;\n]/).map(s => s.trim()).filter(Boolean) : [];
-        const places = item.place ? item.place.split(/[|\-·;\n]/).map(s => s.trim()).filter(Boolean) : [];
-        const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
-
-        validFeatureLayers.forEach((layer, layerIdx) => {
-          if (layer instanceof L.Polygon) {
-            layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: polygonOpacity });
-          } else if (layer instanceof L.Polyline) {
-            layer.setStyle({ color: '#007acc', weight: 2, dashArray: '8, 8' });
-          } else if (layer.setStyle) {
-            layer.setStyle({ color: '#007acc', weight: 4 });
-          }
-
-          if (layer instanceof L.Marker) {
-            layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-            layer.isVip = isVip;
-          }
-
-          const safeSubLabel = subLabels.length > layerIdx ? subLabels[layerIdx] : null;
-          const safePlace = places.length > layerIdx ? places[layerIdx] : null;
-          let labelToUse = safeSubLabel || safePlace || item.title;
-          layer.itemPlace = safeStripHTML(labelToUse);
-          layer.itemTitle = safeStripHTML(item.title);
-          layer.bindTooltip(layer.itemPlace, { direction: 'top', offset: new L.Point(0, -34), className: 'centered-tooltip' });
-          layer.on('click', () => setActiveIndex(idx));
-
-          // Quantum wave dynamic caching parameters
-          let layerDate = null;
-          if (item.startDate && item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List') && Array.isArray(item.startDate.obj.values)) {
-            const dateVal = item.startDate.obj.values[layerIdx];
-            if (dateVal) {
-              layerDate = { min: dateVal.min, max: dateVal.max };
+        // === [ MAJOR BLOCK: MapViewer v6.4.2 ] ===
+        const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
+          const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
+          const mapInstance = useRef(null); const miniMapInstance = useRef(null);
+          const rectBoundsRef = useRef(null); const markerLayer = useRef(null);
+          const clusterLayer = useRef(null); const gridLayerRef = useRef(null);
+          const markersRef = useRef({}); const hasFitBounds = useRef(false);
+          const [mapZoom, setMapZoom] = useState(2); const [showGrid, setShowGrid] = useState(false);
+          const [showLayersMenu, setShowLayersMenu] = useState(false);
+          const [activeBasemap, setActiveBasemap] = useState(null);
+          const [activeOverlays, setActiveOverlays] = useState([]);
+          const [overlayOpacities, setOverlayOpacities] = useState({});
+          const initialLoadRef = useRef(false); const baseLayerRef = useRef(null);
+          const miniBaseLayerRef = useRef(null); const overlayLayersRef = useRef({});
+          const minimapOffsetRef = useRef(minimapOffset || -4);
+          const isSyncingRef = useRef(false);
+          const isFlyAnimatingRef = useRef(false);
+        
+          const safeStripHTML = (str) => {
+            if (!str) return '';
+            return String(str).replace(/<p[^>]*>/gi, ' - ').replace(/<[^>]*>?/gm, '').trim();
+          };
+        
+          const formatPlaces = (str) => {
+            if (!str) return '';
+            return str.split(/[|\\-·;]/).map(s => s.split(',').trim()).filter(Boolean).join(' | ');
+          };
+        
+          const loadScript = (src) => new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${src}"]`)) return resolve();
+            const script = document.createElement('script'); script.src = src; script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
+          });
+        
+          const loadStyle = (href) => {
+            if (document.querySelector(`link[href="${href}"]`)) return;
+            const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = href; document.head.appendChild(link);
+          };
+        
+          const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
+        
+          useEffect(() => {
+            if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
+              const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
+              if (defaultBase) setActiveBasemap(defaultBase.id);
+              const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
+              setActiveOverlays(defaultOverlays);
+              const initOpac = {}; basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => { initOpac[o.id] = o.defaultOpacity ?? 1.0; });
+              setOverlayOpacities(initOpac); initialLoadRef.current = true;
             }
-          }
-          layer.layerDate = layerDate;
-
-          if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer);
-          else markerLayer.current.addLayer(layer);
-          activeLayersArray.push(layer);
-          validMarkers++;
-        });
-
-        if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
-      } catch (e) {
-        console.error("Map Error Row", idx, e);
-      }
-    });
-
-    setTimeout(() => {
-      if (map && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
-        const bounds = L.latLngBounds();
-        markerLayer.current.eachLayer(l => { if (l.getLatLng) bounds.extend(l.getLatLng()); else if (l.getBounds) bounds.extend(l.getBounds()); });
-        clusterLayer.current.eachLayer(l => bounds.extend(l.getLatLng()));
-        if (bounds.isValid()) {
-          map.fitBounds(bounds, { padding: new L.Point(6, 6), maxZoom: 6 });
-          hasFitBounds.current = true;
-        }
-      }
-    }, 100);
-  }, [data, polygonOpacity]);
-
-  useEffect(() => {
-    const map = mapInstance.current;
-    const markers = markersRef.current;
-    if (!map || Object.keys(markers).length === 0) return;
-    const visibleBounds = visibleTimeBounds || new Array(0, Infinity);
-    const vLeft = visibleBounds.at(0);
-    const vRight = visibleBounds.at(1);
-    let clusterAdd = [];
-    let clusterRemove = [];
-
-    Object.keys(markers).forEach(idxStr => {
-      const idx = parseInt(idxStr, 10);
-      const item = data[idx];
-      const isTarget = activeIndex === idx;
-      let inWindow = false;
-
-      if (item && item.startDate && !isNaN(item.startDate.min)) {
-        if (item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List') && Array.isArray(item.startDate.obj.values)) {
-          inWindow = item.startDate.obj.values.some(v => v.max >= vLeft && v.min <= vRight);
-        } else {
-          const sMin = item.startDate.min;
-          const eMax = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : sMin;
-          inWindow = (eMax >= vLeft && sMin <= vRight);
-        }
-      }
-
-      markers[idxStr].forEach(l => {
-        let layerInWindow = inWindow;
-        if (l.layerDate) {
-          layerInWindow = (l.layerDate.max >= vLeft && l.layerDate.min <= vRight);
-        }
-
-        if (l instanceof L.Polygon) {
-          l.setStyle({ stroke: false, fillColor: isTarget ? '#28a745' : '#007acc', fillOpacity: isTarget ? Math.min(polygonOpacity + 0.2, 1) : (layerInWindow ? polygonOpacity : 0.1), opacity: layerInWindow ? 1 : 0.2 });
-          if (isTarget && l.bringToFront) l.bringToFront();
-        } else if (l instanceof L.Polyline) {
-          l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 3 : 2, dashArray: '8, 8', opacity: layerInWindow ? 1 : 0.2 });
-          if (isTarget && l.bringToFront) l.bringToFront();
-        } else if (l instanceof L.Marker) {
-          l.setOpacity(layerInWindow ? 1 : 0.2);
-          if (isTarget) {
-            l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(true, l.isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-            if (!l.isVip) {
-              clusterLayer.current.removeLayer(l);
-              markerLayer.current.addLayer(l);
+          }, [basemapsRegistry]);
+        
+          useEffect(() => {
+            minimapOffsetRef.current = minimapOffset;
+            if (mapInstance.current && miniMapInstance.current) {
+              let targetMiniZoom = Math.max(0, mapInstance.current.getZoom() + minimapOffset);
+              miniMapInstance.current.setView(mapInstance.current.getCenter(), targetMiniZoom, { animate: true });
             }
-            l.setZIndexOffset(1000);
-          } else {
-            l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, l.isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-            l.setZIndexOffset(0);
-            if (!l.isVip) {
-              if (layerInWindow && !clusterLayer.current.hasLayer(l)) {
-                markerLayer.current.removeLayer(l);
-                clusterAdd.push(l);
-              } else if (!layerInWindow && clusterLayer.current.hasLayer(l)) {
-                clusterRemove.push(l);
-                markerLayer.current.addLayer(l);
+          }, [minimapOffset]);
+        
+          const createPinHtml = (isActive, isVip) => {
+            const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
+            return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'};"><div class="pin-head" style="background: ${color};"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'};"></div></div>`;
+          };
+        
+          const extractLayers = (layerObj) => {
+            let layers = [];
+            if (Array.isArray(layerObj)) layerObj.forEach(l => layers = layers.concat(extractLayers(l)));
+            else if (layerObj && layerObj.eachLayer) layerObj.eachLayer(l => layers = layers.concat(extractLayers(l)));
+            else if (layerObj) layers.push(layerObj);
+            return layers;
+          };
+        
+          const parseGeometryCollection = (wktStr) => {
+            const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\\s*\\(/i, '').replace(/\\)\\s*\$/, '');
+            let inParen = 0;
+            let currentGeom = '';
+            const geometries = [];
+            for (let i = 0; i < cleanStr.length; i++) {
+              const char = cleanStr[i];
+              if (char === '(') inParen++;
+              if (char === ')') inParen--;
+              if (char === ',' && inParen === 0) {
+                geometries.push(currentGeom.trim());
+                currentGeom = '';
+              } else currentGeom += char;
+            }
+            if (currentGeom.trim()) geometries.push(currentGeom.trim());
+            let extractedLayers = [];
+            geometries.forEach(geomStr => {
+              try {
+                const wkt = new window.Wkt.Wkt(); wkt.read(geomStr);
+                extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
+              } catch (e) {
+                const upper = geomStr.toUpperCase();
+                if (upper.startsWith('POINT')) {
+                  const m = geomStr.match(/(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)/);
+                  if (m) extractedLayers.push(L.marker(new L.LatLng(parseFloat(m.at(1)), parseFloat(m.at(2)))));
+                } else if (upper.startsWith('LINESTRING') || upper.startsWith('POLYGON')) {
+                  const m = [...geomStr.matchAll(/(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)/g)];
+                  if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))));
+                }
+              }
+            });
+            return extractedLayers;
+          };
+        
+          useEffect(() => {
+            if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const initialZoom = urlParams.get('mapzoom') ? parseInt(urlParams.get('mapzoom')) : 2;
+              setMapZoom(initialZoom);
+              const map = L.map(mapDomRef.current, { zoomControl: false, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), initialZoom);
+              L.control.scale({ position: 'bottomleft', imperial: true, metric: true }).addTo(map);
+              map.on('zoomend', () => setMapZoom(map.getZoom()));
+              markerLayer.current = L.featureGroup().addTo(map);
+              clusterLayer.current = L.markerClusterGroup({
+                maxClusterRadius: 40,
+                spiderfyOnMaxZoom: true,
+                zoomToBoundsOnClick: false,
+                iconCreateFunction: function(cluster) {
+                  const children = cluster.getAllChildMarkers();
+                  const firstLatLng = children.at(0).getLatLng();
+                  const isExactSame = children.every(m => m.getLatLng().equals(firstLatLng));
+                  if (isExactSame) {
+                    const count = children.length;
+                    const html = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;"><div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4);"></div><div class="pin-stem" style="background: #333; width: 2px;"></div><div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">${count}</div></div>`;
+                    return L.divIcon({ className: 'custom-div-icon', html: html, iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
+                  }
+                  let c = ' marker-cluster-';
+                  if (children.length < 10) c += 'small';
+                  else if (children.length < 100) c += 'medium';
+                  else c += 'large';
+                  return new L.DivIcon({ html: '<div><span>' + children.length + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+                }
+              }).addTo(map);
+        
+              clusterLayer.current.on('clusterclick', (c) => {
+                const m = mapInstance.current;
+                if (m.getZoom() < 10) { m.fitBounds(c.layer.getBounds(), { padding: new L.Point(40, 40) }); }
+                else { c.layer.spiderfy(); }
+              });
+        
+              gridLayerRef.current = L.layerGroup().addTo(map);
+              clusterLayer.current.on('clustermouseover', (c) => {
+                const children = c.layer.getAllChildMarkers();
+                const places = [...new Set(children.map(m => m.itemPlace).filter(Boolean))];
+                const titles = [...new Set(children.map(m => m.itemTitle).filter(Boolean))];
+                let displayHtml = '';
+                if (places.length > 0) { displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center;">${places.slice(0, 2).join(' / ')}${places.length > 2 ? '...' : ''}</div>`; }
+                displayHtml += `<div style="text-align: left; line-height: 1.3;">`;
+                displayHtml += titles.slice(0, 5).map(t => `• ${t}`).join('<br/>');
+                if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%;">+${titles.length - 5} more events...</em>`;
+                displayHtml += `</div>`;
+                c.layer.bindTooltip(displayHtml, { direction: 'top', className: 'custom-cluster-tooltip' }).openTooltip();
+              });
+        
+              clusterLayer.current.on('clustermouseout', (c) => c.layer.unbindTooltip());
+        
+              const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: true, scrollWheelZoom: true, doubleClickZoom: true, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), 0);
+              const boundsRect = L.rectangle(map.getBounds(), { color: '#007acc', weight: 2, fillOpacity: 0.15 }).addTo(miniMap);
+              rectBoundsRef.current = boundsRect;
+        
+              map.on('move', () => {
+                if (isFlyAnimatingRef.current) return;
+                isSyncingRef.current = true;
+                let targetMiniZoom = Math.max(0, map.getZoom() + minimapOffsetRef.current);
+                miniMap.setView(map.getCenter(), targetMiniZoom, { animate: false });
+                const mapBounds = map.getBounds(); const center = map.getCenter();
+                const nw = miniMap.project(mapBounds.getNorthWest(), targetMiniZoom);
+                const se = miniMap.project(mapBounds.getSouthEast(), targetMiniZoom);
+                const w = Math.abs(se.x - nw.x); const h = Math.abs(se.y - nw.y);
+                const MIN_PX = 30;
+                if (w < MIN_PX || h < MIN_PX) {
+                  const cPx = miniMap.project(center, targetMiniZoom);
+                  const adjW = Math.max(w, MIN_PX); const adjH = Math.max(h, MIN_PX);
+                  boundsRect.setBounds(L.latLngBounds(miniMap.unproject(L.point(cPx.x - adjW / 2, cPx.y - adjH / 2), targetMiniZoom), miniMap.unproject(L.point(cPx.x + adjW / 2, cPx.y + adjH / 2), targetMiniZoom)));
+                } else boundsRect.setBounds(mapBounds);
+                isSyncingRef.current = false;
+              });
+        
+              miniMap.on('zoomend', () => {
+                if (!isSyncingRef.current && setMinimapOffset) {
+                  let newOffset = miniMap.getZoom() - mapInstance.current.getZoom();
+                  newOffset = Math.max(-10, Math.min(2, newOffset));
+                  setMinimapOffset(newOffset); minimapOffsetRef.current = newOffset;
+                }
+              });
+        
+              mapInstance.current = map; miniMapInstance.current = miniMap;
+              if (window.ResizeObserver) {
+                const ro = new ResizeObserver(() => { setTimeout(() => { if (mapInstance.current) mapInstance.current.invalidateSize(); if (miniMapInstance.current) miniMapInstance.current.invalidateSize(); }, 50); });
+                ro.observe(mapDomRef.current.parentElement);
+                ro.observe(miniMapDomRef.current);
               }
             }
-          }
-        } else if (l.setStyle) {
-          l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 5 : 4, opacity: layerInWindow ? 1 : 0.2 });
-          if (isTarget && l.bringToFront) l.bringToFront();
-        }
-      });
-    });
-
-    if (clusterRemove.length > 0) clusterLayer.current.removeLayers(clusterRemove);
-    if (clusterAdd.length > 0) clusterLayer.current.addLayers(clusterAdd);
-
-    const activeLayers = markers[activeIndex];
-    if (activeLayers && activeLayers.length > 0) {
-      const activeFeatureGroup = L.featureGroup(activeLayers);
-      setTimeout(() => {
-        try {
-          const bounds = activeFeatureGroup.getBounds();
-          if (bounds.isValid()) {
-            map.flyToBounds(bounds, { animate: true, duration: 2.5, maxZoom: maxAutoZoom });
-            hasFitBounds.current = true;
-          }
-          activeLayers.forEach(l => { if (l.openTooltip) l.openTooltip(); });
-        } catch (err) {}
-      }, 250);
-    }
-  }, [activeIndex, data, maxAutoZoom, polygonOpacity, visibleTimeBounds]);
-
-  const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
-  const overlays = basemapsRegistry.filter(b => b.type === 'overlay');
-
-  return html`
-    <div style="position: relative; width:100%; height:100%;">
-      <div style="overflow: hidden; width:100%; height:100%; position: absolute; top:0; left:0; z-index:1;"><div ref=${mapDomRef} style="width:100%; height:100%;"></div></div>
-      <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
-        <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn ${maxPane === 'map' ? 'active' : ''}" onClick=${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">
-            ${maxPane === 'map'
-              ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" /></svg>`
-              : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" /></svg>`
+          }, [basemapsRegistry]);
+        
+          useEffect(() => {
+            const map = mapInstance.current; if (!map || !gridLayerRef.current) return;
+            const updateGrid = () => {
+              gridLayerRef.current.clearLayers(); if (!showGrid) return;
+              const z = map.getZoom(); let step = z > 15 ? 0.01 : z > 13 ? 0.05 : z > 11 ? 0.1 : z > 9 ? 0.5 : z > 7 ? 1 : z > 5 ? 5 : z > 3 ? 10 : 20;
+              const b = map.getBounds();
+              const w = Math.floor(b.getWest() / step) * step - step; const e = Math.ceil(b.getEast() / step) * step + step;
+              const s = Math.floor(b.getSouth() / step) * step - step; const n = Math.ceil(b.getNorth() / step) * step + step;
+              const style = { color: '#007acc', weight: 1, opacity: 0.25, dashArray: '2, 6', interactive: false };
+              for (let lat = s; lat <= n; lat += step) if (lat >= -90 && lat <= 90) L.polyline([new L.LatLng(lat, w), new L.LatLng(lat, e)], style).addTo(gridLayerRef.current);
+              for (let lng = w; lng <= e; lng += step) L.polyline([new L.LatLng(-90, lng), new L.LatLng(90, lng)], style).addTo(gridLayerRef.current);
+            };
+            updateGrid(); map.on('moveend', updateGrid); return () => map.off('moveend', updateGrid);
+          }, [showGrid]);
+        
+          useEffect(() => {
+            const map = mapInstance.current; const miniMap = miniMapInstance.current;
+            if (!map || !miniMap || !basemapsRegistry || !activeBasemap) return;
+            const config = basemapsRegistry.find(b => b.id === activeBasemap) || basemapsRegistry;
+            const renderBasemap = () => {
+              if (baseLayerRef.current) map.removeLayer(baseLayerRef.current);
+              if (miniBaseLayerRef.current) miniMap.removeLayer(miniBaseLayerRef.current);
+              const isVector = config.format === "pbf" || config.format === "mvt";
+              if (isVector && window.L.maplibreGL) {
+                baseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0 }).addTo(map);
+                miniBaseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: false, zIndex: 0 }).addTo(miniMap);
+              } else {
+                baseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0, keepBuffer: 4, updateWhenZooming: false }).addTo(map);
+                miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: false, zIndex: 0, keepBuffer: 4, updateWhenZooming: false }).addTo(miniMap);
+              }
+            };
+            if ((config.format === "pbf" || config.format === "mvt") && !window.L.maplibreGL) {
+              loadStyle('https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css');
+              Promise.all([loadScript('https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js')]).then(() => loadScript('https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js')).then(() => renderBasemap()).catch(e => console.error("Vector Library Failed", e));
+            } else renderBasemap();
+          }, [activeBasemap, basemapsRegistry, maxGlobalZoom]);
+        
+          useEffect(() => {
+            const map = mapInstance.current; const miniMap = miniMapInstance.current;
+            if (!map || !miniMap || !basemapsRegistry) return;
+            Object.keys(overlayLayersRef.current).forEach(id => {
+              if (!activeOverlays.includes(id)) { map.removeLayer(overlayLayersRef.current[id]); delete overlayLayersRef.current[id]; }
+            });
+            activeOverlays.forEach((id, idx) => {
+              if (!overlayLayersRef.current[id]) {
+                const config = basemapsRegistry.find(b => b.id === id);
+                if (config) {
+                  const z = idx + 10; const op = overlayOpacities[id] !== undefined ? overlayOpacities[id] : (config.defaultOpacity ?? 1.0);
+                  const isWms = config.format === "wms" || config.url.toLowerCase().includes("wms");
+                  if (isWms) {
+                    overlayLayersRef.current[id] = L.tileLayer.wms(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, layers: config.wmsLayer || "default", format: "image/png", transparent: true, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
+                  } else {
+                    overlayLayersRef.current[id] = L.tileLayer(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, transparent: true, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
+                  }
+                }
+              }
+            });
+          }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
+        
+          useEffect(() => {
+            Object.keys(overlayOpacities).forEach(id => { if (overlayLayersRef.current[id]) overlayLayersRef.current[id].setOpacity(overlayOpacities[id]); });
+          }, [overlayOpacities]);
+        
+          useEffect(() => {
+            const map = mapInstance.current; if (!map || data.length === 0) return;
+            markerLayer.current.clearLayers(); clusterLayer.current.clearLayers();
+            markersRef.current = {}; let validMarkers = 0;
+            data.forEach((item, idx) => {
+              const locStr = String(item.location || '').trim(); if (!locStr) return;
+              const activeLayersArray = []; let featureLayers = [];
+              try {
+                if (locStr.match(/^GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(locStr);
+                else if (locStr.match(/^[A-Z]+\\s*\\(/)) { const wkt = new window.Wkt.Wkt(); wkt.read(locStr); featureLayers = extractLayers(wkt.toObject()); }
+                else if (locStr.startsWith('{') && locStr.includes('"type"')) featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
+                else {
+                  const coordMatch = locStr.match(/(-?\\d+(?:\\.\\d+)?)[,\\s]+(-?\\d+(?:\\.\\d+)?)/);
+                  if (coordMatch) featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch.at(1)), parseFloat(coordMatch.at(2)))));
+                }
+                const uniqueSignatures = new Set(); const validFeatureLayers = [];
+                featureLayers.forEach(layer => {
+                  if (!layer) return; let sig = null;
+                  if (layer.getLatLng) {
+                    const ll = layer.getLatLng();
+                    if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
+                    sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
+                  } else if (layer.getBounds) {
+                    const b = layer.getBounds();
+                    if (!b || !b.isValid()) return;
+                    sig = `B_${b.toBBoxString()}`;
+                  }
+                  if (sig) { if (uniqueSignatures.has(sig)) return; uniqueSignatures.add(sig); }
+                  validFeatureLayers.push(layer);
+                });
+                const subLabels = item.subLabels ? item.subLabels.split(/[|\\-·;\\n]/).map(s => s.trim()).filter(Boolean) : [];
+                const places = item.place ? item.place.split(/[|\\-·;\\n]/).map(s => s.trim()).filter(Boolean) : [];
+                const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
+                validFeatureLayers.forEach((layer, layerIdx) => {
+                  if (layer instanceof L.Polygon) layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: polygonOpacity });
+                  else if (layer instanceof L.Polyline) layer.setStyle({ color: '#007acc', weight: 2, dashArray: '8, 8' });
+                  else if (layer.setStyle) layer.setStyle({ color: '#007acc', weight: 4 });
+                  if (layer instanceof L.Marker) { layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) })); layer.isVip = isVip; }
+                  const safeSubLabel = subLabels.length > layerIdx ? subLabels[layerIdx] : null;
+                  const safePlace = places.length > layerIdx ? places[layerIdx] : null;
+                  let labelToUse = safeSubLabel || safePlace || item.title;
+                  layer.itemPlace = safeStripHTML(labelToUse);
+                  layer.itemTitle = safeStripHTML(item.title);
+                  // Clamp Polyline tooltip labels to the first comma to prevent massive visual occlusion
+                  if (layer instanceof L.Polyline) {
+                    layer.itemPlace = layer.itemPlace.split(',').shift().trim();
+                  }
+                  layer.bindTooltip(layer.itemPlace, { direction: 'top', offset: new L.Point(0, -34), className: 'centered-tooltip' });
+                  layer.on('click', () => setActiveIndex(idx));
+                  if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer); else markerLayer.current.addLayer(layer);
+                  activeLayersArray.push(layer); validMarkers++;
+                });
+                if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
+              } catch(e) { console.error("Map Error Row", idx, e); }
+            });
+            setTimeout(() => {
+              if (map && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
+                const bounds = L.latLngBounds();
+                markerLayer.current.eachLayer(l => { if (l.getLatLng) bounds.extend(l.getLatLng()); else if (l.getBounds) bounds.extend(l.getBounds()); });
+                clusterLayer.current.eachLayer(l => bounds.extend(l.getLatLng()));
+                if (bounds.isValid()) { map.fitBounds(bounds, { padding: new L.Point(6, 6), maxZoom: 6 }); hasFitBounds.current = true; }
+              }
+            }, 100);
+          }, [data, polygonOpacity]);
+        
+          useEffect(() => {
+            const map = mapInstance.current; const markers = markersRef.current;
+            if (!map || Object.keys(markers).length === 0) return;
+            const visibleBounds = visibleTimeBounds || new Array(0, Infinity);
+            const vLeft = visibleBounds.at(0); const vRight = visibleBounds.at(1);
+            let clusterAdd = []; let clusterRemove = [];
+            Object.keys(markers).forEach(idxStr => {
+              const idx = parseInt(idxStr, 10);
+              const item = data[idx];
+              const isTarget = activeIndex === idx;
+              let inWindow = false;
+              if (item && item.startDate && !isNaN(item.startDate.min)) {
+                if (item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List') && Array.isArray(item.startDate.obj.values)) {
+                  inWindow = item.startDate.obj.values.some(v => v.max >= vLeft && v.min <= vRight);
+                } else {
+                  const sMin = item.startDate.min;
+                  const eMax = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : sMin;
+                  inWindow = (eMax >= vLeft && sMin <= vRight);
+                }
+              }
+              markers[idxStr].forEach(l => {
+                if (l instanceof L.Polygon) {
+                  l.setStyle({ stroke: false, fillColor: isTarget ? '#28a745' : '#007acc', fillOpacity: isTarget ? Math.min(polygonOpacity + 0.2, 1) : (inWindow ? polygonOpacity : 0.1), opacity: inWindow ? 1 : 0.2 });
+                  if (isTarget && l.bringToFront) l.bringToFront();
+                } else if (l instanceof L.Polyline) {
+                  l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 3 : 2, dashArray: '8, 8', opacity: inWindow ? 1 : 0.2 });
+                  if (isTarget && l.bringToFront) l.bringToFront();
+                } else if (l instanceof L.Marker) {
+                  l.setOpacity(inWindow ? 1 : 0.2);
+                  if (isTarget) {
+                    l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(true, l.isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
+                    if (!l.isVip) { clusterLayer.current.removeLayer(l); markerLayer.current.addLayer(l); }
+                    l.setZIndexOffset(1000);
+                  } else {
+                    l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, l.isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
+                    l.setZIndexOffset(0);
+                    if (!l.isVip) {
+                      if (inWindow && !clusterLayer.current.hasLayer(l)) { markerLayer.current.removeLayer(l); clusterAdd.push(l); }
+                      else if (!inWindow && clusterLayer.current.hasLayer(l)) { clusterRemove.push(l); markerLayer.current.addLayer(l); }
+                    }
+                  }
+                } else if (l.setStyle) {
+                  l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 5 : 4, opacity: inWindow ? 1 : 0.2 });
+                  if (isTarget && l.bringToFront) l.bringToFront();
+                }
+              });
+            });
+            if (clusterRemove.length > 0) clusterLayer.current.removeLayers(clusterRemove);
+            if (clusterAdd.length > 0) clusterLayer.current.addLayers(clusterAdd);
+            const activeLayers = markers[activeIndex];
+            if (activeLayers && activeLayers.length > 0) {
+              const activeFeatureGroup = L.featureGroup(activeLayers);
+              setTimeout(() => {
+                try {
+                  const bounds = activeFeatureGroup.getBounds();
+                  if (bounds.isValid()) {
+                    isFlyAnimatingRef.current = true;
+                    map.flyToBounds(bounds, { animate: true, duration: 2.5, maxZoom: maxAutoZoom });
+                    hasFitBounds.current = true;
+                    map.once('moveend', () => { isFlyAnimatingRef.current = false; });
+                  }
+                  activeLayers.forEach(l => { if (l.openTooltip) l.openTooltip(); });
+                } catch(err) {}
+              }, 250);
             }
-          </button>
-        </div>
-        <div style="display: flex; flex-direction: column; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-          </button>
-          <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">${mapZoom}z</div>
-          <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
-          </button>
-        </div>
-        <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn ${showGrid ? 'active' : ''}" onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
-          </button>
-        </div>
-        <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 17 22 12" /></svg>
-          </button>
-        </div>
-        ${showLayersMenu ? html`
-          <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: relative; z-index: 2000;">
-            <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-              ${bases.map(b => html`<div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="radio" id="base_${b.id}" name="basemap_radio" checked=${activeBasemap === b.id} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}</div></div>`)}
+          }, [activeIndex, data, maxAutoZoom, polygonOpacity, visibleTimeBounds]);
+        
+          const bases = basemapsRegistry.filter(b => b.type !== 'overlay'); const overlays = basemapsRegistry.filter(b => b.type === 'overlay');
+        
+          return html`
+            <div style="position: relative; width:100%; height:100%;">
+              <div style="overflow: hidden; width:100%; height:100%; position: absolute; top:0; left:0; z-index:1;"><div ref=${mapDomRef} style="width:100%; height:100%;"></div></div>
+              <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+                <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
+                  <button class="status-btn ${maxPane === 'map' ? 'active' : ''}" onClick=${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">
+                    ${maxPane === 'map'
+                      ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
+                      : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
+                    }
+                  </button>
+                </div>
+                <div style="display: flex; flex-direction: column; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
+                  <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                  <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: monospace; padding: 0; text-align: center;">${mapZoom}z</div>
+                  <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                </div>
+                <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
+                  <button class="status-btn ${showGrid ? 'active' : ''}" onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  </button>
+                </div>
+                <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
+                  <button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                      <polyline points="2 17 12 22 22 17"></polyline>
+                      <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                  </button>
+                </div>
+                ${showLayersMenu ? html`
+                  <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: calc(100% - 150px); overflow-y: auto; font-size: 0.85rem; color: #333; position: relative; z-index: 2000;">
+                    <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                      ${bases.map(b => html`<div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="radio" id="base_${b.id}" name="basemap_radio" checked=${activeBasemap === b.id} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}</div></div>`)}
+                    </div>
+                    <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      ${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_${o.id}" checked=${activeOverlays.includes(o.id)} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}</div></div>${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+              <div class="minimap-container" ref=${miniMapDomRef} style="bottom: 75px !important;"></div>
             </div>
-            <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              ${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_${o.id}" checked=${activeOverlays.includes(o.id)} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}</div></div>${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
-            </div>
-          </div>
-        ` : ''}
-      </div>
-      <div class="minimap-container" ref=${miniMapDomRef}></div>
-    </div>
-  `;
-};
-
-MODULE_VERSIONS['MapViewer'] = 'v6.5.0';
-
-// === [ END MAJOR BLOCK ] ===
+          `;
+        };
+        
+        MODULE_VERSIONS['MapViewer'] = 'v6.4.2';
+        // === [ END MAJOR BLOCK: MapViewer ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer ] 🔽🔽🔽
