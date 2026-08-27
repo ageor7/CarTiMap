@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.63';
+        const APP_VERSION = 'v8.12.64';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2200,34 +2200,23 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
                   }
                 }
-                if (!cleanLegacy) {
-                  if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
-                  return null;
-                }
-                const parts = cleanLegacy.split(' ');
-                if (parts.length < 1) return null;
-                const dParts = parts.at(0).split(/[\/\\.-]/);
-                const tParts = parts.length > 1 ? parts.at(1).split(':') : null;
-                const secParts = tParts && tParts.length > 2 ? String(tParts.at(2)).split('.') : null;
                 
-                let dDay = parseInt(dParts.at(0), 10);
-                let dMonth = parseInt(dParts.at(1), 10) - 1;
-                let dYear = parseInt(dParts.at(2), 10);
-                if (isUS) {
-                  dDay = parseInt(dParts.at(1), 10);
-                  dMonth = parseInt(dParts.at(0), 10) - 1;
+                // Schema Fallback: Direct float extraction of the native Google serial date
+                const serialVal = parseFloat(cleanLegacy);
+                if (!isNaN(serialVal)) {
+                  // 25569 = Days between 30/12/1899 and 01/01/1970 Epoch
+                  const ts = (serialVal - 25569) * 86400 * 1000;
+                  return { 
+                    isEDTF: false, 
+                    min: ts, 
+                    max: ts, 
+                    date: new Date(ts), 
+                    text: cleanLegacy 
+                  };
                 }
-                const tHour = tParts ? parseInt(tParts.at(0), 10) : 0;
-                const tMin = tParts && tParts.length > 1 ? parseInt(tParts.at(1), 10) : 0;
-                const tSec = secParts ? parseInt(secParts.at(0), 10) : 0;
-                const tMs = secParts && secParts.length > 1 ? parseInt(secParts.at(1), 10) : 0;
-                const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
-                const ts = dateObj.getTime();
-                if (isNaN(ts)) {
-                  addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Legacy parser failed on "${cleanLegacy}". Rendering as Undated.`, 'warning');
-                  return null;
-                }
-                return { isEDTF: false, min: ts, max: ts, date: new Date(ts), text: cleanLegacy };
+
+                if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Failed to parse. Rendering as Undated.`, 'warning');
+                return null;
               };
         
               const locStr = exactGet(norm, 'location');
