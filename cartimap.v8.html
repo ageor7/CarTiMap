@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.64';
+        const APP_VERSION = 'v8.12.65';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2011,7 +2011,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           });
           const [showButtonText, setShowButtonText] = useState(() => {
             try { return JSON.parse(localStorage.getItem('tm_show_button_text')) ?? false; }
-            catch (e) { return false; }\n          });
+            catch (e) { return false; }
+          });
           const [dateLocale, setDateLocale] = useState(() => {
             try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
             catch (e) { return 'en-GB'; }

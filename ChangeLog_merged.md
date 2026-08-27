@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.65] - 2026-08-27
+**System Stability & Initialization:**
+*   Resolved a fatal platform boot crash ("invalid escape sequence" SyntaxError) 
+    by removing an unquoted escaped newline character sequence from the 
+    AppOrchestrator button-label toggle state.
+*   Restored seamless, serverless execution across offline viewports and 
+    local browser files.
+
 #### Changelog: [v8.12.64 - 2026-08-27] - Ingestion Pipeline Refinement
 **Performance & Security Upgrades:**
 *   ✓ **[Strict-Schema Integration]** Deprecated and removed the legacy regular expression split sequence (`/[\/\\.-]/`) inside `parseChronoNode`. The engine now relies on a highly efficient, single-pass double-precision float cast, rendering chronological errors caused by unescaped slash characters completely obsolete.

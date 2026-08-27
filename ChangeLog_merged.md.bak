@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.64 - 2026-08-27] - Ingestion Pipeline Refinement
+**Performance & Security Upgrades:**
+*   ✓ **[Strict-Schema Integration]** Deprecated and removed the legacy regular expression split sequence (`/[\/\\.-]/`) inside `parseChronoNode`. The engine now relies on a highly efficient, single-pass double-precision float cast, rendering chronological errors caused by unescaped slash characters completely obsolete.
+
 #### Changelog: [v8.12.63 - 2026-08-26] - Compiler-Gate Stabilization
 **Bug Fixes & System Stability:**
 *   ✓ **[Strict-Mode Tokenizer Repair]** Corrected the unescaped forward slash inside the legacy `parseChronoNode` RegExp while preserving the `.at(0)` array method, securing compile-time stability without violating bracket-stripping safety limits [REF: BOOT-CRASH-03, REF: CRASH-07].

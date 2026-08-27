@@ -126,6 +126,9 @@ The engine utilizes a mathematically precise delimiter interceptor (`/[\r\n]+|\\
 ### [REF: TL-17] Timeline Omni-Splitter
 Intercepts incoming `item.tags` via `getParsedTags()`. Ensures horizontal swimlanes split properly during background generation, scaling vertical boundaries appropriately.
 
+[REF: DATA-15] String Storage Optimization [NEW]:
+To prevent index fragmentation and optimize client-side data transfer, the HGBB database enforces strict string typing. Unbounded narrative fields and complex, multi-point WKT or GeoJSON strings must be typed as TEXT to trigger out-of-line database storage, keeping primary tables compact. Conversely, all relational join keys, standard URI links, and short metadata tags must be typed as bounded VARCHAR variables (e.g., VARCHAR(64) or VARCHAR(2048)) to allow standard B-Tree indexing and prevent hash collision slowdowns during data compilation.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -531,6 +534,9 @@ Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pa
 
 *   **[REF: BOOT-CRASH-03] Character Class Escape Parity [UPDATED]:** Regular expression literals inside utility components must open with an unescaped forward slash (/) and escape any literal slashes within bracket classes (e.g., `[\/\\.-]`). If a leading slash is escaped or an inner slash is left unescaped, compile-time syntax errors cascade down the DOM tree.
 *   **[REF: CRASH-07] Bracket Stripping Immunity [ENFORCED]:** Accessing first-elements inside array split loops must utilize `.at(0)` or `.shift()`. Standard bracket accessors (like ``) are banned within the core ingestion hooks to insulate strings against automatic bracket-stripping in markdown-based translation pipelines.
+
+*   **[REF: BOOT-CRASH-03] Character Class Escape Parity [DEPRECATED]:** The string-splitting regex validation sequence in `parseChronoNode` is officially deprecated in favor of strict-schema float parsing.
+*   **[REF: DATA-16] Native Float-to-Epoch Ingestion [NEW]:** To maintain low boot latency and eliminate strict-mode lexical parser collisions, the chronological engine reads legacy dates strictly as native Double-Precision Floats (`FLOAT8`). The parser casts the incoming PapaParse CSV tokens directly via `parseFloat` and converts the Google Sheets epoch offset (`25569`) to UNIX millisecond timestamps in a single constant-time \\(O(1)\\) computational step, safely discarding all string allocation overhead.
 
 ## ## 9. Core System Stability / Failsafes ↓↓
 
