@@ -527,6 +527,11 @@ Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pa
 
 *   **[REF: BOOT-CRASH-03] Character Class Escape Parity [NEW]:** To maintain strict-mode execution compliance inside ES module runtimes, all literal string-splitting regular expressions containing forward slashes (/) or backslashes (\) must explicitly escape these characters (e.g., `[\/\\.-]`). Failure to escape forward slashes inside bracket classes causes the lexical engine to interpret the token as a closing delimiter, dumping naked escape sequences into the global execution thread and triggering fatal compiler-level halts.
 
+### ## 9. Core System Stability / Failsafes ↓↓
+
+*   **[REF: BOOT-CRASH-03] Character Class Escape Parity [UPDATED]:** Regular expression literals inside utility components must open with an unescaped forward slash (/) and escape any literal slashes within bracket classes (e.g., `[\/\\.-]`). If a leading slash is escaped or an inner slash is left unescaped, compile-time syntax errors cascade down the DOM tree.
+*   **[REF: CRASH-07] Bracket Stripping Immunity [ENFORCED]:** Accessing first-elements inside array split loops must utilize `.at(0)` or `.shift()`. Standard bracket accessors (like ``) are banned within the core ingestion hooks to insulate strings against automatic bracket-stripping in markdown-based translation pipelines.
+
 
 
 ## 11. Media Playback & Camera Focus Controls ↓↓

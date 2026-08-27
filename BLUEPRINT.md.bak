@@ -525,6 +525,10 @@ Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pa
 
 *   **[REF: BOOT-CRASH-03] Character Class Range Bounds & Escaping [NEW]:** All regular expression character classes ([...]) containing literal dashes (-) or backslashes (\) must strictly escape these tokens to isolate them from range operators. Slashes (/) inside RegExp literals must be escaped as \/. Literal dashes must be positioned at the absolute end of the class (e.g., /[\/\\.-]/) or escaped as \- to prevent the JavaScript engine from evaluating ASCII character ranges and throwing fatal SyntaxError exceptions on boot.
 
+*   **[REF: BOOT-CRASH-03] Character Class Escape Parity [NEW]:** To maintain strict-mode execution compliance inside ES module runtimes, all literal string-splitting regular expressions containing forward slashes (/) or backslashes (\) must explicitly escape these characters (e.g., `[\/\\.-]`). Failure to escape forward slashes inside bracket classes causes the lexical engine to interpret the token as a closing delimiter, dumping naked escape sequences into the global execution thread and triggering fatal compiler-level halts.
+
+
+
 ## 11. Media Playback & Camera Focus Controls ↓↓
 
 *   **[REF: MED-11] Asynchronous video pausing [UPDATED]:** Rather than destroying iframe contexts on carousel sliding, inactive `<iframe>` elements configured with `?enablejsapi=1` are sent an asynchronous postMessage post with "pauseVideo" command. Native video targets execute a synchronous `.pause()` to ensure background audio is terminated without resetting buffering pipelines.

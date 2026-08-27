@@ -2206,7 +2206,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 }
                 const parts = cleanLegacy.split(' ');
                 if (parts.length < 1) return null;
-                const dParts = parts.at(0).split(\/[\/\\.-]/);
+                const dateStr = parts.at(0) || '';
+                const dParts = dateStr.split(/[\/\\.-]/);
                 const tParts = parts.length > 1 ? parts.at(1).split(':') : null;
                 const secParts = tParts && tParts.length > 2 ? String(tParts.at(2)).split('.') : null;
                 

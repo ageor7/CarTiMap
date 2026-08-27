@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.62 - 2026-08-26] - Chrono-Parser Alignment
+**Bug Fixes & System Stability:**
+*   ✓ **[Strict-Mode Tokenizer]** Escaped the forward slash inside the legacy `parseChronoNode` regular expression while preserving `.at(0)` array accessors, securing modern strict-mode execution without violating bracket-stripping safety limits [REF: BOOT-CRASH-03, REF: CRASH-07].
+
 #### Changelog: [v8.12.60 - 2026-08-26] - Chronological Regex Defenses
 **Bug Fixes & System Stability:**
 *   ✓ **[Strict-Mode Tokenizer Crash]** Surgically escaped forward slashes inside regular expression character classes in the `parseChronoNode` date tokenizer. This prevents premature literal closures and subsequent strict-mode escape sequence compilation halts [REF: BOOT-CRASH-03].
