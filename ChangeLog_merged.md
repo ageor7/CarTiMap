@@ -1,7 +1,16 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-[v8.12.67] - AppOrchestrator v3.5.6
+### [v8.12.68] - 2026-08-27
+#### Fixed
+- **System Stability:** Cleared the compile-time parenthetical syntax error inside the `MapViewer` geometry parser. Restoring standard single-escaped literals (`\s`, `\d`) prevents the browser's V8 engine from halting during the initial script tokenisation phase.
+- **AST Range Compiler:** Fixed a critical recursion error in `compileCartiMapAST` during range expansion (`..`). The compiler now successfully processes multi-vocal intervals —such as `[1944-08-26..1944-10-11]`— by passing isolated string values into nested execution passes.
+
+#### Changed
+- **Symmetrical Status Bar:** Restructured the status line into a clean, balanced layout. The new center-aligned navigation cockpit groups the step triggers and the interactive record counter into a single, cohesive interface.
+- **Standalone Taskbar Actions:** Purged the secondary dropdown menu. Reset Layout, Settings, and Telemetry are now exposed directly on the taskbar to support rapid touch target access on mobile viewports.
+- **Proportional Logo Scaling:** Locked the compass logo height to a physical limit of 24px with automatic width scaling, protecting its horizontal geometry from visual aspect ratio distortion.
+
 
 ### [v8.12.67] - 2026-08-27
 #### Fixed
