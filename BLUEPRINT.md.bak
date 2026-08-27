@@ -530,6 +530,17 @@ Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pa
 
 *   **[REF: BOOT-CRASH-03] Character Class Escape Parity [NEW]:** To maintain strict-mode execution compliance inside ES module runtimes, all literal string-splitting regular expressions containing forward slashes (/) or backslashes (\) must explicitly escape these characters (e.g., `[\/\\.-]`). Failure to escape forward slashes inside bracket classes causes the lexical engine to interpret the token as a closing delimiter, dumping naked escape sequences into the global execution thread and triggering fatal compiler-level halts.
 
+**[REF: BOOT-CRASH-03] State Initializer Syntax Isolation:**
+To prevent fatal compilation exceptions —(κατάρρευση μεταγλώττισης)— during 
+automated code serialization, pipeline template merges, or human code styling, 
+all JavaScript state initialization code sitting outside string or template 
+literals must pass a strict lexical validation gate. Developers and generator 
+scripts are strictly prohibited from utilizing raw backslashes or unquoted 
+escape sequences —such as literal "\n" characters— in active execution lanes. 
+All physical carriage returns must rely on native, hardware-level line breaks 
+to preserve absolute cross-browser portability and ensure offline Preact 
+reconciliation stability.
+
 #### ## 9. Core System Stability / 2. Parser Error Boundaries ↓↓
 
 *   **[REF: BOOT-CRASH-03] Character Class Escape Parity [UPDATED]:** Regular expression literals inside utility components must open with an unescaped forward slash (/) and escape any literal slashes within bracket classes (e.g., `[\/\\.-]`). If a leading slash is escaped or an inner slash is left unescaped, compile-time syntax errors cascade down the DOM tree.
