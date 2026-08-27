@@ -1,7 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-## [v8.12.69] - 2026-08-27
+[v8.12.70] - AppOrchestrator v3.5.8
+
+    System Stability Hotfix: Resolved a critical parsing failure causing a blank screen on startup by eliminating escaped double quotes (\" and \\\") inside the Settings Modal template literal of AppOrchestrator.
+    Version Alignments: Elevated AppOrchestrator block to v3.5.8 and the application to v8.12.70.## [v8.12.69] - 2026-08-27
+	
 ### Fixed
 - **Chrono-Engine Syntax Crash:** Replaced double-escaped regex patterns (`\\s`, `\\d`, `\\.`) with standard single-escaped literals (`\s`, `\d`, `\.`) across `MapViewer` (v6.4.4), `MediaViewer` (v2.13.6), and `ContentSlider` (v5.7.0). This clears a fatal, compile-time parenthetical syntax exception on line 2068 that paralyzed browser script parsing.
 - **AST Range Compiler:** Corrected recursive parser references in `compileCartiMapAST` (v1.2.3) range expansion block from `compileCartiMapAST(parts)` to `compileCartiMapAST(parts)`, securing robust support for Extended Date/Time Format ranges.
