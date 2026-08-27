@@ -1736,8 +1736,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   validFeatureLayers.push(layer);
                 });
                 // [REF: BOOT-CRASH-03] Character class escape validation
-                const subLabels = item.subLabels ? item.subLabels.split(/[|·;·\n-]/).map(s => s.trim()).filter(Boolean) : [];
-                const places = item.place ? item.place.split(/[|·;·\n-]/).map(s => s.trim()).filter(Boolean) : [];
+                const subLabels = item.subLabels ? item.subLabels.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
+                const places = item.place ? item.place.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
                 const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
                 validFeatureLayers.forEach((layer, layerIdx) => {
                   if (layer instanceof L.Polygon) layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: polygonOpacity });
@@ -2004,7 +2004,6 @@ const compileCartiMapAST = (str) => {
 };
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-
 // 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.5.7 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: AppOrchestrator v3.5.9 ] ===
         const App = () => {
@@ -2120,7 +2119,7 @@ const compileCartiMapAST = (str) => {
             return start.text || 'Date Error';
           };
         
-          const formatPlaces = (str) => { if (!str) return ''; return str.split(/[|·;·-]/).map(s => s.split(',').at(0).trim()).filter(Boolean).join(' | '); };
+          const formatPlaces = (str) => { if (!str) return ''; return str.split(/[|·;·\-]/).map(s => s.split(',').at(0).trim()).filter(Boolean).join(' | '); };
           const stripAndNormalize = (str) => { if (!str) return ''; return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim(); };
         
           useEffect(() => {
@@ -2403,7 +2402,7 @@ const compileCartiMapAST = (str) => {
                 if (parts.length >= 1) {
                   const dateStr = parts[0] || '';
                   const timeStr = parts[1] || '';
-                  const dParts = dateStr.split(/[/\\-.]/);
+                  const dParts = dateStr.split(/[\/\\.\-]/);
                   if (dParts.length >= 3) {
                     const tParts = timeStr ? timeStr.split(':') : [];
                     const secParts = String(tParts[2] || '0').split('.');
@@ -2774,9 +2773,9 @@ const compileCartiMapAST = (str) => {
           `;
         };
         
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.9';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.10';
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
-     
+
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
         render(html`<${ErrorBoundary}><${App} /></${ErrorBoundary}>`, document.getElementById('root'));
         // === [ END MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===

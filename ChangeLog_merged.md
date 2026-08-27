@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.74] - Chronology Engine v3.5.8, MapViewer v6.4.5
+**System Stability & Bug Fixes:**
+✓ **[RegExp Range Sanitation]** Corrected legacy date-splitting patterns inside `parseChronoNode` to eliminate decreasing ASCII character ranges. This prevents browser RegExp compilers from throwing fatal SyntaxErrors on boot.
+✓ **[Greek Unicode Delimiter Alignment]** Applied defensive escaping to all multi-place and sub-label splitting character classes. This guarantees stable, crash-free execution on both legacy Android tablets and modern desktop engines.
+
 ## [v8.12.73] - 2026-08-27
 ### Fixed
 - **Gregorian Parser Compiler Crash:** Patched the `dParts` split regex inside `parseChronoNode` to escape the forward slash (`/[\/\\-.]/`). This resolves a fatal, compile-time syntax exception that aborted script parsing on boot and produced a blank screen in desktop and mobile viewports.
