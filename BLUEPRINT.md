@@ -66,6 +66,10 @@ The CarTiMap application utilizes custom terminology to describe its unique math
 ### [REF: PROT-13] The Anti-Bloat CDN Mandate
 The engine strictly forbids hosting compiled 3rd-party dependencies or massive JavaScript binaries (e.g., >500KB AST parsers) directly within the GitHub repository. Serving raw executable code from version-control endpoints destroys Time-to-Interactive (TTI) metrics by inducing severe V8 Main Thread Blocking. Whenever 3rd-party dependencies exhibit grammatical or functional limitations, the architecture council must engineer lightweight (< 50 lines), native ECMAScript Decorator/Interceptor patterns (e.g., compileCartiMapAST) to mathematically correct the inputs/outputs, strictly maintaining the project's single-file, Zero-Build footprint and utilizing optimized esm.sh distribution.
 
+### ## 1. Engineering Protocols & Coding Rules / 2. Interface Geometry
+
+*   **[REF: UI-164c] Symmetrical Status Cockpit [NEW]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers (Previous and Next) directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>

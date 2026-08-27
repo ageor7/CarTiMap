@@ -307,7 +307,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.65';
+        const APP_VERSION = 'v8.12.66';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -421,8 +421,8 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         }
         // === [ END MAJOR BLOCK ] ===
 
-        // === [ MAJOR BLOCK: VibeMonitor v2.1.16 ] ===
-        const VibeMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVersion, moduleVersions, isTimelineExpanded, timelineRequiredHeight}) => {
+        // === [ MAJOR BLOCK: TelemetryMonitor v2.1.16 ] ===
+        const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVersion, moduleVersions, isTimelineExpanded, timelineRequiredHeight}) => {
             const logsEndRef = useRef (null);
             const monitorRef = useRef (null);
             const [isDragging, setIsDragging] = useState (false);
@@ -1978,8 +1978,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.8';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.5.3 ] 🔽🔽🔽
-        // === [ MAJOR BLOCK: AppOrchestrator v3.5.3 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.5.4 ] 🔽🔽🔽
+        // === [ MAJOR BLOCK: AppOrchestrator v3.5.4 ] ===
         const App = () => {
           const [logs, setLogs] = useState([]);
           const [rawCsvRows, setRawCsvRows] = useState([]);
@@ -2039,16 +2039,23 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             { id: 'esri-topo', label: 'Esri World Topo', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
             { id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 19, active: false, attrText: '© OSM', attrLink: 'https://openstreetmap.org/copyright', defaultOpacity: 1.0 },
             { id: 'opentopo', label: 'OpenTopoMap (OSM)', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 17, active: false, attrText: '© OpenTopoMap', attrLink: 'https://opentopomap.org', defaultOpacity: 1.0 },
-            { id: 'protomaps-vector', label: 'Protomaps Vector Light (OSM)', type: 'base', url: 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', format: 'pbf', maxZoom: 15, active: false, attrText: '© Protomaps', attrLink: 'https://protomaps.com', defaultOpacity: 1.0 }
+            { id: 'protomaps-vector', label: 'Protomaps Vector Light (OSM)', type: 'base', url: 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', format: 'pbf', maxZoom: 15, active: false, attrText: '© Protomaps', attrLink: 'https://protomaps.com', defaultOpacity: 1.0 },
+            { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '', defaultOpacity: 1.0 }
           ];
-          const [basemapsRegistry, setBasemapsRegistry] = useState(DEFAULT_BASEMAPS);
         
-          const addLog = (msg, type = 'info') => {
-            const time = new Date().toLocaleTimeString();
-            setLogs(prev => [...prev, { time, msg, type }]);
-          };
+          const [basemapsRegistry, setBasemapsRegistry] = useState(DEFAULT_BASEMAPS);
+          const [zoomLock, setZoomLock] = useState('auto');
+          const [visibleTimeSpan, setVisibleTimeSpan] = useState('');
+          const [visibleTimeBounds, setVisibleTimeBounds] = useState([0, Infinity]);
+          const hasInitializedRef = useRef(false);
+          const appRef = useRef(null);
+        
+          const addLog = (msg, type = 'info') => setLogs(p => [...p, { time: new Date().toLocaleTimeString('en-US', { hour12: false }), msg, type }]);
         
           const getOmniParam = (key) => {
+            const sp = new URLSearchParams(window.location.search);
+            let val = sp.get(key) || sp.get(`amp;${key}`);
+            if (val) return val;
             const hp = new URLSearchParams(window.location.hash.replace(/^#\/?\??/, ''));
             return hp.get(key) || hp.get(`amp;${key}`);
           };
@@ -2147,23 +2154,167 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               const currentY = tCurrent.clientY;
               const delta = isDesktop ? (currentX - startX) : (startY - currentY);
               let pct = ((startVal + delta) / containerSize) * 100;
-              pct = Math.max(15, Math.min(85, pct));
+              if (pct < 15) pct = 15;
+              if (pct > 85) pct = 85;
               appRef.current.style.setProperty('--primary-split', `${pct}%`);
-              window.dispatchEvent(new Event('resize'));
             };
             const onUp = () => {
-              window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp);
-              window.removeEventListener('touchmove', onMove); window.removeEventListener('touchend', onUp);
+              document.removeEventListener('mousemove', onMove);
+              document.removeEventListener('mouseup', onUp);
+              document.removeEventListener('touchmove', onMove);
+              document.removeEventListener('touchend', onUp);
+              window.dispatchEvent(new Event('resize'));
             };
-            window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
-            window.addEventListener('touchmove', onMove); window.addEventListener('touchend', onUp);
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onUp);
           };
         
-          // --- [ START_SUBBLOCK: Ingestion Regex & Data Parsing Loop ] ---
+          const startSecondaryResize = (e) => {
+            if (maxPane) return;
+            const tStart = e.touches ? Array.from(e.touches).at(0) : e;
+            const startX = tStart.clientX;
+            const startY = tStart.clientY;
+            const isDesktop = window.innerWidth >= 1024;
+            const containerNode = appRef.current.querySelector('.visual-pane');
+            const startVal = isDesktop ? appRef.current.querySelector('.map-pane').offsetHeight : appRef.current.querySelector('.map-pane').offsetWidth;
+            const containerSize = isDesktop ? containerNode.offsetHeight : containerNode.offsetWidth;
+            const onMove = (e2) => {
+              const tCurrent = e2.touches ? Array.from(e2.touches).at(0) : e2;
+              const currentX = tCurrent.clientX;
+              const currentY = tCurrent.clientY;
+              const delta = isDesktop ? (currentY - startY) : (currentX - startX);
+              let pct = ((startVal + delta) / containerSize) * 100;
+              if (pct < 10) pct = 10;
+              if (pct > 90) pct = 90;
+              appRef.current.style.setProperty('--secondary-split', `${pct}%`);
+            };
+            const onUp = () => {
+              document.removeEventListener('mousemove', onMove);
+              document.removeEventListener('mouseup', onUp);
+              document.removeEventListener('touchmove', onMove);
+              document.removeEventListener('touchend', onUp);
+              window.dispatchEvent(new Event('resize'));
+            };
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onUp);
+          };
+        
+          const startTimelineResize = (e) => {
+            if (isTimelineExpanded || isTimelineMinimized) return;
+            const tStart = e.touches ? Array.from(e.touches).at(0) : e;
+            const startY = tStart.clientY;
+            const startHeight = appRef.current.querySelector('.timeline-pane').offsetHeight;
+            const containerHeight = appRef.current.offsetHeight;
+            const onMove = (e2) => {
+              const tCurrent = e2.touches ? Array.from(e2.touches).at(0) : e2;
+              const currentY = tCurrent.clientY;
+              const delta = currentY - startY;
+              let pct = ((startHeight - delta) / containerHeight) * 100;
+              if (pct < 10) pct = 10;
+              if (pct > 60) pct = 60;
+              appRef.current.style.setProperty('--timeline-height', `${pct}%`);
+            };
+            const onUp = () => {
+              document.removeEventListener('mousemove', onMove);
+              document.removeEventListener('mouseup', onUp);
+              document.removeEventListener('touchmove', onMove);
+              document.removeEventListener('touchend', onUp);
+              window.dispatchEvent(new Event('resize'));
+            };
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onUp);
+          };
+        
+          useEffect(() => {
+            if (aboutData && aboutData.title) {
+              const cleanTitle = String(aboutData.title).replace(/<[^>]*>?/gm, '').trim();
+              document.title = `CarTiMap ${APP_VERSION} - ${cleanTitle}`;
+            } else {
+              document.title = `CarTiMap Core - ${APP_VERSION}`;
+            }
+          }, [aboutData]);
+        
+          useEffect(() => {
+            const gid = getOmniParam('gid') || '0';
+            const bgid = getOmniParam('bgid');
+            const source = getOmniParam('source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+            setStatus({ text: 'Fetching CMS Manifests...', progress: 30, isFading: false, active: false });
+            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+            const primaryFetch = fetch(fetchUrlPrimary).then(res => res.text());
+            let basemapsFetch = Promise.resolve(null);
+            if (bgid) {
+              const fetchUrlBasemaps = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}`;
+              basemapsFetch = fetch(fetchUrlBasemaps).then(res => res.text()).catch(e => {
+                console.warn("Basemaps CMS Fetch Failed", e);
+                return null;
+              });
+            }
+            Promise.all([primaryFetch, basemapsFetch]).then(([csvPrimary, csvBasemaps]) => {
+              setStatus({ text: 'Parsing Data...', progress: 60, isFading: false, active: false });
+              if (csvBasemaps) {
+                Papa.parse(csvBasemaps, {
+                  header: true, skipEmptyLines: true, complete: (res) => {
+                    const parsedBMs = res.data.map(row => {
+                      const norm = {};
+                      for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                      const isActive = /^(true|yes)$/i.test(String(norm.active || '').trim());
+                      const rawOpac = parseFloat(norm.defaultopacity);
+                      return {
+                        id: norm.id || "", label: norm.label || "", type: norm.type?.toLowerCase() === "overlay" ? "overlay" : "base",
+                        url: norm.url || "", maxZoom: parseInt(norm.maxzoom, 10) || 19,
+                        active: isActive, attrText: norm.attrtext || "", attrLink: norm.attrlink || "",
+                        defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac, format: norm.format || "xyz",
+                        wmsLayer: norm.wmslayer ? decodeURIComponent(norm.wmslayer.trim()) : "default"
+                      };
+                    }).filter(b => b.id && b.url);
+                    if (parsedBMs.length > 0) setBasemapsRegistry(prev => {
+                      const merged = [...prev];
+                      parsedBMs.forEach(bm => {
+                        const existIdx = merged.findIndex(m => m.id === bm.id);
+                        if (existIdx >= 0) merged[existIdx] = bm;
+                        else merged.push(bm);
+                      });
+                      return merged;
+                    });
+                  }
+                });
+              }
+        
+              Papa.parse(csvPrimary, {
+                header: true, skipEmptyLines: true, complete: (results) => {
+                  if (results.data.length > 0) {
+                    const firstRowNorm = {};
+                    for (let k in results.data[0]) firstRowNorm[k.toLowerCase().trim()] = results.data[0][k];
+                    const exactGet = (normObj, key) => { const val = normObj[key]; return val !== undefined && val !== null ? String(val).trim() : ""; };
+                    setAboutData({
+                      title: exactGet(firstRowNorm, 'title') || 'Dataset Overview',
+                      description: exactGet(aboutData ? aboutData.description : 'No project description provided.'),
+                      rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source,
+                      downloadUrl: fetchUrlPrimary
+                    });
+                    setRawCsvRows(results.data);
+                  }
+                }
+              });
+            }).catch(err => {
+              console.error("Fatal CMS Error", err);
+              setStatus({ text: 'Error Loading Data', progress: 100, isFading: false, active: false });
+            });
+          }, []);
+        
           useEffect(() => {
             if (rawCsvRows.length === 0) return;
             const exactGet = (normObj, key) => { const val = normObj[key]; return val !== undefined && val !== null ? String(val).trim() : ""; };
+            
+            // Re-anchored to parent useEffect scope to protect tags extraction loop from ReferenceError
             const omniSplitRegex = /\||\r?\n/;
+            
             let activeMode = dateEngineMode;
             if (activeMode === 'auto') {
               const hasEDTF = rawCsvRows.some(row => {
@@ -2215,7 +2366,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     text: cleanLegacy 
                   };
                 }
-
+        
                 if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Failed to parse. Rendering as Undated.`, 'warning');
                 return null;
               };
@@ -2290,7 +2441,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
             setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
           }, [rawCsvRows, dateEngineMode, dateLocale]);
-          // --- [ END_SUBBLOCK: Ingestion Regex & Data Parsing Loop ] ---
         
           // Conformed to [REF: ETL-14b] Dynamic horizontal storyline swimlane filtering
           useEffect(() => {
@@ -2306,7 +2456,9 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             }
             
             const tagsMap = new Set();
-            filtered.forEach(d => { d.tags.forEach(t => tagsMap.add(t)); });
+            filtered.forEach(d => {
+              d.tags.forEach(t => tagsMap.add(t));
+            });
             const laneCount = tagsMap.size > 0 ? tagsMap.size : 1;
             setTimelineRequiredHeight((laneCount * 24) + 40);
           }, [unfilteredData, activeTags]);
@@ -2339,183 +2491,209 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
         
           const CarTiMapperLogo = ({ context, appVersion }) => {
-            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
+            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
             if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 16px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.85rem; color: #444; line-height: 1;">CarTiMap</span><span style="font-size: 0.65rem; color: #888; line-height: 1;">${appVersion}</span></div></div>`;
-            return null;
-          };
-        
-          const slideCount = data.length;
-          const slidePercent = slideCount > 0 ? ((activeIndex + 1) / slideCount) * 100 : 0;
-        
-          if (rawCsvRows.length === 0) {
             return html`
-              <div class="splash-stage">
-                <div class="logo-box"><${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} /></div>
-                <div class="splash-spinner-box">
-                  <div class="splash-loading-spinner"></div>
-                  <div class="splash-status-text">${status.text}</div>
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
+                <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <h2 style="margin: 0; font-size: 2.4rem; color: #222; letter-spacing: -0.5px; line-height: 1.1;">CarTiMap Engine</h2>
+                  <div style="font-family: monospace; color: #007acc; font-size: 1.1rem; font-weight: 600; margin-top: 6px;">${appVersion}</div>
                 </div>
-                <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%;"></div></div>
               </div>
             `;
-          }
+          };
         
           return html`
-            <div id="app-layout" class="app-stage ${maxPane ? `max-pane-${maxPane}` : ''} ${isTimelineMinimized ? 'timeline-minimized' : ''} ${isTimelineExpanded ? 'timeline-expanded' : ''}" ref=${appRef}>
-              <!-- Status Bar Layer -->
-              <div class="app-status-bar">
-                <div class="status-left">
-                  <button class="status-btn ${isMenuOpen ? 'active' : ''}" onClick=${() => { setIsMenuOpen(!isMenuOpen); setIsSettingsOpen(false); }} title="Core Menu">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                  </button>
-                  <div class="menu-drop ${isMenuOpen ? 'show' : ''}">
-                    <button class="menu-item-btn" onClick=${() => { resetLayoutPanes(); setIsMenuOpen(false); }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Reset Layout</button>
-                    <button class="menu-item-btn" onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings</button>
-                    <button class="menu-item-btn" onClick=${() => { setIsMonitorOpen(true); setIsMenuOpen(false); }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Telemetry</button>
-                  </div>
-        
-                  <!-- Dynamic Swimlanes Toggle Checklist (Filter Popover) -->
-                  <button class="status-btn ${isFilterOpen ? 'active' : ''}" onClick=${() => setIsFilterOpen(!isFilterOpen)} title="Filter Active Storylines">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                  </button>
-                  ${isFilterOpen ? html`
-                    <div class="menu-drop show" style="left: 40px; padding: 10px; width: max-content; min-width: 180px; max-width: 280px; z-index: 10001;">
-                      <div style="font-weight: bold; font-size: 0.8rem; margin-bottom: 6px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px;">Storyline Filters</div>
-                      <div style="display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto;">
-                        ${allTags.map(tag => html`
-                          <div class="checkbox-row" style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem;">
-                            <input type="checkbox" id="tag_filter_${tag}" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
-                            <label for="tag_filter_${tag}" style="cursor: pointer; user-select: none; color: #444; font-weight: 500;">${tag}</label>
-                          </div>
-                        `)}
-                      </div>
-                    </div>
-                  ` : ''}
-                </div>
-        
-                <div class="status-center">
-                  <div class="status-label semantic-time-span" title="Visible Epoch Span">${visibleTimeSpan}</div>
-                </div>
-        
-                <div class="status-right">
-                  ${aboutData ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(true)} title="About"><${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} /></button>` : ''}
-                  <button class="status-btn" onClick=${() => jumpToSlide(activeIndex - 1)} disabled=${activeIndex === 0} title="Previous Slide">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                  </button>
-                  <button class="status-btn" onClick=${() => jumpToSlide(activeIndex + 1)} disabled=${activeIndex === data.length - 1} title="Next Slide">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                  </button>
-                  <button class="status-btn ${isSearchOpen ? 'active' : ''}" onClick=${() => { setIsSearchOpen(!isSearchOpen); }} title="Search Database">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                  </button>
-                  ${slideHistory && slideHistory.length > 0 ? html`<button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${showButtonText ? html`<span>Back</span>` : ''}</button>` : ''}
-                  
-                  <div class="progress-indicator-bubble" onClick=${() => {
-                    const target = prompt(`Enter Slide Number (1 to ${data.length}):`, activeIndex + 1);
-                    if (target) {
-                      const idx = parseInt(target, 10) - 1;
-                      if (!isNaN(idx) && idx >= 0 && idx < data.length) jumpToSlide(idx);
-                      else alert('Invalid Slide Number.');
-                    }
-                  }} title="Double Click to Enter Custom Slide Number">
-                    <span style="font-weight: 700; color: var(--tm-active, #007acc);">${activeIndex + 1}</span>
-                    <span style="user-select: none; opacity: 0.7;">/ ${data.length}</span>
-                  </div>
-                </div>
-              </div>
-        
-              <!-- Floating Restorers -->
-              ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></button>` : ''}
+            <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
+              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
               
-              <!-- Search Modal Overlay -->
-              <div class="search-overlay ${isSearchOpen ? 'show' : ''}">
-                <div class="search-container">
-                  <div class="search-input-wrapper">
-                    <input type="text" class="search-field" placeholder="Search events, places, tags, or dates..." value=${searchQuery} onInput=${(e) => setSearchQuery(e.target.value)} />
-                    <button class="search-close-btn" onClick=${() => { setIsSearchOpen(false); setSearchQuery(''); }}>✕</button>
-                  </div>
-                  <div class="search-results-viewport">
-                    ${searchHistory.length > 0 && !searchQuery ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; color: #444;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>` : ''}
-                    ${searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title">${res.title}</div><div class="search-result-meta">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`)}
-                    ${searchQuery && searchResults.length === 0 ? html`<div class="search-empty">No matching records found.</div>` : ''}
-                  </div>
+              ${!status.active ? html`
+                <div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
+                  <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
+                  <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%;"></div></div>
                 </div>
-              </div>
+              ` : ''}
         
-              <!-- About Modal Overlay -->
-              ${isAboutOpen ? html`
-                <div class="about-modal-backdrop" onClick=${() => setIsAboutOpen(false)}>
-                  <div class="about-modal-box" onClick=${(e) => e.stopPropagation()}>
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px;">
-                      <h3 style="margin: 0; font-family: 'Helvetica Neue', sans-serif; font-weight: 700; color: #2c3e50;">Dataset Specifications</h3>
-                      <button class="search-close-btn" style="position: static; font-size: 1.2rem;" onClick=${() => setIsAboutOpen(false)}>✕</button>
-                    </div>
-                    <div style="line-height: 1.5; font-size: 0.85rem; color: #444;">
-                      <div style="font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 4px;">${aboutData?.title}</div>
-                      <p style="margin-bottom: 12px; color: #666;">${aboutData?.description}</p>
-                      <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.75rem; margin-bottom: 12px;">
-                        <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
-                        <strong>Source File:</strong> ${aboutData?.rawSource}
+              ${data.length > 0 && status.active ? html`
+                <div id="app-layout" ref=${appRef} class="${isTimelineExpanded ? 'is-expanded-timeline' : ''} ${isTimelineMinimized ? 'is-minimized-timeline' : ''}">
+                  <div class="core-viewports ${maxPane ? 'max-' + maxPane : ''}">
+                    <div class="visual-pane ${hasMedia ? '' : 'no-media'}">
+                      <div class="map-pane">
+                        <${MapViewer} data=${data} activeIndex=${activeIndex} setActiveIndex=${jumpToSlide} maxAutoZoom=${maxAutoZoom} minimapOffset=${minimapOffset} setMinimapOffset=${setMinimapOffset} basemapsRegistry=${basemapsRegistry} maxPane=${maxPane} setMaxPane=${setMaxPane} polygonOpacity=${polygonOpacity} showButtonText=${showButtonText} visibleTimeBounds=${visibleTimeBounds} />
                       </div>
-                      <div style="display: flex; gap: 8px;"><a href="${aboutData?.downloadUrl}" target="_blank" class="status-btn-text" style="width: auto; padding: 0 12px; text-decoration: none;">Download Raw CSV</a></div>
-                      <div style="margin-top: 15px; text-align: left;"><button class="status-btn-text" style="width: max-content; padding: 0 12px;" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>View overview as slide</button></div>
+                      <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize}></div>
+                      <div class="media-pane">
+                        <${MediaViewer} activeSlide=${activeSlide} maxPane=${maxPane} setMaxPane=${setMaxPane} />
+                      </div>
+                    </div>
+                    <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize}></div>
+                    <div class="content-slider-pane">
+                      <${ContentSlider} data=${data} activeIndex=${activeIndex} setActiveIndex=${jumpToSlide} maxPane=${maxPane} setMaxPane=${setMaxPane} dateLocale=${dateLocale} formatSmartDate=${formatSmartDate} />
                     </div>
                   </div>
+        
+                  <div class="global-status-bar">
+                    <div class="status-left" style="position: relative;">
+                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="Menu">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                      </button>
+                      ${isMenuOpen ? html`
+                        <div style="position: absolute; bottom: calc(100% + 5px); left: 0; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 5px 0; min-width: 140px; z-index: 10000;" onClick=${e => e.stopPropagation()}>
+                          <div style="padding: 10px 15px; cursor: pointer; border-bottom: 1px solid rgba(128,128,128,0.1); display: flex; align-items: center; gap: 8px; font-size: 0.85rem;" onClick=${(e) => { e.stopPropagation(); resetLayoutPanes(); setIsMenuOpen(false); }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Reset Layout
+                          </div>
+                          <div style="padding: 10px 15px; cursor: pointer; border-bottom: 1px solid rgba(128,128,128,0.1); display: flex; align-items: center; gap: 8px; font-size: 0.85rem;" onClick=${(e) => { e.stopPropagation(); setIsSettingsOpen(true); setIsMenuOpen(false); }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
+                          </div>
+                          <div style="padding: 10px 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem;" onClick=${(e) => { e.stopPropagation(); setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Telemetry
+                          </div>
+                        </div>
+                      ` : ''}
+        
+                      <!-- Swimlane tag horizontal filter popover button -->
+                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlane Filters">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                        ${showButtonText ? html`<span>Filters</span>` : ''}
+                      </button>
+                      ${isFilterOpen ? html`
+                        <div style="position: absolute; bottom: calc(100% + 5px); left: 40px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; min-width: 220px; z-index: 10000; font-size: 0.82rem; color: #333;" onClick=${e => e.stopPropagation()}>
+                          <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Swimlane Filters</span>
+                            <button onClick=${() => setActiveTags(allTags)} style="background: none; border: none; color: #007acc; cursor: pointer; font-size: 0.72rem; font-weight: 600; padding: 0;">Reset</button>
+                          </div>
+                          <div style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 4px;">
+                            ${allTags.map(tag => html`
+                              <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                                <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer; margin: 0;" />
+                                <span style="font-weight: 500;">${tag}</span>
+                              </label>
+                            `)}
+                          </div>
+                        </div>
+                      ` : ''}
+        
+                      ${aboutData ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(true)} title="About"><${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} /></button>` : ''}
+                    </div>
+        
+                    <div class="status-center">
+                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        ${showButtonText ? html`<span>Prev</span>` : ''}
+                      </button>
+                      <span class="semantic-time-span" title="Visible Time Span">${visibleTimeSpan || '...'}</span>
+                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next">
+                        ${showButtonText ? html`<span>Next</span>` : ''}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                      </button>
+                    </div>
+        
+                    <div class="status-right">
+                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => setIsSearchOpen(true)} title="Search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        ${showButtonText ? html`<span>Search</span>` : ''}
+                      </button>
+                      ${slideHistory && slideHistory.length > 0 ? html`<button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${showButtonText ? html`<span>Back</span>` : ''}</button>` : ''}
+                      
+                      <!-- Editable record input selector with keyboard Arrow containment -->
+                      <div style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; color: #666; font-family: monospace;">
+                        <input
+                          type="number"
+                          min="1"
+                          max=${data.length}
+                          value=${activeIndex + 1}
+                          onChange=${(e) => {
+                            const val = parseInt(e.target.value, 10);
+                            if (!isNaN(val) && val >= 1 && val <= data.length) {
+                              jumpToSlide(val - 1);
+                            }
+                          }}
+                          onKeyDown=${(e) => {
+                            e.stopPropagation();
+                          }}
+                          style="width: 45px; background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.8rem; padding: 2px 0; color: inherit; outline: none;"
+                        />
+                        <span style="user-select: none; opacity: 0.7;">/ ${data.length}</span>
+                      </div>
+                    </div>
+                  </div>
+        
+                  <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize}></div>
+                  <div class="timeline-pane" style="height: ${isTimelineExpanded ? `${timelineRequiredHeight}px` : 'var(--timeline-height)'}; max-height: ${isTimelineMinimized ? '0px' : '100%'}; border-top: ${isTimelineMinimized ? 'none' : '1px solid #ccc'}; opacity: ${isTimelineMinimized ? '0' : '1'}; pointer-events: ${isTimelineMinimized ? 'none' : 'auto'}; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;">
+                    <${TimelineScrubber} data=${data} activeIndex=${activeIndex} setActiveIndex=${jumpToSlide} setVisibleTimeSpan=${setVisibleTimeSpan} zoomLock=${zoomLock} setZoomLock=${setZoomLock} isTimelineExpanded=${isTimelineExpanded} setIsTimelineExpanded=${setIsTimelineExpanded} isTimelineMinimized=${isTimelineMinimized} setIsTimelineMinimized=${setIsTimelineMinimized} dateLocale=${dateLocale} timelineRequiredHeight=${timelineRequiredHeight} setVisibleTimeBounds=${setVisibleTimeBounds} />
+                  </div>
+                  ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></button>` : ''}
                 </div>
               ` : ''}
         
-              <!-- Settings Modal Overlay -->
-              ${isSettingsOpen ? html`
-                <div class="about-modal-backdrop" onClick=${() => setIsSettingsOpen(false)}>
-                  <div class="about-modal-box" onClick=${(e) => e.stopPropagation()}>
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px;">
-                      <h3 style="margin: 0; font-family: 'Helvetica Neue', sans-serif; font-weight: 700; color: #2c3e50;">Platform Configurations</h3>
-                      <button class="search-close-btn" style="position: static; font-size: 1.2rem;" onClick=${() => setIsSettingsOpen(false)}>✕</button>
+              <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 10000;"></div>
+              <div id="search-modal" class="tm-modal ${isSearchOpen ? 'open' : ''}" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column;">
+                <button class="modal-close" onClick=${() => setIsSearchOpen(false)} title="Close">×</button>
+                <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 15px;">Search Dataset</h3>
+                <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} autoFocus />
+                ${searchHistory.length > 0 && !searchQuery ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; color: #444;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>` : ''}
+                <div style="flex-grow: 1; overflow-y: auto; border-top: 1px solid #eee;">
+                  ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
+                  ${searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title">${res.title}</div><div class="search-result-meta">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`)}
+                </div>
+              </div>
+        
+              <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 10000;"></div>
+              <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'};">
+                <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">×</button>
+                <div style="margin-bottom: 25px;">
+                  <h2 style="margin: 0 0 10px 0; font-size: 1.6rem;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Info'}}></h2>
+                  <div style="font-size: 1.05rem; line-height: 1.5; color: #333;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
+                  <div style="margin-top: 15px; text-align: left;"><button class="status-btn-text" style="width: max-content; padding: 0 12px;" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>View overview as slide</button></div>
+                </div>
+                <div style="padding-top: 20px; border-top: 1px solid #eee;">
+                  <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
+                </div>
+              </div>
+        
+              <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
+              <div id="settings-modal" class="tm-modal ${isSettingsOpen ? 'open' : ''}" style="display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px;">
+                <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close">×</button>
+                <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 20px; color: #222;">Engine Settings</h3>
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                  <div>
+                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;">Data Locale Format</label>
+                    <select value=${dateLocale} onChange=${e => { setDateLocale(e.target.value); localStorage.setItem('tm_date_locale', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem;">
+                      <option value="en-GB">European (DD/MM/YYYY)</option>
+                      <option value="en-US">American (MM/DD/YYYY)</option>
+                      <option value="el-GR">Greek (ΗΗ/ΜΜ/ΕΕΕΕ)</option>
+                    </select>
+                  </div>
+                  <div style="border-top: 1px solid #eee; padding-top: 15px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;">Map Auto-Zoom Depth</label>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                      <input type="range" min="5" max="20" step="1" value=${maxAutoZoom} onInput=${e => { setMaxAutoZoom(parseInt(e.target.value)); localStorage.setItem('tm_max_auto_zoom', e.target.value); }} style="flex-grow: 1; -webkit-appearance: none; height: 4px; background: #ddd; border-radius: 2px; outline: none;" />
+                      <span style="font-family: monospace; font-size: 1rem; color: #007acc; font-weight: 600; width: 30px; text-align: right;">${maxAutoZoom}z</span>
                     </div>
-                    <div class="settings-content" style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;">
-                      <div class="settings-row"><label>Date Notation:</label><select value=${dateLocale} onChange=${(e) => { setDateLocale(e.target.value); localStorage.setItem('tm_date_locale', e.target.value); }}><option value="en-GB">European (DD/MM/YYYY)</option><option value="en-US">American (MM/DD/YYYY)</option><option value="el-GR">Greek (ΗΗ/ΜΜ/ΕΕΕΕ)</option></select></div>
-                      <div class="settings-row"><label>Chronology Mode:</label><select value=${dateEngineMode} onChange=${(e) => { setDateEngineMode(e.target.value); localStorage.setItem('tm_date_engine_mode', e.target.value); }}><option value="auto">Auto-Detect</option><option value="edtf">Strict EDTF (ISO 8601-2)</option><option value="legacy">Legacy String Parser</option></select></div>
-                      <div class="settings-row"><label>Polygon Fill Opacity:</label><input type="range" min="0" max="1" step="0.1" value=${polygonOpacity} onChange=${(e) => { setPolygonOpacity(parseFloat(e.target.value)); localStorage.setItem('tm_polygon_opacity', e.target.value); }} /><span>${polygonOpacity}</span></div>
-                      <div class="settings-row"><label>Minimap Zoom Offset:</label><input type="range" min="-8" max="-2" step="1" value=${minimapOffset} onChange=${(e) => { setMinimapOffset(parseInt(e.target.value)); localStorage.setItem('tm_minimap_offset', e.target.value); }} /><span>${minimapOffset}</span></div>
-                      <div class="settings-row"><label>Kinetic Camera Target Zoom:</label><input type="range" min="1" max="22" step="1" value=${maxAutoZoom} onChange=${(e) => { setMaxAutoZoom(parseInt(e.target.value)); localStorage.setItem('tm_max_auto_zoom', e.target.value); }} /><span>${maxAutoZoom}z</span></div>
-                      <div class="settings-row"><label>Descriptive Taskbar Labels:</label><input type="checkbox" checked=${showButtonText} onChange=${(e) => { setShowButtonText(e.target.checked); localStorage.setItem('tm_show_button_text', e.target.checked); }} /></div>
+                  </div>
+                  <div style="border-top: 1px solid #eee; padding-top: 15px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;">Minimap Zoom Offset</label>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                      <input type="range" min="-8" max="0" step="1" value=${minimapOffset} onInput=${e => { setMinimapOffset(parseInt(e.target.value)); localStorage.setItem('tm_minimap_offset', e.target.value); }} style="flex-grow: 1; -webkit-appearance: none; height: 4px; background: #ddd; border-radius: 2px; outline: none;" />
+                      <span style="font-family: monospace; font-size: 1rem; color: #007acc; font-weight: 600; width: 30px; text-align: right;">${minimapOffset}</span>
+                    </div>
+                  </div>
+                  <div style="border-top: 1px solid #eee; padding-top: 15px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;">Global Polygon Opacity</label>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                      <input type="range" min="0.1" max="1" step="0.1" value=${polygonOpacity} onInput=${e => { setPolygonOpacity(parseFloat(e.target.value)); localStorage.setItem('tm_polygon_opacity', e.target.value); }} style="flex-grow: 1; -webkit-appearance: none; height: 4px; background: #ddd; border-radius: 2px; outline: none;" />
+                      <span style="font-family: monospace; font-size: 1rem; color: #007acc; font-weight: 600; width: 30px; text-align: right;">${polygonOpacity.toFixed(1)}</span>
                     </div>
                   </div>
                 </div>
-              ` : ''}
-        
-              <!-- Telemetry Monitor Modal -->
-              <${TelemetryMonitor} isOpen=${isMonitorOpen} onClose=${() => setIsMonitorOpen(false)} logs=${logs} />
-        
-              <!-- Core Viewports Container -->
-              <div class="core-viewports">
-                <div class="visual-panes-panel">
-                  <${MapViewer} data=${data} activeIndex=${activeIndex} setActiveIndex=${jumpToSlide} maxAutoZoom=${maxAutoZoom} minimapOffset=${minimapOffset} setMinimapOffset=${setMinimapOffset} basemapsRegistry=${basemapsRegistry} maxPane=${maxPane} setMaxPane=${setMaxPane} polygonOpacity=${polygonOpacity} showButtonText=${showButtonText} visibleTimeBounds=${visibleTimeBounds} />
-                </div>
-                
-                <div class="resize-handle-median" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize}>
-                  <div class="median-gripper"></div>
-                </div>
-                
-                <div class="content-slider-pane">
-                  <${ContentSlider} data=${data} activeIndex=${activeIndex} setActiveIndex=${jumpToSlide} maxPane=${maxPane} setMaxPane=${setMaxPane} showButtonText=${showButtonText} isTimelineMinimized=${isTimelineMinimized} />
-                </div>
               </div>
-        
-              <!-- Navigation Scrubber Layer -->
-              <div class="app-timeline-scrubber-floor">
-                <${TimelineScrubber} data=${data} activeIndex=${activeIndex} setActiveIndex=${jumpToSlide} zoomLock=${zoomLock} setZoomLock={setZoomLock} setVisibleTimeSpan=${setVisibleTimeSpan} isTimelineExpanded=${isTimelineExpanded} setIsTimelineExpanded=${setIsTimelineExpanded} isTimelineMinimized=${isTimelineMinimized} setIsTimelineMinimized=${setIsTimelineMinimized} dateLocale=${dateLocale} timelineRequiredHeight=${timelineRequiredHeight} setVisibleTimeBounds=${setVisibleTimeBounds} />
-              </div>
-        
-              <!-- Global Progress Tracker (Z-Index 10) -->
-              <div class="global-reading-gauge" style="width: ${slidePercent}%;"></div>
             </div>
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.3';
-        // === [ END MAJOR BLOCK: AppOrchestrator ] ===
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.4';
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
         
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===

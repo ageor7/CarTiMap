@@ -1,6 +1,17 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.67 - 2026-08-27] - Navigation and Chronology Alignment
+**Features & Layout Upgrades:**
+*   ✓ **[Cockpit Navigation Integration]** Re-assembled the status bar into a symmetrical tripartite grid. Directions and indicators are grouped centered as `[Prev] [Counter] [Next]`, with the Span/Zoom metadata moving to the right of the Next button.
+*   ✓ **[Logo Aspect Ratio Locked]** Proportional height scaling (24px height with automatic width adjustment) applied to the compass rosette logo inside the status bar to protect visual geometry from distortion.
+*   ✓ **[Menu Purge]** Removed the small dropdown menu. Standalone Reset, Settings, and Telemetry buttons are exposed directly in the status-left zone.
+*   ✓ **[EDTF Range Resolution]** Corrected the recursive range evaluator inside `compileCartiMapAST` to pass individual string indexes (`parts[0]`/`parts[1]`) rather than the raw split array during segment compilations.
+
+#### Changelog: [v8.12.66 - 2026-08-27] - Telemetry Standardisation
+**Bug Fixes & UI Restoration:**
+*   ✓ **[Mount Crash Eradicated]** Re-aligned the main controller DOM return nodes to call `<${TelemetryMonitor} />` instead of the legacy undefined `<${VibeMonitor} />` component. This prevents raw browser ReferenceErrors on startup, allowing the Preact engine to render, bypass the 10% progress splash screen, and successfully mount.
+
 #### Changelog: [v8.12.65] - 2026-08-27
 **System Stability & Initialization:**
 *   Resolved a fatal platform boot crash ("invalid escape sequence" SyntaxError) 

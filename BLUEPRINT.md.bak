@@ -541,6 +541,10 @@ All physical carriage returns must rely on native, hardware-level line breaks
 to preserve absolute cross-browser portability and ensure offline Preact 
 reconciliation stability.
 
+### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
+
+*   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.
+
 #### ## 9. Core System Stability / 2. Parser Error Boundaries ↓↓
 
 *   **[REF: BOOT-CRASH-03] Character Class Escape Parity [UPDATED]:** Regular expression literals inside utility components must open with an unescaped forward slash (/) and escape any literal slashes within bracket classes (e.g., `[\/\\.-]`). If a leading slash is escaped or an inner slash is left unescaped, compile-time syntax errors cascade down the DOM tree.
