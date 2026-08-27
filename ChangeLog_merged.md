@@ -1,6 +1,16 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.68c] - 2026-08-27
+### Fixed
+- **Chrono-Engine Syntax Crash:** Replaced double-escaped regex patterns (`\\s`, `\\d`, `\\.`) with standard single-escaped literals (`\s`, `\d`, `\.`) across `MapViewer`, `MediaViewer`, and `ContentSlider`. This clears a fatal, compile-time parenthetical syntax exception on line 2068 that paralyzed browser script parsing.
+- **AST Range Compiler:** Corrected recursive parser references in `compileCartiMapAST` range expansion block from `compileCartiMapAST(parts)` to `compileCartiMapAST(parts)`, securing robust support for Extended Date/Time Format ranges.
+
+### Changed
+- **Symmetrical Layout Architecture:** Grouped bottom status-bar navigation controls into a single "Chronological Cockpit" centered on the bottom taskbar, reducing mouse-travel fatigue on tablet viewports.
+- **Standalone Taskbar Actions:** Completely deleted the dropdown menu, exposing Reset Layout, Settings, and Telemetry options directly as flat, responsive buttons.
+- **Proportional Logo Scaling:** Locked the brand logo to a physical height boundary of 24px with automatic horizontal aspect-ratio calculation to protect visual geometry from distortion.
+
 ### [v8.12.68] - 2026-08-27
 #### Fixed
 - **System Stability:** Cleared the compile-time parenthetical syntax error inside the `MapViewer` geometry parser. Restoring standard single-escaped literals (`\s`, `\d`) prevents the browser's V8 engine from halting during the initial script tokenisation phase.

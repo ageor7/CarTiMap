@@ -372,6 +372,12 @@ To maintain visual containment and support intuitive chronological scraping, all
 ### [REF: UI-164d] Proportional Logo Constraints [NEW]
 To preserve brand geometry across variable screen sizes, inline logo assets are strictly scaled using proportional height boundaries. Inside the 32px global status bar wrapper, the compass icon is locked to a physical height of 24px with the width calculated automatically. This structural layout choice establishes a symmetrical 4px top and bottom margin, keeping the logo nested cleanly within the taskbar while preventing geometric aspect ratio distortion.
 
+**[REF: UI-164c] Symmetrical Status Cockpit [UPDATED]:**
+To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers —Previous and Next— directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
+
+**[REF: UI-164d] Proportional Logo Constraints [NEW]:**
+To preserve brand geometry across variable screen sizes, inline logo assets are strictly scaled using proportional height boundaries. Inside the 32px global status bar wrapper, the compass icon is locked to a physical height of 24px with the width calculated automatically. This structural layout choice establishes a symmetrical 4px top and bottom margin, keeping the logo nested cleanly within the taskbar while preventing geometric aspect ratio distortion.
+
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>

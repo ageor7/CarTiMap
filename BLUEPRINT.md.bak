@@ -133,9 +133,11 @@ The engine utilizes a mathematically precise delimiter interceptor (`/[\r\n]+|\\
 ### [REF: TL-17] Timeline Omni-Splitter
 Intercepts incoming `item.tags` via `getParsedTags()`. Ensures horizontal swimlanes split properly during background generation, scaling vertical boundaries appropriately.
 
-[REF: DATA-15] String Storage Optimization [NEW]:
+### [REF: DATA-15] String Storage Optimization [NEW]:
 To prevent index fragmentation and optimize client-side data transfer, the HGBB database enforces strict string typing. Unbounded narrative fields and complex, multi-point WKT or GeoJSON strings must be typed as TEXT to trigger out-of-line database storage, keeping primary tables compact. Conversely, all relational join keys, standard URI links, and short metadata tags must be typed as bounded VARCHAR variables (e.g., VARCHAR(64) or VARCHAR(2048)) to allow standard B-Tree indexing and prevent hash collision slowdowns during data compilation.
 
+### [REF: ETL-08b] AST Range Extraction Bounds [NEW]
+During recursive chronological range expansions —such as those mapping `Date1..Date2` intervals— the compiler must explicitly target isolated string indices rather than passing raw parsed arrays to down-level parser iterations. Passing an array container into string-coercive loops triggers array-to-string serializations that produce illegible, comma-separated streams. This process violates standard Extended Date/Time Format parameters and breaks chronological timeline sorting.
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -360,6 +362,15 @@ To ensure a frictionless retrieval experience—especially critical for Polytoni
 To bypass browser CORS/Clickjacking constraints when embedding third-party interactive media (such as YouTube iframes or PDF players), the media viewport swipe overlay must utilize a physical pass-through coordinate. Rather than using complex hover toggles, the system must deploy an absolute-centered window measuring 160px by 120px (top: 50%; left: 50%; transform: translate(-50%, -50%)) configured with pointer-events: none and carved out using a CSS clip-path polygon. This allows natural center clicks to fall through directly to the underlying media player, while the surrounding outer canvas boundaries retain pointer-events: auto to process swipe navigation gestures cleanly. Symmetrically, to prevent layout collisions, all media navigation chevrons are relocated to the bottom-left corner of the container (left: 16px; bottom: 12px;), and if a caption exists, a padding-left: 110px; is dynamically applied to the caption wrapper to prevent any visual overlapping.
 
 **[REF: UI-164c] Symmetrical Status Cockpit [NEW]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers —Previous and Next— directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
+
+### [REF: UI-46] Symmetrical Left Action Cluster & Standalone Taskbar Actions [UPDATED]
+Secondary utility tools —Settings and Telemetry— are completely decoupled from popover navigation containers. Standalone action triggers reside directly within the left-hand status bar vector alongside the About logo. This flat visual layout optimizes Fitts’s Law on touch devices by eliminating nested click targets, securing rapid, zero-friction interface configuration.
+
+### [REF: UI-164c] Symmetrical Status Cockpit [NEW]
+To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive “Chronological Cockpit” at the absolute center of the viewport's status line. Grouping the incremental navigation triggers —Previous and Next— directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
+
+### [REF: UI-164d] Proportional Logo Constraints [NEW]
+To preserve brand geometry across variable screen sizes, inline logo assets are strictly scaled using proportional height boundaries. Inside the 32px global status bar wrapper, the compass icon is locked to a physical height of 24px with the width calculated automatically. This structural layout choice establishes a symmetrical 4px top and bottom margin, keeping the logo nested cleanly within the taskbar while preventing geometric aspect ratio distortion.
 
 ---
 
