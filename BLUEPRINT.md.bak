@@ -382,6 +382,10 @@ To preserve brand geometry across variable screen sizes, inline logo assets are 
 
 **[REF: UI-164d] Proportional Logo Constraints [NEW]:** To preserve brand geometry across variable screen sizes, inline logo assets are strictly scaled using proportional height boundaries. Inside the 32px global status bar wrapper, the compass icon is locked to a physical height of 24px with the width calculated automatically. This structural layout choice establishes a symmetrical 4px top and bottom margin, keeping the logo nested cleanly within the taskbar while preventing geometric aspect ratio distortion.
 
+    [REF: DATE-12] Strict Serial date containment: Prevents string dates with leading digits from being parsed as serial float numbers, protecting Gregorian fallbacks.
+    [REF: UI-199c] Center Cockpit Navigation: Centers Prev, Input, and Next buttons, locking pagination coordinates.
+    [REF: UI-201b] Minimap Gutter Scale Clearance: Sets minimap coordinates to bottom: 55px, freeing up the Leaflet bottom-left scale bar vertical clearance.
+
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>

@@ -138,6 +138,10 @@ To prevent index fragmentation and optimize client-side data transfer, the HGBB 
 
 ### [REF: ETL-08b] AST Range Extraction Bounds [NEW]
 During recursive chronological range expansions —such as those mapping `Date1..Date2` intervals— the compiler must explicitly target isolated string indices rather than passing raw parsed arrays to down-level parser iterations. Passing an array container into string-coercive loops triggers array-to-string serializations that produce illegible, comma-separated streams. This process violates standard Extended Date/Time Format parameters and breaks chronological timeline sorting.
+
+[REF: ETL-14b] Symmetric Tag Ingestion Protocol [UPDATED - 2026-08-27]:
+To prevent runtime data loss inside browser-side state-filtering loops, the Data Ingestion Phase must maintain absolute delimiter symmetry with the Tag Map Extraction Phase. The primary tags column parser must not rely on simple comma splitting (split(',')). It is strictly mandated to parse tags utilizing a conformed regex /[,\r\n|;·]+/ on initial load. This guarantees that any multi-value arrays compiled upstream via TEXTJOIN are instantly flattened into primitive strings prior to Virtual DOM diffing, completely neutralizing the activeTags intersection failure that previously culled un-split composite strings on boot. Semicolons (;) and Greek ano teleias (·) must be evaluated as primary splitting boundaries.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>

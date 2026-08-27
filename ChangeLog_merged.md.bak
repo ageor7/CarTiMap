@@ -1,6 +1,8 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.12.71] — Chrono Fallback Restored & Status Bar Cockpit Centering. Solves Level 2 EDTF fallback failures and provides dead-center absolute cockpit navigation with suppressed input indicators.
+
 [v8.12.70] - AppOrchestrator v3.5.8
 
     System Stability Hotfix: Resolved a critical parsing failure causing a blank screen on startup by eliminating escaped double quotes (\" and \\\") inside the Settings Modal template literal of AppOrchestrator.
