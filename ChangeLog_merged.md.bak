@@ -1,6 +1,16 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.69] - 2026-08-27
+### Fixed
+- **Chrono-Engine Syntax Crash:** Replaced double-escaped regex patterns (`\\s`, `\\d`, `\\.`) with standard single-escaped literals (`\s`, `\d`, `\.`) across `MapViewer` (v6.4.4), `MediaViewer` (v2.13.6), and `ContentSlider` (v5.7.0). This clears a fatal, compile-time parenthetical syntax exception on line 2068 that paralyzed browser script parsing.
+- **AST Range Compiler:** Corrected recursive parser references in `compileCartiMapAST` (v1.2.3) range expansion block from `compileCartiMapAST(parts)` to `compileCartiMapAST(parts)`, securing robust support for Extended Date/Time Format ranges.
+
+### Changed
+- **Symmetrical Layout Architecture:** Grouped bottom status-bar navigation controls into a single "Chronological Cockpit" centered on the bottom taskbar, reducing mouse-travel fatigue on tablet viewports. Exposes the dynamic time span telemetry directly to the right of the cockpit.
+- **Standalone Taskbar Actions:** Completely deleted the dropdown menu, exposing Reset Layout, Settings, and Telemetry options directly as flat, responsive buttons.
+- **Proportional Logo Scaling:** Locked the brand logo to a physical height boundary of 24px with automatic horizontal aspect-ratio calculation to protect visual geometry from distortion.
+
 ## [v8.12.68c] - 2026-08-27
 ### Fixed
 - **Chrono-Engine Syntax Crash:** Replaced double-escaped regex patterns (`\\s`, `\\d`, `\\.`) with standard single-escaped literals (`\s`, `\d`, `\.`) across `MapViewer`, `MediaViewer`, and `ContentSlider`. This clears a fatal, compile-time parenthetical syntax exception on line 2068 that paralyzed browser script parsing.
