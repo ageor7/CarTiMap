@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.71';
+        const APP_VERSION = 'v8.12.72';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -803,7 +803,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.9 ] 🔽🔽🔽
 
-        // === [ MAJOR BLOCK: TimelineScrubber v26.11.9 ] ===
+        // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
         const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds }) => {
           const wrapperRef = useRef(null);
           const [zoomLevel, setZoomLevel] = useState(1);
@@ -1448,13 +1448,13 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.9';
-// 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
+        MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 
+// 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.4 ] 🔽🔽🔽
 
-        // === [ MAJOR BLOCK: MapViewer v6.4.4 ] ===
+        // === [ MAJOR BLOCK: MapViewer v6.4.5 ] ===
         const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
           const mapInstance = useRef(null); const miniMapInstance = useRef(null);
@@ -1736,8 +1736,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   validFeatureLayers.push(layer);
                 });
                 // [REF: BOOT-CRASH-03] Character class escape validation
-                const subLabels = item.subLabels ? item.subLabels.split(/[|\-·;\n]/).map(s => s.trim()).filter(Boolean) : [];
-                const places = item.place ? item.place.split(/[|\-·;\n]/).map(s => s.trim()).filter(Boolean) : [];
+                const subLabels = item.subLabels ? item.subLabels.split(/[|·;·\n-]/).map(s => s.trim()).filter(Boolean) : [];
+                const places = item.place ? item.place.split(/[|·;·\n-]/).map(s => s.trim()).filter(Boolean) : [];
                 const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
                 validFeatureLayers.forEach((layer, layerIdx) => {
                   if (layer instanceof L.Polygon) layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: polygonOpacity });
@@ -1905,12 +1905,12 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['MapViewer'] = 'v6.4.4';
+        MODULE_VERSIONS['MapViewer'] = 'v6.4.5';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.3 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: compileCartiMapAST v1.2.3 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.1 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: compileCartiMapAST v1.2.4 ] ===
 const compileCartiMapAST = (str) => {
   if (!str) return null;
   let clean = String(str).trim();
@@ -2004,8 +2004,9 @@ const compileCartiMapAST = (str) => {
 };
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.5.8 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.5.8 ] ===
+
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.5.7 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.5.9 ] ===
         const App = () => {
           const [logs, setLogs] = useState([]);
           const [rawCsvRows, setRawCsvRows] = useState([]);
@@ -2119,7 +2120,7 @@ const compileCartiMapAST = (str) => {
             return start.text || 'Date Error';
           };
         
-          const formatPlaces = (str) => { if (!str) return ''; return str.split(/[|\-·;]/).map(s => s.split(',').at(0).trim()).filter(Boolean).join(' | '); };
+          const formatPlaces = (str) => { if (!str) return ''; return str.split(/[|·;·-]/).map(s => s.split(',').at(0).trim()).filter(Boolean).join(' | '); };
           const stripAndNormalize = (str) => { if (!str) return ''; return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim(); };
         
           useEffect(() => {
@@ -2339,7 +2340,7 @@ const compileCartiMapAST = (str) => {
             const exactGet = (normObj, key) => { const val = normObj[key]; return val !== undefined && val !== null ? String(val).trim() : ""; };
             
             // Re-anchored to parent useEffect scope to protect tags extraction loop from ReferenceError
-            const omniSplitRegex = /\||\r?\n/;
+            const omniSplitRegex = /\||\r?\n|;|·/;
             
             let activeMode = dateEngineMode;
             if (activeMode === 'auto') {
@@ -2445,7 +2446,7 @@ const compileCartiMapAST = (str) => {
                 media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
                 mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
                 mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
-                tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(',').map(t => t.trim()).filter(Boolean) : []
+                tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/[,\r\n|;·]+/).map(t => t.trim()).filter(Boolean) : []
               };
             });
         
@@ -2773,7 +2774,7 @@ const compileCartiMapAST = (str) => {
           `;
         };
         
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.8';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.9';
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
      
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
