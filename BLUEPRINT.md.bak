@@ -66,6 +66,10 @@ The CarTiMap application utilizes custom terminology to describe its unique math
 ### [REF: PROT-13] The Anti-Bloat CDN Mandate
 The engine strictly forbids hosting compiled 3rd-party dependencies or massive JavaScript binaries (e.g., >500KB AST parsers) directly within the GitHub repository. Serving raw executable code from version-control endpoints destroys Time-to-Interactive (TTI) metrics by inducing severe V8 Main Thread Blocking. Whenever 3rd-party dependencies exhibit grammatical or functional limitations, the architecture council must engineer lightweight (< 50 lines), native ECMAScript Decorator/Interceptor patterns (e.g., compileCartiMapAST) to mathematically correct the inputs/outputs, strictly maintaining the project's single-file, Zero-Build footprint and utilizing optimized esm.sh distribution.
 
+### ## 1. Engineering Protocols & Coding Rules / 2. Interface Geometry
+
+*   **[REF: UI-164c] Symmetrical Status Cockpit [NEW]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers (Previous and Next) directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>
@@ -227,6 +231,10 @@ Custom HTML CSS markers physically measure `24px` by `34px`. To insulate the geo
 *   **[REF: DOC-02] Sub-Block Surgical Landmarks [UPDATED]:** Logical sub-blocks within major components are strictly isolated using physical comment boundaries (START_SUBBLOCK and END_SUBBLOCK). Patching scripts must target these boundaries exclusively to preserve bracket parity.
 *   **[REF: MAP-03b] Decoupled Kinetic Camera Flight [NEW]:** To eliminate camera jitter during timeline scrubs, marker opacities (Temporal Ghosting) are calculated within a lightweight effect, while heavy flyToBounds transitions are bound to an isolated effect triggered strictly when activeIndex mutates.
 *   **[REF: BOOT-CRASH-03] Character Class Range Bounds [NEW]:** RegExp character classes containing literal dashes or backslashes must explicitly escape these tokens to prevent the compiler from evaluating ASCII ranges and throwing fatal SyntaxError halts on boot.
+
+Update [REF: UI-164c] (Symmetrical Status Cockpit): We must codify the strict physics of the new tripartite status bar. This records the exact spatial layout bounds: .status-left locked to system utilities, .status-center containing the center-grouped Navigation Cockpit [Prev] [ 1 / 87 ] [Next] and dynamic timeline span telemetry, and .status-right housing context utilities (Filters, Search, Undo).
+Update [REF: UI-164d] (Proportional Logo Constraints): Document the mathematical rules of the logo component. It must be strictly bounded to 24px height with automatic width scaling (width: auto;) inside the 32px status line wrapper, leaving a symmetrical 4px top/bottom padding buffer to protect its polygonal SVG aspect ratio from distortion.
+Update [REF: ETL-08] (AST Compiler Recursion): Record the structural correction inside compileCartiMapAST. Specifically, document how the range expansion split (..) was stabilized by passing isolated string elements (parts[0] / parts[1]) into the recursive loop, resolving the array-passing compiler crash.
 
 ---
 

@@ -1,6 +1,15 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.12.67] - AppOrchestrator v3.5.6
+
+### [v8.12.67] - 2026-08-27
+#### Fixed
+- **AppOrchestrator (v3.5.6):** Restructured the status bar into a symmetrical tripartite grid. Directions and indicators are grouped centered as "Prev", "Counter", and "Next", with the Span/Zoom metadata moving to the right of the "Next" button.
+- **AppOrchestrator (v3.5.6):** Removed the dropdown menu. Reset Layout, Settings, and Telemetry are exposed as standalone utility buttons in the taskbar.
+- **CarTiMap AST Compiler (v1.2.1):** Corrected the recursive range evaluator inside `compileCartiMapAST` to pass individual string indexes (`parts`) rather than the raw split array during segment compilations.
+
+
 #### Changelog: [v8.12.67 - 2026-08-27] - Navigation and Chronology Alignment
 **Features & Layout Upgrades:**
 *   ✓ **[Cockpit Navigation Integration]** Re-assembled the status bar into a symmetrical tripartite grid. Directions and indicators are grouped centered as `[Prev] [Counter] [Next]`, with the Span/Zoom metadata moving to the right of the Next button.

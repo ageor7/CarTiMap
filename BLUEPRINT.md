@@ -232,6 +232,10 @@ Custom HTML CSS markers physically measure `24px` by `34px`. To insulate the geo
 *   **[REF: MAP-03b] Decoupled Kinetic Camera Flight [NEW]:** To eliminate camera jitter during timeline scrubs, marker opacities (Temporal Ghosting) are calculated within a lightweight effect, while heavy flyToBounds transitions are bound to an isolated effect triggered strictly when activeIndex mutates.
 *   **[REF: BOOT-CRASH-03] Character Class Range Bounds [NEW]:** RegExp character classes containing literal dashes or backslashes must explicitly escape these tokens to prevent the compiler from evaluating ASCII ranges and throwing fatal SyntaxError halts on boot.
 
+Update [REF: UI-164c] (Symmetrical Status Cockpit): We must codify the strict physics of the new tripartite status bar. This records the exact spatial layout bounds: .status-left locked to system utilities, .status-center containing the center-grouped Navigation Cockpit [Prev] [ 1 / 87 ] [Next] and dynamic timeline span telemetry, and .status-right housing context utilities (Filters, Search, Undo).
+Update [REF: UI-164d] (Proportional Logo Constraints): Document the mathematical rules of the logo component. It must be strictly bounded to 24px height with automatic width scaling (width: auto;) inside the 32px status line wrapper, leaving a symmetrical 4px top/bottom padding buffer to protect its polygonal SVG aspect ratio from distortion.
+Update [REF: ETL-08] (AST Compiler Recursion): Record the structural correction inside compileCartiMapAST. Specifically, document how the range expansion split (..) was stabilized by passing isolated string elements (parts[0] / parts[1]) into the recursive loop, resolving the array-passing compiler crash.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>
@@ -351,6 +355,9 @@ To ensure a frictionless retrieval experience—especially critical for Polytoni
 
 ### [REF: UI-201c] Centered Click-Window Pattern [NEW - 2026-08-25] 
 To bypass browser CORS/Clickjacking constraints when embedding third-party interactive media (such as YouTube iframes or PDF players), the media viewport swipe overlay must utilize a physical pass-through coordinate. Rather than using complex hover toggles, the system must deploy an absolute-centered window measuring 160px by 120px (top: 50%; left: 50%; transform: translate(-50%, -50%)) configured with pointer-events: none and carved out using a CSS clip-path polygon. This allows natural center clicks to fall through directly to the underlying media player, while the surrounding outer canvas boundaries retain pointer-events: auto to process swipe navigation gestures cleanly. Symmetrically, to prevent layout collisions, all media navigation chevrons are relocated to the bottom-left corner of the container (left: 16px; bottom: 12px;), and if a caption exists, a padding-left: 110px; is dynamically applied to the caption wrapper to prevent any visual overlapping.
+
+**[REF: UI-164c] Symmetrical Status Cockpit [NEW]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers —Previous and Next— directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
+
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>
