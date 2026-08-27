@@ -73,6 +73,9 @@ Regular expression literals parsed natively by the browser must strictly utilize
 
 *   **[REF: UI-164c] Symmetrical Status Cockpit [NEW]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers (Previous and Next) directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
 
+[REF: BOOT-CRASH-04] Regular Expression Literal Boundary Escaping [NEW — 2026-08-27]:
+Inside native JavaScript regular expression literals (/.../), the forward slash / acts as the absolute delimiter boundary. Even when nested within character classes [...] —where standard punctuation operators are evaluated as literal strings— a forward slash must be explicitly escaped with a leading backslash (\/). Omission of this escape causes the browser's lexical parser to evaluate the unescaped slash as the closing boundary of the regular expression, exposing the remaining character class characters as executable code and triggering an instant SyntaxError that aborts script tokenization on boot.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>

@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.72] - 2026-08-27
+### Fixed
+- **Tag-Split Ingestion Loss:** Resolved the delimiter mismatch between data ingestion and tag-map extraction. By flat-splitting tags immediately on load, we prevent activeTags synchronization loops from culling composite tags, restoring the 8 missing records to bring the baseline back to its true 95-slide baseline.
+- **Surgical Escaping Cleared:** Replaced double-escaped backslashes with standard single-escaped characters inside `MapViewer`'s places and sublabels splits, protecting character class checks from browser parsing errors.
+
+### Changed
+- **Delimiter Expansion:** Added semicolons (`;`) and Greek ano teleias (`·`) across all parsing vectors, including: `subLabels` split, `places` split, `formatPlaces` helper, and the `omniSplitRegex` media/tag parsing limits.
+
 [v8.12.71] — Chrono Fallback Restored & Status Bar Cockpit Centering. Solves Level 2 EDTF fallback failures and provides dead-center absolute cockpit navigation with suppressed input indicators.
 
 [v8.12.70] - AppOrchestrator v3.5.8

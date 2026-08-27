@@ -1910,98 +1910,99 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.1 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: compileCartiMapAST v1.2.4 ] ===
-const compileCartiMapAST = (str) => {
-  if (!str) return null;
-  let clean = String(str).trim();
-  
-  // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
-  if (clean.startsWith('[') && clean.endsWith(']')) {
-    const inner = clean.slice(1, -1);
-    const parts = inner.split(',');
-    const values = parts.map(p => compileCartiMapAST(p)).filter(Boolean);
-    if (values.length === 0) return null;
-    return { 
-      type: 'Set', 
-      values: values, 
-      min: Math.min(...values.map(v => v.min || 0)), 
-      max: Math.max(...values.map(v => v.max || 0)) 
-    };
-  }
-  
-  // 2. Array Geometry: Inclusive Lists {}
-  if (clean.startsWith('{') && clean.endsWith('}')) {
-    const inner = clean.slice(1, -1);
-    const parts = inner.split(',');
-    const values = parts.map(p => compileCartiMapAST(p)).filter(Boolean);
-    if (values.length === 0) return null;
-    return { 
-      type: 'List', 
-      values: values, 
-      min: Math.min(...values.map(v => v.min || 0)), 
-      max: Math.max(...values.map(v => v.max || 0)) 
-    };
-  }
-  
-  // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
-  if (clean.includes('..')) {
-    const parts = clean.split('..');
-    const v1 = compileCartiMapAST(parts[0]);
-    const v2 = compileCartiMapAST(parts[1]);
-    if (!v1 || !v2) return null;
-    return { 
-      type: 'Set', 
-      values: [v1, v2], 
-      min: Math.min(v1.min || 0, v2.min || 0), 
-      max: Math.max(v1.max || 0, v2.max || 0) 
-    };
-  }
-  
-  // 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
-  let mathStr = clean;
-  let isApprox = false;
-  let isUncertain = false;
-  
-  if (mathStr.includes('T')) {
-    mathStr = mathStr.replace(/(T[0-9X:~.?%]+(?:[+\-Z][0-9:]*)?)/gi, (match) => {
-      if (match.includes('~')) isApprox = true;
-      if (match.includes('?')) isUncertain = true;
-      if (match.includes('%')) {
-        isApprox = true;
-        isUncertain = true;
-      }
-      return match.replace(/X/gi, '0').replace(/[~?%]/g, '');
-    });
-  }
-  
-  // 5. Qualified Durations (PT30~M)
-  // Extract qualifiers from explicit duration strings to prevent AST grammar crashes
-  if (mathStr.startsWith('P') || mathStr.startsWith('-P')) {
-    if (mathStr.includes('~')) {
-      isApprox = true;
-      mathStr = mathStr.replace(/~/g, '');
-    }
-    if (mathStr.includes('?')) {
-      isUncertain = true;
-      mathStr = mathStr.replace(/\?/g, '');
-    }
-  }
-  
-  // 6. Native AST Evaluation (Level 3 for Season/Summer compliance)
-  let parsed = null;
-  try {
-    parsed = edtf(mathStr, { level: 3 });
-  } catch (e) {
-    return null;
-  }
-  
-  // Safety check: Only attach properties if the EDTF object is extensible
-  if (parsed && typeof parsed === 'object' && Object.isExtensible(parsed)) {
-    if (isApprox) parsed.approximate = true;
-    if (isUncertain) parsed.uncertain = true;
-  }
-  return parsed;
-};
+		// === [ MAJOR BLOCK: compileCartiMapAST v1.2.4 ] ===
+		const compileCartiMapAST = (str) => {
+		  if (!str) return null;
+		  let clean = String(str).trim();
+		  
+		  // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
+		  if (clean.startsWith('[') && clean.endsWith(']')) {
+			const inner = clean.slice(1, -1);
+			const parts = inner.split(',');
+			const values = parts.map(p => compileCartiMapAST(p)).filter(Boolean);
+			if (values.length === 0) return null;
+			return { 
+			  type: 'Set', 
+			  values: values, 
+			  min: Math.min(...values.map(v => v.min || 0)), 
+			  max: Math.max(...values.map(v => v.max || 0)) 
+			};
+		  }
+		  
+		  // 2. Array Geometry: Inclusive Lists {}
+		  if (clean.startsWith('{') && clean.endsWith('}')) {
+			const inner = clean.slice(1, -1);
+			const parts = inner.split(',');
+			const values = parts.map(p => compileCartiMapAST(p)).filter(Boolean);
+			if (values.length === 0) return null;
+			return { 
+			  type: 'List', 
+			  values: values, 
+			  min: Math.min(...values.map(v => v.min || 0)), 
+			  max: Math.max(...values.map(v => v.max || 0)) 
+			};
+		  }
+		  
+		  // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
+		  if (clean.includes('..')) {
+			const parts = clean.split('..');
+			const v1 = compileCartiMapAST(parts[0]);
+			const v2 = compileCartiMapAST(parts[1]);
+			if (!v1 || !v2) return null;
+			return { 
+			  type: 'Set', 
+			  values: [v1, v2], 
+			  min: Math.min(v1.min || 0, v2.min || 0), 
+			  max: Math.max(v1.max || 0, v2.max || 0) 
+			};
+		  }
+		  
+		  // 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
+		  let mathStr = clean;
+		  let isApprox = false;
+		  let isUncertain = false;
+		  
+		  if (mathStr.includes('T')) {
+			mathStr = mathStr.replace(/(T[0-9X:~.?%]+(?:[+\-Z][0-9:]*)?)/gi, (match) => {
+			  if (match.includes('~')) isApprox = true;
+			  if (match.includes('?')) isUncertain = true;
+			  if (match.includes('%')) {
+				isApprox = true;
+				isUncertain = true;
+			  }
+			  return match.replace(/X/gi, '0').replace(/[~?%]/g, '');
+			});
+		  }
+		  
+		  // 5. Qualified Durations (PT30~M)
+		  // Extract qualifiers from explicit duration strings to prevent AST grammar crashes
+		  if (mathStr.startsWith('P') || mathStr.startsWith('-P')) {
+			if (mathStr.includes('~')) {
+			  isApprox = true;
+			  mathStr = mathStr.replace(/~/g, '');
+			}
+			if (mathStr.includes('?')) {
+			  isUncertain = true;
+			  mathStr = mathStr.replace(/\?/g, '');
+			}
+		  }
+		  
+		  // 6. Native AST Evaluation (Level 3 for Season/Summer compliance)
+		  let parsed = null;
+		  try {
+			parsed = edtf(mathStr, { level: 3 });
+		  } catch (e) {
+			return null;
+		  }
+		  
+		  // Safety check: Only attach properties if the EDTF object is extensible
+		  if (parsed && typeof parsed === 'object' && Object.isExtensible(parsed)) {
+			if (isApprox) parsed.approximate = true;
+			if (isUncertain) parsed.uncertain = true;
+		  }
+		  return parsed;
+		};
+		MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
 
@@ -2403,7 +2404,7 @@ const compileCartiMapAST = (str) => {
                 if (parts.length >= 1) {
                   const dateStr = parts[0] || '';
                   const timeStr = parts[1] || '';
-                  const dParts = dateStr.split(/[/\\-.]/);
+                  const dParts = dateStr.split(/[\/\\-.]/);
                   if (dParts.length >= 3) {
                     const tParts = timeStr ? timeStr.split(':') : [];
                     const secParts = String(tParts[2] || '0').split('.');
@@ -2774,9 +2775,9 @@ const compileCartiMapAST = (str) => {
           `;
         };
         
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.9';
+		MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.10';
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
-     
+
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
         render(html`<${ErrorBoundary}><${App} /></${ErrorBoundary}>`, document.getElementById('root'));
         // === [ END MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===

@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.73] - 2026-08-27
+### Fixed
+- **Gregorian Parser Compiler Crash:** Patched the `dParts` split regex inside `parseChronoNode` to escape the forward slash (`/[\/\\-.]/`). This resolves a fatal, compile-time syntax exception that aborted script parsing on boot and produced a blank screen in desktop and mobile viewports.
+- **Syntax Integrity:** Cleaned and conformed all regular expression literal boundaries across the global orchestrator.
+
 ## [v8.12.72] - 2026-08-27
 ### Fixed
 - **Tag-Split Ingestion Loss:** Resolved the delimiter mismatch between data ingestion and tag-map extraction. By flat-splitting tags immediately on load, we prevent activeTags synchronization loops from culling composite tags, restoring the 8 missing records to bring the baseline back to its true 95-slide baseline.
