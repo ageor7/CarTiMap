@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.74';
+        const APP_VERSION = 'v8.12.75';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1470,6 +1470,17 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const miniBaseLayerRef = useRef(null); const overlayLayersRef = useRef({});
           const minimapOffsetRef = useRef(minimapOffset || -4);
           const isSyncingRef = useRef(false);
+          const parsePolylineLabels = (placeStr) => {
+            if (!placeStr) return null;
+            const match = placeStr.match(/^\[(.*?)\]\s*(.*)$/);
+            if (match) {
+              const lineName = match[1].trim();
+              const detailsStr = match[2].trim();
+              const details = detailsStr.split(/&|\band\b|\bto\b|[,;·|]/i).map(s => s.trim().replace(/\)$/, '')).filter(Boolean);
+              return { lineName, startLabel: details[0] || '', endLabel: details[1] || '' };
+            }
+            return null;
+          };
         
           const safeStripHTML = (str) => {
             if (!str) return '';
@@ -1531,19 +1542,24 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             }
             if (currentGeom.trim()) geometries.push(currentGeom.trim());
             let extractedLayers = [];
-            geometries.forEach(geomStr => {
+            geometries.forEach((geomStr, geomIdx) => {
               try {
                 const wkt = new window.Wkt.Wkt(); wkt.read(geomStr);
-                extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
+                const subLayers = extractLayers(wkt.toObject());
+                subLayers.forEach(l => { l._geometryIndex = geomIdx; });
+                extractedLayers = extractedLayers.concat(subLayers);
               } catch (e) {
                 const upper = geomStr.toUpperCase();
+                let subLayers = [];
                 if (upper.startsWith('POINT')) {
                   const m = geomStr.match(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/);
-                  if (m) extractedLayers.push(L.marker(new L.LatLng(parseFloat(m.at(1)), parseFloat(m.at(2)))));
+                  if (m) subLayers.push(L.marker(new L.LatLng(parseFloat(m.at(1)), parseFloat(m.at(2)))));
                 } else if (upper.startsWith('LINESTRING') || upper.startsWith('POLYGON')) {
                   const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
-                  if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))));
+                  if (m.length > 0) subLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x.at(1)), parseFloat(x.at(2))))));
                 }
+                subLayers.forEach(l => { l._geometryIndex = geomIdx; });
+                extractedLayers = extractedLayers.concat(subLayers);
               }
             });
             return extractedLayers;
@@ -1641,6 +1657,16 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             }
           }, [basemapsRegistry]);
         
+          useEffect(() => {
+            const map = mapInstance.current;
+            if (map && mapDomRef.current) {
+              if (mapZoom < 12) {
+                mapDomRef.current.classList.add('map-zoom-low');
+              } else {
+                mapDomRef.current.classList.remove('map-zoom-low');
+              }
+            }
+          }, [mapZoom]);
           useEffect(() => {
             const map = mapInstance.current; if (!map || !gridLayerRef.current) return;
             const updateGrid = () => {
@@ -1740,20 +1766,91 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 const places = item.place ? item.place.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
                 const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
                 validFeatureLayers.forEach((layer, layerIdx) => {
-                  if (layer instanceof L.Polygon) layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: polygonOpacity });
-                  else if (layer instanceof L.Polyline) layer.setStyle({ color: '#007acc', weight: 2, dashArray: '8, 8' });
-                  else if (layer.setStyle) layer.setStyle({ color: '#007acc', weight: 4 });
-                  // [REF: BOOT-CRASH-02b] Immutable coordinate pin instantiation
-                  if (layer instanceof L.Marker) { layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) })); layer.isVip = isVip; }
-                  const safeSubLabel = subLabels.length > layerIdx ? subLabels[layerIdx] : null;
-                  const safePlace = places.length > layerIdx ? places[layerIdx] : null;
+                  const geomIdx = layer._geometryIndex !== undefined ? layer._geometryIndex : 0;
+                  const isPolyline = layer instanceof L.Polyline && !(layer instanceof L.Polygon);
+                  const isMarker = (layer instanceof L.Marker) || (layer.setIcon && typeof layer.getLatLng === 'function' && !layer.getBounds);
+
+                  if (layer instanceof L.Polygon) {
+                    layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: polygonOpacity });
+                  } else if (isPolyline) {
+                    layer.setStyle({ color: '#007acc', weight: 2, dashArray: '8, 8' });
+                  } else if (layer.setStyle) {
+                    layer.setStyle({ color: '#007acc', weight: 4 });
+                  }
+
+                  if (isMarker) {
+                    layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
+                    layer.isVip = isVip;
+                  }
+
+                  const safeSubLabel = subLabels.length > geomIdx ? subLabels[geomIdx] : null;
+                  const safePlace = places.length > geomIdx ? places[geomIdx] : null;
                   let labelToUse = safeSubLabel || safePlace || item.title;
-                  layer.itemPlace = safeStripHTML(labelToUse);
+
+                  const polyInfo = isPolyline ? parsePolylineLabels(labelToUse) : null;
+
+                  if (polyInfo) {
+                    layer.itemPlace = safeStripHTML(polyInfo.lineName);
+                  } else {
+                    layer.itemPlace = safeStripHTML(labelToUse);
+                  }
                   layer.itemTitle = safeStripHTML(item.title);
-                  // [REF: MAP-07] Precision vertical tooltip offset
-                  layer.bindTooltip(layer.itemPlace, { direction: 'top', offset: new L.Point(0, -34), className: 'centered-tooltip' });
+
                   layer.on('click', () => setActiveIndex(idx));
-                  if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer); else markerLayer.current.addLayer(layer);
+
+                  if (polyInfo) {
+                    const latlngs = layer.getLatLngs();
+                    if (latlngs && latlngs.length >= 2) {
+                      const firstLatLng = Array.isArray(latlngs[0]) ? latlngs[0][0] : latlngs[0];
+                      const lastArr = latlngs[latlngs.length - 1];
+                      const lastLatLng = Array.isArray(lastArr) ? lastArr[lastArr.length - 1] : lastArr;
+
+                      if (firstLatLng && lastLatLng) {
+                        const startMarker = L.marker(firstLatLng, {
+                          icon: L.divIcon({
+                            className: 'custom-div-icon polyline-endpoint-marker',
+                            html: `<div class="polyline-endpoint" style="width: 6px; height: 6px; border-radius: 50%; background: #007acc; border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);"></div>`,
+                            iconSize: new L.Point(6, 6),
+                            iconAnchor: new L.Point(3, 3)
+                          })
+                        });
+                        startMarker.itemPlace = safeStripHTML(polyInfo.startLabel || polyInfo.lineName);
+                        startMarker.itemTitle = safeStripHTML(item.title);
+                        startMarker.bindTooltip(startMarker.itemPlace, { direction: 'top', className: 'centered-tooltip' });
+                        startMarker.on('click', () => setActiveIndex(idx));
+
+                        const endMarker = L.marker(lastLatLng, {
+                          icon: L.divIcon({
+                            className: 'custom-div-icon polyline-endpoint-marker',
+                            html: `<div class="polyline-endpoint" style="width: 6px; height: 6px; border-radius: 50%; background: #007acc; border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);"></div>`,
+                            iconSize: new L.Point(6, 6),
+                            iconAnchor: new L.Point(3, 3)
+                          })
+                        });
+                        endMarker.itemPlace = safeStripHTML(polyInfo.endLabel || polyInfo.lineName);
+                        endMarker.itemTitle = safeStripHTML(item.title);
+                        endMarker.bindTooltip(endMarker.itemPlace, { direction: 'top', className: 'centered-tooltip' });
+                        endMarker.on('click', () => setActiveIndex(idx));
+
+                        activeLayersArray.push(startMarker);
+                        activeLayersArray.push(endMarker);
+                        markerLayer.current.addLayer(startMarker);
+                        markerLayer.current.addLayer(endMarker);
+                      }
+                    }
+                  }
+
+                  if (!polyInfo) {
+                    layer.bindTooltip(layer.itemPlace, { direction: 'top', offset: new L.Point(0, -34), className: 'centered-tooltip' });
+                  } else {
+                    layer.bindTooltip(layer.itemPlace, { direction: 'top', className: 'centered-tooltip' });
+                  }
+
+                  if (isMarker && !isVip) {
+                    clusterLayer.current.addLayer(layer);
+                  } else {
+                    markerLayer.current.addLayer(layer);
+                  }
                   activeLayersArray.push(layer); validMarkers++;
                 });
                 if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
@@ -1854,6 +1951,11 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         
           return html`
             <div style="position: relative; width:100%; height:100%;">
+              <style>
+                .map-zoom-low .polyline-endpoint-marker {
+                  display: none !important;
+                }
+              </style>
               <div style="overflow: hidden; width:100%; height:100%; position: absolute; top:0; left:0; z-index:1;"><div ref=${mapDomRef} style="width:100%; height:100%;"></div></div>
               <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
                 <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
@@ -1869,7 +1971,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
-                  <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">${mapZoom}z</div>
+                  <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">${mapZoom}</div>
                   <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
@@ -1905,7 +2007,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['MapViewer'] = 'v6.4.5';
+        MODULE_VERSIONS['MapViewer'] = 'v6.4.6';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 

@@ -1,6 +1,17 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.75] - 2026-08-28
+### Fixed
+- **Dropdown Relocation:** Relocated the Map Layers dropdown menu inside the absolute column button container, resolving the layout regression where the card detached from its button anchor.
+- **Layers SVG Typo:** Corrected the Feather layers icon SVG path typo, restoring its taskbar visual display.
+- **WKT Array Shifting:** Implemented strict index-coupling (`_geometryIndex`) inside `parseGeometryCollection` to bypass Leaflet's auto-incremented layer IDs, aligning multi-geometry coordinates 1:1 with spreadsheet labels.
+
+### Changed
+- **Tablet Boundaries:** Clamped the layers panel to a tablet-safe maximum vertical bound (`40vh`) with native vertical scrollbar on overflow.
+- **Tactical Transit Labels:** Added endpoint marker generation for bracket-labeled [transit lines], hiding markers at zoom levels < 12.
+- **Zoom HUD:** Removed the 'z' suffix from the map zoom level container.
+
 #### Changelog: [v8.12.74] - Chronology Engine v3.5.8, MapViewer v6.4.5
 **System Stability & Bug Fixes:**
 ✓ **[RegExp Range Sanitation]** Corrected legacy date-splitting patterns inside `parseChronoNode` to eliminate decreasing ASCII character ranges. This prevents browser RegExp compilers from throwing fatal SyntaxErrors on boot.
