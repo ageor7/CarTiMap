@@ -1,6 +1,22 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.75c] — 2026-08-28
+### Added
+- **Two-Pass Nested Tokenization:** Implemented coordinate-to-label pairing inside the map engine. Place fields split by newlines first to isolate parent geometries, then split by semicolons to match child coordinate layers.
+- **Semantic Version Gating:** Integrated an automated lexicographical comparison engine (`compile_cartimap.py v1.1.2`) that halts compilation of equal or older blocks to enforce minimal delta-only patching.
+- **Coordinate Armor:** Added upstream `@`-symbol shielding to coordinate strings during vertical splits, preventing spreadsheet auto-coercion.
+
+### Fixed
+- **Plain WKT Disappearance:** Resolved a regex double-backslash corruption (`\\s` and `\\(`) inside `MapViewer` that caused un-wrapped WKT shapes like Scobie's perimeter to bypass Wicket.
+- **Red Sea Marker Displacement:** Corrected the Cartesian coordinate mapping sequence inside the manual fallback parser catch block to run a standard Lat/Lon axis inversion.
+- **Formula Parse Error:** Patched the upstream horizontal grouping formula (`ExtractsCombinedV v6.1.7`) by doubling nested double quotes inside the JSON string literal.
+- **Dropdown Dislocation:** Relocated the Map Layers configuration menu inside the absolute buttons column on the right edge, clamping its height to 40vh with scroll containment.
+
+### Changed
+- **HUD Scale Legibility:** Removed the redundant "z" suffix from the map zoom level display and increased the HUD container font size to 0.8rem.
+- **Compiler Substitutions:** Migrated regex replacement arguments in the Python build script to raw callable strings, preventing unescaped backslashes inside Javascript arrays from crashing the parser.
+
 ## [v8.12.75] - 2026-08-28
 ### Fixed
 - **Dropdown Relocation:** Relocated the Map Layers dropdown menu inside the absolute column button container, resolving the layout regression where the card detached from its button anchor.

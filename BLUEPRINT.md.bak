@@ -495,6 +495,9 @@ To prevent vertical axis and layout scroll-snapping errors during timeline scali
 ### [REF: MAP-12b] Granular Wave-Date Dimming (Quantum Sets) [NEW - 2026-08-25]: 
 To support micro-chronological geographic modeling—such as military or diplomatic forces arriving in distinct waves inside an inclusive EDTF Set or List {}—the mapping engine must decouple coordinate highlights from slide-level states. During data ingestion, the engine maps the individual elements of a Set/List of dates 1:1 to the individual features in the coordinate geometry, caching the specific date limit onto each Leaflet layer object as layerDate. During active timeline scrubbing, the temporal filter loops through each layer of the active slide. Any layer whose cached layerDate intersects the scrubber viewport bounds receives 100% opacity, while layers representing future or past dates are attenuated to 20% opacity (Temporal Ghosting), allowing the map to physically animate strategic spatial expansions on the fly.
 
+**[REF: BOOT-CRASH-03b] Character Class Escaping and Hyphen Bounds:**
+To isolate the regular expression engine from unexpected system encodings or polytonic Greek character overlaps, all hyphens (-) utilized inside active split arrays (places, sublabels, dates) must be explicitly escaped as \- or anchored to the absolute far-right boundary of the bracket. Ingesting unescaped hyphens in the middle of character classes (e.g., [\\/\\\\-.]) forces the browser to evaluate character ranges based on ASCII codes. If the character preceding the hyphen holds a higher decimal value than the trailing character, the JS compiler immediately throws a fatal "invalid range in character class" SyntaxError, blocking the Preact boot sequence.
+
 ---
 
 ## 6. Algorithms, Analytics & Methodologies <a name="category-6"></a>
