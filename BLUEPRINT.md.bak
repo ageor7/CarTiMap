@@ -69,6 +69,10 @@ The engine strictly forbids hosting compiled 3rd-party dependencies or massive J
 ### [REF: BOOT-CRASH-03] Regular Expression Literal Compilation [NEW]
 Regular expression literals parsed natively by the browser must strictly utilize standard single-escaped backslash formatting —such as `\s`, `\d`, or `\(`. Double-escaping backslashes inside a regular expression literal compiles the first backslash as a literal character, leaving trailing formatting operators unescaped. This instantly violates browser-level abstract syntax tree validation, triggering a critical system syntax error that halts script tokenisation.
 
+**[REF: PROT-15] The Regression Audit Gate:** Prior to compiling any client-side JavaScript or CSS alterations, the developer AI must execute a systematic, line-by-line audit comparing the proposed module state against the previous conformed version in /workspace/artifacts/. Any modification that drops previously validated features (such as CSS legend tables, scroll containment, or specific bibliographic details) must be halted immediately. No blind code simplification is permitted without an explicit Socratic explanation in the chat and explicit approval.
+
+**[REF: PROT-16] Unified Delimiter Symmetries:** Semicolons (;) and Greek ano teleias (·) must be conformed as first-class delimiters across all multi-value string splitters (places, sublabels, tags, media) in both the Map and Timeline modules to ensure identical spatial-temporal tracking.
+
 ### ## 1. Engineering Protocols & Coding Rules / 2. Interface Geometry
 
 *   **[REF: UI-164c] Symmetrical Status Cockpit [NEW]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers (Previous and Next) directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
@@ -144,6 +148,9 @@ During recursive chronological range expansions —such as those mapping `Date1.
 
 [REF: ETL-14b] Symmetric Tag Ingestion Protocol [UPDATED - 2026-08-27]:
 To prevent runtime data loss inside browser-side state-filtering loops, the Data Ingestion Phase must maintain absolute delimiter symmetry with the Tag Map Extraction Phase. The primary tags column parser must not rely on simple comma splitting (split(',')). It is strictly mandated to parse tags utilizing a conformed regex /[,\r\n|;·]+/ on initial load. This guarantees that any multi-value arrays compiled upstream via TEXTJOIN are instantly flattened into primitive strings prior to Virtual DOM diffing, completely neutralizing the activeTags intersection failure that previously culled un-split composite strings on boot. Semicolons (;) and Greek ano teleias (·) must be evaluated as primary splitting boundaries.
+
+[REF: ETL-01] Upstream Horizontal Ingestion Compiler (v6.1.7) [UPDATED]
+The horizontal consolidation formula (ExtractsCombinedV) must resolve spatial coordinate cell boundaries before running WKT keyword validation blocks. If a grouped coordinate cell contains multi-row inputs or inline HTML line breaks ((?i)<br\s*/?>), the formula splits them by clean newlines (CHAR(10)) and processes them as a vertical vector utilizing TOCOL(..., 1). To prevent Google Sheets from stripping leading zeroes or truncating coordinate decimals during splitting, the formula must wrap each element in temporary @-armor, stripping the character only after the transposition is complete. Furthermore, nested quotation marks inside compiled GeoJSON strings must be escaped using doubled double quotes ("") to satisfy the Sheets formula compiler.
 
 ---
 
@@ -247,6 +254,11 @@ Custom HTML CSS markers physically measure `24px` by `34px`. To insulate the geo
 Update [REF: UI-164c] (Symmetrical Status Cockpit): We must codify the strict physics of the new tripartite status bar. This records the exact spatial layout bounds: .status-left locked to system utilities, .status-center containing the center-grouped Navigation Cockpit [Prev] [ 1 / 87 ] [Next] and dynamic timeline span telemetry, and .status-right housing context utilities (Filters, Search, Undo).
 Update [REF: UI-164d] (Proportional Logo Constraints): Document the mathematical rules of the logo component. It must be strictly bounded to 24px height with automatic width scaling (width: auto;) inside the 32px status line wrapper, leaving a symmetrical 4px top/bottom padding buffer to protect its polygonal SVG aspect ratio from distortion.
 Update [REF: ETL-08] (AST Compiler Recursion): Record the structural correction inside compileCartiMapAST. Specifically, document how the range expansion split (..) was stabilized by passing isolated string elements (parts[0] / parts[1]) into the recursive loop, resolving the array-passing compiler crash.
+
+[REF: MAP-04] Type-Agnostic Sequential Index Coupling [UPDATED]
+To prevent coordinate-label desynchronization across multi-geometry slides, the visualizer must decouple layer-label mapping from Leaflet's internal, auto-incremented object IDs (_leaflet_id). During the initial WKT tokenization loop inside parseGeometryCollection, each extracted sub-layer must be stamped with its original, raw WKT string index (_geometryIndex) and nested sub-coordinate sequence index (_childIndex) at the exact millisecond of creation. Symmetrically, the tooltip rendering engine evaluates the place labels by splitting strings by newlines first to isolate the parent block (_geometryIndex), and then by semicolons to retrieve the precise descriptor matching the active _childIndex position.
+[REF: MAP-05] Fallback Axis Inversion Physics [UPDATED]
+When a Well-Known Text (WKT) string fails to compile through Wicket and triggers a regex catch block fallback, the manual extractor must enforce standard WKT axis inversion. Because OGC standards dictate Cartesian POINT(Lon Lat) formatting while Leaflet expects L.LatLng(Lat, Lon), the fallback regular expression must explicitly swap the captured coordinate groups (parseFloat(m.at(2)) for Latitude, parseFloat(m.at(1)) for Longitude). Plain, non-WKT coordinate cells parsed from the database must bypass this inversion loop, ingesting raw Lat, Lon arrays directly.
 
 ---
 
@@ -559,6 +571,9 @@ When intercepting mobile hardware telemetry (touch events), the engine must neve
 
 ### [REF: CRASH-07] Bracket Stripping Immunity [NEW]
 During string parsing and extraction loops inside the Virtual DOM, the engine must actively avoid utilizing static numeric bracket accessors (like `[0]`) to retrieve first-elements from arrays or DOM nodes. To guarantee the code physically survives text-stripping transmission pipelines (where `[0]` may be mistaken for a citation or markdown tag), the engine must utilize native traversal methods: `.shift()` for extracting the first string from an Array, and `.item(0)` for extracting the primary Cartesian object from a DOM `TouchList`.
+
+[REF: PROT-15] Semantic Version Gating & Compiler Escape Armor [NEW]
+The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Furthermore, to prevent unescaped regular expressions or backslashes nested within the Javascript codeblocks from crashing the compiler, all string substitutions inside the Python regex engine must run through a callable replacement function to be parsed as raw text.
 
 ---
 
