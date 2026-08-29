@@ -637,6 +637,9 @@ When the user queries the database index via the Search Modal, the action list r
 #### [REF: CRASH-05b] Template Literal Decoupling & Isolation [NEW - 2026-08-29]
 To prevent fatal browser-level parsing errors (SyntaxError: unexpected token: identifier), any complex conditional HTML element containing template strings must be decoupled from the core JSX template rendering stream. Tagged template expressions (e.g., `html\`...\``) nested deeply within larger template interpolation blocks (`\${...}`) can trigger lexical collisions in browser engines when interpreted in a single-file environment. By compiling the sub-component into an independent state variable (such as `downloadBtn`) before the core JSX return declaration, the parsing contexts are strictly separated, securing 100% engine stability and cross-viewport compatibility.
 
+#### [REF: CRASH-05b] Hoisted Variable Isolation & Escaping [UPDATED - 2026-08-29]
+To completely insulate the Preact Virtual DOM from browser-level lexer crashes (e.g., SyntaxError: unexpected token: identifier), nesting conditional template strings (such as html`...`) inside the main return block's JSX placeholders is strictly deprecated. Deep-nesting triggers catastrophic compiler collisions when parsed client-side in a monolithic file. All conditional or complex HTML elements must be extracted and declared as independent JS constants (e.g., downloadBtn, backBtn, prevBtn) *above* the core JSX render stream. This physical decoupling isolates the string parsing contexts, securing 100% engine stability and maintaining a deterministic constant-time render frame.
+
 ---
 
 ### ## 9. System Stability & Error Boundaries ↓↓

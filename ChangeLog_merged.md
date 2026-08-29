@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.1] — 2026-08-29 - AppOrchestrator v3.7.0b, MapViewer v6.4.20 [CONFORMED]
+### Refactored
+- **Hoisted Component Variables:** Decoupled and hoisted all inline Preact HTML subcomponents (`downloadBtn`, `backBtn`, `resetLayoutBtn`, `settingsBtn`, `telemetryBtn`, `prevBtn`, `nextBtn`, `searchBtn`, `filterBtn`) out of the main `App` return literal. This completely isolates the string evaluation context, securing 100% immunity against nested-backtick lexer crashes `[REF: CRASH-05b]`.
+- **Ten-Subblock Modular Architecture:** Organized the entire `AppOrchestrator` block into ten heavily commented, isolated code sectors to prevent code drift and secure long-term maintainability `[REF: COMP-01]`.
+
+### Fixed
+- **Forensic Patch Compilation:** Resolved a silent compilation bug in `compile_cartimap.py` where older, broken version caches of `AppOrchestrator v3.5.3` were inadvertently preserved during manual patching. This ensures that the clean hoisted `v3.7.0` block renders flawlessly, curing the blank screen and unexpected token syntax crashes.
+
 ## [v8.13.0] — 2026-08-29 - AppOrchestrator v3.7.0, MapViewer v6.4.20 [CONFORMED]
 ### Refactored
 - **Ten-Subblock Modular Architecture:** Re-engineered the entire `AppOrchestrator` block into ten heavily commented, isolated code sectors to prevent code drift and secure long-term maintainability `[REF: COMP-01]`.
