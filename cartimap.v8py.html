@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.85b';
+        const APP_VERSION = 'v8.13.0';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2108,8 +2108,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.6.2 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.6.2 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.0 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.0 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2149,7 +2149,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           });
           const [dateLocale, setDateLocale] = useState(() => {
             try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
-            catch (e) { return 'en-GB'; }\
+            catch (e) { return 'en-GB'; }
           });
           const [dateEngineMode, setDateEngineMode] = useState(() => {
             try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
@@ -2165,7 +2165,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         
           const addLog = (msg, type = 'info') => {
             const timeStr = new Date().toTimeString().split(' ').at(0);
-            setLogs(prev => [{ time: timeStr, text: msg, type }, ...prev].slice(0, 100));
+            setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
           };
         
           const stripAndNormalize = (str) => {
@@ -2285,7 +2285,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     return null;
                   }
                   
-                  if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
+                  if (/^\d+(\.\d+)?\$/.test(cleanLegacy)) {
                     const serialVal = parseFloat(cleanLegacy);
                     const ts = (serialVal - 25569) * 86400 * 1000;
                     return { 
@@ -2299,19 +2299,19 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   
                   const parts = cleanLegacy.split(' ');
                   if (parts.length >= 1) {
-                    const dateStr = parts[0] || '';
-                    const timeStr = parts[1] || '';
+                    const dateStr = parts || '';
+                    const timeStr = parts[2] || '';
                     const dParts = dateStr.split(/[\/\\.\-]/);
                     if (dParts.length >= 3) {
                       const tParts = timeStr ? timeStr.split(':') : [];
-                      const secParts = String(tParts[2] || '0').split('.');
-                      const dYear = parseInt(dParts[2], 10);
+                      const secParts = String(tParts[3] || '0').split('.');
+                      const dYear = parseInt(dParts[3], 10);
                       const dMonth = parseInt(dParts[isUS ? 0 : 1], 10) - 1;
                       const dDay = parseInt(dParts[isUS ? 1 : 0], 10);
-                      const tHour = parseInt(tParts[0] || 0, 10);
-                      const tMin = parseInt(tParts[1] || 0, 10);
-                      const tSec = parseInt(secParts[0] || 0, 10);
-                      const tMs = parseInt(secParts[1] || 0, 10);
+                      const tHour = parseInt(tParts || 0, 10);
+                      const tMin = parseInt(tParts[2] || 0, 10);
+                      const tSec = parseInt(secParts || 0, 10);
+                      const tMs = parseInt(secParts[2] || 0, 10);
                       const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
                       const ts = dateObj.getTime();
                       if (!isNaN(ts)) {
@@ -2470,11 +2470,11 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           // =========================================================================
           const startTimelineResize = (e) => {
             e.preventDefault();
-            const startY = e.clientY || (e.touches && e.touches.at(0).clientY);
+            const startY = e.clientY || (e.touches && e.touches.clientY);
             const startHeight = timelineRequiredHeight;
             
             const doDrag = (moveEvent) => {
-              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches.at(0).clientY);
+              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches.clientY);
               const diffY = startY - currentY;
               const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
               setTimelineRequiredHeight(newHeight);
@@ -2554,56 +2554,109 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         
           const goBack = () => {
             if (slideHistory.length > 0) {
-              const prev = slideHistory.at(-1);
+              const prev = slideHistory[slideHistory.length - 1];
               setSlideHistory(h => h.slice(0, -1));
               setActiveIndex(prev);
             }
           };
         
           const searchResults = executeSearch(debouncedSearchQuery);
-          const activeSlide = data.at(activeIndex);
+          const activeSlide = data[activeIndex];
           const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
         
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
           // =========================================================================
           const CarTiMapperLogo = ({ context, appVersion }) => {
-            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
-            if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
-            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 24px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.85rem; color: #444; line-height: 1;">CarTiMap</span><span style="font-size: 0.65rem; color: #888; line-height: 1;">${appVersion}</span></div></div>`;
+            const svgIcon = html`<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"20 0 165 100\" style=\"width: 100%; height: 100%; display: block;\"><defs><filter id=\"dot-glow\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\"><feGaussianBlur stdDeviation=\"1.2\" result=\"blur\" /><feMerge><feMergeNode in=\"blur\" /><feMergeNode in=\"blur\" /><feMergeNode in=\"SourceGraphic\" /></feMerge></filter></defs><path d=\"M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z\" fill=\"#2c3e50\" stroke=\"#007acc\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/><g fill=\"#fff\" opacity=\"0.9\"><rect x=\"55\" y=\"19\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"71\" y=\"19\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"87\" y=\"19\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"103\" y=\"19\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"119\" y=\"19\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"135\" y=\"19\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"151\" y=\"19\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"167\" y=\"19\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"55\" y=\"75\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"71\" y=\"75\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"87\" y=\"75\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"103\" y=\"75\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"119\" y=\"75\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"135\" y=\"75\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"151\" y=\"75\" width=\"4\" height=\"6\" rx=\"1\" /><rect x=\"167\" y=\"75\" width=\"4\" height=\"6\" rx=\"1\" /></g><g transform=\"translate(112, 50)\"><path d=\"M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z\" fill=\"#546e7a\" opacity=\"0.8\"/><g fill=\"#fcfcfc\" font-family=\"Arial, sans-serif\" font-size=\"7\" font-weight=\"normal\" text-anchor=\"middle\"><text x=\"0\" y=\"-21\">N</text><text x=\"24\" y=\"2.5\">E</text><text x=\"0\" y=\"27\">S</text><text x=\"-24\" y=\"2.5\">W</text></g><g fill=\"#8be9fd\" filter=\"url(#dot-glow)\"><circle cx=\"12.5\" cy=\"-21.6\" r=\"1.2\" /><circle cx=\"21.6\" cy=\"-12.5\" r=\"1.2\" /><circle cx=\"21.6\" cy=\"12.5\" r=\"1.2\" /><circle cx=\"12.5\" cy=\"21.6\" r=\"1.2\" /><circle cx=\"-12.5\" cy=\"-21.6\" r=\"1.2\" /><circle cx=\"-21.6\" cy=\"12.5\" r=\"1.2\" /><circle cx=\"-21.6\" cy=\"-12.5\" r=\"1.2\" /><circle cx=\"-12.5\" cy=\"-21.6\" r=\"1.2\" /></g><g transform=\"rotate(60)\"><path d=\"M0,0 L-1,-16 L1,-16 Z\" fill=\"#999\" /><circle cx=\"0\" cy=\"-20\" r=\"2.8\" fill=\"#007acc\" /></g><g transform=\"rotate(270)\"><path d=\"M0,0 L-1.2,-9 L1.2,-9 Z\" fill=\"#999\" /><circle cx=\"0\" cy=\"-13\" r=\"2.8\" fill=\"#28a745\" /></g><circle cx=\"0\" cy=\"0\" r=\"1.5\" fill=\"#fff\" /></g></svg>`;
+            if (context === 'splash') return html`<div class=\"logo-stack-splash\"><div class=\"splash-icon-wrapper\">${svgIcon}</div><div class=\"splash-text\">CarTiMap</div><div class=\"splash-version\">${appVersion}</div></div>`;
+            if (context === 'status') return html`<div style=\"display: flex; align-items: center; gap: 6px; height: 100%;\"><div style=\"height: 24px; width: auto; display: flex; align-items: center;\">${svgIcon}</div><div style=\"display: flex; align-items: baseline; gap: 4px;\"><span style=\"font-size: 0.85rem; color: #444; line-height: 1;\">CarTiMap</span><span style=\"font-size: 0.65rem; color: #888; line-height: 1;\">${appVersion}</span></div></div>`;
             return html`
-              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
-                <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                  <h2 style="margin: 0; font-size: 2.4rem; color: #222; letter-spacing: -0.5px; line-height: 1.1;">CarTiMap Engine</h2>
-                  <div style="font-family: monospace; color: #007acc; font-size: 1.1rem; font-weight: 600; margin-top: 6px;">${appVersion}</div>
+              <div style=\"display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;\">
+                <div style=\"width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;\">${svgIcon}</div>
+                <div style=\"display: flex; flex-direction: column; align-items: center;\">
+                  <h2 style=\"margin: 0; font-size: 2.4rem; color: #222; letter-spacing: -0.5px; line-height: 1.1;\">CarTiMap Engine</h2>
+                  <div style=\"font-family: monospace; color: #007acc; font-size: 1.1rem; font-weight: 600; margin-top: 6px;\">${appVersion}</div>
                 </div>
               </div>
             `;
           };
         
           // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 10: ISOLATED METADATA VARIABLE ] ===
+          // === [ APP_ORCHESTRATOR SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
           // =========================================================================
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
-            ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
+            ? html`<a href=${aboutData.downloadUrl} target=\"_blank\" class=\"status-btn-text\" style=\"text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"></path><polyline points=\"7 10 12 15 17 10\"></polyline><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"></line></svg> Download Dataset (CSV)</a>`
             : '';
         
+          const backBtn = (slideHistory && slideHistory.length > 0)
+            ? html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} title=\"Back to Previous Slide\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M 4 12 A 8 8 0 1 0 12 4\"></path><polyline points=\"16 0 12 4 16 8\"></polyline></svg>${showButtonText ? html`<span>Back</span>` : ''}</button>`
+            : '';
+        
+          const resetLayoutBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(200); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title=\"Reset Layout Viewport\">
+              <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\"></path><polyline points=\"16 3 21 8 16 13\"></polyline><path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\"></path><polyline points=\"8 21 3 16 8 11\"></polyline></svg>
+              ${showButtonText ? html`<span>Reset Layout</span>` : ''}
+            </button>
+          `;
+        
+          const settingsBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(true)} title=\"Engine Configurations\">
+              <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>
+              ${showButtonText ? html`<span>Settings</span>` : ''}
+            </button>
+          `;
+        
+          const telemetryBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title=\"Telemetry Logs\">
+              <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"10\"></line><line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"4\"></line><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"14\"></line></svg>
+              ${showButtonText ? html`<span>Telemetry</span>` : ''}
+            </button>
+          `;
+        
+          const prevBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title=\"Previous Node\">
+              <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"15 18 9 12 15 6\"></polyline></svg>
+              ${showButtonText ? html`<span>Prev</span>` : ''}
+            </button>
+          `;
+        
+          const nextBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title=\"Next Node\">
+              ${showButtonText ? html`<span>Next</span>` : ''}
+              <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"9 18 15 12 9 6\"></polyline></svg>
+            </button>
+          `;
+        
+          const searchBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSearchOpen(true)} title=\"Interactive Query Index\">
+              <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"12\" r=\"8\"></circle><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"></line></svg>
+              ${showButtonText ? html`<span>Search</span>` : ''}
+            </button>
+          `;
+        
+          const filterBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title=\"Swimlanes Filtering\">
+              <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\"></polygon></svg>
+              ${showButtonText ? html`<span>Filters</span>` : ''}
+            </button>
+          `;
+        
           return html`
-            <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
+            <div id=\"tm-root\" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
               <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
               
               ${!status.active ? html`
-                <div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
-                  <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
-                  <div class="loading-bar-container"><div class="loading-bar" style="width: ${status.progress}%"></div></div>
-                  <div class="status-text">${status.text}</div>
+                <div class=\"loading-screen ${status.isFading ? 'fade-out' : ''}\">
+                  <${CarTiMapperLogo} context=\"splash\" appVersion=${APP_VERSION} />
+                  <div class=\"loading-bar-container\"><div class=\"loading-bar\" style=\"width: ${status.progress}%\"></div></div>
+                  <div class=\"status-text\">${status.text}</div>
                 </div>
               ` : ''}
         
               ${data.length > 0 && status.active ? html`
-                <div id="app-layout" ref=${appRef} class="${isTimelineExpanded ? 'is-expanded-timeline' : ''} ${isTimelineMinimized ? 'is-minimized-timeline' : ''}">
-                  <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}">
+                <div id=\"app-layout\" ref=${appRef} class=\"${isTimelineExpanded ? 'is-expanded-timeline' : ''} ${isTimelineMinimized ? 'is-minimized-timeline' : ''}\">
+                  <div class=\"map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}\">
                     <${MapViewer}
                       data=${data}
                       activeIndex=${activeIndex}
@@ -2621,7 +2674,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     />
                   </div>
         
-                  <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}">
+                  <div class=\"media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}\">
                     <${MediaScroller}
                       data=${data}
                       activeIndex=${activeIndex}
@@ -2632,7 +2685,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     />
                   </div>
         
-                  <div class="timeline-pane ${maxPane === 'timeline' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'timeline' ? 'pane-hidden' : ''}" style="height: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}; min-height: ${isTimelineMinimized ? '0px' : '45px'}">
+                  <div class=\"timeline-pane ${maxPane === 'timeline' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'timeline' ? 'pane-hidden' : ''}\" style=\"height: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}; min-height: ${isTimelineMinimized ? '0px' : '45px'}\">
                     <${TimelineScrubber}
                       data=${data}
                       activeIndex=${activeIndex}
@@ -2649,40 +2702,26 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     />
                   </div>
         
-                  <div class="status-bar" style="bottom: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}">
-                    <div class="status-left">
-                      ${aboutData ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(true)} title="Dataset Specs">
-                        <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
+                  <div class=\"status-bar\" style=\"bottom: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}\">
+                    <div class=\"status-left\">
+                      ${aboutData ? html`<button class=\"status-btn\" style=\"width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;\" onClick=${() => setIsAboutOpen(true)} title=\"Dataset Specs\">
+                        <${CarTiMapperLogo} context=\"status\" appVersion=${APP_VERSION} />
                       </button>` : ''}
                       
-                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(200); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><polyline points="16 3 21 8 16 13"></polyline><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><polyline points="8 21 3 16 8 11"></polyline></svg>
-                        ${showButtonText ? html`<span>Reset Layout</span>` : ''}
-                      </button>
-        
-                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => setIsSettingsOpen(true)} title="Engine Configurations">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                        ${showButtonText ? html`<span>Settings</span>` : ''}
-                      </button>
-        
-                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Logs">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                        ${showButtonText ? html`<span>Telemetry</span>` : ''}
-                      </button>
+                      ${resetLayoutBtn}
+                      ${settingsBtn}
+                      ${telemetryBtn}
                     </div>
         
-                    <div class="status-center">
-                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        ${showButtonText ? html`<span>Prev</span>` : ''}
-                      </button>
+                    <div class=\"status-center\">
+                      ${prevBtn}
         
                       <!-- Center-Grouped Nav Selector Cockpit [REF: UI-340] -->
-                      <div style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; color: #666; font-family: monospace;">
+                      <div style=\"display: flex; align-items: center; gap: 4px; font-size: 0.85rem; color: #666; font-family: monospace;\">
                         <input
-                          type="number"
-                          class="record-select-input"
-                          min="1"
+                          type=\"number\"
+                          class=\"record-select-input\"
+                          min=\"1\"
                           max=${data.length}
                           value=${activeIndex + 1}
                           onChange=${(e) => {
@@ -2694,134 +2733,125 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                           onKeyDown=${(e) => {
                             e.stopPropagation();
                           }}
-                          style="width: 45px; background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.8rem; padding: 2px 0; color: inherit; outline: none;"
+                          style=\"width: 45px; background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.8rem; padding: 2px 0; color: inherit; outline: none;\"
                         />
-                        <span style="user-select: none; opacity: 0.7;">/ ${data.length}</span>
+                        <span style=\"user-select: none; opacity: 0.7;\">/ ${data.length}</span>
                       </div>
         
-                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next Node">
-                        ${showButtonText ? html`<span>Next</span>` : ''}
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </button>
+                      ${nextBtn}
                     </div>
         
-                    <div class="status-right" style="position: relative;">
-                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'} ${isFilterOpen ? 'active' : ''}" onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); setIsMenuOpen(false); }} title="Swimlanes Filtering">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                        ${showButtonText ? html`<span>Filters</span>` : ''}
-                      </button>
+                    <div class=\"status-right\" style=\"position: relative;\">
+                      ${filterBtn}
                       ${isFilterOpen ? html`
-                        <div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
-                          <div style="font-weight: 600; font-size: 0.85rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style=\"position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;\" onClick=${(e) => e.stopPropagation()}>
+                          <div style=\"font-weight: 600; font-size: 0.85rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;\">
                             <span>Active Swimlanes</span>
-                            <button style="border: none; background: transparent; color: #007acc; font-size: 0.75rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
+                            <button style=\"border: none; background: transparent; color: #007acc; font-size: 0.75rem; cursor: pointer; padding: 0;\" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
                           </div>
-                          <div style="display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; padding-right: 4px;">
+                          <div style=\"display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; padding-right: 4px;\">
                             ${allTags.map(tag => html`
-                              <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
-                                <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
-                                <span style="font-size: 0.8rem; color: #555;">${tag}</span>
+                              <label key=${tag} style=\"display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;\">
+                                <input type=\"checkbox\" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style=\"cursor: pointer;\" />
+                                <span style=\"font-size: 0.8rem; color: #555;\">${tag}</span>
                               </label>
                             `)}
                           </div>
                         </div>
                       ` : ''}
         
-                      <button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${() => setIsSearchOpen(true)} title="Interactive Query Index">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        ${showButtonText ? html`<span>Search</span>` : ''}
-                      </button>
-                      ${slideHistory && slideHistory.length > 0 ? html`<button class="${showButtonText ? 'status-btn-text' : 'status-btn'}" onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>${showButtonText ? html`<span>Back</span>` : ''}</button>` : ''}
+                      ${searchBtn}
+                      ${backBtn}
                     </div>
                   </div>
         
-                  <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style="bottom: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}"></div>
+                  <div class=\"resizer-dyn-timeline\" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style=\"bottom: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}\"></div>
         
-                  ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
+                  ${isTimelineMinimized ? html`<button class=\"fab-btn\" onClick=${() => setIsTimelineMinimized(false)} title=\"Restore Timeline\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"18 15 12 9 6 15\"></polyline></svg></button>` : ''}
                 </div>
               ` : ''}
         
-              <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 10000;"></div>
-              <div id="search-modal" class="tm-modal ${isSearchOpen ? 'open' : ''}" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column;">
-                <button class="modal-close" onClick=${() => setIsSearchOpen(false)} title="Close">✕</button>
-                <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 15px;">Search Dataset</h3>
-                <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} autoFocus />
-                ${searchHistory.length > 0 && !searchQuery ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;\">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; color: #444;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>` : ''}
-                <div style="flex-grow: 1; overflow-y: auto; border-top: 1px solid #eee;">
-                  ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
-                  ${searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title">${res.title}</div><div class="search-result-meta">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`)}
+              <div class=\"tm-backdrop ${isSearchOpen ? 'open' : ''}\" onClick=${() => setIsSearchOpen(false)} style=\"z-index: 10000;\"></div>
+              <div id=\"search-modal\" class=\"tm-modal ${isSearchOpen ? 'open' : ''}\" style=\"display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column;\">
+                <button class=\"modal-close\" onClick=${() => setIsSearchOpen(false)} title=\"Close\">✕</button>
+                <h3 style=\"margin-top: 0; font-size: 1.3rem; margin-bottom: 15px;\">Search Dataset</h3>
+                <input type=\"text\" class=\"search-input\" placeholder=\"Search events, places, dates...\" value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} autoFocus />
+                ${searchHistory.length > 0 && !searchQuery ? html`<div style=\"margin-bottom: 15px;\"><div style=\"font-size: 0.8rem; color: #888; margin-bottom: 8px;\">Recent Searches:</div><div style=\"display: flex; flex-wrap: wrap; gap: 6px;\">${searchHistory.map(h => html`<button style=\"background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; color: #444;\" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>` : ''}
+                <div style=\"flex-grow: 1; overflow-y: auto; border-top: 1px solid #eee;\">
+                  ${searchQuery && searchResults.length === 0 ? html`<div style=\"padding: 20px; text-align: center; color: #888;\">No events found for \"${searchQuery}\"</div>` : ''}
+                  ${searchResults.map(res => html`<div class=\"search-result-item\" onClick=${() => handleResultClick(res.id, searchQuery)}><div class=\"search-result-title\">${res.title}</div><div class=\"search-result-meta\">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`)}
                 </div>
               </div>
         
-              <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 10000;"></div>
+              <div class=\"tm-backdrop ${isAboutOpen ? 'open' : ''}\" onClick=${() => setIsAboutOpen(false)} style=\"z-index: 10000;\"></div>
               
               <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.6.2 - About Modal pure CSS Symbology Legends ] --- -->
-              <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;">
-                <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">✕</button>
-                <div style="margin-bottom: 25px;">
-                  <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
-                  <h2 style="margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Specifications'}}></h2>
-                  <div style="font-size: 1.05rem; line-height: 1.5; color: #333; margin-bottom: 15px;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
-                  <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.4;">
+              <div id=\"about-modal\" class=\"tm-modal ${isAboutOpen ? 'open' : ''}\" style=\"display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;\">
+                <button class=\"modal-close\" onClick=${() => setIsAboutOpen(false)} title=\"Close\">✕</button>
+                <div style=\"margin-bottom: 25px;\">
+                  <${CarTiMapperLogo} context=\"about\" appVersion=${APP_VERSION} />
+                  <h2 style=\"margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50;\" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Specifications'}}></h2>
+                  <div style=\"font-size: 1.05rem; line-height: 1.5; color: #333; margin-bottom: 15px;\" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
+                  <div style=\"background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.4;\">
                     <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
                     <strong>Source File Reference:</strong> ${aboutData?.rawSource}
                   </div>
-                  <div style="display: flex; gap: 8px; margin-bottom: 25px;">
-                    <button class="status-btn-text" style="width: max-content; padding: 6px 12px; background: #007acc; color: #fff; border: none; cursor: pointer;" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>Play Overview Slide</button>
+                  <div style=\"display: flex; gap: 8px; margin-bottom: 25px;\">
+                    <button class=\"status-btn-text\" style=\"width: max-content; padding: 6px 12px; background: #007acc; color: #fff; border: none; cursor: pointer;\" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>Play Overview Slide</button>
                     ${downloadBtn}
                   </div>
                 </div>
 
                 <!-- pure CSS-drawn Map & Timeline Symbology (REF: UI-184) -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; background: #fcfcfc; border-radius: 8px; padding: 20px; border: 1px solid #eee;">
+                <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; background: #fcfcfc; border-radius: 8px; padding: 20px; border: 1px solid #eee;\">
                   <div>
-                    <h4 style="margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;">📍 Map Symbology</h4>
-                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;">
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#007acc; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div></div>
+                    <h4 style=\"margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;\">📍 Map Symbology</h4>
+                    <div style=\"display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;\">
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;\"><div style=\"width:12px; height:12px; border-radius:50%; background:#007acc; border:2px solid #fff; position:absolute; top:0;\"></div><div style=\"width:2px; height:16px; background:#333;\"></div></div>
                         <span>Standard Event Node</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:14px; height:14px; border-radius:50%; background:#28a745; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:3px; height:16px; background:#28a745;"></div></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;\"><div style=\"width:14px; height:14px; border-radius:50%; background:#28a745; border:2px solid #fff; position:absolute; top:0;\"></div><div style=\"width:3px; height:16px; background:#28a745;\"></div></div>
                         <span>Active / Selected Event Node</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#ffb300; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;\"><div style=\"width:12px; height:12px; border-radius:50%; background:#ffb300; border:2px solid #fff; position:absolute; top:0;\"></div><div style=\"width:2px; height:16px; background:#333;\"></div></div>
                         <span>VIP / Priority Event</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#007acc; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div><div style="position:absolute; top:-4px; right:-6px; background:#d32f2f; color:#fff; border-radius:50%; width:12px; height:12px; font-size:7px; display:flex; align-items:center; justify-content:center; border:1px solid #fff;">4</div></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;\"><div style=\"width:12px; height:12px; border-radius:50%; background:#007acc; position:absolute; top:0;\"></div><div style=\"width:2px; height:16px; background:#333;\"></div><div style=\"position:absolute; top:-4px; right:-6px; background:#d32f2f; color:#fff; border-radius:50%; width:12px; height:12px; font-size:7px; display:flex; align-items:center; justify-content:center; border:1px solid #fff;\">4</div></div>
                         <span>Stacked Pin (Exact Identical Coords)</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 20px; background: rgba(0,122,204,0.15); border: 2px dashed #007acc;"></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 20px; background: rgba(0,122,204,0.15); border: 2px dashed #007acc;\"></div>
                         <span>Geofence / Polygon / Area Bounds</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 style="margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;">⏱ Timeline Symbology</h4>
-                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;">
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 16px; background: #fff; border: 1px solid #ddd; border-left: 2px solid #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));"></div>
+                    <h4 style=\"margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;\">⏱ Timeline Symbology</h4>
+                    <div style=\"display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;\">
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 24px; height: 16px; background: #fff; border: 1px solid #ddd; border-left: 2px solid #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));\"></div>
                         <span>Gregorian Event Block</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 16px; background: #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));"></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 24px; height: 16px; background: #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));\"></div>
                         <span>Active Selected Event Block</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 6px; background: rgba(0, 122, 204, 0.3); border-left: 2px solid #007acc;"></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 24px; height: 6px; background: rgba(0, 122, 204, 0.3); border-left: 2px solid #007acc;\"></div>
                         <span>Event Duration Span Bar</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 8px; background: rgba(255, 179, 0, 0.15); border: 1px dashed #ffb300; border-radius: 4px;"></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 24px; height: 8px; background: rgba(255, 179, 0, 0.15); border: 1px dashed #ffb300; border-radius: 4px;\"></div>
                         <span>EDTF Approximation Uncertainty Span</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">←</span>
-                        <span style="background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">→</span>
+                      <div style=\"display: flex; align-items: center; gap: 10px;\">
+                        <span style=\"background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;\">←</span>
+                        <span style=\"background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;\">→</span>
                         <span>Keyboard Nav Controls</span>
                       </div>
                     </div>
@@ -2829,53 +2859,53 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 </div>
 
                 <!-- Collapsible System Architecture & Routing Accordion (REF: UI-183) -->
-                <details style="background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; padding: 0; margin-bottom: 20px;">
-                  <summary style="background: #f1f1f1; padding: 12px 15px; font-weight: 600; cursor: pointer; color: #333; outline: none; user-select: none;">⚙️ System Architecture & Routing Syntax</summary>
-                  <div style="padding: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; border-top: 1px solid #eee;">
-                    <p style="margin-top: 0;">The <b>CarTiMap Engine</b> is a high-performance, single-file spatial-temporal processing suite. It dynamically parses raw Google Sheet datasets directly in the browser via zero-build Vanilla JS and Preact, executing R-Tree spatial indexing and ISO 8601-2 EDTF chronologies on the fly.</p>
-                    <h5 style="margin: 15px 0 5px 0; color: #222;">Analytical URL Parameters</h5>
-                    <ul style="margin: 0; padding-left: 20px; font-family: monospace; color: #007acc; line-height: 1.6;">
-                      <li><span style="color:#555">?source=ID</span> (Google Sheet Base ID)</li>
-                      <li><span style="color:#555">&amp;gid=ID</span> (Primary Data Tab ID)</li>
-                      <li><span style="color:#555">&amp;bgid=ID</span> (Basemaps/Overlays Tab ID)</li>
-                      <li><span style="color:#555">&amp;slide=X</span> (Target integer slide index bypass)</li>
-                      <li><span style="color:#555">&amp;date=YYYY-MM-DD</span> (Temporal anchor bypass)</li>
-                      <li><span style="color:#555">&amp;mapzoom=Z</span> (Initial geographic zoom override)</li>
-                      <li><span style="color:#555">&amp;theme=dark</span> (System dark mode override)</li>
+                <details style=\"background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; padding: 0; margin-bottom: 20px;\">
+                  <summary style=\"background: #f1f1f1; padding: 12px 15px; font-weight: 600; cursor: pointer; color: #333; outline: none; user-select: none;\">⚙️ System Architecture & Routing Syntax</summary>
+                  <div style=\"padding: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; border-top: 1px solid #eee;\">
+                    <p style=\"margin-top: 0;\">The <b>CarTiMap Engine</b> is a high-performance, single-file spatial-temporal processing suite. It dynamically parses raw Google Sheet datasets directly in the browser via zero-build Vanilla JS and Preact, executing R-Tree spatial indexing and ISO 8601-2 EDTF chronologies on the fly.</p>
+                    <h5 style=\"margin: 15px 0 5px 0; color: #222;\">Analytical URL Parameters</h5>
+                    <ul style=\"margin: 0; padding-left: 20px; font-family: monospace; color: #007acc; line-height: 1.6;\">
+                      <li><span style=\"color:#555\">?source=ID</span> (Google Sheet Base ID)</li>
+                      <li><span style=\"color:#555\">&amp;gid=ID</span> (Primary Data Tab ID)</li>
+                      <li><span style="color:#555\">&amp;bgid=ID</span> (Basemaps/Overlays Tab ID)</li>
+                      <li><span style=\"color:#555\">&amp;slide=X</span> (Target integer slide index bypass)</li>
+                      <li><span style=\"color:#555\">&amp;date=YYYY-MM-DD</span> (Temporal anchor bypass)</li>
+                      <li><span style=\"color:#555\">&amp;mapzoom=Z</span> (Initial geographic zoom override)</li>
+                      <li><span style=\"color:#555\">&amp;theme=dark</span> (System dark mode override)</li>
                     </ul>
                   </div>
                 </details>
               </div>
               <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.6.2 - About Modal pure CSS Symbology Legends ] --- -->
         
-              <div class="tm-backdrop ${isSettingsOpen}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
-              <div id="settings-modal" class="tm-modal ${isSettingsOpen ? 'open' : ''}" style="display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px;">
-                <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close">✕</button>
-                <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 20px; color: #222;">Engine Settings</h3>
-                <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div class=\"tm-backdrop ${isSettingsOpen ? 'open' : ''}\" onClick=${() => setIsSettingsOpen(false)} style=\"z-index: 10000;\"></div>
+              <div id=\"settings-modal\" class=\"tm-modal ${isSettingsOpen ? 'open' : ''}\" style=\"display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px;\">
+                <button class=\"modal-close\" onClick=${() => setIsSettingsOpen(false)} title=\"Close\">✕</button>
+                <h3 style=\"margin-top: 0; font-size: 1.3rem; margin-bottom: 20px; color: #222;\">Engine Settings</h3>
+                <div style=\"display: flex; flex-direction: column; gap: 20px;\">
                   <div>
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;">Data Locale Format</label>
-                    <select value=${dateLocale} onChange=${e => { setDateLocale(e.target.value); localStorage.setItem('tm_date_locale', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem;">
-                      <option value="en-GB">European (DD/MM/YYYY)</option>
-                      <option value="en-US">American (MM/DD/YYYY)</option>
-                      <option value="el-GR">Greek (ΗΗ/ΜΜ/ΕΕΕΕ)</option>
+                    <label style=\"font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;\">Data Locale Format</label>
+                    <select value=${dateLocale} onChange=${e => { setDateLocale(e.target.value); localStorage.setItem('tm_date_locale', e.target.value); }} style=\"width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem;\">
+                      <option value=\"en-GB\">European (DD/MM/YYYY)</option>
+                      <option value=\"en-US\">American (MM/DD/YYYY)</option>
+                      <option value=\"el-GR\">Greek (ΗΗ/ΜΜ/ΕΕΕΕ)</option>
                     </select>
                   </div>
         
                   <div>
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;">Chrono Parse Engine Mode</label>
-                    <select value=${dateEngineMode} onChange=${e => { setDateEngineMode(e.target.value); localStorage.setItem('tm_date_engine_mode', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem;">
-                      <option value="auto">Auto-Detect Chronologies (Default)</option>
-                      <option value="edtf">Strict ISO 8601-2 / EDTF Only</option>
-                      <option value="legacy">Strict Gregorian Serial / DD-MM-YYYY Fallback</option>
+                    <label style=\"font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;\">Chrono Parse Engine Mode</label>
+                    <select value=${dateEngineMode} onChange=${e => { setDateEngineMode(e.target.value); localStorage.setItem('tm_date_engine_mode', e.target.value); }} style=\"width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem;\">
+                      <option value=\"auto\">Auto-Detect Chronologies (Default)</option>
+                      <option value=\"edtf\">Strict ISO 8601-2 / EDTF Only</option>
+                      <option value=\"legacy\">Strict Gregorian Serial / DD-MM-YYYY Fallback</option>
                     </select>
                   </div>
         
                   <div>
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;">Global Polygon Opacity</label>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                      <input type="range" min="0.1" max="1" step="0.1" value=${polygonOpacity} onInput=${e => { setPolygonOpacity(parseFloat(e.target.value)); localStorage.setItem('tm_polygon_opacity', e.target.value); }} style="flex-grow: 1; -webkit-appearance: none; height: 4px; background: #ddd; border-radius: 2px; outline: none;" />
-                      <span style="font-family: monospace; font-size: 1rem; color: #007acc; font-weight: 600; width: 30px; text-align: right;">${polygonOpacity.toFixed(1)}</span>
+                    <label style=\"font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;\">Global Polygon Opacity</label>
+                    <div style=\"display: flex; align-items: center; gap: 15px;\">
+                      <input type=\"range\" min=\"0.1\" max=\"1\" step=\"0.1\" value=${polygonOpacity} onInput=${e => { setPolygonOpacity(parseFloat(e.target.value)); localStorage.setItem('tm_polygon_opacity', e.target.value); }} style=\"flex-grow: 1; -webkit-appearance: none; height: 4px; background: #ddd; border-radius: 2px; outline: none;\" />
+                      <span style=\"font-family: monospace; font-size: 1rem; color: #007acc; font-weight: 600; width: 30px; text-align: right;\">${polygonOpacity.toFixed(1)}</span>
                     </div>
                   </div>
                 </div>
@@ -2884,9 +2914,10 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.6.2';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.0';
 
-// 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
+// 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼"""
+
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
         render(html`<${ErrorBoundary}><${App} /></${ErrorBoundary}>`, document.getElementById('root'));
         // === [ END MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===

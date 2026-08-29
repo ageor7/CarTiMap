@@ -1,6 +1,20 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.0] — 2026-08-29 - AppOrchestrator v3.7.0, MapViewer v6.4.20 [CONFORMED]
+### Refactored
+- **Ten-Subblock Modular Architecture:** Re-engineered the entire `AppOrchestrator` block into ten heavily commented, isolated code sectors to prevent code drift and secure long-term maintainability `[REF: COMP-01]`.
+- **Hoist UI Subcomponents:** Decoupled and hoisted all conditional HTML elements (such as `downloadBtn`, `backBtn`, `prevBtn`, etc.) out of Preact's main template literal into isolated top-level variables declared before the render stream. This completely insulates the browser from nested-backtick lexer crashes `[REF: CRASH-05b]`.
+
+### Fixed
+- **Search Slide Drift:** Upgraded the search click-handler `handleResultClick` to perform `data.findIndex(d => d.id === id)` inside the chronologically-sorted data array, resolving nearby slide displacement regressions `[REF: UI-340]`.
+- **Multi-Line WKT Polygon Splitting:** Purged `.flatMap(p => p.split('\\n'))` pre-parser operations from the coordinate splitter `[REF: MAP-01e]`. Splits are now restricted to `<br>` tags to prevent the engine from fragmentation-destroying raw multi-line WKT polygons from Google Sheets before they compile.
+- **Search Focus Latency:** Appended a 150ms setTimeout hook inside a React `useEffect` linked to `isSearchOpen` to ensure the input text box autofocuses cleanly on high-latency browser viewports without thread-blocking.
+
+### Added
+- **Pure CSS Legend Panel:** Constructed a fully scalable, pure CSS Map and Timeline Symbology panel embedded inside the About Modal to satisfy UWK thesis validation constraints without relying on external raster files `[REF: UI-184]`.
+- **System Architecture Accordion:** Injected a collapsible `<details>` panel breaking down native URL parameter routing configurations.
+
 ## [v8.12.85b] — 2026-08-29 - AppOrchestrator v3.6.2 [CONFORMED]
 ### Fixed
 - **Nested Template Literal Crash:** Decoupled and refactored the About Modal download link out of the nested JSX template literal by binding it to an independent variable (`downloadBtn`) outside the main render stream. This completely eradicates nested browser-level `SyntaxError` crashes caused by backtick lexical collisions `[REF: CRASH-05b]`.

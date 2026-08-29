@@ -1,6 +1,15 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.85b] — 2026-08-29 - AppOrchestrator v3.6.2 [CONFORMED]
+### Fixed
+- **Nested Template Literal Crash:** Decoupled and refactored the About Modal download link out of the nested JSX template literal by binding it to an independent variable (`downloadBtn`) outside the main render stream. This completely eradicates nested browser-level `SyntaxError` crashes caused by backtick lexical collisions `[REF: CRASH-05b]`.
+- **Search Slide Drift:** Upgraded the search click-handler `handleResultClick` to perform `data.findIndex(d => d.id === id)` inside the chronologically-sorted data array, resolving nearby slide displacement regressions `[REF: UI-340]`.
+
+### Added
+- **Ten-Subblock Architecture:** Structured the entire `AppOrchestrator` block into ten standardized code sectors with high-contrast comments for future edits, eliminating any risk of code drift `[REF: COMP-01]`.
+- **Pure CSS Legend Panel:** Constructed a fully scalable, pure CSS Map and Timeline Symbology panel embedded inside the About Modal to satisfy UWK thesis validation constraints without relying on external raster files `[REF: UI-184]`.
+
 ## [v8.12.85] — 2026-08-29 - AppOrchestrator v3.6.1 [CONFORMED]
 ### Fixed
 - **Nested Template Literal Crash:** Corrected an unescaped backtick within Subblock C of the About Modal, preventing premature termination of the main App component's template literal and resolving the fatal SyntaxError blank screen crash `[REF: CRASH-05b]`.
