@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.5';
+        const APP_VERSION = 'v8.13.6';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2107,8 +2107,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.5 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.5 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.6 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.6 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2203,8 +2203,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
         
-            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/export?format=csv&gid=${gid}`;
-            const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/export?format=csv&gid=${bgid}` : null;
+            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+            const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
         
             Promise.all([
               fetch(fetchUrlPrimary).then(res => {
@@ -2692,33 +2692,35 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
           const appLayout = (data.length > 0 && status.active)
             ? html`<div id="app-layout" ref=${appRef} class="${isTimelineExpanded ? 'is-expanded-timeline' : ''} ${isTimelineMinimized ? 'is-minimized-timeline' : ''}">
-		  <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}">
-            <${MapViewer}
-              data=${data}
-              activeIndex=${activeIndex}
-              setActiveIndex=${setActiveIndex}
-              addLog=${addLog}
-              basemapsRegistry=${basemapsRegistry}
-              maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
-              minimapOffset=${minimapOffset}
-              setMinimapOffset=${setMinimapOffset}
-              maxPane=${maxPane}
-              setMaxPane=${setMaxPane}
-              polygonOpacity=${polygonOpacity}
-              showButtonText=${showButtonText}
-              visibleTimeBounds=${visibleTimeBounds}
-            />
-          </div>      
-		  <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}">
-            <${MediaViewer}
-              data=${data}
-              activeIndex=${activeIndex}
-              setActiveIndex=${setActiveIndex}
-              maxPane=${maxPane}
-              setMaxPane=${setMaxPane}
-              showButtonText=${showButtonText}
-            />
-          </div>      
+                <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}">
+                  <${MapViewer}
+                    data=${data}
+                    activeIndex=${activeIndex}
+                    setActiveIndex=${setActiveIndex}
+                    addLog=${addLog}
+                    basemapsRegistry=${basemapsRegistry}
+                    maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
+                    minimapOffset=${minimapOffset}
+                    setMinimapOffset=${setMinimapOffset}
+                    maxPane=${maxPane}
+                    setMaxPane=${setMaxPane}
+                    polygonOpacity=${polygonOpacity}
+                    showButtonText=${showButtonText}
+                    visibleTimeBounds=${visibleTimeBounds}
+                  />
+                </div>
+      
+                <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}">
+                  <${MediaViewer}
+                    data=${data}
+                    activeIndex=${activeIndex}
+                    setActiveIndex=${setActiveIndex}
+                    maxPane=${maxPane}
+                    setMaxPane=${setMaxPane}
+                    showButtonText=${showButtonText}
+                  />
+                </div>
+      
                 <div class="timeline-pane ${maxPane === 'timeline' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'timeline' ? 'pane-hidden' : ''}" style="height: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}; min-height: ${isTimelineMinimized ? '0px' : '45px'}">
                   <${TimelineScrubber}
                     data=${data}
@@ -2807,87 +2809,87 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         
               <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 10000;"></div>
               
-              <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.7.1 - About Modal pure CSS Symbology Legends ] --- -->
-              <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;">
-                <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">✕</button>
-                <div style="margin-bottom: 25px;">
-                  <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
-                  <h2 style="margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Specifications'}}></h2>
-                  <div style="font-size: 1.05rem; line-height: 1.5; color: #333; margin-bottom: 15px;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
-                  <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.4;">
+              <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.7.6 - About Modal pure CSS Symbology Legends ] --- -->
+              <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}\" style=\"display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;\">
+                <button class=\"modal-close\" onClick=${() => setIsAboutOpen(false)} title=\"Close\">✕</button>
+                <div style=\"margin-bottom: 25px;\">
+                  <${CarTiMapperLogo} context=\"about\" appVersion=${APP_VERSION} />
+                  <h2 style=\"margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50;\" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Specifications'}}></h2>
+                  <div style=\"font-size: 1.05rem; line-height: 1.5; color: #333; margin-bottom: 15px;\" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
+                  <div style=\"background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.75rem; margin-bottom: 12px; line-height: 1.4;\">
                     <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
                     <strong>Source File Reference:</strong> ${aboutData?.rawSource}
                   </div>
-                  <div style="display: flex; gap: 8px; margin-bottom: 25px;">
-                    <button class="status-btn-text" style="width: max-content; padding: 6px 12px; background: #007acc; color: #fff; border: none; cursor: pointer;" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>Play Overview Slide</button>
+                  <div style=\"display: flex; gap: 8px; margin-bottom: 25px;\">
+                    <button class=\"status-btn-text\" style=\"width: max-content; padding: 6px 12px; background: #007acc; color: #fff; border: none; cursor: pointer;\" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>Play Overview Slide</button>
                     ${downloadBtn}
                   </div>
                 </div>
 
                 <!-- pure CSS-drawn Map & Timeline Symbology (REF: UI-184) -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; background: #fcfcfc; border-radius: 8px; padding: 20px; border: 1px solid #eee;">
+                <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; background: #fcfcfc; border-radius: 8px; padding: 20px; border: 1px solid #eee;\">
                   <div>
-                    <h4 style="margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;">📍 Map Symbology</h4>
-                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;">
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#007acc; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div></div>
+                    <h4 style=\"margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;\">📍 Map Symbology</h4>
+                    <div style=\"display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;\">
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;\"><div style=\"width:12px; height:12px; border-radius:50%; background:#007acc; border:2px solid #fff; position:absolute; top:0;\"></div><div style=\"width:2px; height:16px; background:#333;\"></div></div>
                         <span>Standard Event Node</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:14px; height:14px; border-radius:50%; background:#28a745; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:3px; height:16px; background:#28a745;"></div></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;\"><div style=\"width:14px; height:14px; border-radius:50%; background:#28a745; border:2px solid #fff; position:absolute; top:0;\"></div><div style=\"width:3px; height:16px; background:#28a745;\"></div></div>
                         <span>Active / Selected Event Node</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#ffb300; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;\"><div style=\"width:12px; height:12px; border-radius:50%; background:#ffb300; border:2px solid #fff; position:absolute; top:0;\"></div><div style=\"width:2px; height:16px; background:#333;\"></div></div>
                         <span>VIP / Priority Event</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#007acc; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div><div style="position:absolute; top:-4px; right:-6px; background:#d32f2f; color:#fff; border-radius:50%; width:12px; height:12px; font-size:7px; display:flex; align-items:center; justify-content:center; border:1px solid #fff;">4</div></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;\"><div style=\"width:12px; height:12px; border-radius:50%; background:#007acc; position:absolute; top:0;\"></div><div style=\"width:2px; height:16px; background:#333;\"></div><div style=\"position:absolute; top:-4px; right:-6px; background:#d32f2f; color:#fff; border-radius:50%; width:12px; height:12px; font-size:7px; display:flex; align-items:center; justify-content:center; border:1px solid #fff;\">4</div></div>
                         <span>Stacked Pin (Exact Identical Coords)</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 20px; background: rgba(0,122,204,0.15); border: 2px dashed #007acc;"></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 20px; height: 20px; background: rgba(0,122,204,0.15); border: 2px dashed #007acc;\"></div>
                         <span>Geofence / Polygon / Area Bounds</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 style="margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;">⏱ Timeline Symbology</h4>
-                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;">
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 16px; background: #fff; border: 1px solid #ddd; border-left: 2px solid #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));"></div>
+                    <h4 style=\"margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;\">⏱ Timeline Symbology</h4>
+                    <div style=\"display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;\">
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 24px; height: 16px; background: #fff; border: 1px solid #ddd; border-left: 2px solid #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));\"></div>
                         <span>Gregorian Event Block</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 16px; background: #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));"></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 24px; height: 16px; background: #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));\"></div>
                         <span>Active Selected Event Block</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 6px; background: rgba(0, 122, 204, 0.3); border-left: 2px solid #007acc;"></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 24px; height: 6px; background: rgba(0, 122, 204, 0.3); border-left: 2px solid #007acc;\"></div>
                         <span>Event Duration Span Bar</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 8px; background: rgba(255, 179, 0, 0.15); border: 1px dashed #ffb300; border-radius: 4px;"></div>
+                      <div style=\"display: flex; align-items: center; gap: 12px;\">
+                        <div style=\"width: 24px; height: 8px; background: rgba(255, 179, 0, 0.15); border: 1px dashed #ffb300; border-radius: 4px;\"></div>
                         <span>EDTF Approximation Uncertainty Span</span>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">←</span>
-                        <span style="background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">→</span>
+                      <div style=\"display: flex; align-items: center; gap: 10px;\">
+                        <span style=\"background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;\">←</span>
+                        <span style=\"background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;\">→</span>
                         <span>Keyboard Nav Controls</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Collapsible System Architecture & Routing Syntax (REF: UI-183) -->
-                <details style="background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; padding: 0; margin-bottom: 20px;">
-                  <summary style="background: #f1f1f1; padding: 12px 15px; font-weight: 600; cursor: pointer; color: #333; outline: none; user-select: none;">⚙️ System Architecture & Routing Syntax</summary>
-                  <div style="padding: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; border-top: 1px solid #eee;">
-                    <p style="margin-top: 0;">The <b>CarTiMap Engine</b> is a high-performance, single-file spatial-temporal processing suite. It dynamically parses raw Google Sheet datasets directly in the browser via zero-build Vanilla JS and Preact, executing R-Tree spatial indexing and ISO 8601-2 EDTF chronologies on the fly.</p>
-                    <h5 style="margin: 15px 0 5px 0; color: #222;">Analytical URL Parameters</h5>
-                    <ul style="margin: 0; padding-left: 20px; font-family: monospace; color: #007acc; line-height: 1.6;">
-                      <li><span style="color:#555">?source=ID</span> (Google Sheet Base ID)</li>
+                <!-- Collapsible System Architecture & Routing Accordion (REF: UI-183) -->
+                <details style=\"background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; padding: 0; margin-bottom: 20px;\">
+                  <summary style=\"background: #f1f1f1; padding: 12px 15px; font-weight: 600; cursor: pointer; color: #333; outline: none; user-select: none;\">⚙️ System Architecture & Routing Syntax</summary>
+                  <div style=\"padding: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; border-top: 1px solid #eee;\">
+                    <p style=\"margin-top: 0;\">The <b>CarTiMap Engine</b> is a high-performance, single-file spatial-temporal processing suite. It dynamically parses raw Google Sheet datasets directly in the browser via zero-build Vanilla JS and Preact, executing R-Tree spatial indexing and ISO 8601-2 EDTF chronologies on the fly.</p>
+                    <h5 style=\"margin: 15px 0 5px 0; color: #222;\">Analytical URL Parameters</h5>
+                    <ul style=\"margin: 0; padding-left: 20px; font-family: monospace; color: #007acc; line-height: 1.6;\">
+                      <li><span style=\"color:#555\">?source=ID</span> (Google Sheet Base ID)</li>
                       <li><span style="color:#555">&amp;gid=ID</span> (Primary Data Tab ID)</li>
                       <li><span style="color:#555">&amp;bgid=ID</span> (Basemaps/Overlays Tab ID)</li>
                       <li><span style="color:#555">&amp;slide=X</span> (Target integer slide index bypass)</li>
@@ -2898,7 +2900,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   </div>
                 </details>
               </div>
-              <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.7.1 - About Modal pure CSS Symbology Legends ] --- -->
+              <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.7.6 - About Modal pure CSS Symbology Legends ] --- -->
         
               <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
               <div id="settings-modal" class="tm-modal ${isSettingsOpen ? 'open' : ''}" style="display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px;">
@@ -2936,7 +2938,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.5';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.6';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
