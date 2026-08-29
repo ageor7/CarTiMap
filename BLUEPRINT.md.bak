@@ -268,6 +268,9 @@ When the horizontal LET() compiler aggregates deconstructed event rows, it frequ
 [REF: MAP-02b] Identical Coordinate Stacking [UPDATED - 2026-08-29]
 When multiple historical actions share mathematically identical coordinates, standard mapping libraries overlap and eclipse markers. To communicate chronological volume without visual bloat, the engine intercepts overlapping coordinates and groups them into a custom “Stacked Pin” featuring a numeric depth badge. For complex geometries, the tooltip rendering engine evaluates the place labels by splitting strings by newlines first to isolate the parent block, and then by semicolons to retrieve the precise descriptor matching the active sub-coordinate sequence.
 
+#### [REF: MAP-01c] Multi-Line WKT Array Splitting [NEW - 2026-08-29]
+When the horizontal LET() compiler aggregates deconstructed event rows, it frequently produces line-break separated lists of geographic shapes within a single cell (e.g., `POINT(...)<br>POINT(...)`). Attempting to parse these strings directly via the Wicket library triggers a fatal syntax crash inside the rendering loop. The `MapViewer` engine implements a pre-parser string interceptor: it splits the incoming `location` string by `<br>` tags and then flattens them by string-based newlines (`\n`) into a flat array, processing each geometry node independently. This string-based fallback bypasses regular expression escaping anomalies entirely, ensuring that composite, multi-vocal coordinate matrices render perfectly as distinct, interactive spatial nodes without breaking the Leaflet cycle.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>

@@ -271,6 +271,12 @@ When multiple historical actions share mathematically identical coordinates, sta
 #### [REF: MAP-01c] Multi-Line WKT Array Splitting [NEW - 2026-08-29]
 When the horizontal LET() compiler aggregates deconstructed event rows, it frequently produces line-break separated lists of geographic shapes within a single cell (e.g., `POINT(...)<br>POINT(...)`). Attempting to parse these strings directly via the Wicket library triggers a fatal syntax crash inside the rendering loop. The `MapViewer` engine implements a pre-parser string interceptor: it splits the incoming `location` string by `<br>` tags and then flattens them by string-based newlines (`\n`) into a flat array, processing each geometry node independently. This string-based fallback bypasses regular expression escaping anomalies entirely, ensuring that composite, multi-vocal coordinate matrices render perfectly as distinct, interactive spatial nodes without breaking the Leaflet cycle.
 
+#### [REF: MAP-01d] Fallback Coordinate Axis Realignment [NEW - 2026-08-29]
+When the Leaflet MapViewer's primary WKT engine encounters nested geometries that trigger parser catch-blocks, it utilizes regular expression fallback mapping to capture decimal primitives. To prevent JavaScript array-to-string type coercion (where `parseFloat(match_array)` evaluates both Lat and Lon to the identical first index), coordinate extraction must explicitly target indexed group sequences: `parseFloat(match_array[2])` for Latitude, and `parseFloat(match_array[1])` for Longitude. Symmetrically, this maintains consistency with WKT’s Cartesian axis layout (`POINT(Lng Lat)`) and prevents collapsed flat diagonal geometries, ensuring 100% visual rendering accuracy.
+
+#### [REF: UI-71b] Basemap Opacity Attenuation [NEW - 2026-08-29]
+To allow qualitative researchers to visually attenuate high-contrast raster background details, the Layers dropdown incorporates inline `<input type="range">` opacity sliders dynamically nestled below active basemap radio buttons. Adjusting the slider binds the value directly to a reactive `basemapOpacity` state variable. Symmetrically, a React `useEffect` hook intercepts opacity mutations and directly executes `setOpacity()` on the active base and mini-base Leaflet tile-layers in constant time, avoiding expensive canvas re-creations.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>
