@@ -1,6 +1,28 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.77] — 2026-08-28
+
+### Added
+- **Topological Self-Healing:** Integrated pre-flight self-healing inside compile_cartimap.py v1.1.7 to automatically detect and rebuild deleted closing END_INJECT comments on the user's filesystem.
+
+### Fixed
+- **Layers Menu Overlap:** Converted the Map Layers menu to absolute positioning (right: 35px; top: 130px), preventing it from crossing the right panel border under the Media pane.
+- **Layers Icon Geometry:** Restored the broken third layer coordinates of the layers button SVG from `2 12 17 22 12` to `2 12 12 17 22 12`.
+- **WKT Coordinate Erasure:** Cleaned regular expression double-backslashes inside MapViewer v6.4.11, allowing Scobie's perimeter and sewer line-strings to render natively.
+
+## [v8.12.76] — 2026-08-28
+
+### Added
+- **Anchor Checks:** Promoted Infiltration Compiler to v1.1.5, fixing the capture group index shift bug to prevent duplicate blocks.
+
+### Fixed
+- **Missing WKT Geometries:** Restored the parsing of plain WKT strings (including Scobie's perimeter) by cleaning regex double-backslashes.
+- **Blank Canvas Crash:** Upgraded MapViewer to v6.4.9, integrating an ES6 `.at(0)` basemap fallback to prevent Leaflet boot crashes.
+
+### Changed
+- **Pristine Delta Patching:** Removed unchanged modules from the patches file, restricting the delivery ledger strictly to active, conformed modifications.
+
 ## [v8.12.75c] — 2026-08-28
 ### Added
 - **Two-Pass Nested Tokenization:** Implemented coordinate-to-label pairing inside the map engine. Place fields split by newlines first to isolate parent geometries, then split by semicolons to match child coordinate layers.
