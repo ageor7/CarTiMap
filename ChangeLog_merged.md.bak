@@ -1,6 +1,16 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.84] — 2026-08-29 - MapViewer v6.4.20, AppOrchestrator v3.6.0 [CONFORMED]
+### Fixed
+- **Multi-Line WKT Polygon Splitting:** Purged `.flatMap(p => p.split('\n'))` pre-parser operations from the coordinate splitter `[REF: MAP-01e]`. Splits are now restricted to `<br>` tags to prevent the engine from fragmentation-destroying raw multi-line WKT polygons from Google Sheets before they compile.
+- **Search Slide Drift:** Upgraded the search click-handler `handleResultClick` to perform `data.findIndex(d => d.id === id)` inside the chronologically-sorted data array, resolving nearby slide displacement regressions `[REF: UI-340]`.
+- **Search Focus Latency:** Appended a 150ms setTimeout hook inside a React `useEffect` linked to `isSearchOpen` to ensure the input text box autofocuses cleanly on high-latency browser viewports without thread-blocking.
+
+### Added
+- **Pure CSS Legend Panel:** Constructed a fully scalable, pure CSS Map and Timeline Symbology panel embedded inside the About Modal to satisfy UWK thesis validation constraints without relying on external raster files `[REF: UI-184]`.
+- **System Architecture Accordion:** Injected a collapsible `<details>` panel breaking down native URL parameter routing configurations.
+
 [v8.12.83] — 2026-08-29 - MapViewer v6.4.19 [CONFORMED]
 Rolled Back
 

@@ -654,6 +654,9 @@ All physical carriage returns must rely on native, hardware-level line breaks
 to preserve absolute cross-browser portability and ensure offline Preact 
 reconciliation stability.
 
+#### [REF: CRASH-05b] Nested Template Literal Escaping [NEW - 2026-08-29]
+To prevent fatal browser compilation crashes (SyntaxError: unexpected token: identifier), any secondary Preact html template string nested inside the main App component's return literal must explicitly escape its backticks using backslashes (\`). If unescaped, the browser's parser interprets the first nested backtick as the termination of the outer template literal, forcing the following HTML markup to parse as raw JavaScript execution code. This instantly breaks the document thread, preventing the Virtual DOM from mounting. Escaping nested backticks isolates the inner arrays, securing 100% rendering stability.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.85] — 2026-08-29 - AppOrchestrator v3.6.1 [CONFORMED]
+### Fixed
+- **Nested Template Literal Crash:** Corrected an unescaped backtick within Subblock C of the About Modal, preventing premature termination of the main App component's template literal and resolving the fatal SyntaxError blank screen crash `[REF: CRASH-05b]`.
+- **System Version Alignment:** Synchronized global module states to baseline `v8.12.85` for absolute Git-push parity.
+
 ## [v8.12.84] — 2026-08-29 - MapViewer v6.4.20, AppOrchestrator v3.6.0 [CONFORMED]
 ### Fixed
 - **Multi-Line WKT Polygon Splitting:** Purged `.flatMap(p => p.split('\n'))` pre-parser operations from the coordinate splitter `[REF: MAP-01e]`. Splits are now restricted to `<br>` tags to prevent the engine from fragmentation-destroying raw multi-line WKT polygons from Google Sheets before they compile.
