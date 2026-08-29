@@ -659,9 +659,6 @@ All physical carriage returns must rely on native, hardware-level line breaks
 to preserve absolute cross-browser portability and ensure offline Preact 
 reconciliation stability.
 
-#### [REF: CRASH-05b] Zero-Nesting Decoupled Architecture [UPDATED - 2026-08-29]
-To permanently insulate the Preact Virtual DOM from browser-level lexer crashes (such as `unexpected token: identifier`), deep-nesting conditional template strings (`html`...`) inside the main return block's JSX placeholders is strictly prohibited. Low-spec browser engines frequently fail to balance backticks nested within placeholders. Symmetrically, all conditional blocks, modals, loops, and button text segments must be hoisted and resolved into independent JavaScript constants *prior* to the main return statement. The final JSX stream must only interpolate flat variables (e.g., `${loadingScreen}`, `${appLayout}`), securing 100% engine stability and ensuring clean execution across restricted mobile devices and field tablets.
-
 #### [REF: CRASH-05b] Nested Template Literal Escaping [NEW - 2026-08-29]
 To prevent fatal browser compilation crashes (SyntaxError: unexpected token: identifier), any secondary Preact html template string nested inside the main App component's return literal must explicitly escape its backticks using backslashes (\`). If unescaped, the browser's parser interprets the first nested backtick as the termination of the outer template literal, forcing the following HTML markup to parse as raw JavaScript execution code. This instantly breaks the document thread, preventing the Virtual DOM from mounting. Escaping nested backticks isolates the inner arrays, securing 100% rendering stability.
 

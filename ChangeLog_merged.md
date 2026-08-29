@@ -1,7 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-[v8.13.2] — 2026-08-29 - AppOrchestrator v3.7.0c, MapViewer v6.4.20 [CONFORMED]
+## [v8.13.4] — 2026-08-29 - AppOrchestrator v3.7.1, MapViewer v6.4.20, TimelineScrubber v26.11.8 [CONFORMED]
+### Fixed
+- **Zero-Nesting Decoupled Architecture:** Hoisted all remaining nested conditional Preact HTML layouts (`loadingScreen`, `appLayout`, `filterPopup`, `searchHistoryLayout`, and `searchResultsList`) into isolated, standalone Preact variables outside the final main `return html` block. This flattens the rendering stream to exactly zero nested templates, permanently curing browser V8 syntax crashes on line 1950 (`min="1"`) `[REF: CRASH-05b]`.
+- **Button Inner-Text Decoupling:** Extracted nested `html` tags inside action button labels (`backBtnText`, `resetLayoutBtnText`, `settingsBtnText`, etc.) into flat, isolated Preact template constants to insulate single-file compilation from string leakage.
+- **Topological Version Alignment:** Promoted unified codebase release to v8.13.4, incrementing AppOrchestrator from v3.7.0 to v3.7.1 to secure strict synchronization with your GitHub codebase.
+
+2[v8.13.2] — 2026-08-29 - AppOrchestrator v3.7.0c, MapViewer v6.4.20 [CONFORMED]
 Refactored
 
     Hoisted Component Variables: Decoupled and hoisted all inline Preact HTML subcomponents (downloadBtn, backBtn, resetLayoutBtn, settingsBtn, telemetryBtn, prevBtn, nextBtn, searchBtn, filterBtn) out of the main App return literal. This completely isolates the string evaluation context, securing 100% immunity against nested-backtick lexer crashes [REF: CRASH-05b].

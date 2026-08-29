@@ -1,7 +1,7 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-[v8.13.2] — 2026-08-29 - AppOrchestrator v3.7.0, MapViewer v6.4.20 [CONFORMED]
+[v8.13.2] — 2026-08-29 - AppOrchestrator v3.7.0c, MapViewer v6.4.20 [CONFORMED]
 Refactored
 
     Hoisted Component Variables: Decoupled and hoisted all inline Preact HTML subcomponents (downloadBtn, backBtn, resetLayoutBtn, settingsBtn, telemetryBtn, prevBtn, nextBtn, searchBtn, filterBtn) out of the main App return literal. This completely isolates the string evaluation context, securing 100% immunity against nested-backtick lexer crashes [REF: CRASH-05b].
