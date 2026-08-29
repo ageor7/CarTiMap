@@ -288,6 +288,9 @@ To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and secure epistemic
 1. **WKT Integrity:** If a WKT string (e.g. POINT(...), LINESTRING(...), POLYGON(...)) is syntactically malformed and fails during Wicket compilation, the MapViewer must fail gracefully. It is strictly prohibited to execute manual regular expression extractions inside catch blocks to "rescue" or guess the coordinate parameters, as this masks upstream data-entry errors and generates invalid cartographic layers.
 2. **Explicit Lat/Lon Support:** Symmetrically, standard geographic coordinates are fully supported but must be formatted explicitly matching /^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/. Standard coordinate parsing operates purely on its own conditional branch and must never serve as a catch-block fallback for failed WKT inputs.
 
+#### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-08-29]
+To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate coordinates strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>
@@ -627,6 +630,9 @@ Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pa
 
 *   **[REF: UI-83] Absolute Utility Margin Offsets [UPDATED]:** The floating control toolbar (`Maximize` and `Open Source File [↗]`) inside the Media Viewer is absolute-positioned at `top: 60px; right: 60px`. This horizontal translation provides a strict 60px safe margin that isolates our UI elements from native browser scrollbars and inline iframe toolbars.
 *   **[REF: UI-84] Bottom-Center Navigation HUD [NEW]:** To eliminate vertical side-edge clutter over maps and images, multiple-media slides display a consolidated, central navigation bubble absolute-positioned at `bottom: 65px; left: 50%; transform: translateX(-50%)`. This groups chevrons and counter indicators into a compact tap zone while clearing bottom-aligned iframe menu overlays.
+
+#### [REF: UI-340] Sorted Search State Inversion [NEW - 2026-08-29]
+When the user queries the database index via the Search Modal, the action list returns matching records based on original row indexes (`res.id`). Symmetrically, because the active viewport stage presents a chronologically sorted and tag-filtered subset of records, directly jumping to an absolute index `id` creates an index-drift regression. To eliminate this drift, the modal click handler must execute a mathematical state inversion inside the active state registry: `data.findIndex(d => d.id === id)`. This retrieves the correct sorted target position, guaranteeing that the Stage, Map, and Scrubber focus on the exact intended historical node.
 
 
 ---
