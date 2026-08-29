@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+#### Changelog: [v8.12.79] - 2026-08-29
+*   **WKT Extraction Restored:** Recovered Leaflet rendering for WKT and standard coordinate shapes by aligning JavaScript internal regex variables to correct matching states.
+*   **Multi-Geometry Break Immunity:** Added a robust array-splitting mechanism allowing complex, multi-point entries separated by line-breaks (e.g., Hotel Grande Bretagne and Metochiko Tameio) to render simultaneously as separate interactive pins.
+*   **Layer Menu Visibility:** Elevated the Layer Dropdown menu above the Map-Media border resizer line, ensuring overlay selections remain fully visible and clickable without horizontal clipping.
+
 ## [v8.12.78] — 2026-08-29
 
 ### Added
