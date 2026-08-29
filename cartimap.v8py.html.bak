@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.1';
+        const APP_VERSION = 'v8.13.2';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2108,8 +2108,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.0b ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.0b ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.0c ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.0c ] ===
 
         const App = () => {
           // =========================================================================
@@ -2171,7 +2171,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const stripAndNormalize = (str) => {
             if (!str) return '';
             const noHtml = String(str).replace(/<[^>]*>?/gm, '');
-            return noHtml.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+            return noHtml.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
           };
         
           const formatSmartDate = (startObj, endObj, locale) => {
@@ -2189,7 +2189,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const formatPlaces = (placeStr) => {
             if (!placeStr) return '';
             const stripped = placeStr.replace(/^\s*\[.*?\]\s*/, '');
-            return stripped.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean).join(' · ');
+            return stripped.split(/[|·;·
+\-]/).map(s => s.trim()).filter(Boolean).join(' · ');
           };
         
           // =========================================================================
@@ -2285,7 +2286,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     return null;
                   }
                   
-                  if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
+                  if (/^\d+(\.\d+)?\$/.test(cleanLegacy)) {
                     const serialVal = parseFloat(cleanLegacy);
                     const ts = (serialVal - 25569) * 86400 * 1000;
                     return { 
@@ -2299,7 +2300,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   
                   const parts = cleanLegacy.split(' ');
                   if (parts.length >= 1) {
-                    const dateStr = parts || '';
+                    const dateStr = parts[0] || '';
                     const timeStr = parts[1] || '';
                     const dParts = dateStr.split(/[\/\\.\-]/);
                     if (dParts.length >= 3) {
@@ -2308,9 +2309,9 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                       const dYear = parseInt(dParts[2], 10);
                       const dMonth = parseInt(dParts[isUS ? 0 : 1], 10) - 1;
                       const dDay = parseInt(dParts[isUS ? 1 : 0], 10);
-                      const tHour = parseInt(tParts || 0, 10);
+                      const tHour = parseInt(tParts[0] || 0, 10);
                       const tMin = parseInt(tParts[1] || 0, 10);
-                      const tSec = parseInt(secParts || 0, 10);
+                      const tSec = parseInt(secParts[0] || 0, 10);
                       const tMs = parseInt(secParts[1] || 0, 10);
                       const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
                       const ts = dateObj.getTime();
@@ -2466,15 +2467,15 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           };
         
           // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 6: INTERSECTION & RESIZING LISTENERS ] ===
+          // === [ APP_ORCHEST_SUBBLOCK 6: INTERSECTION & RESIZING LISTENERS ] ===
           // =========================================================================
           const startTimelineResize = (e) => {
             e.preventDefault();
-            const startY = e.clientY || (e.touches && e.touches.clientY);
+            const startY = e.clientY || (e.touches && e.touches[0].clientY);
             const startHeight = timelineRequiredHeight;
             
             const doDrag = (moveEvent) => {
-              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches.clientY);
+              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0].clientY);
               const diffY = startY - currentY;
               const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
               setTimelineRequiredHeight(newHeight);
@@ -2568,7 +2569,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
           // =========================================================================
           const CarTiMapperLogo = ({ context, appVersion }) => {
-            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
+            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"/><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"/><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
             if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 24px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.85rem; color: #444; line-height: 1;">CarTiMap</span><span style="font-size: 0.65rem; color: #888; line-height: 1;">${appVersion}</span></div></div>`;
             return html`
@@ -2776,7 +2777,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 <button class="modal-close" onClick=${() => setIsSearchOpen(false)} title="Close">✕</button>
                 <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 15px;">Search Dataset</h3>
                 <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} autoFocus />
-                ${searchHistory.length > 0 && !searchQuery ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;\">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; color: #444;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>` : ''}
+                ${searchHistory.length > 0 && !searchQuery ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; color: #444;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>` : ''}
                 <div style="flex-grow: 1; overflow-y: auto; border-top: 1px solid #eee;">
                   ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
                   ${searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title">${res.title}</div><div class="search-result-meta">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`)}
@@ -2914,10 +2915,9 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.0b';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.0c';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
-
 
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
         render(html`<${ErrorBoundary}><${App} /></${ErrorBoundary}>`, document.getElementById('root'));
