@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.12.83';
+        const APP_VERSION = 'v8.12.84';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1447,7 +1447,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.19 ] 🔽🔽🔽
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.20 ] 🔽🔽🔽
 
         const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -1471,7 +1471,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const match = placeStr.match(/^\s*\[(.*?)\].*$/);
             if (match) {
               const lineName = match[1].trim();
-              const details = placeStr.replace(/^\s*\[.*?\]\s*/, '').split(/[,|·;]/).map(s => s.trim()).filter(Boolean);
+              const details = placeStr.replace(/^\s*\[.*?\].*$/, '').split(/[,|·;]/).map(s => s.trim()).filter(Boolean);
               return { lineName, startLabel: details[0] || '', endLabel: details[1] || '' };
             }
             return null;
@@ -1715,14 +1715,15 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             data.forEach((item, idx) => {
               const locStr = String(item.location || '').trim(); if (!locStr) return;
               const activeLayersArray = [];
-              const parts = locStr.split(/<br\s*\/?>/i).flatMap(p => p.split('\n')).map(s => s.trim()).filter(Boolean);
+              // Strictly split on <br> tags only to preserve continuous multi-line polygons
+              const parts = locStr.split(/<br\s*\/?>/i).map(s => s.trim()).filter(Boolean);
               
               parts.forEach(part => {
                 let featureLayers = [];
                 try {
                   if (part.match(/^\s*GEOMETRYCOLLECTION/i)) {
                     featureLayers = parseGeometryCollection(part);
-                  } else if (part.match(/^\s*[A-Z]+\s*\(/)) { 
+                  } else if (part.match(/^\s*[A-Z]+\s*\(/i)) { 
                     const wkt = new window.Wkt.Wkt(); 
                     wkt.read(part); 
                     featureLayers = extractLayers(wkt.toObject()); 
@@ -1731,7 +1732,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   } else {
                     const coordMatch = part.match(/^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/);
                     if (coordMatch) {
-                      featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch[1]), parseFloat(coordMatch[2]))));
+                      featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch.at(1)), parseFloat(coordMatch.at(2)))));
                     } else {
                       console.warn("Skipping unidentifiable location format:", part);
                     }
@@ -1956,7 +1957,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
-                  <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">\${mapZoom}</div>
+                  <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">\${mapZoom}</div>
                   <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
@@ -1999,7 +2000,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   </div>
                   <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
                   <div style="display: flex; flex-direction: column; gap: 8px;">
-                    \${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_\${o.id}" checked=\${activeOverlays.includes(o.id)} onChange=\${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="over_\${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">\${o.label}</label>\${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="\${o.attrLink || '#'}" target="_blank" onClick=\\\${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>\${o.attrText}</a></span>` : ''}</div></div>\${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=\${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
+                    \${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_\${o.id}" checked=\${activeOverlays.includes(o.id)} onChange=\${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="over_\${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">\${o.label}</label>\${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="\${o.attrLink || '#'}" target="_blank" onClick=\${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>\${o.attrText}</a></span>` : ''}</div></div>\${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=\${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
                   </div>
                 </div>
               ` : ''}
@@ -2008,7 +2009,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['MapViewer'] = 'v6.4.19';
+        MODULE_VERSIONS['MapViewer'] = 'v6.4.20';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2250,6 +2251,16 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             window.addEventListener('keydown', handleKeyDown);
             return () => window.removeEventListener('keydown', handleKeyDown);
           }, [activeIndex, data.length]);
+
+		  // Auto-focus search input on modal mount safely resolving browser focus latency [REF: SEARCH-02]
+		  useEffect(() => {
+			if (isSearchOpen) {
+			  setTimeout(() => {
+				const inputNode = document.querySelector('.search-input');
+				if (inputNode) inputNode.focus();
+			  }, 150);
+			}
+		  }, [isSearchOpen]);
         
           useEffect(() => {
             const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
@@ -2637,16 +2648,16 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             }
           };
         
-          const handleResultClick = (id, qString) => {
-            const sortedIdx = data.findIndex(d => d.id === id);
-            if (sortedIdx >= 0) jumpToSlide(sortedIdx);
-            setIsSearchOpen(false);
-            if (qString && !searchHistory.includes(qString)) {
-              const newH = [qString, ...searchHistory].slice(0, 8);
-              setSearchHistory(newH);
-              localStorage.setItem('tm_search_history', JSON.stringify(newH));
-            }
-          };
+		  const handleResultClick = (id, qString) => {
+			const sortedIdx = data.findIndex(d => d.id === id);
+			if (sortedIdx >= 0) jumpToSlide(sortedIdx);
+			setIsSearchOpen(false);
+			if (qString && !searchHistory.includes(qString)) {
+			  const newH = [qString, ...searchHistory].slice(0, 8);
+			  setSearchHistory(newH);
+			  localStorage.setItem('tm_search_history', JSON.stringify(newH));
+			}
+		  };
         
           const searchResults = executeSearch(debouncedSearchQuery);
           const activeSlide = data.at(activeIndex);
@@ -2833,6 +2844,81 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 <div style="padding-top: 20px; border-top: 1px solid #eee;">
                   <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
                 </div>
+                <!-- 🔽🔽🔽 INSERT NEW SUBBLOCK C HERE 🔽🔽🔽 -->
+            <!-- pure CSS-drawn Map & Timeline Symbology (REF: UI-184) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; background: #fcfcfc; border-radius: 8px; padding: 20px; border: 1px solid #eee;">
+              <div>
+                <h4 style="margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;">📍 Map Symbology</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#007acc; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div></div>
+                    <span>Standard Event Node</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:14px; height:14px; border-radius:50%; background:#28a745; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:3px; height:16px; background:#28a745;"></div></div>
+                    <span>Active / Selected Event Node</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#ffb300; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div></div>
+                    <span>VIP / Priority Event</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#007acc; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div><div style="position:absolute; top:-4px; right:-6px; background:#d32f2f; color:#fff; border-radius:50%; width:12px; height:12px; font-size:7px; display:flex; align-items:center; justify-content:center; border:1px solid #fff;">4</div></div>
+                    <span>Stacked Pin (Exact Identical Coords)</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 20px; height: 20px; background: rgba(0,122,204,0.15); border: 2px dashed #007acc;"></div>
+                    <span>Geofence / Polygon / Area Bounds</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 style="margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;">⏱ Timeline Symbology</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 24px; height: 16px; background: #fff; border: 1px solid #ddd; border-left: 2px solid #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));"></div>
+                    <span>Gregorian Event Block</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 24px; height: 16px; background: #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));"></div>
+                    <span>Active Selected Event Block</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 24px; height: 6px; background: rgba(0, 122, 204, 0.3); border-left: 2px solid #007acc;"></div>
+                    <span>Event Duration Span Bar</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 24px; height: 8px; background: rgba(255, 179, 0, 0.15); border: 1px dashed #ffb300; border-radius: 4px;"></div>
+                    <span>EDTF Approximation Uncertainty Span</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">←</span>
+                    <span style="background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">→</span>
+                    <span>Keyboard Nav Controls</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsible System Architecture & Routing Accordion (REF: UI-183) -->
+            <details style="background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; padding: 0; margin-bottom: 20px;">
+              <summary style="background: #f1f1f1; padding: 12px 15px; font-weight: 600; cursor: pointer; color: #333; outline: none; user-select: none;">⚙️ System Architecture & Routing Syntax</summary>
+              <div style="padding: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; border-top: 1px solid #eee;">
+                <p style="margin-top: 0;">The <b>CarTiMap Engine</b> is a high-performance, single-file spatial-temporal processing suite. It dynamically parses raw Google Sheet datasets directly in the browser via zero-build Vanilla JS and Preact, executing R-Tree spatial indexing and ISO 8601-2 EDTF chronologies on the fly.</p>
+                <h5 style="margin: 15px 0 5px 0; color: #222;">Analytical URL Parameters</h5>
+                <ul style="margin: 0; padding-left: 20px; font-family: monospace; color: #007acc; line-height: 1.6;">
+                  <li><span style="color:#555">?source=ID</span> (Google Sheet Base ID)</li>
+                  <li><span style="color:#555">&amp;gid=ID</span> (Primary Data Tab ID)</li>
+                  <li><span style="color:#555">&amp;bgid=ID</span> (Basemaps/Overlays Tab ID)</li>
+                  <li><span style="color:#555">&amp;slide=X</span> (Target integer slide index bypass)</li>
+                  <li><span style="color:#555">&amp;date=YYYY-MM-DD</span> (Temporal anchor bypass)</li>
+                  <li><span style="color:#555">&amp;mapzoom=Z</span> (Initial geographic zoom override)</li>
+                  <li><span style="color:#555">&amp;theme=dark</span> (System dark mode override)</li>
+                </ul>
+              </div>
+            </details>
+                <!-- 🔼🔼🔼 INSERT NEW SUBBLOCK C HERE 🔼🔼🔼 -->
               </div>
         
               <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
@@ -2875,7 +2961,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.10';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.6.0';
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
