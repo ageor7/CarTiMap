@@ -634,6 +634,8 @@ Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pa
 #### [REF: UI-340] Sorted Search State Inversion [NEW - 2026-08-29]
 When the user queries the database index via the Search Modal, the action list returns matching records based on original row indexes (`res.id`). Symmetrically, because the active viewport stage presents a chronologically sorted and tag-filtered subset of records, directly jumping to an absolute index `id` creates an index-drift regression. To eliminate this drift, the modal click handler must execute a mathematical state inversion inside the active state registry: `data.findIndex(d => d.id === id)`. This retrieves the correct sorted target position, guaranteeing that the Stage, Map, and Scrubber focus on the exact intended historical node.
 
+#### [REF: CRASH-05b] Template Literal Decoupling & Isolation [NEW - 2026-08-29]
+To prevent fatal browser-level parsing errors (SyntaxError: unexpected token: identifier), any complex conditional HTML element containing template strings must be decoupled from the core JSX template rendering stream. Tagged template expressions (e.g., `html\`...\``) nested deeply within larger template interpolation blocks (`\${...}`) can trigger lexical collisions in browser engines when interpreted in a single-file environment. By compiling the sub-component into an independent state variable (such as `downloadBtn`) before the core JSX return declaration, the parsing contexts are strictly separated, securing 100% engine stability and cross-viewport compatibility.
 
 ---
 
