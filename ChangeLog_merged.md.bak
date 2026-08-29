@@ -1,6 +1,16 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.78] — 2026-08-29
+
+### Added
+- **Topological Self-Healing:** Integrated pre-flight self-healing inside compile_cartimap.py v1.1.7 to automatically detect and rebuild deleted closing END_INJECT comments on the user's filesystem.
+
+### Fixed
+- **Layers Menu Overlap:** Converted the Map Layers menu to absolute positioning (right: 40px; top: 130px; z-index: 2000), preventing it from crossing the right panel border under the Media pane.
+- **Layers Icon Geometry:** Restored the broken third layer coordinates of the layers button SVG from `2 12 17 22 12` to `2 12 12 17 22 12`.
+- **WKT Coordinate Erasure:** Cleaned regular expression double-backslashes inside MapViewer v6.4.13, allowing Scobie's perimeter and sewer line-strings to render natively.
+
 ## [v8.12.77] — 2026-08-28
 
 ### Added
