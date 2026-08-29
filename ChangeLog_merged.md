@@ -1,6 +1,22 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.12.83] — 2026-08-29 - MapViewer v6.4.19 [CONFORMED]
+Rolled Back
+
+    Manual WKT Regex Fallback Parsing: Rolled back and permanently purged the fragile manual regex rescue mechanism inside the catch block of parseGeometryCollection and the main parsing loop [REF: MAP-01d]. Malformed or syntactically incorrect WKT strings will no longer degrade to manual coordinate guesses; they will fail gracefully with a clear console warning [REF: PROT-04].
+    Coordinate Fallback Conflation: Resolved the logical conflict where malformed WKT structures were mistakenly evaluated as Lat/Lon. Standard coordinate parsing is now strictly constrained to explicit coordinate sequences (e.g. 37.9838, 23.7275) matching /^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/.
+
+Fixed
+
+    Layers Menu Clipping: Elevated .map-pane layout z-index to 110 !important to force-render the absolute Layers menu container completely in front of the map border resizer line.
+    HUD Zoom Readability: Increased the map zoom display box font-size from 0.65rem to 0.85rem with a weight of 800 for high-DPI viewports.
+
+Added
+
+    Basemaps Opacity Sliders: Integrated active opacity sliders mapped to basemapOpacity state variables directly below the radio selections inside the Layers dropdown, dynamically controlling Leaflet's tileLayer opacity parameters in real-time [REF: UI-71b].
+    Persistent Changelog Asset: Created and deployed /workspace/artifacts/CHANGELOG.md to permanently record codebase iterations.
+
 ## [v8.12.80b] — 2026-08-29
 
 ### Fixed

@@ -277,6 +277,17 @@ When the Leaflet MapViewer's primary WKT engine encounters nested geometries tha
 #### [REF: UI-71b] Basemap Opacity Attenuation [NEW - 2026-08-29]
 To allow qualitative researchers to visually attenuate high-contrast raster background details, the Layers dropdown incorporates inline `<input type="range">` opacity sliders dynamically nestled below active basemap radio buttons. Adjusting the slider binds the value directly to a reactive `basemapOpacity` state variable. Symmetrically, a React `useEffect` hook intercepts opacity mutations and directly executes `setOpacity()` on the active base and mini-base Leaflet tile-layers in constant time, avoiding expensive canvas re-creations.
 
+#### [REF: MAP-01d] Fallback Coordinate Axis Realignment [NEW - 2026-08-29]
+When the Leaflet MapViewer's primary WKT engine encounters nested geometries that trigger parser catch-blocks, it utilizes regular expression fallback mapping to capture decimal primitives. To prevent JavaScript array-to-string type coercion (where `parseFloat(match_array)` evaluates both Lat and Lon to the identical first index), coordinate extraction must explicitly target indexed group sequences: `parseFloat(match_array.at(2))` for Latitude, and `parseFloat(match_array.at(1))` for Longitude. Symmetrically, this maintains consistency with WKT’s Cartesian axis layout (`POINT(Lng Lat)`) and prevents collapsed flat diagonal geometries, ensuring 100% visual rendering accuracy.
+
+#### [REF: UI-71b] Basemap Opacity Attenuation [NEW - 2026-08-29]
+To allow qualitative researchers to visually attenuate high-contrast raster background details, the Layers dropdown incorporates inline `<input type="range">` opacity sliders dynamically nestled below active basemap radio buttons. Adjusting the slider binds the value directly to a reactive `basemapOpacity` state variable. Symmetrically, a React `useEffect` hook intercepts opacity mutations and directly executes `setOpacity()` on the active base and mini-base Leaflet tile-layers in constant time, avoiding expensive canvas re-creations.
+
+#### [REF: MAP-05] Complete Separation of WKT and Standard Coordinate Parsers [UPDATED - 2026-08-29]
+To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and secure epistemic data accuracy, the spatial engine must strictly separate Well-Known Text (WKT) from explicit Lat/Lon coordinate notation:
+1. **WKT Integrity:** If a WKT string (e.g. POINT(...), LINESTRING(...), POLYGON(...)) is syntactically malformed and fails during Wicket compilation, the MapViewer must fail gracefully. It is strictly prohibited to execute manual regular expression extractions inside catch blocks to "rescue" or guess the coordinate parameters, as this masks upstream data-entry errors and generates invalid cartographic layers.
+2. **Explicit Lat/Lon Support:** Symmetrically, standard geographic coordinates are fully supported but must be formatted explicitly matching /^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/. Standard coordinate parsing operates purely on its own conditional branch and must never serve as a catch-block fallback for failed WKT inputs.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>

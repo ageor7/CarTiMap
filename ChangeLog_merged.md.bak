@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.12.80b] — 2026-08-29
+
+### Fixed
+- **Pre-Parser Syntax Crash:** Resolved a fatal JS compilation error (`SyntaxError: unterminated regular expression literal` on line 1719) by converting regular expression splits (`/\\n/`) to string-based `.flatMap(p => p.split('\\n'))` operations, completely purging backslashes from the line-break loop.
+- **Visual Stacking Context:** Elevated `.map-pane` to `z-index: 110 !important` inside the rendering styles block, forcing the absolute Layers Dropdown to sit in front of the map border dividing line (`z-index: 100`) and the Media viewport.
+- **Double-Escape Clean-Up:** Conducted a direct string audit on `MapViewer` parameters, bringing regular expression checks to a single-backslash baseline inside your raw template.
+
 #### Changelog: [v8.12.79] - 2026-08-29
 *   **WKT Extraction Restored:** Recovered Leaflet rendering for WKT and standard coordinate shapes by aligning JavaScript internal regex variables to correct matching states.
 *   **Multi-Geometry Break Immunity:** Added a robust array-splitting mechanism allowing complex, multi-point entries separated by line-breaks (e.g., Hotel Grande Bretagne and Metochiko Tameio) to render simultaneously as separate interactive pins.
