@@ -313,6 +313,15 @@ During both Leaflet marker clustering and AppOrchestrator date parsing, the Java
 #### [REF: MAP-01b] Basemaps Registry Fallback & Dynamic Fetching [UPDATED - 2026-08-30]
 The MapViewer requires a conformed `basemapsRegistry` array to mount. To prevent runtime failures when loading offline or with isolated parameters, the AppOrchestrator must maintain a conformed static `DEFAULT_BASEMAPS` catalog hook within State Subblock 1. If an external `bgid` is active, the parser must merge those sheets-defined layers dynamically over the fallback basemaps, updating Leaflet tile definitions without physical DOM restarts.
 
+#### [REF: CHRONO-08] Absolute Unbounded/Interval Check Optimization [UPDATED - 2026-08-30]
+The ingestion pipeline must identify open-ended ranges and unbounded intervals (such as ISO 8601-2 Level 2 Choice Sets with undefined endings) to guarantee structural parity in long-term data preservation. 
+
+To maintain execution fluidity, the engine must avoid structural depth-traversals of nested Abstract Syntax Trees (AST) or array-matching loops during real-time rendering. Because the native `compileCartiMapAST` decorator recursively propagates infinity limits up to the root boundaries of the parsed date node, checking the absolute limits of the computed timestamps resolves unboundedness in mathematical \\(O(1)\\) complexity:
+
+`isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY)`
+
+This evaluation bypasses the need for object type-checking and functions seamlessly across simple dates, Sets, Lists, and Interval trees.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>

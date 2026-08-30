@@ -1,6 +1,23 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.16b] — 2026-08-30 - AppOrchestrator v3.7.16, MapViewer v6.4.22, TimelineScrubber v26.11.10 [CONFORMED]
+### Added
+- **Centralized Ingestion Diagnostics:** MapViewer now actively captures syntax-level parsing exceptions inside its WKT coordinate processing pipelines and routes detailed warnings straight to the Telemetry panel, referencing sheet row indices (`id + 2`) [REF: MAP-01f].
+
+### Changed
+- **One-Line Navigation Cockpit:** Collapsed the status/toolbar to a single-line height of 38px to maximize spatial-temporal canvas viewports. Enlarged interactive buttons and text inputs by one click to protect accessibility on tablet-class screens. Shifted dynamic timeline scale metrics directly to the immediate right of the Next control button [REF: UI-164c].
+- **Multi-Platform Geometry Splitting:** Re-engineered the MapViewer coordinate ingestion engine to recursively split multi-line cells using both HTML breaks and platform-native newline configurations (`\r\n`, `\n`, `\r`) [REF: MAP-01f].
+
+### Restored
+- **High-Fidelity Branding Suite:** Re-integrated the original master vector logo (the bracket base, sapphire primary needle, active-green secondary needle, and sub-pixel glow filter) inside the `<CarTiMapperLogo>` component [REF: UI-236b].
+
+### Removed
+- **Unsanitized WKT Fallbacks:** Purged fragile regex fallbacks for malformed coordinates, enforcing strict WKT compliance with real-time logging feedback.
+
+## [v8.13.16] by Gemini Pro
+- Removed the // comments from inside <${TimelineScrubber}
+
 ## [v8.13.15-telemetry] — 2026-08-30 - AppOrchestrator v3.7.13, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Fixed
 - **Status Bar Telemetry Disconnect:** Integrated the missing `.semantic-time-span-left` HTML rendering block inside the left status container (`status-left`) of the parent layout. This ensures the parent component physically projects the scrubber's dynamically calculated timeline zoom-span telemetry (`visibleTimeSpan`), correcting a silent state-hoisting dead end without requiring modification of existing functional React hooks or prop-routing bridges [REF: UI-164b].
