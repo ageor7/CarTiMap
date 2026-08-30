@@ -575,6 +575,15 @@ Dynamic sizing on structural divs must bypass nested template literals (e.g., st
 #### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
 To avoid component-level scope leaks, the active zoom parameters and computed semantic time spans must be managed by the parent AppOrchestrator. `<TimelineScrubber>` must remain a conformed presentation and event-capture layer, receiving state mutators (`setVisibleTimeSpan`, `setZoomLock`) and boundary properties (`timelineRequiredHeight`, `dateLocale`) as explicit React props. Any alteration to state-hoisting that separates these mutators from the parent render tree will crash the V8 runtime upon timeline scroll or drag interactions.
 
+#### [REF: UI-244] Multi-Axis Dynamic Resizing [UPDATED - 2026-08-30]
+The application layout relies on mathematical partitioning between visual media components and raw text sliders. To maintain dynamic responsive rendering without CSS repaint lag, the parent AppOrchestrator must bind structural drag-resizers to the window's mouse/touch interaction threads.
+1. Primary splitter resizes visual panels against content slides on the X-axis (bound strictly between 15% and 85% width).
+2. Secondary splitter divides map views from media views on the Y-axis (bound strictly between 10% and 90% height).
+All drag delta offsets must write straight to CSS variables (`--primary-split` and `--secondary-split`) on the `#app-layout` element, triggering smooth layout recalculations on Leaflet and SVG render paths without hard state-level re-draws.
+
+#### [REF: UI-245] Structural Collapse Shields [UPDATED - 2026-08-30]
+Any drag action that drives a partition width or height to 0% will completely drop active component event listeners, causing standard scrolling and zoom mechanisms to lock. The drag handlers must execute strict clamp checks prior to setting properties, enforcing hard minimum sizes of 15% for the primary panel and 10% for secondary structures.
+
 
 ---
 

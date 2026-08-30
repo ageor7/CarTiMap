@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.12';
+        const APP_VERSION = 'v8.13.13';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2107,8 +2107,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.12 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.12 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.13 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.13 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2565,6 +2565,66 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             window.addEventListener('touchmove', doDrag, { passive: true });
             window.addEventListener('touchend', stopDrag);
           };
+
+          const startPrimaryResize = (e) => {
+            if (maxPane) return; 
+            const startX = e.touches ? e.touches.clientX : e.clientX; 
+            const startY = e.touches ? e.touches.clientY : e.clientY; 
+            const isDesktop = window.innerWidth >= 1024; 
+            const containerNode = appRef.current.querySelector('.core-viewports'); 
+            const startVal = isDesktop ? appRef.current.querySelector('.content-slider-pane').offsetWidth : appRef.current.querySelector('.content-slider-pane').offsetHeight; 
+            const containerSize = isDesktop ? containerNode.offsetWidth : containerNode.offsetHeight;
+            const onMove = (e2) => { 
+              const currentX = e2.touches ? e2.touches.clientX : e2.clientX; 
+              const currentY = e2.touches ? e2.touches.clientY : e2.clientY; 
+              const delta = isDesktop ? (currentX - startX) : (startY - currentY); 
+              let pct = ((startVal + delta) / containerSize) * 100; 
+              if (pct < 15) pct = 15; 
+              if (pct > 85) pct = 85; 
+              appRef.current.style.setProperty('--primary-split', pct + '%'); 
+            };
+            const onUp = () => { 
+              document.removeEventListener('mousemove', onMove); 
+              document.removeEventListener('mouseup', onUp); 
+              document.removeEventListener('touchmove', onMove); 
+              document.removeEventListener('touchend', onUp); 
+              window.dispatchEvent(new Event('resize')); 
+            };
+            document.addEventListener('mousemove', onMove); 
+            document.addEventListener('mouseup', onUp); 
+            document.addEventListener('touchmove', onMove, { passive: false }); 
+            document.addEventListener('touchend', onUp);
+          };
+
+          const startSecondaryResize = (e) => {
+            if (maxPane) return; 
+            const startX = e.touches ? e.touches.clientX : e.clientX; 
+            const startY = e.touches ? e.touches.clientY : e.clientY; 
+            const isDesktop = window.innerWidth >= 1024; 
+            const containerNode = appRef.current.querySelector('.visual-pane'); 
+            const startVal = isDesktop ? appRef.current.querySelector('.map-pane').offsetHeight : appRef.current.querySelector('.map-pane').offsetWidth; 
+            const containerSize = isDesktop ? containerNode.offsetHeight : containerNode.offsetWidth;
+            const onMove = (e2) => { 
+              const currentX = e2.touches ? e2.touches.clientX : e2.clientX; 
+              const currentY = e2.touches ? e2.touches.clientY : e2.clientY; 
+              const delta = isDesktop ? (currentY - startY) : (currentX - startX); 
+              let pct = ((startVal + delta) / containerSize) * 100; 
+              if (pct < 10) pct = 10; 
+              if (pct > 90) pct = 90; 
+              appRef.current.style.setProperty('--secondary-split', pct + '%'); 
+            };
+            const onUp = () => { 
+              document.removeEventListener('mousemove', onMove); 
+              document.removeEventListener('mouseup', onUp); 
+              document.removeEventListener('touchmove', onMove); 
+              document.removeEventListener('touchend', onUp); 
+              window.dispatchEvent(new Event('resize')); 
+            };
+            document.addEventListener('mousemove', onMove); 
+            document.addEventListener('mouseup', onUp); 
+            document.addEventListener('touchmove', onMove, { passive: false }); 
+            document.addEventListener('touchend', onUp);
+          };
         
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 7: VIEWPORT BOUNDS TRACKING ] ===
@@ -2603,7 +2663,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           }, [isSearchOpen]);
         
           useEffect(() => {
-            const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+            const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
             updateAppHeight();
             let wasDesktop = window.innerWidth >= 1024;
             const handleResize = () => {
@@ -2641,7 +2701,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
           // =========================================================================
           const CarTiMapperLogo = ({ context, appVersion }) => {
-            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
+            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
             if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 24px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.85rem; color: #444; line-height: 1;">CarTiMap</span><span style="font-size: 0.65rem; color: #888; line-height: 1;">${appVersion}</span></div></div>`;
             return html`
@@ -2759,40 +2819,57 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const loadingScreen = (!status.active)
             ? html`<div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
                 <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
-                <div class="loading-bar-container"><div class="loading-bar" style="width: ${status.progress}%"></div></div>
+                <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%"></div></div>
                 <div class="status-text">${status.text}</div>
               </div>`
             : '';
 
           const appLayout = (data.length > 0 && status.active)
             ? html`<div id="app-layout" ref=${appRef} class="${isTimelineExpanded ? 'is-expanded-timeline' : ''} ${isTimelineMinimized ? 'is-minimized-timeline' : ''}">
-                <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}">
-                  <${MapViewer}
-                    data=${data}
-                    activeIndex=${activeIndex}
-                    setActiveIndex=${setActiveIndex}
-                    addLog=${addLog}
-                    basemapsRegistry=${basemapsRegistry}
-                    maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
-                    minimapOffset=${minimapOffset}
-                    setMinimapOffset=${setMinimapOffset}
-                    maxPane=${maxPane}
-                    setMaxPane=${setMaxPane}
-                    polygonOpacity=${polygonOpacity}
-                    showButtonText=${showButtonText}
-                    visibleTimeBounds=${visibleTimeBounds}
-                  />
-                </div>
-      
-                <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}">
-                  <${MediaViewer}
-                    data=${data}
-                    activeIndex=${activeIndex}
-                    setActiveIndex=${setActiveIndex}
-                    maxPane=${maxPane}
-                    setMaxPane=${setMaxPane}
-                    showButtonText=${showButtonText}
-                  />
+                <div class="core-viewports ${maxPane ? 'max-' + maxPane : ''}">
+                  <div class="visual-pane ${hasMedia ? '' : 'no-media'}">
+                    <div class="map-pane">
+                      <${MapViewer}
+                        data=${data}
+                        activeIndex=${activeIndex}
+                        setActiveIndex=${setActiveIndex}
+                        addLog=${addLog}
+                        basemapsRegistry=${basemapsRegistry}
+                        maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
+                        minimapOffset=${minimapOffset}
+                        setMinimapOffset=${setMinimapOffset}
+                        maxPane=${maxPane}
+                        setMaxPane=${setMaxPane}
+                        polygonOpacity=${polygonOpacity}
+                        showButtonText=${showButtonText}
+                        visibleTimeBounds=${visibleTimeBounds}
+                      />
+                    </div>
+          
+                    <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize}></div>
+          
+                    <div class="media-pane">
+                      <${MediaViewer}
+                        activeSlide=${activeSlide}
+                        maxPane=${maxPane}
+                        setMaxPane=${setMaxPane}
+                      />
+                    </div>
+                  </div>
+          
+                  <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize}></div>
+          
+                  <div class="content-slider-pane">
+                    <${ContentSlider}
+                      data=${data}
+                      activeIndex=${activeIndex}
+                      setActiveIndex=${jumpToSlide}
+                      maxPane=${maxPane}
+                      setMaxPane=${setMaxPane}
+                      dateLocale=${dateLocale}
+                      formatSmartDate=${formatSmartDate}
+                    />
+                  </div>
                 </div>
       
                 <!-- String Concatenation used to eliminate nested template backticks -->
@@ -2896,7 +2973,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         
               <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 10000;"></div>
               
-              <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.7.12 - About Modal pure CSS Symbology Legends ] --- -->
+              <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.7.13 - About Modal pure CSS Symbology Legends ] --- -->
               <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;">
                 <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">✕</button>
                 <div style="margin-bottom: 25px;">
@@ -2987,7 +3064,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   </div>
                 </details>
               </div>
-              <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.7.12 - About Modal pure CSS Symbology Legends ] --- -->
+              <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.7.13 - About Modal pure CSS Symbology Legends ] --- -->
         
               <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
               <div id="settings-modal" class="tm-modal ${isSettingsOpen ? 'open' : ''}" style="display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px;">
@@ -3025,7 +3102,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.12';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.13';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 

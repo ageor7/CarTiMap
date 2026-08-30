@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.14] — 2026-08-30 - AppOrchestrator v3.7.15, MapViewer v6.4.20, TimelineScrubber v26.11.10 [CONFORMED]
+### Fixed
+- **Timeline Zoom Crashing (setVisibleTimeSpan):** Re-hoisted and declared missing layout and zoom-metric hooks (`visibleTimeSpan`, `zoomLock`) in the parent context.
+- **Component Prop Interface Bridge:** Handled prop-level interface drop by bridging `setVisibleTimeSpan`, `setZoomLock`, `isTimelineMinimized`, `dateLocale`, and `timelineRequiredHeight` directly into the `<TimelineScrubber>` instantiation block.
+- **Mobile Swipe Stabilization:** Corrected mobile dragging handlers to read coordinates without invoking illegal array-prototype methods on native `TouchList` elements.
+
 ## [v8.13.13] — 2026-08-30 - AppOrchestrator v3.7.13, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Added
 - **Multi-Axis Panel Resizing:** Restored dynamic resize listeners (`startPrimaryResize` and `startSecondaryResize`) inside Orchestrator Subblock 6. This enables bidirectional touch/mouse dragging to resize the primary visual-content split and secondary map-media split [REF: UI-244].

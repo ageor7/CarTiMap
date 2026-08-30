@@ -584,6 +584,11 @@ All drag delta offsets must write straight to CSS variables (`--primary-split` a
 #### [REF: UI-245] Structural Collapse Shields [UPDATED - 2026-08-30]
 Any drag action that drives a partition width or height to 0% will completely drop active component event listeners, causing standard scrolling and zoom mechanisms to lock. The drag handlers must execute strict clamp checks prior to setting properties, enforcing hard minimum sizes of 15% for the primary panel and 10% for secondary structures.
 
+#### [REF: UI-164c] Timeline Scrubber Component Interface Stability [UPDATED - 2026-08-30]
+Presentation-layer visual controllers, such as the SVG ruler timeline and zoom clusters, must never independently mutate global canvas scales. The parent AppOrchestrator retains absolute state ownership over variables tracking physical layout parameters (e.g., active swimlane dimensions, temporal spans, and zoom-lock flags). 
+
+Components (specifically <TimelineScrubber> and <MapViewer>) must remain pure, reactively rendering coordinates from incoming props and reporting physical telemetry changes via verified state callback mutators. Severing this interface bridge or leaving state setters unpassed during instantiation instantly breaks V8 compilation upon rendering loops.
+
 
 ---
 
