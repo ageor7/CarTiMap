@@ -598,6 +598,15 @@ To maintain the architectural boundary between state calculation and DOM represe
 3. The resulting string **must** be explicitly consumed and rendered within a dedicated `.semantic-time-span` element inside the left-aligned status bar (`status-left`). 
 4. This placement isolates high-frequency text-node repaints away from the interactive center record navigation cockpit, preserving structural performance.
 
+#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
+The parent AppOrchestrator state tree and the child <TimelineScrubber> communicate scale computations and temporal measurements strictly via the `setVisibleTimeSpan` callback prop. 
+
+To maintain the strict architectural boundary between performance-intensive calculations and visual representation:
+1. The raw state variable `visibleTimeSpan` must reside in parent scope.
+2. The active scale-delta is calculated inside the child scrubber's execution thread.
+3. The resulting string must be rendered within a dedicated `.semantic-time-span-left` node inside the left-aligned status bar (`status-left`).
+4. This specific placement isolates frequent layout reflows away from the center record navigation cockpit (`record-select-input`), preserving keyboard focus and ensuring 60fps responsiveness on tablet-class viewports.
+
 
 ---
 

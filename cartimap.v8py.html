@@ -309,6 +309,13 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 }
 /* --- [ End SubBlock: Centered Swipe Pass-Through Gutter ] --- */
 
+.semantic-time-span-left {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 </style>
 <!-- === [ END MAJOR BLOCK ] === -->
 </head>
@@ -325,7 +332,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.14';
+        const APP_VERSION = 'v8.13.15';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2107,8 +2114,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.14b ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.14b ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.15 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.15 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2799,18 +2806,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
           // =========================================================================
-			<div class="status-left">
-			  ${aboutData ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(true)} title="About"><${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} /></button>` : ''}
-			  
-			  ${resetLayoutBtn}
-			  ${settingsBtn}
-			  ${telemetryBtn}
-			  
-			  <!-- Non-disruptive, layout-safe time-span telemetry badge -->
-			  <span class="semantic-time-span" title="Visible Time Span" style="margin-left: 10px; font-size: 0.8rem; color: #666; font-family: monospace;">
-				${visibleTimeSpan || 'Calculating Span...'}
-			  </span>
-			</div>
 
           const aboutBtn = aboutData 
             ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(true)} title="Dataset Specs">
@@ -2927,20 +2922,19 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
       
                 <!-- String Concatenation used to eliminate nested template backticks -->
-                <div class="status-bar" style="bottom: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}">
-				<div class="status-left">
-				  ${aboutData ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(true)} title="About"><${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} /></button>` : ''}
-				  
-				  ${resetLayoutBtn}
-				  ${settingsBtn}
-				  ${telemetryBtn}
-				  
-				  <!-- Symmetrically bound time-span telemetry metrics [REF: UI-164b] -->
-				  <span class="semantic-time-span" title="Visible Time Span" style="margin-left: 10px; font-size: 0.8rem; color: #666; font-family: monospace;">
-					${visibleTimeSpan || 'Calculating Span...'}
-				  </span>
-				</div>
-
+                  <div class="status-bar" style="bottom: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}">
+                    <div class="status-left">
+                      ${aboutData ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(true)} title="Dataset Specs">
+                        <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
+                      </button>` : ''}
+                      
+                      ${resetLayoutBtn}
+                      ${settingsBtn}
+                      ${telemetryBtn}
+                      
+                      <!-- Symmetrically rendering the hoisted visibleTimeSpan metric [REF: UI-164b] -->
+                      ${visibleTimeSpan && html`<span class="semantic-time-span-left" style="font-size: 0.8rem; color: #666; margin-left: 10px; font-family: monospace; user-select: none;">${visibleTimeSpan}</span>`}
+                    </div>
       
                   <div class="status-center">
                     ${prevBtn}
@@ -3135,7 +3129,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.14b';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.15';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 

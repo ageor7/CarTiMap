@@ -589,6 +589,15 @@ Presentation-layer visual controllers, such as the SVG ruler timeline and zoom c
 
 Components (specifically <TimelineScrubber> and <MapViewer>) must remain pure, reactively rendering coordinates from incoming props and reporting physical telemetry changes via verified state callback mutators. Severing this interface bridge or leaving state setters unpassed during instantiation instantly breaks V8 compilation upon rendering loops.
 
+#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
+The parent AppOrchestrator state tree and the child <TimelineScrubber> communicate scale computations strictly via the `setVisibleTimeSpan` callback prop. 
+
+To maintain the architectural boundary between state calculation and DOM representation:
+1. The raw state variable `visibleTimeSpan` is held in parent scope.
+2. The interactive calculation is processed at 60fps in the child scrubber.
+3. The resulting string **must** be explicitly consumed and rendered within a dedicated `.semantic-time-span` element inside the left-aligned status bar (`status-left`). 
+4. This placement isolates high-frequency text-node repaints away from the interactive center record navigation cockpit, preserving structural performance.
+
 
 ---
 
