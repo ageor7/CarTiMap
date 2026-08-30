@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.18] — 2026-08-30 - AppOrchestrator v3.7.18, MapViewer v6.4.22, TimelineScrubber v26.11.10 [CONFORMED]
+### Fixed
+- **Chrono Token Alignment (L1987):** Repaired the fatal unhandled lexical token leak at line 1990 where a redundant closing brace (`}`) caused the browser to isolate the trailing `catch (e)` block, throwing a compile-time `SyntaxError: catch without try`.
+- **Open-Ended Temporal Ingestion (L1986):** Upgraded `isOpen` checks inside `parseChronoNode` from array-loop iteration to constant-time \\(O(1)\\) root boundary evaluations, validating open intervals (such as `1944-12-25/..`) seamlessly.
+- **Coordinate Array Parsing:** Healed a point marker ingestion bug where the regex extractor attempted to parse the raw RegExp object rather than accessing array indexes `[1]` and `[2]`, resolving silent `NaN` mapping failures.
+- **Responsive Layout Collisions:** Tightened bottom status layout to an exact single-line profile of 38px, scaling button interfaces and text nodes by "one click" for tablet viewports.
+
 ## [v8.13.17] — 2026-08-30 - AppOrchestrator v3.7.17, MapViewer v6.4.22, TimelineScrubber v26.11.10 [CONFORMED]
 ### Fixed
 - **EDTF Open-Ended Resolution (L1986):** Resolved a critical strict-type object mismatch in `parseChronoNode` where the engine tried to compare complex node objects directly with primitive numerical infinities. Replaced the linear-time array iteration loop with a constant-time bounds evaluation checking root timestamp endpoints. This fixes the recognition of open-ended ranges/intervals (e.g., `1944-12-25/..`) and propagates the `isOpen` Boolean flag downstream with zero runtime overhead.

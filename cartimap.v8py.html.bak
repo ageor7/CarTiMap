@@ -1454,8 +1454,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.22 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v6.4.22 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.22b ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v6.4.22b ] ===
 
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
   const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -1557,7 +1557,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     }
     if (currentGeom.trim()) geometries.push(currentGeom.trim());
     let extractedLayers = [];
-     geometries.forEach(geomStr => {
+    geometries.forEach(geomStr => {
       try {
         const wkt = new window.Wkt.Wkt(); wkt.read(geomStr);
         extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
@@ -1758,8 +1758,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           } else if (part.startsWith(String.fromCharCode(123)) && part.includes('"type"')) {
             featureLayers = extractLayers(L.geoJSON(JSON.parse(part)));
           } else {
-            const coordMatch = part.match(/^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/);
+            const coordMatch = part.match(/^\s*(-?\\d+(?:\\.\\d+)?)[,\\s]+(-?\\d+(?:\\.\\d+)?)\\s*$/);
             if (coordMatch) {
+              // Direct indices compilation prevents numeric parsing failures [REF: MAP-01f]
               featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch[1]), parseFloat(coordMatch[2]))));
             } else {
               // Direct error dispatch to block syntax deviations [REF: MAP-01f]
@@ -2036,7 +2037,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           </div>
           <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            \${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_\${o.id}" checked=\${activeOverlays.includes(o.id)} onChange=\${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;\"><label for="over_\${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">\${o.label}</label>\${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="\${o.attrLink || '#'}" target="_blank" onClick=\${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>\${o.attrText}</a></span>` : ''}</div></div>\${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=\${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
+            \${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">\n                  <input type="checkbox" id="over_\${o.id}" checked=\${activeOverlays.includes(o.id)} onChange=\${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />\n                  <div style="display: inline; margin: 0;"><label for="over_\${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">\${o.label}</label>\${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="\${o.attrLink || '#'}" target="_blank" onClick=\${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>\${o.attrText}</a></span>` : ''}</div></div>\${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=\${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
           </div>
         </div>
       ` : ''}
@@ -2045,7 +2046,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
   `;
 };
 
-MODULE_VERSIONS['MapViewer'] = 'v6.4.22';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2144,8 +2145,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.16b ] 🔽🔽🔽
-		// === [ MAJOR BLOCK: AppOrchestrator v3.7.16b ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.17 ] 🔽🔽🔽
+		// === [ MAJOR BLOCK: AppOrchestrator v3.7.17 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2373,33 +2374,34 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22';
                   for (let k in row) norm[k.toLowerCase().trim()] = row[k];
                   const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
         
-                  const parseChronoNode = (legacyStr, edtfStr) => {
-                    const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
-                    const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
-                    if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
-                      try {
-                        if (cleanEdtf) {
-                          const parsed = compileCartiMapAST(cleanEdtf);
-                          if (parsed) {
-                            return {
-                              isEDTF: true,
-                              min: parsed.min,
-                              max: parsed.max,
-                              obj: parsed,
-                              isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
-                              text: cleanEdtf
-                            };
-                          }
+                const parseChronoNode = (legacyStr, edtfStr) => {
+                  const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
+                  const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
+                  if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
+                    try {
+                      if (cleanEdtf) {
+                        const parsed = compileCartiMapAST(cleanEdtf);
+                        if (parsed) {
+                          return {
+                            isEDTF: true,
+                            min: parsed.min,
+                            max: parsed.max,
+                            obj: parsed,
+                            // Corrected strict-type comparison of complex AST objects [REF: CHRONO-08]
+                            isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY),
+                            text: cleanEdtf
+                          };
                         }
-                      } catch (e) {
-                        addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
                       }
+                    } catch (e) {
+                      addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
                     }
-                    
-                    if (!cleanLegacy) {
-                      if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
-                      return null;
-                    }
+                  }
+                  
+                  if (!cleanLegacy) {
+                    if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
+                    return null;
+                  }
                     
                     if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
                       const serialVal = parseFloat(cleanLegacy);
@@ -2833,7 +2835,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22';
           // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
           // =========================================================================
           const aboutBtn = aboutData 
-            ? html`<button class="status-btn" style="width: auto; padding: 0 6px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=\${() => setIsAboutOpen(true)} title="Dataset Specs">
+            ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;" onClick=\${() => setIsAboutOpen(true)} title="Dataset Specs">
                 <\${CarTiMapperLogo} context="status" appVersion=\${APP_VERSION} />
               </button>`
             : '';
@@ -2856,7 +2858,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22';
             : '';
 
           const searchHistoryLayout = (searchHistory.length > 0 && !searchQuery)
-            ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">\${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=\\${() => setSearchQuery(h)}>\${h}</button>`)}</div></div>`
+            ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">\${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=\${() => setSearchQuery(h)}>\${h}</button>`)}</div></div>`
             : '';
 
           const searchResultsList = searchResults.map(res => html`<div class="search-result-item" onClick=\${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">\${res.title}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">\${formatSmartDate(res.startDate, res.endDate, dateLocale)} \${res.place ? ` • \${formatPlaces(res.place)}` : ''}</div></div>`);
@@ -2925,51 +2927,51 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22';
                   />
                 </div>
       
-                <!-- Single-Line Status Bar Cockpit [REF: UI-164c] -->
-                <div class="status-bar" style="bottom: \${isTimelineMinimized ? '0px' : `\${timelineRequiredHeight}px`}; height: 38px; display: flex; align-items: center; background: #fff; border-top: 1px solid #ddd; box-sizing: border-box; padding: 0 10px;">
+                <!-- Optimized Single-Line Status Bar Cockpit [REF: UI-164c] -->
+                <div class="status-bar" style="bottom: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}; height: 38px; display: flex; align-items: center; background: #fff; border-top: 1px solid #ddd; box-sizing: border-box; padding: 0 10px;">
                   <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
-                    \${aboutBtn}
-                    \${resetLayoutBtn}
-                    \${settingsBtn}
-                    \${telemetryBtn}
+                    ${aboutBtn}
+                    ${resetLayoutBtn}
+                    ${settingsBtn}
+                    ${telemetryBtn}
                   </div>
       
-                  <!-- Centralized Navigation & Telemetry Block [REF: UI-164c] -->
+                  <!-- Enlarged, High-Contrast Navigation Controls -->
                   <div class="status-center" style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
-                    \${prevBtn}
+                    ${prevBtn}
       
                     <div style="display: flex; align-items: center; gap: 4px; font-family: monospace; font-weight: bold; font-size: 0.95rem;">
                       <input
                         type="number"
                         class="record-select-input"
                         min="1"
-                        max=\${data.length}
-                        value=\${activeIndex + 1}
-                        onChange=\${(e) => {
+                        max=${data.length}
+                        value=${activeIndex + 1}
+                        onChange={(e) => {
                           const val = parseInt(e.target.value, 10);
                           if (!isNaN(val) && val >= 1 && val <= data.length) {
                             jumpToSlide(val - 1);
                           }
                         }}
-                        onKeyDown=\${(e) => {
+                        onKeyDown={(e) => {
                           e.stopPropagation();
                         }}
                         style="width: 50px; background: rgba(0, 0, 0, 0.05); border: 1px solid #999; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.95rem; font-weight: bold; padding: 3px 0; color: inherit; outline: none;"
                       />
-                      <span style="user-select: none; opacity: 0.8;">/ \${data.length}</span>
+                      <span style="user-select: none; opacity: 0.8;">/ ${data.length}</span>
                     </div>
       
-                    \${nextBtn}
+                    ${nextBtn}
 
-                    <!-- Repositioned dynamic scale metric directly adjacent to Next navigation control -->
-                    \${visibleTimeSpan ? html`<span class="semantic-time-span-left" style="font-size: 0.95rem; color: #111; margin-left: 12px; font-family: monospace; font-weight: bold; user-select: none; white-space: nowrap;">\${visibleTimeSpan}</span>` : ''}
+                    <!-- Repositioned dynamic scale metric directly adjacent to Next navigation control [REF: UI-164c] -->
+                    ${visibleTimeSpan ? html`<span class="semantic-time-span-left" style="font-size: 0.95rem; color: #111; margin-left: 12px; font-family: monospace; font-weight: bold; user-select: none; white-space: nowrap;">${visibleTimeSpan}</span>` : ''}
                   </div>
       
-                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
-                    \${filterBtn}
-                    \${filterPopup}
-                    \${searchBtn}
-                    \${backBtn}
+                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
+                    ${filterBtn}
+                    ${filterPopup}
+                    ${searchBtn}
+                    ${backBtn}
                   </div>
                 </div>
       
@@ -2978,6 +2980,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22';
                 \${isTimelineMinimized ? html`<button class="fab-btn" onClick=\${() => setIsTimelineMinimized(false)} title="Restore Timeline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
               </div>`
             : '';
+
         
           return html`
             <div id="tm-root" onClick=\${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
@@ -3127,7 +3130,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.16b';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.17';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
