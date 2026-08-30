@@ -2145,8 +2145,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.18 ] 🔽🔽🔽
-		// === [ MAJOR BLOCK: AppOrchestrator v3.7.18 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.18c ] 🔽🔽🔽
+		// === [ MAJOR BLOCK: AppOrchestrator v3.7.18c ] ===
 
         const App = () => {
           // =========================================================================
@@ -3148,7 +3148,7 @@ const aboutBtn = aboutData
           `;
 		  };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.18b';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.18c';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
