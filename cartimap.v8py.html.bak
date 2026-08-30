@@ -2899,8 +2899,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 					showButtonText=${showButtonText}
 					visibleTimeBounds=${visibleTimeBounds}
 					setVisibleTimeBounds=${setVisibleTimeBounds}
-					
-					// Complete prop bridge restoring zoom and minimize interfaces [REF: UI-164c]
 					zoomLock=${zoomLock}
 					setZoomLock=${setZoomLock}
 					visibleTimeSpan=${visibleTimeSpan}

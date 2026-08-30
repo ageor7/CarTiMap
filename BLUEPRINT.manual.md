@@ -607,6 +607,19 @@ To maintain the strict architectural boundary between performance-intensive calc
 3. The resulting string must be rendered within a dedicated `.semantic-time-span-left` node inside the left-aligned status bar (`status-left`).
 4. This specific placement isolates frequent layout reflows away from the center record navigation cockpit (`record-select-input`), preserving keyboard focus and ensuring 60fps responsiveness on tablet-class viewports.
 
+#### [REF: UI-164c] Integrated Navigation and Telemetry Cockpit [UPDATED - 2026-08-30]
+To maximize real estate for high-density historical mapping, the Status/Toolbar height is strictly capped at 38px, restricting layout rendering to a single line. Interactive buttons and text inputs within this container must be scaled up by one click (e.g., font-size: 0.95rem; button padding: 4px 10px;) to maintain tactile accessibility. 
+
+Timeline scale measurements and dynamic zoom spans (`visibleTimeSpan`) must be rendered within a dedicated text node in the center cockpit, positioned immediately to the right of the Next control button. This alignment minimizes eye tracking fatigue during chronological scrubbing.
+
+#### [REF: MAP-01f] Non-Destructive Ingestion & Telemetry Diagnostics [UPDATED - 2026-08-30]
+The MapViewer GIS pipeline strictly rejects native regex fallback approximations for malformed Well-Known Text (WKT). The presentation engine is a renderer, not a correction tool. Location coordinate cells must be parsed by splitting on HTML breaks (`<br>`) and platform-native newlines (`\r\n`, `\n`, `\r`) recursively. 
+
+When geometry compilation encounters an un-geocodable entry or coordinate syntax failure:
+1. The engine must cleanly drop the specific features to avoid DOM halting.
+2. The pipeline must calculate the physical spreadsheet row index (`item.id + 2`).
+3. An active error marker must be dispatched straight to the Telemetry panel to alert the dataset compiler of database syntax errors.
+
 
 ---
 
