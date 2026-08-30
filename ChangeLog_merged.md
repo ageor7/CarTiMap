@@ -1,7 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-## [v8.13.14] — 2026-08-30 - AppOrchestrator v3.7.15, MapViewer v6.4.20, TimelineScrubber v26.11.10 [CONFORMED]
+## [v8.13.14b] — 2026-08-30 - AppOrchestrator v3.7.14, MapViewer v6.4.21, TimelineScrubber v26.11.10 [CONFORMED]
+### Fixed
+- **Status Bar Telemetry Disconnect:** Restored the missing `.semantic-time-span` HTML text element inside the left status container (`status-left`). This allows the parent component to physically render the calculated dynamic time-span metrics (`visibleTimeSpan`) emitted by the scrubber, eliminating silent state-hoisting dead ends without modifying functional React state hooks or prop bridges [REF: UI-164b].
+
+## [v8.13.14] — 2026-08-30 - AppOrchestrator v3.7.14,
 ### Fixed
 - **Timeline Zoom Crashing (setVisibleTimeSpan):** Re-hoisted and declared missing layout and zoom-metric hooks (`visibleTimeSpan`, `zoomLock`) in the parent context.
 - **Component Prop Interface Bridge:** Handled prop-level interface drop by bridging `setVisibleTimeSpan`, `setZoomLock`, `isTimelineMinimized`, `dateLocale`, and `timelineRequiredHeight` directly into the `<TimelineScrubber>` instantiation block.
