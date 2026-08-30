@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.12] — 2026-08-30 - AppOrchestrator v3.7.12, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+### Fixed
+- **Timeline State Resolution (setVisibleTimeSpan):** Re-anchored the `visibleTimeSpan` string and `zoomLock` enum states in parent State Orchestration (Subblock 1) to eliminate Leaflet/timeline-zoom rendering crashes.
+- **Prop Synchronization:** Bridged missing lifecycle handlers and properties—including `setVisibleTimeSpan`, `setZoomLock`, `isTimelineMinimized`, `dateLocale`, and `timelineRequiredHeight`—directly to the `<TimelineScrubber>` invocation in Subblock 11 to keep layout states fully in sync.
+
 ## [v8.13.11] — 2026-08-30 - AppOrchestrator v3.7.11, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Fixed
 - **Undefined Prop Crash (basemapsRegistry):** Restored the `basemapsRegistry` state variable and set it to a robust `DEFAULT_BASEMAPS` catalog fallback, resolving a fatal `ReferenceError` inside the `<MapViewer>` component [REF: MAP-01b].

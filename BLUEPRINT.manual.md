@@ -572,6 +572,9 @@ Avoid nesting backtick strings inside dynamic HTM template layouts (e.g., style=
 #### [REF: CRASH-05b] Dynamic Viewport Bounds [UPDATED - 2026-08-30]
 Dynamic sizing on structural divs must bypass nested template literals (e.g., style="height: `${val}px`" inside parent html`...`). All layouts must use flat single-quoted string concatenation (`+ 'px'`) to maintain 100% V8 runtime parser stability.
 
+#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
+To avoid component-level scope leaks, the active zoom parameters and computed semantic time spans must be managed by the parent AppOrchestrator. `<TimelineScrubber>` must remain a conformed presentation and event-capture layer, receiving state mutators (`setVisibleTimeSpan`, `setZoomLock`) and boundary properties (`timelineRequiredHeight`, `dateLocale`) as explicit React props. Any alteration to state-hoisting that separates these mutators from the parent render tree will crash the V8 runtime upon timeline scroll or drag interactions.
+
 
 ---
 

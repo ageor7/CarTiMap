@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.10';
+        const APP_VERSION = 'v8.13.11';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2107,8 +2107,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.10 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.10 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.11 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.11 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2158,6 +2158,20 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const [activeTags, setActiveTags] = useState([]);
           const [visibleTimeBounds, setVisibleTimeBounds] = useState(null);
           const [minimapOffset, setMinimapOffset] = useState(-4);
+
+          // Restored standard basemaps configurations [REF: MAP-01b]
+          const DEFAULT_BASEMAPS = [
+            { id: 'carto-light', label: 'CartoDB Light', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'xyz', maxZoom: 19, active: true, attrText: '© CartoDB', attrLink: 'https://carto.com/attributions', defaultOpacity: 1.0 },
+            { id: 'esri-sat', label: 'Esri Worlds Satellite', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
+            { id: 'esri-street', label: 'Esri World Street', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
+            { id: 'esri-topo', label: 'Esri World Topo', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
+            { id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 19, active: false, attrText: '© OSM', attrLink: 'https://openstreetmap.org/copyright', defaultOpacity: 1.0 },
+            { id: 'opentopo', label: 'OpenTopoMap (OSM)', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 17, active: false, attrText: '© OpenTopoMap', attrLink: 'https://opentopomap.org', defaultOpacity: 1.0 },
+            { id: 'protomaps-vector', label: 'Protomaps Vector Light (OSM)', type: 'base', url: 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', format: 'pbf', maxZoom: 15, active: false, attrText: '© Protomaps', attrLink: 'https://protomaps.com', defaultOpacity: 1.0 },
+            { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '', defaultOpacity: 1.0 }
+          ];
+        
+          const [basemapsRegistry, setBasemapsRegistry] = useState(DEFAULT_BASEMAPS);
         
           const appRef = useRef(null);
           const hasInitializedRef = useRef(false);
@@ -2243,6 +2257,35 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
               
               try {
+                // Parse basemaps config if provided by Google Sheets [REF: MAP-01b]
+                if (basemapsCsv) {
+                  const bResults = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
+                  const parsedBMs = bResults.data.map(row => {
+                    const norm = {};
+                    for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                    const isActive = /^(true|yes)$/i.test(String(norm.active || '').trim());
+                    const rawOpac = parseFloat(norm.defaultopacity);
+                    return {
+                      id: norm.id || "", label: norm.label || "", type: norm.type?.toLowerCase() === "overlay" ? "overlay" : "base",
+                      url: norm.url || "", maxZoom: parseInt(norm.maxzoom, 10) || 19,
+                      active: isActive, attrText: norm.attrtext || "", attrLink: norm.attrlink || "",
+                      defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac, format: norm.format || "xyz",
+                      wmsLayer: norm.wmslayer ? decodeURIComponent(norm.wmslayer.trim()) : "default"
+                    };
+                  }).filter(b => b.id && b.url);
+                  if (parsedBMs.length > 0) {
+                    setBasemapsRegistry(prev => {
+                      const merged = [...prev];
+                      parsedBMs.forEach(bm => {
+                        const existIdx = merged.findIndex(m => m.id === bm.id);
+                        if (existIdx >= 0) merged[existIdx] = bm;
+                        else merged.push(bm);
+                      });
+                      return merged;
+                    });
+                  }
+                }
+
                 const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
                 if (results.errors.length > 0) {
                   results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
@@ -2839,7 +2882,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         
               <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 10000;"></div>
               
-              <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.7.10 - About Modal pure CSS Symbology Legends ] --- -->
+              <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.7.11 - About Modal pure CSS Symbology Legends ] --- -->
               <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;">
                 <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">✕</button>
                 <div style="margin-bottom: 25px;">
@@ -2930,7 +2973,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   </div>
                 </details>
               </div>
-              <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.7.10 - About Modal pure CSS Symbology Legends ] --- -->
+              <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.7.11 - About Modal pure CSS Symbology Legends ] --- -->
         
               <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
               <div id="settings-modal" class="tm-modal ${isSettingsOpen ? 'open' : ''}" style="display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px;">
@@ -2968,7 +3011,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.10';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.11';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
