@@ -155,6 +155,11 @@ The horizontal consolidation formula (ExtractsCombinedV) must resolve spatial co
 ### [REF: ETL-01b] Google Sheets Ingestion (gviz/tq vs export) [UPDATED - 2026-08-29]
 To prevent client-side "Database Sync Failure" exceptions, the CarTiMap client rendering layer must exclusively fetch raw Google Sheet data utilizing Google's Visualization Query API endpoint (`/gviz/tq?tqx=out:csv&gid=...`). Developers are strictly prohibited from utilizing Google's raw file export endpoint (`/export?format=csv`). While both endpoints conceptually return CSV payloads, the `/export` endpoint does not support cross-origin queries and refuses to transmit Access-Control-Allow-Origin headers to anonymous user-agents. Reverting to `/gviz/tq` guarantees 100% CORS-compliance, permitting secure, serverless database synchronization directly inside the browser across all domains (including GitHub Pages, local files, and resource-constrained tablets).
 
+#### [REF: ARCH-01b] Decoupled Data Pipeline (Ingestion vs. Parsing Telemetry) [NEW - 2026-08-30]
+To secure robust client-side diagnostic transparency, the data synchronization lifecycle must be split into two isolated, sequential execution bounds:
+- **Ingestion Zone:** Contains only the asynchronous promise network chains. Rejection here strictly indicates origin blocking (CORS), unreachability, or transport-layer timeouts, setting the UI state directly to `"Connection Timeout"`.
+- **Compilation Zone:** Contains CSV parsing (`Papa.parse`), chronological normalization, and index mapping. Handled inside a local `try-catch` scope, any runtime or structural mapping exceptions caught here designate localized formatting or variable typing failures, setting the UI state directly to `"Dataset Parse Error"`.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -293,6 +298,9 @@ To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and secure epistemic
 
 #### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-08-29]
 To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate coordinates strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
+
+### [REF: MAP-02c] The Anti-Swallow Indexing Pattern [UPDATED - 2026-08-30]
+During both Leaflet marker clustering and AppOrchestrator date parsing, the JavaScript engine dynamically accesses indices of array structures. To insulate the codebase from compiler filters, markdown engines, or Git tools that accidentally swallow or strip square brackets (e.g., mistaking `parts[0]` for a markdown footnote indicator), all array index mapping must explicitly use the safe ES6 `.at()` accessor prototype (e.g., `parts.at(0)`). This prevents syntax and runtime exceptions while guaranteeing strict data format alignment across all compiler channels.
 
 ---
 
@@ -543,6 +551,9 @@ To support micro-chronological geographic modeling—such as military or diploma
 
 **[REF: BOOT-CRASH-03b] Character Class Escaping and Hyphen Bounds:**
 To isolate the regular expression engine from unexpected system encodings or polytonic Greek character overlaps, all hyphens (-) utilized inside active split arrays (places, sublabels, dates) must be explicitly escaped as \- or anchored to the absolute far-right boundary of the bracket. Ingesting unescaped hyphens in the middle of character classes (e.g., [\\/\\\\-.]) forces the browser to evaluate character ranges based on ASCII codes. If the character preceding the hyphen holds a higher decimal value than the trailing character, the JS compiler immediately throws a fatal "invalid range in character class" SyntaxError, blocking the Preact boot sequence.
+
+#### [REF: CRASH-05b] Nested Template Literal Syntax Guard [UPDATED - 2026-08-30]
+Dynamic rendering variables passed to hoisted Preact layouts (`appLayout`) must strictly avoid nested backtick structures (e.g., `` `\${height}px` `` inside `html` tag literals). Lexical parsers in standard browser V8 engines interpret inner backticks as template closures, prematurely terminating the parent literal and triggering fatal syntax errors. All variable property calculations must utilize standard JavaScript string concatenation (e.g., `height + 'px'`) to maintain single-file compilation integrity.
 
 ---
 

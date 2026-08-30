@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.8] — 2026-08-30 - AppOrchestrator v3.7.9, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+### Refactored
+- **Bifurcated Data Ingestion & Parsing:** Isolated raw Google Sheets `fetch` operations from downstream synchronous parsing loops (`Papa.parse` and chronology calculations). These are now executed sequentially in two distinct telemetry zones to eliminate error masking [REF: ARCH-01b].
+
+### Fixed
+- **Granular Error Telemetry:** Replaced the generic "Database Sync Failure" fallback. Settle connection errors (CORS, network drops, unreachability) directly to `"Connection Timeout"`, while redirecting local script crashes, format mismatches, and schema failures to `"Dataset Parse Error"` [REF: CRASH-08].
+- **Nested Template Lexer Collapse:** Converted dynamic viewport height evaluations (`timelineRequiredHeight` properties) on lines 1837, 1854, and 1898 from nested template backticks to clean string concatenation, permanently curing browser V8 syntax crashes on launch [REF: CRASH-05b].
+
 ## [v8.13.7] — 2026-08-30 - AppOrchestrator v3.7.7, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Fixed
 - **The Case of the Swallowed Brackets:** Rewrote the entire legacy date parser `parseChronoNode` to use ES6 `.at()` array indexing accessors (`parts.at(0)`, `parts.at(1)`, etc.) instead of square brackets [REF: MAP-02c]. This permanently shields your variable declarations from being stripped by markdown parsers or documentation compilers that misinterpret bracketed array indices as footnote citations, restoring complete database load and state mapping.

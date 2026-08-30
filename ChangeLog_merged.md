@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.8b] — 2026-08-30 - AppOrchestrator v3.7.9, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+### Refactored
+- **Decoupled Sync Boundaries:** Split raw Google Sheets API ingestion from synchronous dataset parsing (`Papa.parse`) and chronological mapping. Connection errors now map cleanly to `"Connection Timeout"`, while schema and local JS exceptions map to `"Dataset Parse Error"` [REF: ARCH-01b].
+
+### Fixed
+- **Preact Lexical Repair (L2420):** Converted dynamic height properties on timeline elements to string concatenation (`timelineRequiredHeight + 'px'`) to eliminate nested template literals, curing browser-side V8 syntax crashes on launch [REF: CRASH-05b].
+- **Cleaned Escaped Variables:** Removed 227 automated backslash insertions (`\$`) on Preact template bindings, restoring correct property interpolation across the layout [REF: COMP-09].
+
 ## [v8.13.8] — 2026-08-30 - AppOrchestrator v3.7.9, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Refactored
 - **Bifurcated Data Ingestion & Parsing:** Isolated raw Google Sheets `fetch` operations from downstream synchronous parsing loops (`Papa.parse` and chronology calculations). These are now executed sequentially in two distinct telemetry zones to eliminate error masking [REF: ARCH-01b].

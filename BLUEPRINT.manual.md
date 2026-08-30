@@ -160,6 +160,10 @@ To secure robust client-side diagnostic transparency, the data synchronization l
 - **Ingestion Zone:** Contains only the asynchronous promise network chains. Rejection here strictly indicates origin blocking (CORS), unreachability, or transport-layer timeouts, setting the UI state directly to `"Connection Timeout"`.
 - **Compilation Zone:** Contains CSV parsing (`Papa.parse`), chronological normalization, and index mapping. Handled inside a local `try-catch` scope, any runtime or structural mapping exceptions caught here designate localized formatting or variable typing failures, setting the UI state directly to `"Dataset Parse Error"`.
 
+#### [REF: ARCH-01b] Decoupled Data Pipeline (CORS vs Parse Boundaries) [NEW - 2026-08-30]
+The synchronization lifecycle must execute within two isolated boundaries to provide accurate telemetry:
+1. **The Ingestion Zone:** Raw asychronous fetch operations. Any failure here sets the UI state directly to "Connection Timeout".
+2. **The Data Compilation Zone:** Dynamic mappings and array manipulations. Handled inside an isolated local try-catch block, any failure sets the UI state directly to "Dataset Parse Error".
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -554,6 +558,9 @@ To isolate the regular expression engine from unexpected system encodings or pol
 
 #### [REF: CRASH-05b] Nested Template Literal Syntax Guard [UPDATED - 2026-08-30]
 Dynamic rendering variables passed to hoisted Preact layouts (`appLayout`) must strictly avoid nested backtick structures (e.g., `` `\${height}px` `` inside `html` tag literals). Lexical parsers in standard browser V8 engines interpret inner backticks as template closures, prematurely terminating the parent literal and triggering fatal syntax errors. All variable property calculations must utilize standard JavaScript string concatenation (e.g., `height + 'px'`) to maintain single-file compilation integrity.
+
+#### [REF: CRASH-05b] Dynamic Layout Dimensions [UPDATED - 2026-08-30]
+Avoid nesting backtick strings inside dynamic HTM template layouts (e.g., style="height: `${variable}px`" inside a parent html`...` tag). This forces parser collisions on downstream elements, triggering syntax errors (e.g., Error L2420). All dynamic inline styles must use standard string concatenation wrapped in single quotes (e.g., style="height: ${variable + 'px'}").
 
 ---
 
