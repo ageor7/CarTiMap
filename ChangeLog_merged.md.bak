@@ -1,6 +1,22 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+[v8.13.7] — 2026-08-30 - AppOrchestrator v3.7.7, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+Fixed
+
+    The Case of the Swallowed Brackets: Rewrote the entire legacy date parser parseChronoNode to use ES6 .at() array indexing accessors (parts.at(0), parts.at(1), etc.) instead of square brackets [REF: MAP-02c]. This permanently shields your variable declarations from being stripped by markdown parsers or documentation compilers that misinterpret bracketed array indices as footnote citations, restoring complete database load and state mapping.
+    Google Sheets Ingestion CORS Compliance: Ensured that Visualisation Query endpoints (/gviz/tq?tqx=out:csv) are preserved for Google Sheets fetches [REF: ETL-01b].
+
+## [v8.13.6] — 2026-08-29 - AppOrchestrator v3.7.6, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+### Fixed
+- **Google Sheets Ingestion Fallback (CORS Restored):** Reverted the raw spreadsheet fetch URL from `/export?format=csv` back to Google's cross-origin-permissive Visualization Query API (`/gviz/tq?tqx=out:csv`). This permanently resolves the cross-origin/CORS blockage that triggered fatal network errors and induced the "Database Sync Failure" state when executing the codebase on live GitHub Pages [REF: ETL-01b].
+- **Unified Version Promotion:** Aligned and promoted the master baseline suite to version v8.13.6, incrementing AppOrchestrator to v3.7.6 and MapViewer to v6.4.22 to guarantee absolute synchronization with live GitHub.
+- **MediaViewer Synchronization:** Aligned the main AppLayout block with the newly conformed `MediaViewer` block on GitHub, purging the legacy `MediaScroller` layout references.
+
+## [v8.13.5] — 2026-08-29 - AppOrchestrator v3.7.5 [REGRESSED]
+### Broken
+- **CORS Ingestion Exception:** An uncoordinated codebase update migrated the primary Google Sheets fetch URL to `/export?format=csv`. Because Google's raw export endpoint does not set the required Access-Control-Allow-Origin headers, this change completely broke anonymous client-side fetches across differing web origins, triggering catastrophic browser CORS violations [REF: CRASH-06].
+
 ## [v8.13.4] — 2026-08-29 - AppOrchestrator v3.7.1, MapViewer v6.4.20, TimelineScrubber v26.11.8 [CONFORMED]
 ### Fixed
 - **Zero-Nesting Decoupled Architecture:** Hoisted all remaining nested conditional Preact HTML layouts (`loadingScreen`, `appLayout`, `filterPopup`, `searchHistoryLayout`, and `searchResultsList`) into isolated, standalone Preact variables outside the final main `return html` block. This flattens the rendering stream to exactly zero nested templates, permanently curing browser V8 syntax crashes on line 1950 (`min="1"`) `[REF: CRASH-05b]`.

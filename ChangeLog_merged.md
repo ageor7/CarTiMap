@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.7] — 2026-08-30 - AppOrchestrator v3.7.7, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+### Fixed
+- **The Case of the Swallowed Brackets:** Rewrote the entire legacy date parser `parseChronoNode` to use ES6 `.at()` array indexing accessors (`parts.at(0)`, `parts.at(1)`, etc.) instead of square brackets [REF: MAP-02c]. This permanently shields your variable declarations from being stripped by markdown parsers or documentation compilers that misinterpret bracketed array indices as footnote citations, restoring complete database load and state mapping.
+- **Google Sheets Ingestion CORS Compliance:** Ensured that Visualisation Query endpoints (`/gviz/tq?tqx=out:csv`) are preserved for Google Sheets fetches [REF: ETL-01b].
+
 ## [v8.13.6] — 2026-08-29 - AppOrchestrator v3.7.6, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Fixed
 - **Google Sheets Ingestion Fallback (CORS Restored):** Reverted the raw spreadsheet fetch URL from `/export?format=csv` back to Google's cross-origin-permissive Visualization Query API (`/gviz/tq?tqx=out:csv`). This permanently resolves the cross-origin/CORS blockage that triggered fatal network errors and induced the "Database Sync Failure" state when executing the codebase on live GitHub Pages [REF: ETL-01b].
