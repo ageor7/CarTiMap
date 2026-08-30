@@ -332,7 +332,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.15';
+        const APP_VERSION = 'v8.13.16';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2114,91 +2114,83 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.15 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.15 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.16 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.16 ] ===
 
         const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
           // =========================================================================
-          const [logs, setLogs] = useState([]);
-          const [rawCsvRows, setRawCsvRows] = useState([]);
-          const [unfilteredData, setUnfilteredData] = useState([]);
-          const [data, setData] = useState([]);
-          const [aboutData, setAboutData] = useState(null);
-          const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
-          const [activeIndex, setActiveIndex] = useState(0);
-          const [slideHistory, setSlideHistory] = useState([]);
-		  
-		  // Core layout-governing states restored to resolve rendering crashes [REF: UI-164c]
-			const [visibleTimeSpan, setVisibleTimeSpan] = useState('');
-			const [zoomLock, setZoomLock] = useState('auto');
-			const [isTimelineMinimized, setIsTimelineMinimized] = useState(false);
-			const [timelineRequiredHeight, setTimelineRequiredHeight] = useState(200);
-			const [dateLocale, setDateLocale] = useState(() => {
-			  try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
-			  catch (e) { return 'en-GB'; }
-			});
+          const [logs, setLogs] = useState ([]);
+          const [rawCsvRows, setRawCsvRows] = useState ([]);
+          const [unfilteredData, setUnfilteredData] = useState ([]);
+          const [data, setData] = useState ([]);
+          const [aboutData, setAboutData] = useState (null);
+          const [status, setStatus] = useState ({"text": 'Initializing Engine...', "progress": 10, "isFading": false, "active": false});
+          const [activeIndex, setActiveIndex] = useState (0);
+          const [slideHistory, setSlideHistory] = useState ([]);
+          
+          // Core layout-governing states
+          const [visibleTimeSpan, setVisibleTimeSpan] = useState ('');
+          const [zoomLock, setZoomLock] = useState ('auto');
+          const [isTimelineMinimized, setIsTimelineMinimized] = useState (false);
+          const [isTimelineExpanded, setIsTimelineExpanded] = useState (false);
+          const [timelineRequiredHeight, setTimelineRequiredHeight] = useState (200);
 
-
-          const [isMonitorOpen, setIsMonitorOpen] = useState(false);
-          const [isAboutOpen, setIsAboutOpen] = useState(false);
-          const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-          const [isMenuOpen, setIsMenuOpen] = useState(false);
-          const [isFilterOpen, setIsFilterOpen] = useState(false);
-          const [isSearchOpen, setIsSearchOpen] = useState(false);
-          const [searchQuery, setSearchQuery] = useState('');
-          const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-          const [searchHistory, setSearchHistory] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; }
+          const [isMonitorOpen, setIsMonitorOpen] = useState (false);
+          const [isAboutOpen, setIsAboutOpen] = useState (false);
+          const [isSettingsOpen, setIsSettingsOpen] = useState (false);
+          const [isMenuOpen, setIsMenuOpen] = useState (false);
+          const [isFilterOpen, setIsFilterOpen] = useState (false);
+          const [isSearchOpen, setIsSearchOpen] = useState (false);
+          const [searchQuery, setSearchQuery] = useState ('');
+          const [debouncedSearchQuery, setDebouncedSearchQuery] = useState ('');
+          
+          const [searchHistory, setSearchHistory] = useState (() => {
+            try { return JSON.parse (localStorage.getItem ('tm_search_history')) || []; }
             catch (e) { return []; }
           });
-          const [maxPane, setMaxPane] = useState(null);
-          const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
-          const [isTimelineMinimized, setIsTimelineMinimized] = useState(false);
-          const [timelineRequiredHeight, setTimelineRequiredHeight] = useState(200);
-          const [polygonOpacity, setPolygonOpacity] = useState(() => {
-            try { return parseFloat(localStorage.getItem('tm_polygon_opacity')) || 0.4; }
+          const [maxPane, setMaxPane] = useState (null);
+          
+          const [polygonOpacity, setPolygonOpacity] = useState (() => {
+            try { return parseFloat (localStorage.getItem ('tm_polygon_opacity')) || 0.4; }
             catch (e) { return 0.4; }
           });
-          const [showButtonText, setShowButtonText] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_show_button_text')) ?? false; }
+          const [showButtonText, setShowButtonText] = useState (() => {
+            try { return JSON.parse (localStorage.getItem ('tm_show_button_text')) ?? false; }
             catch (e) { return false; }
           });
-          const [dateLocale, setDateLocale] = useState(() => {
-            try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
+          const [dateLocale, setDateLocale] = useState (() => {
+            try { return localStorage.getItem ('tm_date_locale') || 'en-GB'; }
             catch (e) { return 'en-GB'; }
           });
-          const [dateEngineMode, setDateEngineMode] = useState(() => {
-            try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
+          const [dateEngineMode, setDateEngineMode] = useState (() => {
+            try { return localStorage.getItem ('tm_date_engine_mode') || 'auto'; }
             catch (e) { return 'auto'; }
           });
-          const [allTags, setAllTags] = useState([]);
-          const [activeTags, setActiveTags] = useState([]);
-          const [visibleTimeBounds, setVisibleTimeBounds] = useState(null);
-          const [minimapOffset, setMinimapOffset] = useState(-4);
 
-          // Restored / conformed states to support timeline interface bounds [REF: MAP-01b, UI-164b]
-          const [visibleTimeSpan, setVisibleTimeSpan] = useState('');
-          const [zoomLock, setZoomLock] = useState('auto');
+          const [allTags, setAllTags] = useState ([]);
+          const [activeTags, setActiveTags] = useState ([]);
+          const [visibleTimeBounds, setVisibleTimeBounds] = useState (null);
+          const [minimapOffset, setMinimapOffset] = useState (-4);
 
           // Restored standard basemaps configurations [REF: MAP-01b]
           const DEFAULT_BASEMAPS = [
-            { id: 'carto-light', label: 'CartoDB Light', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'xyz', maxZoom: 19, active: true, attrText: '© CartoDB', attrLink: 'https://carto.com/attributions', defaultOpacity: 1.0 },
-            { id: 'esri-sat', label: 'Esri Worlds Satellite', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
-            { id: 'esri-street', label: 'Esri World Street', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
-            { id: 'esri-topo', label: 'Esri World Topo', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
-            { id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 19, active: false, attrText: '© OSM', attrLink: 'https://openstreetmap.org/copyright', defaultOpacity: 1.0 },
-            { id: 'opentopo', label: 'OpenTopoMap (OSM)', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 17, active: false, attrText: '© OpenTopoMap', attrLink: 'https://opentopomap.org', defaultOpacity: 1.0 },
-            { id: 'protomaps-vector', label: 'Protomaps Vector Light (OSM)', type: 'base', url: 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', format: 'pbf', maxZoom: 15, active: false, attrText: '© Protomaps', attrLink: 'https://protomaps.com', defaultOpacity: 1.0 },
-            { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '', defaultOpacity: 1.0 }
+            {"id": 'carto-light', "label": 'CartoDB Light', "type": 'base', "url": 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', "format": 'xyz', "maxZoom": 19, "active": true, "attrText": '© CartoDB', "attrLink": 'https://carto.com/attributions', "defaultOpacity": 1.0},
+            {"id": 'esri-sat', "label": 'Esri Worlds Satellite', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
+            {"id": 'esri-street', "label": 'Esri World Street', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
+            {"id": 'esri-topo', "label": 'Esri World Topo', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
+            {"id": 'osm', "label": 'OpenStreetMap', "type": 'base', "url": 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": '© OSM', "attrLink": 'https://openstreetmap.org/copyright', "defaultOpacity": 1.0},
+            {"id": 'opentopo', "label": 'OpenTopoMap (OSM)', "type": 'base', "url": 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', "format": 'xyz', "maxZoom": 17, "active": false, "attrText": '© OpenTopoMap', "attrLink": 'https://opentopomap.org', "defaultOpacity": 1.0},
+            {"id": 'protomaps-vector', "label": 'Protomaps Vector Light (OSM)', "type": 'base', "url": 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', "format": 'pbf', "maxZoom": 15, "active": false, "attrText": '© Protomaps', "attrLink": 'https://protomaps.com', "defaultOpacity": 1.0},
+            {"id": 'no-basemap', "label": 'No Basemap (Blank Canvas)', "type": 'base', "url": 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', "format": 'xyz', "maxZoom": 22, "active": false, "attrText": 'Canvas', "attrLink": '', "defaultOpacity": 1.0}
           ];
         
-          const [basemapsRegistry, setBasemapsRegistry] = useState(DEFAULT_BASEMAPS);
+          const [basemapsRegistry, setBasemapsRegistry] = useState ([...DEFAULT_BASEMAPS]);
         
-          const appRef = useRef(null);
-          const hasInitializedRef = useRef(false);
-        
+          const appRef = useRef (null);
+          const hasInitializedRef = useRef (false);      
+		  
           const addLog = (msg, type = 'info') => {
             const timeStr = new Date().toTimeString().split(' ').at(0);
             setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
@@ -2907,8 +2899,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 					showButtonText=${showButtonText}
 					visibleTimeBounds=${visibleTimeBounds}
 					setVisibleTimeBounds=${setVisibleTimeBounds}
-					
-					// Complete prop bridge restoring zoom and minimize interfaces [REF: UI-164c]
 					zoomLock=${zoomLock}
 					setZoomLock=${setZoomLock}
 					visibleTimeSpan=${visibleTimeSpan}
@@ -3129,7 +3119,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.15';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.16';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
