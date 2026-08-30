@@ -325,7 +325,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.8b';
+        const APP_VERSION = 'v8.13.10';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2107,8 +2107,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.9b ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.9b ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.10 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.10 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2172,6 +2172,15 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const noHtml = String(str).replace(/<[^>]*>?/gm, '');
             return noHtml.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
           };
+
+          // Re-instated URL query & Hash parser [REF: URL-01]
+          const getOmniParam = (key) => {
+            const sp = new URLSearchParams(window.location.search);
+            let val = sp.get(key) || sp.get(`amp;${key}`);
+            if (val) return val;
+            const hp = new URLSearchParams(window.location.hash.replace(/^#\/?\??/, ''));
+            return hp.get(key) || hp.get(`amp;${key}`);
+          };
         
           const formatSmartDate = (startObj, endObj, locale) => {
             if (!startObj) return 'Undated';
@@ -2195,10 +2204,10 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           // === [ APP_ORCHESTRATOR SUBBLOCK 2: DECOUPLED DATA CONNECTION PIPELINE ] ===
           // =========================================================================
           useEffect(() => {
-            const urlParams = new URLSearchParams(window.location.search);
-            let source = urlParams.get('source') || urlParams.get('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
-            const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
-            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid');
+            // Memory Parameter Cache [REF: PERF-36]
+            const source = getOmniParam('source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+            const gid = getOmniParam('gid') || '0';
+            const bgid = getOmniParam('bgid');
         
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
@@ -2206,7 +2215,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
             const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
         
-            // --- [ ZONE 1: PURE NETWORK INGESTION (CORS Telemetry Boundary) ] ---
+            // --- [ ZONE 1: PURE NETWORK INGESTION ] ---
             Promise.all([
               fetch(fetchUrlPrimary)
                 .catch(err => { throw new Error(`Primary unreachable: ${err.message}`); })
@@ -2227,9 +2236,9 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               console.error("CMS Connection Aborted:", netErr);
               setStatus({ text: 'Connection Timeout', progress: 100, isFading: false, active: false });
               addLog(`Connection Timeout: ${netErr.message}`, 'error');
-              throw netErr; // Halt execution chain
+              throw netErr;
             })
-            // --- [ ZONE 2: DECOUPLED DATA PARSING (Syntactical Telemetry Boundary) ] ---
+            // --- [ ZONE 2: DECOUPLED DATA PARSING ] ---
             .then(([primaryCsv, basemapsCsv]) => {
               setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
               
@@ -2267,6 +2276,10 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   activeMode = hasEDTF ? 'edtf' : 'legacy';
                 }
                 const isUS = dateLocale === 'en-US';
+                
+                // Re-instated dynamic flattener [REF: MED-11]
+                const omniSplitRegex = /\||\r?\n/;
+
                 const cleaned = results.data.map((row, index) => {
                   const norm = {};
                   for (let k in row) norm[k.toLowerCase().trim()] = row[k];
@@ -2316,7 +2329,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     if (parts.length >= 1) {
                       const dateStr = parts.at(0) || '';
                       const timeStr = parts.at(1) || '';
-                      const dParts = dateStr.split(/[\/\\.\-]/);
+                      const dParts = dateStr.split(/[\/\\.-]/);
                       if (dParts.length >= 3) {
                         const tParts = timeStr ? timeStr.split(':') : [];
                         const secParts = String(tParts.at(2) || '0').split('.');
@@ -2826,7 +2839,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         
               <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 10000;"></div>
               
-              <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.7.9b - About Modal pure CSS Symbology Legends ] --- -->
+              <!-- --- [ START_SUBBLOCK: AppOrchestrator v3.7.10 - About Modal pure CSS Symbology Legends ] --- -->
               <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;">
                 <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">✕</button>
                 <div style="margin-bottom: 25px;">
@@ -2917,7 +2930,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   </div>
                 </details>
               </div>
-              <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.7.9b - About Modal pure CSS Symbology Legends ] --- -->
+              <!-- --- [ END_SUBBLOCK: AppOrchestrator v3.7.10 - About Modal pure CSS Symbology Legends ] --- -->
         
               <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
               <div id="settings-modal" class="tm-modal ${isSettingsOpen ? 'open' : ''}" style="display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px;">
@@ -2936,7 +2949,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   <div>
                     <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.9rem; color: #444;">Chrono Parse Engine Mode</label>
                     <select value=${dateEngineMode} onChange=${e => { setDateEngineMode(e.target.value); localStorage.setItem('tm_date_engine_mode', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem;">
-                      <option value="auto">Auto-Detect Chronologies (Default)</option>
+                      <option value="auto">Auto-Detect (Default)</option>
                       <option value="edtf">Strict ISO 8601-2 / EDTF Only</option>
                       <option value="legacy">Strict Gregorian Serial / DD-MM-YYYY Fallback</option>
                     </select>
@@ -2955,9 +2968,10 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
         
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.9b';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.10';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
+
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
         render(html`<${ErrorBoundary}><${App} /></${ErrorBoundary}>`, document.getElementById('root'));
         // === [ END MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
