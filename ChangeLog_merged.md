@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.11] — 2026-08-30 - AppOrchestrator v3.7.11, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+### Fixed
+- **Undefined Prop Crash (basemapsRegistry):** Restored the `basemapsRegistry` state variable and set it to a robust `DEFAULT_BASEMAPS` catalog fallback, resolving a fatal `ReferenceError` inside the `<MapViewer>` component [REF: MAP-01b].
+- **Dynamic Basemap Fetching:** Restored the sequential PAPA parser block to process incoming geographic basemaps and overlays dynamically when the `bgid` query parameter is present.
+
 ## [v8.13.10] — 2026-08-30 - AppOrchestrator v3.7.10, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Fixed
 - **Lexical V8 Parsing Repair (L2420):** Stripped nested backticks inside the status-bar height properties, utilizing single quotes and standard string concatenation to prevent engine lockup [REF: CRASH-05b].

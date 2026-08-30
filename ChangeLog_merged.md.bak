@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.10] — 2026-08-30 - AppOrchestrator v3.7.10, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+### Fixed
+- **Lexical V8 Parsing Repair (L2420):** Stripped nested backticks inside the status-bar height properties, utilizing single quotes and standard string concatenation to prevent engine lockup [REF: CRASH-05b].
+- **Undefined Ingestion Closures:** Re-anchored `getOmniParam()` for URL param/hash-routing and `omniSplitRegex` inside the parsing lifecycle, restoring functional multimedia split arrays and tags mapping [REF: URL-01, MED-11].
+
 ## [v8.13.8b] — 2026-08-30 - AppOrchestrator v3.7.9, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Refactored
 - **Decoupled Sync Boundaries:** Split raw Google Sheets API ingestion from synchronous dataset parsing (`Papa.parse`) and chronological mapping. Connection errors now map cleanly to `"Connection Timeout"`, while schema and local JS exceptions map to `"Dataset Parse Error"` [REF: ARCH-01b].

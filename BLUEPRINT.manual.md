@@ -310,6 +310,9 @@ To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-pars
 ### [REF: MAP-02c] The Anti-Swallow Indexing Pattern [UPDATED - 2026-08-30]
 During both Leaflet marker clustering and AppOrchestrator date parsing, the JavaScript engine dynamically accesses indices of array structures. To insulate the codebase from compiler filters, markdown engines, or Git tools that accidentally swallow or strip square brackets (e.g., mistaking `parts[0]` for a markdown footnote indicator), all array index mapping must explicitly use the safe ES6 `.at()` accessor prototype (e.g., `parts.at(0)`). This prevents syntax and runtime exceptions while guaranteeing strict data format alignment across all compiler channels.
 
+#### [REF: MAP-01b] Basemaps Registry Fallback & Dynamic Fetching [UPDATED - 2026-08-30]
+The MapViewer requires a conformed `basemapsRegistry` array to mount. To prevent runtime failures when loading offline or with isolated parameters, the AppOrchestrator must maintain a conformed static `DEFAULT_BASEMAPS` catalog hook within State Subblock 1. If an external `bgid` is active, the parser must merge those sheets-defined layers dynamically over the fallback basemaps, updating Leaflet tile definitions without physical DOM restarts.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>

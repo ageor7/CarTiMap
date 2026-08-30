@@ -164,6 +164,10 @@ To secure robust client-side diagnostic transparency, the data synchronization l
 The synchronization lifecycle must execute within two isolated boundaries to provide accurate telemetry:
 1. **The Ingestion Zone:** Raw asychronous fetch operations. Any failure here sets the UI state directly to "Connection Timeout".
 2. **The Data Compilation Zone:** Dynamic mappings and array manipulations. Handled inside an isolated local try-catch block, any failure sets the UI state directly to "Dataset Parse Error".
+
+#### [REF: MED-11] Local Splitting Closures [UPDATED - 2026-08-30]
+Multi-valued fields (media URLs, credits, captions, and tags) must be split on the fly inside the local parsing scope. Symmetrically, the `/\||\r?\n/` regex (`omniSplitRegex`) must be anchored within the core parsing context to avoid hoisting reference errors during rapid client-side compiles.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -561,6 +565,10 @@ Dynamic rendering variables passed to hoisted Preact layouts (`appLayout`) must 
 
 #### [REF: CRASH-05b] Dynamic Layout Dimensions [UPDATED - 2026-08-30]
 Avoid nesting backtick strings inside dynamic HTM template layouts (e.g., style="height: `${variable}px`" inside a parent html`...` tag). This forces parser collisions on downstream elements, triggering syntax errors (e.g., Error L2420). All dynamic inline styles must use standard string concatenation wrapped in single quotes (e.g., style="height: ${variable + 'px'}").
+
+#### [REF: CRASH-05b] Dynamic Viewport Bounds [UPDATED - 2026-08-30]
+Dynamic sizing on structural divs must bypass nested template literals (e.g., style="height: `${val}px`" inside parent html`...`). All layouts must use flat single-quoted string concatenation (`+ 'px'`) to maintain 100% V8 runtime parser stability.
+
 
 ---
 
