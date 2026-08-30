@@ -152,6 +152,9 @@ To prevent runtime data loss inside browser-side state-filtering loops, the Data
 [REF: ETL-01] Upstream Horizontal Ingestion Compiler (v6.1.7) [UPDATED]
 The horizontal consolidation formula (ExtractsCombinedV) must resolve spatial coordinate cell boundaries before running WKT keyword validation blocks. If a grouped coordinate cell contains multi-row inputs or inline HTML line breaks ((?i)<br\s*/?>), the formula splits them by clean newlines (CHAR(10)) and processes them as a vertical vector utilizing TOCOL(..., 1). To prevent Google Sheets from stripping leading zeroes or truncating coordinate decimals during splitting, the formula must wrap each element in temporary @-armor, stripping the character only after the transposition is complete. Furthermore, nested quotation marks inside compiled GeoJSON strings must be escaped using doubled double quotes ("") to satisfy the Sheets formula compiler.
 
+### [REF: ETL-01b] Google Sheets Ingestion (gviz/tq vs export) [UPDATED - 2026-08-29]
+To prevent client-side "Database Sync Failure" exceptions, the CarTiMap client rendering layer must exclusively fetch raw Google Sheet data utilizing Google's Visualization Query API endpoint (`/gviz/tq?tqx=out:csv&gid=...`). Developers are strictly prohibited from utilizing Google's raw file export endpoint (`/export?format=csv`). While both endpoints conceptually return CSV payloads, the `/export` endpoint does not support cross-origin queries and refuses to transmit Access-Control-Allow-Origin headers to anonymous user-agents. Reverting to `/gviz/tq` guarantees 100% CORS-compliance, permitting secure, serverless database synchronization directly inside the browser across all domains (including GitHub Pages, local files, and resource-constrained tablets).
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
