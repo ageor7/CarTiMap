@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.13] — 2026-08-30 - AppOrchestrator v3.7.13, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
+### Added
+- **Multi-Axis Panel Resizing:** Restored dynamic resize listeners (`startPrimaryResize` and `startSecondaryResize`) inside Orchestrator Subblock 6. This enables bidirectional touch/mouse dragging to resize the primary visual-content split and secondary map-media split [REF: UI-244].
+### Fixed
+- **Viewport Dimension Locking:** Re-anchored `--primary-split` and `--secondary-split` CSS variables directly to the core Preact render tree, capping layout parameters strictly between 15% and 85% to prevent complete panel collapse [REF: UI-245].
+- **Media Ingestion Bindings:** Conformed Orchestrator Subblock 11 to correctly mount the `<MediaViewer>` component in place of stale references, eliminating nested backtick parsing failures during view rendering.
+
 ## [v8.13.12] — 2026-08-30 - AppOrchestrator v3.7.12, MapViewer v6.4.22, TimelineScrubber v26.11.8 [CONFORMED]
 ### Fixed
 - **Timeline State Resolution (setVisibleTimeSpan):** Re-anchored the `visibleTimeSpan` string and `zoomLock` enum states in parent State Orchestration (Subblock 1) to eliminate Leaflet/timeline-zoom rendering crashes.
