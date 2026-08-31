@@ -3026,8 +3026,9 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
                 <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style="position: absolute; left: 0; right: 0; height: 4px; border-top: 1px solid #ddd; cursor: ns-resize; z-index: 10006; bottom: ${isTimelineMinimized ? '38px' : (timelineRequiredHeight + 38) + 'px'}"></div>
       
                 ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
-              </div>`
-            : '';
+              </div>
+			 `:
+		   };
 		
 		MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.19b';
 
