@@ -1,7 +1,7 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-## [v8.13.19b]
+## [v8.13.19b-c]
 Gemini Pro 
 
 ## [v8.13.19] — 2026-08-31 - AppOrchestrator v3.7.19, MapViewer v6.4.23, TimelineScrubber v26.11.10

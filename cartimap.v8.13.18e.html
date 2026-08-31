@@ -2148,8 +2148,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.19 ] 🔽🔽🔽
-		// === [ MAJOR BLOCK: AppOrchestrator v3.7.19 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.18e ] 🔽🔽🔽
+		// === [ MAJOR BLOCK: AppOrchestrator v3.7.18e ] ===
 
         const App = () => {
           // =========================================================================
@@ -2837,7 +2837,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
           // =========================================================================
-          const aboutBtn = aboutData 
+const aboutBtn = aboutData 
             ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;" onClick=${() => setIsAboutOpen(true)} title="Dataset Specs">
                 <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
               </button>`
@@ -2876,38 +2876,57 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
 
           const appLayout = (data.length > 0 && status.active)
             ? html`<div id="app-layout" ref=${appRef} class="${isTimelineExpanded ? 'is-expanded-timeline' : ''} ${isTimelineMinimized ? 'is-minimized-timeline' : ''}">
-                <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}">
-                  <${MapViewer}
-                    data=${data}
-                    activeIndex=${activeIndex}
-                    setActiveIndex=${jumpToSlide}
-                    addLog=${addLog}
-                    basemapsRegistry=${basemapsRegistry}
-                    maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
-                    minimapOffset=${minimapOffset}
-                    setMinimapOffset=${setMinimapOffset}
-                    maxPane=${maxPane}
-                    setMaxPane=${setMaxPane}
-                    polygonOpacity=${polygonOpacity}
-                    showButtonText=${showButtonText}
-                    visibleTimeBounds=${visibleTimeBounds}
-                  />
+                <div class="core-viewports ${maxPane ? 'max-' + maxPane : ''}">
+                  <div class="visual-pane ${hasMedia ? '' : 'no-media'}">
+                    <div class="map-pane">
+                      <${MapViewer}
+                        data=${data}
+                        activeIndex=${activeIndex}
+                        setActiveIndex=${setActiveIndex}
+                        addLog=${addLog}
+                        basemapsRegistry=${basemapsRegistry}
+                        maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
+                        minimapOffset=${minimapOffset}
+                        setMinimapOffset=${setMinimapOffset}
+                        maxPane=${maxPane}
+                        setMaxPane=${setMaxPane}
+                        polygonOpacity=${polygonOpacity}
+                        showButtonText=${showButtonText}
+                        visibleTimeBounds=${visibleTimeBounds}
+                      />
+                    </div>
+          
+                    <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize}></div>
+          
+                    <div class="media-pane">
+                      <${MediaViewer}
+                        activeSlide=${activeSlide}
+                        maxPane=${maxPane}
+                        setMaxPane=${setMaxPane}
+                      />
+                    </div>
+                  </div>
+          
+                  <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize}></div>
+          
+                  <div class="content-slider-pane">
+                    <${ContentSlider}
+                      data=${data}
+                      activeIndex=${activeIndex}
+                      setActiveIndex=${jumpToSlide}
+                      maxPane=${maxPane}
+                      setMaxPane=${setMaxPane}
+                      dateLocale=${dateLocale}
+                      formatSmartDate=${formatSmartDate}
+                    />
+                  </div>
                 </div>
       
-                <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}">
-                  <${MediaViewer}
-                    activeSlide=${activeSlide}
-                    maxPane=${maxPane}
-                    setMaxPane=${setMaxPane}
-                  />
-                </div>
-      
-                <!-- Decoupled Timeline Pane with Clean Separators (border-top duplicate removed) [REF: UI-175] -->
-                <div class="timeline-pane ${maxPane === 'timeline' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'timeline' ? 'pane-hidden' : ''}" style="height: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}; min-height: ${isTimelineMinimized ? '0px' : '45px'}; border-top: none;">
-                  <${TimelineScrubber}
+				<div class="timeline-pane ${maxPane === 'timeline' ? 'pane-maximized' : ''}${maxPane && maxPane !== 'timeline' ? 'pane-hidden' : ''}" style="height: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}; min-height: ${isTimelineMinimized ? '0px' : '45px'}">
+				  <${TimelineScrubber}
                     data=${data}
                     activeIndex=${activeIndex}
-                    setActiveIndex=${jumpToSlide}
+                    setActiveIndex=${setActiveIndex}
                     addLog=${addLog}
                     activeTags=${activeTags}
                     isTimelineExpanded=${isTimelineExpanded}
@@ -2917,10 +2936,10 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
                     showButtonText=${showButtonText}
                     visibleTimeBounds=${visibleTimeBounds}
                     setVisibleTimeBounds=${setVisibleTimeBounds}
-                    visibleTimeSpan=${visibleTimeSpan}
-                    setVisibleTimeSpan=${setVisibleTimeSpan}
                     zoomLock=${zoomLock}
                     setZoomLock=${setZoomLock}
+                    visibleTimeSpan=${visibleTimeSpan}
+                    setVisibleTimeSpan=${setVisibleTimeSpan}
                     isTimelineMinimized=${isTimelineMinimized}
                     setIsTimelineMinimized=${setIsTimelineMinimized}
                     dateLocale=${dateLocale}
@@ -2928,30 +2947,16 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
                   />
                 </div>
       
-                <!-- conformed 38px status bar. Style purging is injected to remove inputs spinner arrows [REF: UI-164c] -->
-                <div class="status-bar" style="position: absolute; left: 0; right: 0; z-index: 1000; bottom: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}; height: 38px; display: flex; align-items: center; background: #fff; border-top: 1px solid #ddd; box-sizing: border-box; padding: 0 10px;">
-                  <style>
-                    .record-select-input::-webkit-outer-spin-button,
-                    .record-select-input::-webkit-inner-spin-button {
-                      -webkit-appearance: none;
-                      margin: 0;
-                    }
-                    .record-select-input[type=number] {
-                      -moz-appearance: textfield;
-                    }
-                  </style>
+                <div class="status-bar" style="bottom: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}; height: 38px; display: flex; align-items: center; background: #fff; border-top: 1px solid #ddd; box-sizing: border-box; padding: 0 10px;">
                   <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
-                    ${aboutBtn}
-                    ${resetLayoutBtn}
-                    ${settingsBtn}
-                    ${telemetryBtn}
+                    ${aboutBtn}${resetLayoutBtn}
+                    ${settingsBtn}${telemetryBtn}
                   </div>
       
-                  <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
-                  <div class="status-center" style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; z-index: 1001; font-size: 0.95rem;">
+                  <div class="status-center" style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
                     ${prevBtn}
       
-                    <div style="display: flex; align-items: center; gap: 4px; font-family: monospace; font-size: 0.95rem;">
+                    <div style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; color: #666; font-family: monospace;">
                       <input
                         type="number"
                         class="record-select-input"
@@ -2967,49 +2972,28 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
                         onKeyDown=${(e) => {
                           e.stopPropagation();
                         }}
-                        style="width: 50px; background: rgba(0, 0, 0, 0.05); border: 1px solid #999; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.95rem; padding: 3px 0; color: inherit; outline: none;"
+                        style="width: 45px; background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.8rem; padding: 2px 0; color: inherit; outline: none;"
                       />
-                      <span style="user-select: none; opacity: 0.8;">/ ${data.length}</span>
-                    </div>
-      
+                      <span style="user-select: none; opacity: 0.7;">/ ${data.length}</span>
+                    </div>      
+
                     ${nextBtn}
 
-                    <!-- Non-bold left-aligned dynamic scale metrics directly adjacent to Next navigation control [REF: UI-164c, TL-15] -->
-                    ${visibleTimeSpan ? (() => {
-                      const parts = visibleTimeSpan.split(' (');
-                      const spanStr = parts[0] ? parts[0].replace('Span: ', '') : '';
-                      const zoomStr = parts[1] ? parts[1].replace('Zoom: ', '').replace(')', '') : '';
-                      return html`
-                        <div class="telemetry-span-zoom" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin-left: 12px; font-size: 0.8rem; line-height: 1.1; text-anchor: left; text-align: left; white-space: nowrap; font-weight: normal; user-select: none;">
-                          <div style="display: flex; align-items: center; gap: 4px;">
-                            <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>
-                            <span style="font-family: monospace; color: #333;">${spanStr}</span>
-                          </div>
-                          ${zoomStr ? html`
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                              <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>
-                              <span style="font-family: monospace; color: #333;">${zoomStr}</span>
-                            </div>
-                          ` : ''}
-                        </div>
-                      `;
-                    })() : ''}
+                    ${visibleTimeSpan ? html`<span class="semantic-time-span-left" style="font-size: 0.95rem; color: #111; margin-left: 12px; font-family: monospace; font-weight: bold; user-select: none; white-space: nowrap;">${visibleTimeSpan}</span>` : ''}
                   </div>
       
-                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
-                    ${filterBtn}
-                    ${filterPopup}
-                    ${searchBtn}
-                    ${backBtn}
+                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
+                    ${filterBtn}${filterPopup}
+                    ${searchBtn}${backBtn}
                   </div>
                 </div>
       
-                <!-- Resizer acts as the sole high-contrast taskbar divider [REF: UI-175] -->
-                <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style="position: absolute; left: 0; right: 0; height: 4px; border-top: 1px solid #ddd; cursor: ns-resize; z-index: 10006; bottom: ${isTimelineMinimized ? '38px' : (timelineRequiredHeight + 38) + 'px'}"></div>
+                <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style="bottom: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}"></div>
       
                 ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
               </div>`
             : '';
+
         
           return html`
             <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
@@ -3154,7 +3138,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
           `;
         };        
 		
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.19';
+		MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.18e';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
