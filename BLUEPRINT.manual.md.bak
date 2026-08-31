@@ -322,6 +322,13 @@ To maintain execution fluidity, the engine must avoid structural depth-traversal
 
 This evaluation bypasses the need for object type-checking and functions seamlessly across simple dates, Sets, Lists, and Interval trees.
 
+#### [REF: CHRONO-08] Absolute Unbounded/Interval Check Optimization [UPDATED - 2026-08-30]
+The ingestion pipeline identifies open-ended ranges and unbounded intervals to guarantee visual structural integrity on long-term project data. To maintain high-velocity execution, the compiler checks the root boundary coordinates of parsed dates in constant \\(O(1)\\) time:
+
+`isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY)`
+
+This bypasses costly array looping and functions smoothly across single dates, Sets, Lists, and Interval nodes.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>
@@ -628,6 +635,9 @@ When geometry compilation encounters an un-geocodable entry or coordinate syntax
 1. The engine must cleanly drop the specific features to avoid DOM halting.
 2. The pipeline must calculate the physical spreadsheet row index (`item.id + 2`).
 3. An active error marker must be dispatched straight to the Telemetry panel to alert the dataset compiler of database syntax errors.
+
+#### [REF: UI-164c] Integrated Navigation and Telemetry Cockpit [UPDATED - 2026-08-30]
+To maximize vertical workspace, the Status/Toolbar height is locked to 38px (single-line layout). Interactive buttons and input indicators must scale up by one click (e.g., font-size: 0.95rem; button padding: 4px 10px;). Timeline scale measurements (`visibleTimeSpan`) must be rendered inside the center cockpit immediately to the right of the Next control button to minimize eye tracking fatigue.
 
 
 ---

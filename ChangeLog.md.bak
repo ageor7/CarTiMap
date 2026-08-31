@@ -1,17 +1,6 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-## [v8.13.19] — 2026-08-31 - AppOrchestrator v3.7.19, MapViewer v6.4.23, TimelineScrubber v26.11.10
-### Added
-- **White Runway Theme:** Implemented a pure, high-contrast white runway background under the timeline duration track, substantially improving the legibility of overlapping patterns.
-- **Micro-Typography Telemetry:** Redesigned the scale metrics with condensed label spacing, preventing text truncation in narrow or portrait device viewports.
-
-### Fixed
-- **Athens Sewer WKT Re-rendering:** Resolved a major mapping bug where multi-line polygon coordinates in location rows (specifically representing subterranean aqueduct and conduit networks) were fragmented, failing to display on map launch.
-- **Greek Dialect Search Compatibility:** Standardised coordinate string parsing to be case-insensitive, ensuring that mixed-case entries natively render as geographical overlays.
-- **Double Taskbar Border Clashing:** Cleared the duplicate borders that cluttered the bottom status cockpit. Integrated the horizontal resizer directly into the top edge of the navigation panel, producing a clean, single-pixel interactive divider.
-- **Current Slide Numeric Steppers:** Suppressed browser-native numeric steppers/spinner arrows within the slide select box, securing a stable vertical height for the status bar.
-
 ## [v8.13.18b-e]
 Gemini Pro 
 

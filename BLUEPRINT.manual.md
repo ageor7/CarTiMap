@@ -329,6 +329,9 @@ The ingestion pipeline identifies open-ended ranges and unbounded intervals to g
 
 This bypasses costly array looping and functions smoothly across single dates, Sets, Lists, and Interval nodes.
 
+#### [REF: MAP-01b] Case-Insensitive WKT Compilation & Parenthetical Depth Validation [UPDATED - 2026-08-31]
+To preserve coordinate rendering integrity across multi-line spatial datasets, the mapping pipeline rejects standard linear string splitting. Location data fields are processed using a parenthetical-depth ingestion tokenizer. The tokenizer scans the string character-by-character, incrementing a depth counter on open parenthesis “(” and decrementing on closed parenthesis “)”. It executes newline divisions strictly when the unclosed parenthetical depth is exactly zero. Further, the WKT validation regex executes case-insensitively (`/i`) to support mixed-case coordinates (e.g., “Polygon”, “LineString”, “Point”) natively, preventing coordinate fracturing and subsequent Leaflet rendering crashes.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>
@@ -720,6 +723,9 @@ The local Dev/Ops compilation script (compile_cartimap.py) must protect git repo
 [REF: PROT-15] Boundary Self-Healing & Compiler Escape Armor [UPDATED - 2026-08-29]
 The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Symmetrically, the script replaces component payloads using a callable replacement callback that preserves the closing END_INJECT comment via the fourth matched group (m_match.group(4)), preventing duplicate blocks or orphaned characters. To recover from corrupt target files, the compiler runs a pre-flight self-healing routine: if a component possesses a start anchor but is missing a closing anchor, the script scans forward, locates the next component's starting boundary or closing </script> tag, and reconstructs the missing END_INJECT comment block in-place on the user's filesystem prior to compilation.
 
+#### [REF: CHRONO-09] White-Label Theme Runway Isolation [NEW - 2026-08-31]
+The timeline xAxisMarker duration ribbons are isolated against a solid white background runway (`background: #ffffff;`) inside the track container. This architectural styling choice decouples the bottom runway from the alternating tag-lane grey stripes on the swimlanes above, guaranteeing maximum visual contrast for overlapping translucent trapezoids and hatched approximate qualifiers.
+
 ---
 
 ## 8. Grid Topology & Stacking Domination <a name="category-8"></a>
@@ -780,6 +786,17 @@ To prevent fatal browser compilation crashes (SyntaxError: unexpected token: ide
 
 *   **[REF: BOOT-CRASH-03] Character Class Escape Parity [UPDATED]:** Regular expression literals inside utility components must open with an unescaped forward slash (/) and escape any literal slashes within bracket classes (e.g., `[\/\\.-]`). If a leading slash is escaped or an inner slash is left unescaped, compile-time syntax errors cascade down the DOM tree.
 *   **[REF: CRASH-07] Bracket Stripping Immunity [ENFORCED]:** Accessing first-elements inside array split loops must utilize `.at(0)` or `.shift()`. Standard bracket accessors (like ``) are banned within the core ingestion hooks to insulate strings against automatic bracket-stripping in markdown-based translation pipelines.
+
+## Category: 10. Grid Topology & Stacking Domination
+
+#### [REF: UI-175] Coupled Resizer & Separator Architecture [UPDATED - 2026-08-31]
+To eliminate duplicate visual dividers, static border properties are purged from the `.timeline-pane` and `.status-bar` structures. Symmetrically, the interactive timeline resizer handle (`.resizer-dyn-timeline`) is styled as the primary divider line (`border-top: 1px solid #ddd`), anchored precisely above the 38px status bar wrapper at `bottom: timelineRequiredHeight + 38px` (or `38px` if minimized), serving as a single-pixel tactile boundary between viewports.
+
+
+---
+
+#### [REF: UI-164c] Condensed Micro-Typography & Cockpit Layout [UPDATED - 2026-08-31]
+To prevent layout overflows under narrow aspect ratios, the dynamic `visibleTimeSpan` readout is stripped of all bold properties. Static key text nodes (“Span:”, “Zoom:”) are styled using a narrow condensed sans-serif font family (`font-family: 'Arial Narrow', sans-serif; font-stretch: condensed;`), while dynamic values retain monospaced alignments. The telemetry block is left-aligned and placed directly adjacent to the centered previous/next navigation buttons, optimizing horizontal viewport space.
 
 
 
