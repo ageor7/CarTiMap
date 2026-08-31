@@ -2148,13 +2148,13 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.18e ] 🔽🔽🔽
-		// === [ MAJOR BLOCK: AppOrchestrator v3.7.18e ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.19 ] 🔽🔽🔽
+		// === [ MAJOR BLOCK: AppOrchestrator v3.7.19 ] ===
 
+        // =========================================================================
+        // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
+        // =========================================================================
         const App = () => {
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
-          // =========================================================================
           const [logs, setLogs] = useState ([]);
           const [rawCsvRows, setRawCsvRows] = useState ([]);
           const [unfilteredData, setUnfilteredData] = useState ([]);
@@ -2744,6 +2744,24 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
           const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
         
           // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 8B: NAVIGATION CONTROLS ] ===
+          // =========================================================================
+          const jumpToSlide = (newIdx, isSequential = false) => {
+            if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
+              if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
+              setActiveIndex(newIdx);
+            }
+          };
+        
+          const goBack = () => {
+            if (slideHistory.length > 0) {
+              const prev = slideHistory[slideHistory.length - 1];
+              setSlideHistory(h => h.slice(0, -1));
+              setActiveIndex(prev);
+            }
+          };
+
+          const searchResults = executeSearch(debouncedSearchQuery);          // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
           // =========================================================================
             // High-fidelity Compass & Bracket Base Vector Graphics Restored [REF: UI-236b]
