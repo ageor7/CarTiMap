@@ -80,6 +80,15 @@ Regular expression literals parsed natively by the browser must strictly utilize
 [REF: BOOT-CRASH-04] Regular Expression Literal Boundary Escaping [NEW — 2026-08-27]:
 Inside native JavaScript regular expression literals (/.../), the forward slash / acts as the absolute delimiter boundary. Even when nested within character classes [...] —where standard punctuation operators are evaluated as literal strings— a forward slash must be explicitly escaped with a leading backslash (\/). Omission of this escape causes the browser's lexical parser to evaluate the unescaped slash as the closing boundary of the regular expression, exposing the remaining character class characters as executable code and triggering an instant SyntaxError that aborts script tokenization on boot.
 
+#### [REF: DOC-02] Architectural SubBlock Taxonomy [UPDATED - 2026-09-02]
+To eliminate cascading errors, prevent attention mask decay, and enable risk-free surgical patching, all major component Blocks (AppOrchestrator, MapViewer, TimelineScrubber) are strictly partitioned into distinct topological boundaries. Symmetrically, as development progresses and logical density scales, the developer AI must introduce progressively smaller, highly granular Subblocks (each rigidly capped at a maximum of 80 lines). Each subblock must be bounded by explicit alphanumeric comment anchors:
+- `// --- [ START_SUBBLOCK: LogicDescription ] ---`
+- `// --- [ END_SUBBLOCK: LogicDescription ] ---`
+This isolation guarantees that Virtual DOM transitions, kinetic camera calculations, and state handling are physically decoupled, preventing adjacent logic from being mutated or dropped during token serialization.
+
+#### [REF: PROT-16] Whole-Block Delivery Mandate [NEW - 2026-09-02]
+To prevent compiler crashes due to truncated state declarations, unresolved dependencies, or orphaned variable scope, the developer AI is strictly prohibited from delivering fragmented code line suggestions. All updates must be delivered purely in the form of 100% intact, complete component Blocks, or fully compiled, self-contained Subblocks. Every delivered block must contain all required state declarations, React hooks, and render streams intact, guaranteeing browser-native compilation on a single copy-paste transaction.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>

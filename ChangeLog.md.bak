@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.24] — 2026-09-02 — AppOrchestrator v3.7.23, MapViewer v6.4.25, TimelineScrubber v26.11.12 [CONFORMED]
+### Added
+- **DSSMP v3.0 Protocol Upgrade [REF: PROT-16]:** Implemented the mandatory Dual-Signature Software Modification Protocol v3.0, strictly forbidding the delivery of fragmented code lines and mandating 100% intact whole-block or self-contained subblock deliveries to eliminate orphaned hook regressions.
+- **Dynamic Subblock Partitioning [REF: DOC-02]:** Established a strict 80-line typographic ceiling for subblock isolation. Mandated the continuous introduction of smaller, highly localized subblocks as component logical density scales, safeguarding the compiler against local attention mask decay.
+
 ## [v8.13.23] — 2026-09-02 — AppOrchestrator v3.7.22b, MapViewer v6.4.25, TimelineScrubber v26.11.12 [CONFORMED]
 ### Fixed
 - **CORS Database Sync Failure [REF: CRASH-02]:** Resolved CORS network blocks ('TypeError: Failed to fetch') on remote staging domains and local sandboxes. Reverted primary data ingestion (`fetchUrlPrimary`) and secondary basemaps config (`fetchUrlBasemaps`) from direct `/export` routes to CORS-relaxed Google Visualization API queries (`/gviz/tq?tqx=out:csv`).
