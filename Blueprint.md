@@ -170,6 +170,9 @@ Multi-valued fields (media URLs, credits, captions, and tags) must be split on t
 #### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
 The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
 
+#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
+The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -491,6 +494,12 @@ To ensure a frictionless retrieval experience —especially critical for Polyton
 #### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
 Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
 
+#### [REF: SEARCH-02] Advanced Normalization & Agnosticism (Search Engine) [UPDATED - 2026-09-02]
+To ensure a frictionless retrieval experience —especially critical for Polytonic Greek historical archives— the search indexer is explicitly decoupled from raw data strings. The search indexer utilizes contains-matching over raw fields to preserve indexing properties of diacritics and HTML-formatted slides like the Help card. Symmetrically, the AppOrchestrator utilizes a specialized `stripAndNormalize` regex closure. This engine sequentially: 1) Executes NFD Unicode decomposition to mathematically separate base characters from their diacritics. 2) Strips the tonal markers, enforcing a perfect case-and-accent-agnostic search matrix.
+
+#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
+Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
+
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>
@@ -756,6 +765,10 @@ The local Dev/Ops compilation script (compile_cartimap.py) must protect git repo
 
 #### [REF: CHRONO-09] White-Label Theme Runway Isolation [NEW - 2026-08-31]
 The timeline xAxisMarker duration ribbons are isolated against a solid white background runway (`background: #ffffff;`) inside the track container. This architectural styling choice decouples the bottom runway from the alternating tag-lane grey stripes on the swimlanes above, guaranteeing maximum visual contrast for overlapping translucent trapezoids and hatched approximate qualifiers.
+
+#### [REF: CRASH-02] Cross-Origin (CORS) Ingestion Armor [UPDATED - 2026-09-02]
+Google Sheets direct `/export?format=csv` downloads lack explicit wildcard `Access-Control-Allow-Origin: *` headers, throwing silent, catastrophic network violations ('TypeError: Failed to fetch') when requested by client-side browser runtimes executing from remote staging domains or local filesystems (`file://`). To protect system connectivity, the data pipeline strictly routes data parsing endpoints through the Google Visualization query API (`/gviz/tq?tqx=out:csv`), which natively guarantees CORS compliance for unauthenticated single-page architectures.
+
 
 #### [REF: CRASH-02] Cross-Origin (CORS) Ingestion Armor [UPDATED - 2026-09-02]
 Google Sheets direct `/export?format=csv` downloads lack explicit wildcard `Access-Control-Allow-Origin: *` headers, throwing silent, catastrophic network violations ('TypeError: Failed to fetch') when requested by client-side browser runtimes executing from remote staging domains or local filesystems (`file://`). To protect system connectivity, the data pipeline strictly routes data parsing endpoints through the Google Visualization query API (`/gviz/tq?tqx=out:csv`), which natively guarantees CORS compliance for unauthenticated single-page architectures.

@@ -757,6 +757,9 @@ The local Dev/Ops compilation script (compile_cartimap.py) must protect git repo
 #### [REF: CHRONO-09] White-Label Theme Runway Isolation [NEW - 2026-08-31]
 The timeline xAxisMarker duration ribbons are isolated against a solid white background runway (`background: #ffffff;`) inside the track container. This architectural styling choice decouples the bottom runway from the alternating tag-lane grey stripes on the swimlanes above, guaranteeing maximum visual contrast for overlapping translucent trapezoids and hatched approximate qualifiers.
 
+#### [REF: CRASH-02] Cross-Origin (CORS) Ingestion Armor [UPDATED - 2026-09-02]
+Google Sheets direct `/export?format=csv` downloads lack explicit wildcard `Access-Control-Allow-Origin: *` headers, throwing silent, catastrophic network violations ('TypeError: Failed to fetch') when requested by client-side browser runtimes executing from remote staging domains or local filesystems (`file://`). To protect system connectivity, the data pipeline strictly routes data parsing endpoints through the Google Visualization query API (`/gviz/tq?tqx=out:csv`), which natively guarantees CORS compliance for unauthenticated single-page architectures.
+
 ---
 
 ## 8. Grid Topology & Stacking Domination <a name="category-8"></a>
