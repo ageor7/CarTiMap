@@ -1,6 +1,18 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.23] — 2026-09-02 — AppOrchestrator v3.7.22b, MapViewer v6.4.25, TimelineScrubber v26.11.12 [CONFORMED]
+### Fixed
+- **CORS Database Sync Failure [REF: CRASH-02]:** Resolved CORS network blocks ('TypeError: Failed to fetch') on remote staging domains and local sandboxes. Reverted primary data ingestion (`fetchUrlPrimary`) and secondary basemaps config (`fetchUrlBasemaps`) from direct `/export` routes to CORS-relaxed Google Visualization API queries (`/gviz/tq?tqx=out:csv`).
+- **L2228 State Hook Syntax Error:** Cleared browser-level lexical compilation crashes by purging an escaped literal carriage character (`\n`) within the `showButtonText` state hook initialization closure.
+- **Sticky Modal Closures [REF: UI-176b]:** Re-engineered About and Search modal frames (`#about-modal`, `#search-modal`) into vertical Flex containers with fixed header sections. Anchored the close `[X]` buttons permanently at the top-right while nesting narrative body text inside scrollable viewports (`overflow-y: auto`).
+- **Resizer Depth Stacking Overlaps:** Resolved timeline sizer bleed-through by lowering the `.resizer-dyn-timeline` layer weight to `z-index: 90` to render cleanly below global overlay backdrop masks.
+- **Search Index Lookup [REF: SEARCH-02]:** Reverted search indexing to contains-matching over raw fields, restoring diacritic-insensitive lookup speed and resolving the index omission of diacritics and HTML tags.
+
+### Added
+- **Extract Type Stream Filtering [REF: ETL-14c]:** Configured native ingestion for the `Extract Type` database parameter (Column 18) and bound it to global state filtering rules, dynamically segmenting data across four stream layers: `Storyline` (default), `Context`, `Related history`, and `Presentation`.
+- **Interactive Stream Cockpit Toggles:** Deployed stream-filtering checkbox selectors inside the status cockpit drawer, allowing users to intersect narrative data layers dynamically on the timeline.
+
 ### Fixed
 - **CORS Database Sync Failure [REF: CRASH-02]:** Resolved CORS violations blocking Google Sheet database retrieval on external domains. Reverted primary data ingestion (`fetchUrlPrimary`) and secondary basemaps registry (`fetchUrlBasemaps`) transport layers from direct `/export` downloads to CORS-relaxed Google Visualization API endpoints (`/gviz/tq?tqx=out:csv`).
 
