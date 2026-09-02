@@ -1,8 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-## [v8.13.19b-c]
-Gemini Pro 
+## [v8.13.20] — 2026-09-02 - AppOrchestrator v3.7.20, MapViewer v6.4.24, TimelineScrubber v26.11.11 [CONFORMED]
+### Fixed
+- **Narrative Pane Recovery:** Repaired the layout regression that caused the entire text panel wrapping the `ContentSlider` component to fail to mount.
+- **Taskbar Bottom Leak:** Fixed the layout breakdown that caused a white space gap below the status cockpit. Re-engineered the container logic from absolute positioning to clean flex column layout.
+- **Media Pane Vertical Compression:** Resolved the spatial clamping of the Media Viewer, allowing it to dynamically stretch down to the top of the 38px status bar when the timeline drawer is collapsed.
+- **Z-Index Modals Stacking:** Patched `.tm-modal` and `.tm-backdrop` style rules with dominant layer depths, ensuring they render cleanly on top of active timeline splitters.
 
 ## [v8.13.19] — 2026-08-31 - AppOrchestrator v3.7.19, MapViewer v6.4.23, TimelineScrubber v26.11.10
 ### Added

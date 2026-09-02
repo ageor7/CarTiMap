@@ -152,6 +152,22 @@ To prevent runtime data loss inside browser-side state-filtering loops, the Data
 [REF: ETL-01] Upstream Horizontal Ingestion Compiler (v6.1.7) [UPDATED]
 The horizontal consolidation formula (ExtractsCombinedV) must resolve spatial coordinate cell boundaries before running WKT keyword validation blocks. If a grouped coordinate cell contains multi-row inputs or inline HTML line breaks ((?i)<br\s*/?>), the formula splits them by clean newlines (CHAR(10)) and processes them as a vertical vector utilizing TOCOL(..., 1). To prevent Google Sheets from stripping leading zeroes or truncating coordinate decimals during splitting, the formula must wrap each element in temporary @-armor, stripping the character only after the transposition is complete. Furthermore, nested quotation marks inside compiled GeoJSON strings must be escaped using doubled double quotes ("") to satisfy the Sheets formula compiler.
 
+### [REF: ETL-01b] Google Sheets Ingestion (gviz/tq vs export) [UPDATED - 2026-08-29]
+To prevent client-side "Database Sync Failure" exceptions, the CarTiMap client rendering layer must exclusively fetch raw Google Sheet data utilizing Google's Visualization Query API endpoint (`/gviz/tq?tqx=out:csv&gid=...`). Developers are strictly prohibited from utilizing Google's raw file export endpoint (`/export?format=csv`). While both endpoints conceptually return CSV payloads, the `/export` endpoint does not support cross-origin queries and refuses to transmit Access-Control-Allow-Origin headers to anonymous user-agents. Reverting to `/gviz/tq` guarantees 100% CORS-compliance, permitting secure, serverless database synchronization directly inside the browser across all domains (including GitHub Pages, local files, and resource-constrained tablets).
+
+#### [REF: ARCH-01b] Decoupled Data Pipeline (Ingestion vs. Parsing Telemetry) [NEW - 2026-08-30]
+To secure robust client-side diagnostic transparency, the data synchronization lifecycle must be split into two isolated, sequential execution bounds:
+- **Ingestion Zone:** Contains only the asynchronous promise network chains. Rejection here strictly indicates origin blocking (CORS), unreachability, or transport-layer timeouts, setting the UI state directly to `"Connection Timeout"`.
+- **Compilation Zone:** Contains CSV parsing (`Papa.parse`), chronological normalization, and index mapping. Handled inside a local `try-catch` scope, any runtime or structural mapping exceptions caught here designate localized formatting or variable typing failures, setting the UI state directly to `"Dataset Parse Error"`.
+
+#### [REF: ARCH-01b] Decoupled Data Pipeline (CORS vs Parse Boundaries) [NEW - 2026-08-30]
+The synchronization lifecycle must execute within two isolated boundaries to provide accurate telemetry:
+1. **The Ingestion Zone:** Raw asychronous fetch operations. Any failure here sets the UI state directly to "Connection Timeout".
+2. **The Data Compilation Zone:** Dynamic mappings and array manipulations. Handled inside an isolated local try-catch block, any failure sets the UI state directly to "Dataset Parse Error".
+
+#### [REF: MED-11] Local Splitting Closures [UPDATED - 2026-08-30]
+Multi-valued fields (media URLs, credits, captions, and tags) must be split on the fly inside the local parsing scope. Symmetrically, the `/\||\r?\n/` regex (`omniSplitRegex`) must be anchored within the core parsing context to avoid hoisting reference errors during rapid client-side compiles.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -290,6 +306,31 @@ To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and secure epistemic
 
 #### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-08-29]
 To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate coordinates strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
+
+### [REF: MAP-02c] The Anti-Swallow Indexing Pattern [UPDATED - 2026-08-30]
+During both Leaflet marker clustering and AppOrchestrator date parsing, the JavaScript engine dynamically accesses indices of array structures. To insulate the codebase from compiler filters, markdown engines, or Git tools that accidentally swallow or strip square brackets (e.g., mistaking `parts[0]` for a markdown footnote indicator), all array index mapping must explicitly use the safe ES6 `.at()` accessor prototype (e.g., `parts.at(0)`). This prevents syntax and runtime exceptions while guaranteeing strict data format alignment across all compiler channels.
+
+#### [REF: MAP-01b] Basemaps Registry Fallback & Dynamic Fetching [UPDATED - 2026-08-30]
+The MapViewer requires a conformed `basemapsRegistry` array to mount. To prevent runtime failures when loading offline or with isolated parameters, the AppOrchestrator must maintain a conformed static `DEFAULT_BASEMAPS` catalog hook within State Subblock 1. If an external `bgid` is active, the parser must merge those sheets-defined layers dynamically over the fallback basemaps, updating Leaflet tile definitions without physical DOM restarts.
+
+#### [REF: CHRONO-08] Absolute Unbounded/Interval Check Optimization [UPDATED - 2026-08-30]
+The ingestion pipeline must identify open-ended ranges and unbounded intervals (such as ISO 8601-2 Level 2 Choice Sets with undefined endings) to guarantee structural parity in long-term data preservation. 
+
+To maintain execution fluidity, the engine must avoid structural depth-traversals of nested Abstract Syntax Trees (AST) or array-matching loops during real-time rendering. Because the native `compileCartiMapAST` decorator recursively propagates infinity limits up to the root boundaries of the parsed date node, checking the absolute limits of the computed timestamps resolves unboundedness in mathematical \\(O(1)\\) complexity:
+
+`isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY)`
+
+This evaluation bypasses the need for object type-checking and functions seamlessly across simple dates, Sets, Lists, and Interval trees.
+
+#### [REF: CHRONO-08] Absolute Unbounded/Interval Check Optimization [UPDATED - 2026-08-30]
+The ingestion pipeline identifies open-ended ranges and unbounded intervals to guarantee visual structural integrity on long-term project data. To maintain high-velocity execution, the compiler checks the root boundary coordinates of parsed dates in constant \\(O(1)\\) time:
+
+`isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY)`
+
+This bypasses costly array looping and functions smoothly across single dates, Sets, Lists, and Interval nodes.
+
+#### [REF: MAP-01b] Case-Insensitive WKT Compilation & Parenthetical Depth Validation [UPDATED - 2026-08-31]
+To preserve coordinate rendering integrity across multi-line spatial datasets, the mapping pipeline rejects standard linear string splitting. Location data fields are processed using a parenthetical-depth ingestion tokenizer. The tokenizer scans the string character-by-character, incrementing a depth counter on open parenthesis “(” and decrementing on closed parenthesis “)”. It executes newline divisions strictly when the unclosed parenthetical depth is exactly zero. Further, the WKT validation regex executes case-insensitively (`/i`) to support mixed-case coordinates (e.g., “Polygon”, “LineString”, “Point”) natively, preventing coordinate fracturing and subsequent Leaflet rendering crashes.
 
 ---
 
@@ -541,6 +582,67 @@ To support micro-chronological geographic modeling—such as military or diploma
 **[REF: BOOT-CRASH-03b] Character Class Escaping and Hyphen Bounds:**
 To isolate the regular expression engine from unexpected system encodings or polytonic Greek character overlaps, all hyphens (-) utilized inside active split arrays (places, sublabels, dates) must be explicitly escaped as \- or anchored to the absolute far-right boundary of the bracket. Ingesting unescaped hyphens in the middle of character classes (e.g., [\\/\\\\-.]) forces the browser to evaluate character ranges based on ASCII codes. If the character preceding the hyphen holds a higher decimal value than the trailing character, the JS compiler immediately throws a fatal "invalid range in character class" SyntaxError, blocking the Preact boot sequence.
 
+#### [REF: CRASH-05b] Nested Template Literal Syntax Guard [UPDATED - 2026-08-30]
+Dynamic rendering variables passed to hoisted Preact layouts (`appLayout`) must strictly avoid nested backtick structures (e.g., `` `\${height}px` `` inside `html` tag literals). Lexical parsers in standard browser V8 engines interpret inner backticks as template closures, prematurely terminating the parent literal and triggering fatal syntax errors. All variable property calculations must utilize standard JavaScript string concatenation (e.g., `height + 'px'`) to maintain single-file compilation integrity.
+
+#### [REF: CRASH-05b] Dynamic Layout Dimensions [UPDATED - 2026-08-30]
+Avoid nesting backtick strings inside dynamic HTM template layouts (e.g., style="height: `${variable}px`" inside a parent html`...` tag). This forces parser collisions on downstream elements, triggering syntax errors (e.g., Error L2420). All dynamic inline styles must use standard string concatenation wrapped in single quotes (e.g., style="height: ${variable + 'px'}").
+
+#### [REF: CRASH-05b] Dynamic Viewport Bounds [UPDATED - 2026-08-30]
+Dynamic sizing on structural divs must bypass nested template literals (e.g., style="height: `${val}px`" inside parent html`...`). All layouts must use flat single-quoted string concatenation (`+ 'px'`) to maintain 100% V8 runtime parser stability.
+
+#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
+To avoid component-level scope leaks, the active zoom parameters and computed semantic time spans must be managed by the parent AppOrchestrator. `<TimelineScrubber>` must remain a conformed presentation and event-capture layer, receiving state mutators (`setVisibleTimeSpan`, `setZoomLock`) and boundary properties (`timelineRequiredHeight`, `dateLocale`) as explicit React props. Any alteration to state-hoisting that separates these mutators from the parent render tree will crash the V8 runtime upon timeline scroll or drag interactions.
+
+#### [REF: UI-244] Multi-Axis Dynamic Resizing [UPDATED - 2026-08-30]
+The application layout relies on mathematical partitioning between visual media components and raw text sliders. To maintain dynamic responsive rendering without CSS repaint lag, the parent AppOrchestrator must bind structural drag-resizers to the window's mouse/touch interaction threads.
+1. Primary splitter resizes visual panels against content slides on the X-axis (bound strictly between 15% and 85% width).
+2. Secondary splitter divides map views from media views on the Y-axis (bound strictly between 10% and 90% height).
+All drag delta offsets must write straight to CSS variables (`--primary-split` and `--secondary-split`) on the `#app-layout` element, triggering smooth layout recalculations on Leaflet and SVG render paths without hard state-level re-draws.
+
+#### [REF: UI-245] Structural Collapse Shields [UPDATED - 2026-08-30]
+Any drag action that drives a partition width or height to 0% will completely drop active component event listeners, causing standard scrolling and zoom mechanisms to lock. The drag handlers must execute strict clamp checks prior to setting properties, enforcing hard minimum sizes of 15% for the primary panel and 10% for secondary structures.
+
+#### [REF: UI-164c] Timeline Scrubber Component Interface Stability [UPDATED - 2026-08-30]
+Presentation-layer visual controllers, such as the SVG ruler timeline and zoom clusters, must never independently mutate global canvas scales. The parent AppOrchestrator retains absolute state ownership over variables tracking physical layout parameters (e.g., active swimlane dimensions, temporal spans, and zoom-lock flags). 
+
+Components (specifically <TimelineScrubber> and <MapViewer>) must remain pure, reactively rendering coordinates from incoming props and reporting physical telemetry changes via verified state callback mutators. Severing this interface bridge or leaving state setters unpassed during instantiation instantly breaks V8 compilation upon rendering loops.
+
+#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
+The parent AppOrchestrator state tree and the child <TimelineScrubber> communicate scale computations strictly via the `setVisibleTimeSpan` callback prop. 
+
+To maintain the architectural boundary between state calculation and DOM representation:
+1. The raw state variable `visibleTimeSpan` is held in parent scope.
+2. The interactive calculation is processed at 60fps in the child scrubber.
+3. The resulting string **must** be explicitly consumed and rendered within a dedicated `.semantic-time-span` element inside the left-aligned status bar (`status-left`). 
+4. This placement isolates high-frequency text-node repaints away from the interactive center record navigation cockpit, preserving structural performance.
+
+#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
+The parent AppOrchestrator state tree and the child <TimelineScrubber> communicate scale computations and temporal measurements strictly via the `setVisibleTimeSpan` callback prop. 
+
+To maintain the strict architectural boundary between performance-intensive calculations and visual representation:
+1. The raw state variable `visibleTimeSpan` must reside in parent scope.
+2. The active scale-delta is calculated inside the child scrubber's execution thread.
+3. The resulting string must be rendered within a dedicated `.semantic-time-span-left` node inside the left-aligned status bar (`status-left`).
+4. This specific placement isolates frequent layout reflows away from the center record navigation cockpit (`record-select-input`), preserving keyboard focus and ensuring 60fps responsiveness on tablet-class viewports.
+
+#### [REF: UI-164c] Integrated Navigation and Telemetry Cockpit [UPDATED - 2026-08-30]
+To maximize real estate for high-density historical mapping, the Status/Toolbar height is strictly capped at 38px, restricting layout rendering to a single line. Interactive buttons and text inputs within this container must be scaled up by one click (e.g., font-size: 0.95rem; button padding: 4px 10px;) to maintain tactile accessibility. 
+
+Timeline scale measurements and dynamic zoom spans (`visibleTimeSpan`) must be rendered within a dedicated text node in the center cockpit, positioned immediately to the right of the Next control button. This alignment minimizes eye tracking fatigue during chronological scrubbing.
+
+#### [REF: MAP-01f] Non-Destructive Ingestion & Telemetry Diagnostics [UPDATED - 2026-08-30]
+The MapViewer GIS pipeline strictly rejects native regex fallback approximations for malformed Well-Known Text (WKT). The presentation engine is a renderer, not a correction tool. Location coordinate cells must be parsed by splitting on HTML breaks (`<br>`) and platform-native newlines (`\r\n`, `\n`, `\r`) recursively. 
+
+When geometry compilation encounters an un-geocodable entry or coordinate syntax failure:
+1. The engine must cleanly drop the specific features to avoid DOM halting.
+2. The pipeline must calculate the physical spreadsheet row index (`item.id + 2`).
+3. An active error marker must be dispatched straight to the Telemetry panel to alert the dataset compiler of database syntax errors.
+
+#### [REF: UI-164c] Integrated Navigation and Telemetry Cockpit [UPDATED - 2026-08-30]
+To maximize vertical workspace, the Status/Toolbar height is locked to 38px (single-line layout). Interactive buttons and input indicators must scale up by one click (e.g., font-size: 0.95rem; button padding: 4px 10px;). Timeline scale measurements (`visibleTimeSpan`) must be rendered inside the center cockpit immediately to the right of the Next control button to minimize eye tracking fatigue.
+
+
 ---
 
 ## 6. Algorithms, Analytics & Methodologies <a name="category-6"></a>
@@ -621,6 +723,9 @@ The local Dev/Ops compilation script (compile_cartimap.py) must protect git repo
 [REF: PROT-15] Boundary Self-Healing & Compiler Escape Armor [UPDATED - 2026-08-29]
 The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Symmetrically, the script replaces component payloads using a callable replacement callback that preserves the closing END_INJECT comment via the fourth matched group (m_match.group(4)), preventing duplicate blocks or orphaned characters. To recover from corrupt target files, the compiler runs a pre-flight self-healing routine: if a component possesses a start anchor but is missing a closing anchor, the script scans forward, locates the next component's starting boundary or closing </script> tag, and reconstructs the missing END_INJECT comment block in-place on the user's filesystem prior to compilation.
 
+#### [REF: CHRONO-09] White-Label Theme Runway Isolation [NEW - 2026-08-31]
+The timeline xAxisMarker duration ribbons are isolated against a solid white background runway (`background: #ffffff;`) inside the track container. This architectural styling choice decouples the bottom runway from the alternating tag-lane grey stripes on the swimlanes above, guaranteeing maximum visual contrast for overlapping translucent trapezoids and hatched approximate qualifiers.
+
 ---
 
 ## 8. Grid Topology & Stacking Domination <a name="category-8"></a>
@@ -636,6 +741,9 @@ When the user queries the database index via the Search Modal, the action list r
 
 #### [REF: CRASH-05b] Template Literal Decoupling & Isolation [NEW - 2026-08-29]
 To prevent fatal browser-level parsing errors (SyntaxError: unexpected token: identifier), any complex conditional HTML element containing template strings must be decoupled from the core JSX template rendering stream. Tagged template expressions (e.g., `html\`...\``) nested deeply within larger template interpolation blocks (`\${...}`) can trigger lexical collisions in browser engines when interpreted in a single-file environment. By compiling the sub-component into an independent state variable (such as `downloadBtn`) before the core JSX return declaration, the parsing contexts are strictly separated, securing 100% engine stability and cross-viewport compatibility.
+
+#### [REF: CRASH-05b] Hoisted Variable Isolation & Escaping [UPDATED - 2026-08-29]
+To completely insulate the Preact Virtual DOM from browser-level lexer crashes (e.g., SyntaxError: unexpected token: identifier), nesting conditional template strings (such as html`...`) inside the main return block's JSX placeholders is strictly deprecated. Deep-nesting triggers catastrophic compiler collisions when parsed client-side in a monolithic file. All conditional or complex HTML elements must be extracted and declared as independent JS constants (e.g., downloadBtn, backBtn, prevBtn) *above* the core JSX render stream. This physical decoupling isolates the string parsing contexts, securing 100% engine stability and maintaining a deterministic constant-time render frame.
 
 ---
 
@@ -656,6 +764,9 @@ All physical carriage returns must rely on native, hardware-level line breaks
 to preserve absolute cross-browser portability and ensure offline Preact 
 reconciliation stability.
 
+#### [REF: CRASH-05b] Zero-Nesting Decoupled Architecture [UPDATED - 2026-08-29]
+To permanently insulate the Preact Virtual DOM from browser-level lexer crashes (such as `unexpected token: identifier`), deep-nesting conditional template strings (`html`...`) inside the main return block's JSX placeholders is strictly prohibited. Low-spec browser engines frequently fail to balance backticks nested within placeholders. Symmetrically, all conditional blocks, modals, loops, and button text segments must be hoisted and resolved into independent JavaScript constants *prior* to the main return statement. The final JSX stream must only interpolate flat variables (e.g., `${loadingScreen}`, `${appLayout}`), securing 100% engine stability and ensuring clean execution across restricted mobile devices and field tablets.
+
 #### [REF: CRASH-05b] Nested Template Literal Escaping [NEW - 2026-08-29]
 To prevent fatal browser compilation crashes (SyntaxError: unexpected token: identifier), any secondary Preact html template string nested inside the main App component's return literal must explicitly escape its backticks using backslashes (\`). If unescaped, the browser's parser interprets the first nested backtick as the termination of the outer template literal, forcing the following HTML markup to parse as raw JavaScript execution code. This instantly breaks the document thread, preventing the Virtual DOM from mounting. Escaping nested backticks isolates the inner arrays, securing 100% rendering stability.
 
@@ -675,6 +786,17 @@ To prevent fatal browser compilation crashes (SyntaxError: unexpected token: ide
 
 *   **[REF: BOOT-CRASH-03] Character Class Escape Parity [UPDATED]:** Regular expression literals inside utility components must open with an unescaped forward slash (/) and escape any literal slashes within bracket classes (e.g., `[\/\\.-]`). If a leading slash is escaped or an inner slash is left unescaped, compile-time syntax errors cascade down the DOM tree.
 *   **[REF: CRASH-07] Bracket Stripping Immunity [ENFORCED]:** Accessing first-elements inside array split loops must utilize `.at(0)` or `.shift()`. Standard bracket accessors (like ``) are banned within the core ingestion hooks to insulate strings against automatic bracket-stripping in markdown-based translation pipelines.
+
+## Category: 10. Grid Topology & Stacking Domination
+
+#### [REF: UI-175] Coupled Resizer & Separator Architecture [UPDATED - 2026-08-31]
+To eliminate duplicate visual dividers, static border properties are purged from the `.timeline-pane` and `.status-bar` structures. Symmetrically, the interactive timeline resizer handle (`.resizer-dyn-timeline`) is styled as the primary divider line (`border-top: 1px solid #ddd`), anchored precisely above the 38px status bar wrapper at `bottom: timelineRequiredHeight + 38px` (or `38px` if minimized), serving as a single-pixel tactile boundary between viewports.
+
+
+---
+
+#### [REF: UI-164c] Condensed Micro-Typography & Cockpit Layout [UPDATED - 2026-08-31]
+To prevent layout overflows under narrow aspect ratios, the dynamic `visibleTimeSpan` readout is stripped of all bold properties. Static key text nodes (“Span:”, “Zoom:”) are styled using a narrow condensed sans-serif font family (`font-family: 'Arial Narrow', sans-serif; font-stretch: condensed;`), while dynamic values retain monospaced alignments. The telemetry block is left-aligned and placed directly adjacent to the centered previous/next navigation buttons, optimizing horizontal viewport space.
 
 
 
