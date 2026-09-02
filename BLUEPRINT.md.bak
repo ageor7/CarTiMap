@@ -485,6 +485,12 @@ To maintain GIS database standards, the fallback regex marker generation is enti
 #### [REF: MAP-01c] Parenthetical-Depth Tokenizer [NEW - 2026-09-02]
 Multiline cells containing raw WKT geometry definitions are protected from newline-splitting bugs using a parenthetical identifier scanner. If a cell matches WKT signatures (POINT, LINESTRING, POLYGON, etc.), the parser bypasses string splitting, cleans whitespace, and passes the WKT block cleanly to the compilation engine.
 
+#### [REF: SEARCH-02] Advanced Normalization & Agnosticism (Search Engine) [UPDATED - 2026-09-02]
+To ensure a frictionless retrieval experience —especially critical for Polytonic Greek historical archives— the search indexer is explicitly decoupled from raw data strings. The search indexer utilizes contains-matching over raw fields to preserve indexing properties of diacritics and HTML-formatted slides like the Help card. Symmetrically, the AppOrchestrator utilizes a specialized `stripAndNormalize` regex closure. This engine sequentially: 1) Executes NFD Unicode decomposition to mathematically separate base characters from their diacritics. 2) Strips the tonal markers, enforcing a perfect case-and-accent-agnostic search matrix.
+
+#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
+Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
+
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>

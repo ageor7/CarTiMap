@@ -1,6 +1,19 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+## [v8.13.21] — 2026-09-02 — AppOrchestrator v3.7.21, MapViewer v6.4.25, TimelineScrubber v26.11.12 [CONFORMED]
+### Added
+- **Extract Type Stream Filtering [REF: ETL-14c]:** Integrated native database ingestion for the `Extract Type` parameter (Column 18). Configured global states to split the event timeline dynamically across four narrative streams: `Storyline` (default), `Context` (Συνδεόμενα Στοιχεία), `Related history` (Ιστορικό Υπόβαθρο), and `Presentation` (Παρουσίαση).
+- **Interactive Stream Toggles:** Implemented stream-filtering checkbox controls inside the status cockpit filter drawer, allowing users to toggle entire narrative and historical data layers dynamically.
+
+### Fixed
+- **WKT Spatial Ingestion Integrity [REF: MAP-01b]:** Resolved map-rendering breakdowns where Well-Known Text coordinate blocks failed to draw. Purged loose manual regex point fallbacks that generated "ghost" markers in out-of-bounds oceanic locations, ensuring invalid geometries cleanly log to Telemetry and skip rendering.
+- **Multiline WKT Processing [REF: MAP-01c]:** Implemented a parenthetical-depth cell tokenizer to protect multiline WKT coordinate cells from being fractured by newline-splitting rules.
+- **Search and Help Indexing [REF: SEARCH-02]:** Restored full contains-matching search capabilities over raw slide parameters. This corrects the indexing regression which stripped HTML tags, restoring searchability for the "Help" card.
+- **Sticky Close Buttons [REF: UI-176b]:** Restructured the spatial design of modals (About, Search) using flexbox geometry. Lock close `[X]` buttons in a stationary position while delegating scrolling to nested scrollable child elements.
+- **Viewport Layout White Space:** Restored vertical flexcolumn flow to the parent viewport. Minimizing the timeline pane now causes viewports to scale downward smoothly without leaving blank voids.
+- **Resizer Stack Overlaps:** Resolved timeline sizer bleed-through by lowering the `.resizer-dyn-timeline` layer weight to `z-index: 90`, ensuring it rests cleanly below overlay dialogs.
+
 ## [v8.13.21] — 2026-09-02 — AppOrchestrator v3.7.21, MapViewer v6.4.25, TimelineScrubber v26.11.12
 ### Added
 - **Extract Type Stream Filtering [REF: ETL-14c]:** Added native database ingestion for the `Extract Type` parameter (Column 18). Configured global states to split the event timeline dynamically across four streams: `Storyline` (default), `Context` (Συνδεόμενα Στοιχεία), `Related history` (Ιστορικό Υπόβαθρο), and `Presentation` (Παρουσίαση).

@@ -1,6 +1,9 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+### Fixed
+- **CORS Database Sync Failure [REF: CRASH-02]:** Resolved CORS violations blocking Google Sheet database retrieval on external domains. Reverted primary data ingestion (`fetchUrlPrimary`) and secondary basemaps registry (`fetchUrlBasemaps`) transport layers from direct `/export` downloads to CORS-relaxed Google Visualization API endpoints (`/gviz/tq?tqx=out:csv`).
+
 ## [v8.13.21] — 2026-09-02 — AppOrchestrator v3.7.21, MapViewer v6.4.25, TimelineScrubber v26.11.12 [CONFORMED]
 ### Added
 - **Extract Type Stream Filtering [REF: ETL-14c]:** Integrated native database ingestion for the `Extract Type` parameter (Column 18). Configured global states to split the event timeline dynamically across four narrative streams: `Storyline` (default), `Context` (Συνδεόμενα Στοιχεία), `Related history` (Ιστορικό Υπόβαθρο), and `Presentation` (Παρουσίαση).
