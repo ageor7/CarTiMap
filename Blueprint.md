@@ -184,6 +184,9 @@ The engine ingests the exact database header "Extract Type" from the unified dat
 
 #### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
 The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
+#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
+The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -347,6 +350,9 @@ This bypasses costly array looping and functions smoothly across single dates, S
 
 #### [REF: MAP-01b] Case-Insensitive WKT Compilation & Parenthetical Depth Validation [UPDATED - 2026-08-31]
 To preserve coordinate rendering integrity across multi-line spatial datasets, the mapping pipeline rejects standard linear string splitting. Location data fields are processed using a parenthetical-depth ingestion tokenizer. The tokenizer scans the string character-by-character, incrementing a depth counter on open parenthesis “(” and decrementing on closed parenthesis “)”. It executes newline divisions strictly when the unclosed parenthetical depth is exactly zero. Further, the WKT validation regex executes case-insensitively (`/i`) to support mixed-case coordinates (e.g., “Polygon”, “LineString”, “Point”) natively, preventing coordinate fracturing and subsequent Leaflet rendering crashes.
+
+#### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-09-02]
+To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate arrays strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
 
 #### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-09-02]
 To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate arrays strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
@@ -521,6 +527,15 @@ To resolve mobile accessibility bottlenecks and conform to Fitts's Law, the prim
 Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
 
 #### [REF: UI-176c] Perfect Modal X-Axis Alignment [NEW - 2026-09-02]
+Vector brand logos nested inside vertical modular overlays are isolated inside horizontal flex alignment wrappers (`display: flex; justify-content: center; width: 100%;`). This prohibits structural text nodes from inducing asymmetrical margins, centering assets regardless of viewport dimension.
+
+#### [REF: UI-156b] Double-Sized Brand Touch Target [NEW - 2026-08-30]
+To resolve mobile accessibility bottlenecks and conform to Fitts's Law, the primary brand About button is scaled to a horizontal 48px footprint. This distinguishes the primary brand entry target from adjacent 22px utility toggles.
+
+#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-08-30]
+Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
+
+#### [REF: UI-176c] Perfect Modal X-Axis Alignment [NEW - 2026-08-30]
 Vector brand logos nested inside vertical modular overlays are isolated inside horizontal flex alignment wrappers (`display: flex; justify-content: center; width: 100%;`). This prohibits structural text nodes from inducing asymmetrical margins, centering assets regardless of viewport dimension.
 
 ---

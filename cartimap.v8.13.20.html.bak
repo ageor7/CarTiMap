@@ -1483,8 +1483,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.22b ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v6.4.22b ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.21 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v6.4.21 ] ===
 
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
   const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -1503,14 +1503,13 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
   const minimapOffsetRef = useRef(minimapOffset || -4);
   const isSyncingRef = useRef(false);
   
-  // --- [ START_SUBBLOCK: Helper Parsers & Loaders ] ---
   const parsePolylineLabels = (placeStr) => {
     if (!placeStr) return null;
     const match = placeStr.match(/^\s*\[(.*?)\].*$/);
     if (match) {
-      const lineName = match[1].trim();
+      const lineName = match.trim();
       const details = placeStr.replace(/^\s*\[.*?\]\s*/, '').split(/[,|·;]/).map(s => s.trim()).filter(Boolean);
-      return { lineName, startLabel: details[0] || '', endLabel: details[1] || '' };
+      return { lineName, startLabel: details || '', endLabel: details || '' };
     }
     return null;
   };
@@ -1532,9 +1531,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
   };
 
   const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
-  // --- [ END_SUBBLOCK: Helper Parsers & Loaders ] ---
 
-  // --- [ START_SUBBLOCK: Layer Registry Lifecycle Hooks ] ---
   useEffect(() => {
     if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
       const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
@@ -1558,9 +1555,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     if (baseLayerRef.current && baseLayerRef.current.setOpacity) baseLayerRef.current.setOpacity(basemapOpacity);
     if (miniBaseLayerRef.current && miniBaseLayerRef.current.setOpacity) miniBaseLayerRef.current.setOpacity(basemapOpacity);
   }, [basemapOpacity]);
-  // --- [ END_SUBBLOCK: Layer Registry Lifecycle Hooks ] ---
 
-  // --- [ START_SUBBLOCK: GIS Drawing Primitives ] ---
   const createPinHtml = (isActive, isVip) => {
     const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
     return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'}"><div class="pin-head" style="background: ${color}"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'}"></div></div>`;
@@ -1574,8 +1569,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     return layers;
   };
 
-  // Iterates and parses composite WKT layouts. Captures syntax failures directly to Telemetry Logs. [REF: MAP-01f]
-  const parseGeometryCollection = (wktStr, item) => {
+  const parseGeometryCollection = (wktStr) => {
     const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\s*\(/i, '').replace(/\)\s*$/, '');
     let inParen = 0; let currentGeom = ''; const geometries = [];
     for (let i = 0; i < cleanStr.length; i++) {
@@ -1591,17 +1585,19 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
         const wkt = new window.Wkt.Wkt(); wkt.read(geomStr);
         extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
       } catch (e) {
-        console.warn("WKT parsing failed for geometry component:", geomStr, e);
-        if (addLog) {
-          addLog(`[Map-Engine] Malformed geometry component on Row ${item ? item.id + 2 : 'unknown'} ("${item ? item.title : ''}"): ${e.message}`, 'error');
+        const upper = geomStr.toUpperCase();
+        if (upper.startsWith('POINT')) {
+          const m = geomStr.match(/(-?\d+\.?\d*)\s+(-?\\d+\\.?\\d*)/);
+          if (m) extractedLayers.push(L.marker(new L.LatLng(parseFloat(m[1]), parseFloat(m[2]))));
+        } else if (upper.startsWith('LINESTRING') || upper.startsWith('POLYGON')) {
+          const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
+          if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))));
         }
       }
     });
     return extractedLayers;
   };
-  // --- [ END_SUBBLOCK: GIS Drawing Primitives ] ---
 
-  // --- [ START_SUBBLOCK: Leaflet Canvas Initialization ] ---
   useEffect(() => {
     if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
       const urlParams = new URLSearchParams(window.location.search);
@@ -1622,7 +1618,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const isExactSame = children.every(m => m.getLatLng().equals(firstLatLng));
           if (isExactSame) {
             const count = children.length;
-            const html = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;"><div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4)"></div><div class="pin-stem" style="background: #333; width: 2px"></div><div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3)">${count}</div></div>`;
+            const html = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;"><div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4)"></div><div class="pin-stem" style="background: #333; width: 2px"></div><div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3)">\${count}</div></div>`;
             return L.divIcon({ className: 'custom-div-icon', html: html, iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
           }
           let c = ' marker-cluster-';
@@ -1645,10 +1641,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
         const places = [...new Set(children.map(m => m.itemPlace).filter(Boolean))];
         const titles = [...new Set(children.map(m => m.itemTitle).filter(Boolean))];
         let displayHtml = '';
-        if (places.length > 0) { displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center">${places.slice(0, 2).join(' / ')}${places.length > 2 ? '...' : ''}</div>`; }
+        if (places.length > 0) { displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center">\${places.slice(0, 2).join(' / ')}\${places.length > 2 ? '...' : ''}</div>`; }
         displayHtml += `<div style="text-align: left; line-height: 1.3">`;
-        displayHtml += titles.slice(0, 5).map(t => `• ${t}`).join('<br/>');
-        if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%">+${titles.length - 5} more events...</em>`;
+        displayHtml += titles.slice(0, 5).map(t => `• \${t}`).join('<br/>');
+        if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%">+\\${titles.length - 5} more events...</em>`;
         displayHtml += `</div>`;
         c.layer.bindTooltip(displayHtml, { direction: 'top', className: 'custom-cluster-tooltip' }).openTooltip();
       });
@@ -1692,9 +1688,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
       }
     }
   }, [basemapsRegistry]);
-  // --- [ END_SUBBLOCK: Leaflet Canvas Initialization ] ---
 
-  // --- [ START_SUBBLOCK: Grid Overlay Logic ] ---
   useEffect(() => {
     const map = mapInstance.current; if (!map || !gridLayerRef.current) return;
     const updateGrid = () => {
@@ -1709,9 +1703,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     };
     updateGrid(); map.on('moveend', updateGrid); return () => map.off('moveend', updateGrid);
   }, [showGrid]);
-  // --- [ END_SUBBLOCK: Grid Overlay Logic ] ---
 
-  // --- [ START_SUBBLOCK: Basemap Tile Rendering Hook ] ---
   useEffect(() => {
     const map = mapInstance.current; const miniMap = miniMapInstance.current;
     if (!map || !miniMap || !basemapsRegistry || !activeBasemap) return;
@@ -1721,10 +1713,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
       if (miniBaseLayerRef.current) miniMap.removeLayer(miniBaseLayerRef.current);
       const isVector = config.format === "pbf" || config.format === "mvt";
       if (isVector && window.L.maplibreGL) {
-        baseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0, opacity: basemapOpacity }).addTo(map);
+        baseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: `<a href="\\${config.attrLink}" target="_blank">\\${config.attrText}</a>`, zIndex: 0, opacity: basemapOpacity }).addTo(map);
         miniBaseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: false, zIndex: 0, opacity: basemapOpacity }).addTo(miniMap);
       } else {
-        baseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0, keepBuffer: 4, updateWhenZooming: false, opacity: basemapOpacity }).addTo(map);
+        baseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="\\${config.attrLink}" target="_blank">\\${config.attrText}</a>`, zIndex: 0, keepBuffer: 4, updateWhenZooming: false, opacity: basemapOpacity }).addTo(map);
         miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: false, zIndex: 0, keepBuffer: 4, updateWhenZooming: false, opacity: basemapOpacity }).addTo(miniMap);
       }
     };
@@ -1733,9 +1725,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
       Promise.all([loadScript('https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js')]).then(() => loadScript('https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js')).then(() => renderBasemap()).catch(e => console.error("Vector Library Failed", e));
     } else renderBasemap();
   }, [activeBasemap, basemapsRegistry, maxGlobalZoom]);
-  // --- [ END_SUBBLOCK: Basemap Tile Rendering Hook ] ---
 
-  // --- [ START_SUBBLOCK: Overlay Toggle Hook ] ---
   useEffect(() => {
     const map = mapInstance.current; const miniMap = miniMapInstance.current;
     if (!map || !miniMap || !basemapsRegistry) return;
@@ -1749,9 +1739,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const z = idx + 10; const op = overlayOpacities[id] !== undefined ? overlayOpacities[id] : (config.defaultOpacity ?? 1.0);
           const isWms = config.format === "wms" || config.url.toLowerCase().includes("wms");
           if (isWms) {
-            overlayLayersRef.current[id] = L.tileLayer.wms(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, layers: config.wmsLayer || "default", format: "image/png", transparent: true, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
+            overlayLayersRef.current[id] = L.tileLayer.wms(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, layers: config.wmsLayer || "default", format: "image/png", transparent: true, opacity: op, attribution: `<a href="\\${config.attrLink}" target="_blank">\\${config.attrText}</a>`, zIndex: z, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
           } else {
-            overlayLayersRef.current[id] = L.tileLayer(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, transparent: true, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
+            overlayLayersRef.current[id] = L.tileLayer(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: op, attribution: `<a href="\\${config.attrLink}" target="_blank">\\${config.attrText}</a>`, zIndex: z, transparent: true, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
           }
         }
       }
@@ -1761,9 +1751,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
   useEffect(() => {
     Object.keys(overlayOpacities).forEach(id => { if (overlayLayersRef.current[id]) overlayLayersRef.current[id].setOpacity(overlayOpacities[id]); });
   }, [overlayOpacities]);
-  // --- [ END_SUBBLOCK: Overlay Toggle Hook ] ---
 
-  // --- [ START_SUBBLOCK: Spatial Ingestion & Telemetry Parser ] ---
   useEffect(() => {
     const map = mapInstance.current; if (!map || data.length === 0) return;
     markerLayer.current.clearLayers(); clusterLayer.current.clearLayers();
@@ -1771,30 +1759,17 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     data.forEach((item, idx) => {
       const locStr = String(item.location || '').trim(); if (!locStr) return;
       const activeLayersArray = [];
-      
-      // Symmetrically splits geometries on HTML breaks and platform newlines (\r\n, \n, \r) [REF: MAP-01f]
-      const parts = locStr.split(/<br\s*\/?>/i).flatMap(p => p.split(/\r?\n|\r/)).map(s => s.trim()).filter(Boolean);
+      const parts = locStr.split(/<br\s*\/?>/i).map(s => s.trim()).filter(Boolean);
       
       parts.forEach(part => {
         let featureLayers = [];
         try {
-          if (part.match(/^\s*GEOMETRYCOLLECTION/i)) {
-            featureLayers = parseGeometryCollection(part, item);
-          } else if (part.match(/^\s*[A-Z]+\s*\(/)) { 
-            const wkt = new window.Wkt.Wkt(); 
-            wkt.read(part); 
-            featureLayers = extractLayers(wkt.toObject()); 
-          } else if (part.startsWith(String.fromCharCode(123)) && part.includes('"type"')) {
-            featureLayers = extractLayers(L.geoJSON(JSON.parse(part)));
-          } else {
-            const coordMatch = part.match(/^\s*(-?\\d+(?:\\.\\d+)?)[,\\s]+(-?\\d+(?:\\.\\d+)?)\\s*$/);
-            if (coordMatch) {
-              // Direct indices compilation prevents numeric parsing failures [REF: MAP-01f]
-              featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch[1]), parseFloat(coordMatch[2]))));
-            } else {
-              // Direct error dispatch to block syntax deviations [REF: MAP-01f]
-              throw new Error(`Invalid or unidentifiable coordinates: "${part}"`);
-            }
+          if (part.match(/^\s*GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(part);
+          else if (part.match(/^\s*[A-Z]+\s*\(/)) { const wkt = new window.Wkt.Wkt(); wkt.read(part); featureLayers = extractLayers(wkt.toObject()); }
+          else if (part.startsWith(String.fromCharCode(123)) && part.includes('"type"')) featureLayers = extractLayers(L.geoJSON(JSON.parse(part)));
+          else {
+            const coordMatch = part.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
+            if (coordMatch) featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch.at(1)), parseFloat(coordMatch.at(2)))));
           }
           
           const uniqueSignatures = new Set(); const validFeatureLayers = [];
@@ -1803,11 +1778,11 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             if (layer.getLatLng) {
               const ll = layer.getLatLng();
               if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
-              sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
+              sig = `P_\${ll.lat.toFixed(5)}_\${ll.lng.toFixed(5)}`;
             } else if (layer.getBounds) {
               const b = layer.getBounds();
               if (!b || !b.isValid()) return;
-              sig = `B_${b.toBBoxString()}`;
+              sig = `B_\${b.toBBoxString()}`;
             }
             if (sig) { if (uniqueSignatures.has(sig)) return; uniqueSignatures.add(sig); }
             validFeatureLayers.push(layer);
@@ -1849,7 +1824,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             if (polyInfo) {
               const latlngs = layer.getLatLngs();
               if (latlngs && latlngs.length >= 2) {
-                const startLL = latlngs[0];
+                const startLL = latlngs;
                 const endLL = latlngs[latlngs.length - 1];
 
                 const startMarker = L.marker(startLL, {
@@ -1899,25 +1874,18 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             activeLayersArray.push(layer); validMarkers++;
           });
           if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
-        } catch(e) { 
-          console.error("Map Error Row", idx, e); 
-          // Direct real-time Telemetry logger integration with DB row feedback [REF: MAP-01f]
-          if (addLog) {
-            addLog(`[Map-Engine] Malformed geometry parsing on Row ${item.id + 2} ("${item.title || 'Untitled'}"): ${e.message}`, 'error');
-          }
-        }
+        } catch(e) { console.error("Map Error Row", idx, e); }
       });
     });
     setTimeout(() => {
-      if (map && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
+      if (mapInstance.current && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
         const bounds = L.latLngBounds();
         markerLayer.current.eachLayer(l => { if (l.getLatLng) bounds.extend(l.getLatLng()); else if (l.getBounds) bounds.extend(l.getBounds()); });
         clusterLayer.current.eachLayer(l => bounds.extend(l.getLatLng()));
-        if (bounds.isValid()) { map.fitBounds(bounds, { padding: new L.Point(6, 6), maxZoom: 6 }); hasFitBounds.current = true; }
+        if (bounds.isValid()) { mapInstance.current.fitBounds(bounds, { padding: new L.Point(6, 6), maxZoom: 6 }); hasFitBounds.current = true; }
       }
     }, 100);
   }, [data, polygonOpacity]);
-  // --- [ END_SUBBLOCK: Spatial Ingestion & Telemetry Parser ] ---
 
   // --- [ START_SUBBLOCK: Map Temporal Ghosting Loop ] ---
   useEffect(() => {
@@ -1925,7 +1893,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     if (!map || Object.keys(markers).length === 0) return;
 
     const visibleBounds = visibleTimeBounds || new Array(0, Infinity);
-    const vLeft = visibleBounds[0]; const vRight = visibleBounds[1];
+    const vLeft = visibleBounds.at(0); const vRight = visibleBounds.at(1);
     let clusterAdd = []; let clusterRemove = [];
 
     Object.keys(markers).forEach(idxStr => {
@@ -2002,7 +1970,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
   const bases = basemapsRegistry.filter(b => b.type !== 'overlay'); const overlays = basemapsRegistry.filter(b => b.type === 'overlay');
 
-return html`
+  return html`
     <style id="layers-menu-zindex-fix">
       .map-pane { z-index: 110 !important; }
       .media-pane { z-index: 10 !important; }
@@ -2011,8 +1979,8 @@ return html`
       <div style="overflow: hidden; width:100%; height:100%; position: absolute; top:0; left:0; z-index:1;"><div ref=${mapDomRef} style="width:100%; height:100%;"></div></div>
       <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn ${maxPane === 'map' ? 'active' : ''}" onClick=${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">
-            ${maxPane === 'map'
+          <button class="status-btn \${maxPane === 'map' ? 'active' : ''}" onClick=\${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=\${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">
+            \${maxPane === 'map'
               ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
               : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
             }
@@ -2020,45 +1988,45 @@ return html`
         </div>
 
         <div style="display: flex; flex-direction: column; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
+          <button class="status-btn" onClick=\${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
-          <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">${mapZoom}</div>
-          <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
+          <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">\${mapZoom}</div>
+          <button class="status-btn" onClick=\${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
         </div>
 
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn ${showGrid ? 'active' : ''}" onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;">
+          <button class="status-btn \${showGrid ? 'active' : ''}" onClick=\${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
           </button>
         </div>
 
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;">
+          <button class="status-btn \${showLayersMenu ? 'active' : ''}" onClick=\${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
           </button>
         </div>
       </div>
 
-      ${showLayersMenu ? html`
+      \${showLayersMenu ? html`
         <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 40px; top: 130px; z-index: 2000;">
           <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
           <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-            ${bases.map(b => html`
+            \${bases.map(b => html`
               <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px;">
                 <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
-                  <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${activeBasemap === b.id} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <input type="radio" id="base_\${b.id}" name="basemap_radio" checked=\${activeBasemap === b.id} onChange=\${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
-                    <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
-                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
+                    <label for="base_\${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">\${b.label}</label>
+                    \${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="\${b.attrLink || '#'}" target="_blank" onClick=\${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>\${b.attrText}</a></span>` : ''}
                   </div>
                 </div>
-                ${activeBasemap === b.id ? html`
+                \${activeBasemap === b.id ? html`
                   <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 0.65rem; color: #888;">Opacity</span>
-                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${basemapOpacity} onChange=${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
+                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${basemapOpacity} onChange=\${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
                   </div>
                 ` : ''}
               </div>
@@ -2066,18 +2034,16 @@ return html`
           </div>
           <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            ${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
-                  <input type="checkbox" id="over_${o.id}" checked=${activeOverlays.includes(o.id)} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
-                  <div style="display: inline; margin: 0;"><label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}</div></div>${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
+            \${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_\${o.id}" checked=\${activeOverlays.includes(o.id)} onChange=\${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="over_\${o.id}" style="cursor: pointer; font-weight: 500; color: #222;\">\${o.label}</label>\${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;\">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;\"><a href="\\${o.attrLink || '#'}" target="_blank" onClick=\${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>\${o.attrText}</a></span>` : ''}</div></div>\${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;\"><span style="font-size: 0.65rem; color: #888;\">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=\${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;\">No overlays available.</div>`}
           </div>
         </div>
       ` : ''}
     </div>
-    <div class="minimap-container" ref=${miniMapDomRef}></div>
+    <div class="minimap-container" ref=\${miniMapDomRef}></div>
   `;
 };
 
-MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.21';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2176,1046 +2142,946 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.20] 🔽🔽🔽
-		// === [ MAJOR BLOCK: AppOrchestrator v3.7.20 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.23 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.23 ] ===
 
-        const App = () => {
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
-          // =========================================================================
-          const [logs, setLogs] = useState ([]);
-          const [rawCsvRows, setRawCsvRows] = useState ([]);
-          const [unfilteredData, setUnfilteredData] = useState ([]);
-          const [data, setData] = useState ([]);
-          const [aboutData, setAboutData] = useState (null);
-          const [status, setStatus] = useState ({"text": 'Initializing Engine...', "progress": 10, "isFading": false, "active": false});
-          const [activeIndex, setActiveIndex] = useState (0);
-          const [slideHistory, setSlideHistory] = useState ([]);
-          
-          // Core layout-governing states
-          const [visibleTimeSpan, setVisibleTimeSpan] = useState ('');
-          const [zoomLock, setZoomLock] = useState ('auto');
-          const [isTimelineMinimized, setIsTimelineMinimized] = useState (false);
-          const [isTimelineExpanded, setIsTimelineExpanded] = useState (false);
-          const [timelineRequiredHeight, setTimelineRequiredHeight] = useState (200);
+const App = () => {
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
+  // =========================================================================
+  const [logs, setLogs] = useState([]);
+  const [rawCsvRows, setRawCsvRows] = useState([]);
+  const [unfilteredData, setUnfilteredData] = useState([]);
+  const [data, setData] = useState([]);
+  const [aboutData, setAboutData] = useState(null);
+  const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [slideHistory, setSlideHistory] = useState([]);
+  const [isMonitorOpen, setIsMonitorOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [searchHistory, setSearchHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; }
+    catch (e) { return []; }
+  });
+  const [maxPane, setMaxPane] = useState(null);
+  const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
+  const [isTimelineMinimized, setIsTimelineMinimized] = useState(false);
+  const [timelineRequiredHeight, setTimelineRequiredHeight] = useState(140);
+  const [polygonOpacity, setPolygonOpacity] = useState(() => {
+    try { return parseFloat(localStorage.getItem('tm_polygon_opacity')) || 0.4; }
+    catch (e) { return 0.4; }
+  });
+  const [showButtonText, setShowButtonText] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('tm_show_button_text')) ?? false; }
+    catch (e) { return false; }
+  });
+  const [dateLocale, setDateLocale] = useState(() => {
+    try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
+    catch (e) { return 'en-GB'; }
+  });
+  const [dateEngineMode, setDateEngineMode] = useState(() => {
+    try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
+    catch (e) { return 'auto'; }
+  });
+  const [maxAutoZoom, setMaxAutoZoom] = useState(() => {
+    try { return parseInt(localStorage.getItem('tm_max_auto_zoom')) || 15; }
+    catch (e) { return 15; }
+  });
+  const [minimapOffset, setMinimapOffset] = useState(() => {
+    try { return parseInt(localStorage.getItem('tm_minimap_offset')) || -4; }
+    catch (e) { return -4; }
+  });
+  const [allTags, setAllTags] = useState([]);
+  
+  // --- [ PART Β: Global Active Filtering States ] ---
+  const [activeTags, setActiveTags] = useState([]);
+  const [activeExtractTypes, setActiveExtractTypes] = useState(['Storyline', 'Context', 'Related history', 'Presentation']);
+  
+  const DEFAULT_BASEMAPS = [
+    { id: 'carto-light', label: 'CartoDB Light', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'xyz', maxZoom: 19, active: true, attrText: '© CartoDB', attrLink: 'https://carto.com/attributions', defaultOpacity: 1.0 },
+    { id: 'esri-sat', label: 'Esri Worlds Satellite', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
+    { id: 'esri-street', label: 'Esri World Street', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
+    { id: 'esri-topo', label: 'Esri World Topo', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', format: 'xyz', maxZoom: 19, active: false, attrText: 'Tiles © Esri', attrLink: 'https://www.esri.com/', defaultOpacity: 1.0 },
+    { id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 19, active: false, attrText: '© OSM', attrLink: 'https://openstreetmap.org/copyright', defaultOpacity: 1.0 },
+    { id: 'opentopo', label: 'OpenTopoMap (OSM)', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'xyz', maxZoom: 17, active: false, attrText: '© OpenTopoMap', attrLink: 'https://opentopomap.org', defaultOpacity: 1.0 },
+    { id: 'protomaps-vector', label: 'Protomaps Vector Light (OSM)', type: 'base', url: 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', format: 'pbf', maxZoom: 15, active: false, attrText: '© Protomaps', attrLink: 'https://protomaps.com', defaultOpacity: 1.0 },
+    { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '', defaultOpacity: 1.0 }
+  ];
 
-          const [isMonitorOpen, setIsMonitorOpen] = useState (false);
-          const [isAboutOpen, setIsAboutOpen] = useState (false);
-          const [isSettingsOpen, setIsSettingsOpen] = useState (false);
-          const [isMenuOpen, setIsMenuOpen] = useState (false);
-          const [isFilterOpen, setIsFilterOpen] = useState (false);
-          const [isSearchOpen, setIsSearchOpen] = useState (false);
-          const [searchQuery, setSearchQuery] = useState ('');
-          const [debouncedSearchQuery, setDebouncedSearchQuery] = useState ('');
-          
-          const [searchHistory, setSearchHistory] = useState (() => {
-            try { return JSON.parse (localStorage.getItem ('tm_search_history')) || []; }
-            catch (e) { return []; }
-          });
-          const [maxPane, setMaxPane] = useState (null);
-          
-          const [polygonOpacity, setPolygonOpacity] = useState (() => {
-            try { return parseFloat (localStorage.getItem ('tm_polygon_opacity')) || 0.4; }
-            catch (e) { return 0.4; }
-          });
-          const [showButtonText, setShowButtonText] = useState (() => {
-            try { return JSON.parse (localStorage.getItem ('tm_show_button_text')) ?? false; }
-            catch (e) { return false; }
-          });
-          const [dateLocale, setDateLocale] = useState (() => {
-            try { return localStorage.getItem ('tm_date_locale') || 'en-GB'; }
-            catch (e) { return 'en-GB'; }
-          });
-          const [dateEngineMode, setDateEngineMode] = useState (() => {
-            try { return localStorage.getItem ('tm_date_engine_mode') || 'auto'; }
-            catch (e) { return 'auto'; }
-          });
+  const [basemapsRegistry, setBasemapsRegistry] = useState(DEFAULT_BASEMAPS);
+  const [zoomLock, setZoomLock] = useState('auto');
+  const [visibleTimeSpan, setVisibleTimeSpan] = useState('');
+  const [visibleTimeBounds, setVisibleTimeBounds] = useState(null);
 
-          const [allTags, setAllTags] = useState ([]);
-          const [activeTags, setActiveTags] = useState ([]);
-          const [visibleTimeBounds, setVisibleTimeBounds] = useState (null);
-          const [minimapOffset, setMinimapOffset] = useState (-4);
+  const appRef = useRef(null);
+  const hasInitializedRef = useRef(false);
 
-          // Restored standard basemaps configurations [REF: MAP-01b]
-          const DEFAULT_BASEMAPS = [
-            {"id": 'carto-light', "label": 'CartoDB Light', "type": 'base', "url": 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', "format": 'xyz', "maxZoom": 19, "active": true, "attrText": '© CartoDB', "attrLink": 'https://carto.com/attributions', "defaultOpacity": 1.0},
-            {"id": 'esri-sat', "label": 'Esri Worlds Satellite', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
-            {"id": 'esri-street', "label": 'Esri World Street', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
-            {"id": 'esri-topo', "label": 'Esri World Topo', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
-            {"id": 'osm', "label": 'OpenStreetMap', "type": 'base', "url": 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": '© OSM', "attrLink": 'https://openstreetmap.org/copyright', "defaultOpacity": 1.0},
-            {"id": 'opentopo', "label": 'OpenTopoMap (OSM)', "type": 'base', "url": 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', "format": 'xyz', "maxZoom": 17, "active": false, "attrText": '© OpenTopoMap', "attrLink": 'https://opentopomap.org', "defaultOpacity": 1.0},
-            {"id": 'protomaps-vector', "label": 'Protomaps Vector Light (OSM)', "type": 'base', "url": 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', "format": 'pbf', "maxZoom": 15, "active": false, "attrText": '© Protomaps', "attrLink": 'https://protomaps.com', "defaultOpacity": 1.0},
-            {"id": 'no-basemap', "label": 'No Basemap (Blank Canvas)', "type": 'base', "url": 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', "format": 'xyz', "maxZoom": 22, "active": false, "attrText": 'Canvas', "attrLink": '', "defaultOpacity": 1.0}
-          ];
-        
-          const [basemapsRegistry, setBasemapsRegistry] = useState ([...DEFAULT_BASEMAPS]);
-        
-          const appRef = useRef (null);
-          const hasInitializedRef = useRef (false);      
-		  
-          const addLog = (msg, type = 'info') => {
-            const timeStr = new Date().toTimeString().split(' ').at(0);
-            setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
-          };
-        
-          const stripAndNormalize = (str) => {
-            if (!str) return '';
-            const noHtml = String(str).replace(/<[^>]*>?/gm, '');
-            return noHtml.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-          };
+  const addLog = (msg, type = 'info') => {
+    const timeStr = new Date().toTimeString().split(' ').at(0);
+    setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
+  };
 
-          // Re-instated URL query & Hash parser [REF: URL-01]
-          const getOmniParam = (key) => {
-            const sp = new URLSearchParams(window.location.search);
-            let val = sp.get(key) || sp.get(`amp;${key}`);
-            if (val) return val;
-            const hp = new URLSearchParams(window.location.hash.replace(/^#\/?\??/, ''));
-            return hp.get(key) || hp.get(`amp;${key}`);
-          };
-        
-          const formatSmartDate = (startObj, endObj, locale) => {
-            if (!startObj) return 'Undated';
-            if (startObj.isEDTF) return startObj.text;
-            const d = startObj.date; if (!d || isNaN(d.getTime())) return 'Invalid Date';
-            if (endObj && endObj.date && !isNaN(endObj.date.getTime())) {
-              const dEnd = endObj.date;
-              if (dEnd.getTime() === d.getTime()) return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
-              return `${d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })} — ${dEnd.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}`;
+  const stripAndNormalize = (str) => {
+    if (!str) return '';
+    return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim();
+  };
+
+  const formatSmartDate = (startObj, endObj, locale) => {
+    if (!startObj) return 'Undated';
+    if (startObj.isEDTF) return startObj.text;
+    const d = startObj.date; if (!d || isNaN(d.getTime())) return 'Invalid Date';
+    if (endObj && endObj.date && !isNaN(endObj.date.getTime())) {
+      const dEnd = endObj.date;
+      if (dEnd.getTime() === d.getTime()) return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+      return `${d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })} — ${dEnd.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}`;
+    }
+    return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
+  const formatPlaces = (placeStr) => {
+    if (!placeStr) return '';
+    const stripped = placeStr.replace(/^\s*\[.*?\]\s*/, '');
+    return stripped.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean).join(' · ');
+  };
+
+  const getOmniParam = (key) => {
+    const sp = new URLSearchParams(window.location.search);
+    let val = sp.get(key) || sp.get(`amp;${key}`);
+    if (val) return val;
+    const hp = new URLSearchParams(window.location.hash.replace(/^#\/?\??/, ''));
+    return hp.get(key) || hp.get(`amp;${key}`);
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 2: CHRONO ENGINE - DATAFRAME PARSING ] ===
+  // =========================================================================
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    let source = urlParams.get('source') || urlParams.get('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+    const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
+    const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid');
+
+    setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
+    addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
+
+    // CORS-relaxed Google Visualization API endpoints mapped under [REF: CRASH-02]
+    const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+    const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
+
+    Promise.all([
+      fetch(fetchUrlPrimary).then(res => {
+        if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
+        return res.text();
+      }),
+      fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
+        if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status ${res.status})`);
+        return res.text();
+      }) : Promise.resolve(null)
+    ]).then(([primaryCsv, basemapsCsv]) => {
+      setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
+      
+      const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
+      if (results.errors.length > 0) {
+        results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
+      }
+
+      const exactGet = (normObj, key) => {
+        const val = normObj[key];
+        return val !== undefined && val !== null ? String(val).trim() : "";
+      };
+
+      const firstRowNorm = {};
+      if (results.data.length > 0) {
+        for (let k in results.data.at(0)) firstRowNorm[k.toLowerCase().trim()] = results.data.at(0)[k];
+      }
+
+      const aboutDataObj = {
+        title: exactGet(firstRowNorm, 'title') || 'Dataset Overview',
+        description: exactGet(firstRowNorm, 'description') || 'No project description provided.',
+        rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source,
+        downloadUrl: fetchUrlPrimary
+      };
+      setAboutData(aboutDataObj);
+
+      let activeMode = dateEngineMode;
+      if (activeMode === 'auto') {
+        const hasEDTF = results.data.some(row => {
+          const norm = {};
+          for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+          return exactGet(norm, 'start edtf') !== '';
+        });
+        activeMode = hasEDTF ? 'edtf' : 'legacy';
+      }
+      const isUS = dateLocale === 'en-US';
+      const omniSplitRegex = /\||\r?\n/;
+      const rows = results.data.slice(1);
+
+      const parseChronoNode = (legacyStr, edtfStr) => {
+        const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
+        const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
+        if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
+          try {
+            if (cleanEdtf) {
+              const parsed = compileCartiMapAST(cleanEdtf);
+              if (parsed) {
+                return {
+                  isEDTF: true,
+                  min: parsed.min,
+                  max: parsed.max,
+                  obj: parsed,
+                  isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
+                  text: cleanEdtf
+                };
+              }
             }
-            return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+          } catch (e) {
+            addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
+          }
+        }
+        
+        if (!cleanLegacy) {
+          if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
+          return null;
+        }
+        
+        if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
+          const serialVal = parseFloat(cleanLegacy);
+          const ts = (serialVal - 25569) * 86400 * 1000;
+          return { 
+            isEDTF: false, 
+            min: ts, 
+            max: ts, 
+            date: new Date(ts), 
+            text: cleanLegacy 
           };
+        }
         
-          const formatPlaces = (placeStr) => {
-            if (!placeStr) return '';
-            const stripped = placeStr.replace(/^\s*\[.*?\]\s*/, '');
-            return stripped.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean).join(' · ');
+        const parts = cleanLegacy.split(' ');
+        if (parts.length >= 1) {
+          const dateStr = parts.at(0) || '';
+          const timeStr = parts.at(1) || '';
+          const dParts = dateStr.split(/[\/\.\-]/);
+          if (dParts.length >= 3) {
+            const tParts = timeStr ? timeStr.split(':') : [];
+            const secParts = String(tParts.at(2) || '0').split('.');
+            const dYear = parseInt(dParts.at(2), 10);
+            const dMonth = parseInt(dParts.at(isUS ? 0 : 1), 10) - 1;
+            const dDay = parseInt(dParts.at(isUS ? 1 : 0), 10);
+            const tHour = parseInt(tParts.at(0) || 0, 10);
+            const tMin = parseInt(tParts.at(1) || 0, 10);
+            const tSec = parseInt(secParts.at(0) || 0, 10);
+            const tMs = parseInt(secParts.at(1) || 0, 10);
+            const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
+            const ts = dateObj.getTime();
+            if (!isNaN(ts)) {
+              return { 
+                isEDTF: false, 
+                min: ts, 
+                max: ts, 
+                date: dateObj, 
+                text: cleanLegacy 
+              };
+            }
+          }
+        }
+
+        if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Failed to parse. Rendering as Undated.`, 'warning');
+        return null;
+      };
+
+      // --- [ PART Α: Ingestion Mapping & Column Extraction ] ---
+      const cleaned = rows.map((row, index) => {
+        const norm = {};
+        for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+        const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
+
+        return {
+          id: index,
+          title: rowTitle,
+          startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf')),
+          endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf')),
+          description: exactGet(norm, 'description'),
+          place: exactGet(norm, 'place'),
+          location: exactGet(norm, 'location'),
+          subLabels: exactGet(norm, 'sublabels') || exactGet(norm, 'sub-labels') || exactGet(norm, 'sub labels') || '',
+          priority: exactGet(norm, 'priority'),
+          media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
+          mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
+          mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
+          tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/[, \r\n|;·]+/).map(t => t.trim()).filter(Boolean) : [],
+          extractType: exactGet(norm, 'extract type') || 'Storyline'
+        };
+      });
+
+      const valid = cleaned.sort((a, b) => {
+        const aMin = a.startDate ? a.startDate.min : 0;
+        const bMin = b.startDate ? b.startDate.min : 0;
+        if (aMin !== bMin) return aMin - bMin;
+        return a.id - b.id;
+      });
+
+      // =========================================================================
+      // === [ APP_ORCHESTRATOR SUBBLOCK 3: VECTOR SEARCH INDEXING ] ===
+      // =========================================================================
+      const indexedData = valid.map(d => ({
+        ...d,
+        _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
+      }));
+      setUnfilteredData(indexedData);
+
+      const tagsMap = new Set();
+      indexedData.forEach(d => {
+        let rawTags = d.tags || [];
+        let arr = [];
+        (Array.isArray(rawTags) ? rawTags : [rawTags]).forEach(t => {
+          if (typeof t === 'string') arr.push(...t.split(omniSplitRegex));
+          else arr.push(t);
+        });
+        arr.map(s => String(s).trim()).filter(Boolean).forEach(t => tagsMap.add(t));
+      });
+
+      const uniqueTagsList = Array.from(tagsMap).sort();
+      setAllTags(uniqueTagsList);
+      setActiveTags(uniqueTagsList);
+
+      if (basemapsCsv) {
+        const baseResult = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
+        const basemaps = baseResult.data.map(row => {
+          const norm = {};
+          for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+          return {
+            id: exactGet(norm, 'id'),
+            label: exactGet(norm, 'label'),
+            type: exactGet(norm, 'type'),
+            url: exactGet(norm, 'url'),
+            format: exactGet(norm, 'format'),
+            maxZoom: parseInt(exactGet(norm, 'maxzoom') || 19, 10),
+            active: exactGet(norm, 'active').toLowerCase() === 'true',
+            attrText: exactGet(norm, 'attribution text'),
+            attrLink: exactGet(norm, 'attribution link'),
+            wmsLayer: exactGet(norm, 'wms layer'),
+            defaultOpacity: exactGet(norm, 'default opacity') !== '' ? parseFloat(exactGet(norm, 'default opacity')) : 1.0
           };
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 2: DECOUPLED DATA CONNECTION PIPELINE ] ===
-          // =========================================================================
-          useEffect(() => {
-            // Memory Parameter Cache [REF: PERF-36]
-            const source = getOmniParam('source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
-            const gid = getOmniParam('gid') || '0';
-            const bgid = getOmniParam('bgid');
-        
-            setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
-            addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
-        
-            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
-            const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
-        
-            // --- [ ZONE 1: PURE NETWORK INGESTION ] ---
-            Promise.all([
-              fetch(fetchUrlPrimary)
-                .catch(err => { throw new Error(`Primary unreachable: ${err.message}`); })
-                .then(res => {
-                  if (!res.ok) throw new Error(`HTTP ${res.status} Primary`);
-                  return res.text();
-                }),
-              fetchUrlBasemaps 
-                ? fetch(fetchUrlBasemaps)
-                    .catch(err => { throw new Error(`Basemaps unreachable: ${err.message}`); })
-                    .then(res => {
-                      if (!res.ok) throw new Error(`HTTP ${res.status} Basemaps`);
-                      return res.text();
-                    })
-                : Promise.resolve(null)
-            ])
-            .catch(netErr => {
-              console.error("CMS Connection Aborted:", netErr);
-              setStatus({ text: 'Connection Timeout', progress: 100, isFading: false, active: false });
-              addLog(`Connection Timeout: ${netErr.message}`, 'error');
-              throw netErr;
-            })
-            // --- [ ZONE 2: DECOUPLED DATA PARSING ] ---
-            .then(([primaryCsv, basemapsCsv]) => {
-              setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
-              
-              try {
-                // Parse basemaps config if provided by Google Sheets [REF: MAP-01b]
-                if (basemapsCsv) {
-                  const bResults = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
-                  const parsedBMs = bResults.data.map(row => {
-                    const norm = {};
-                    for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                    const isActive = /^(true|yes)$/i.test(String(norm.active || '').trim());
-                    const rawOpac = parseFloat(norm.defaultopacity);
-                    return {
-                      id: norm.id || "", label: norm.label || "", type: norm.type?.toLowerCase() === "overlay" ? "overlay" : "base",
-                      url: norm.url || "", maxZoom: parseInt(norm.maxzoom, 10) || 19,
-                      active: isActive, attrText: norm.attrtext || "", attrLink: norm.attrlink || "",
-                      defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac, format: norm.format || "xyz",
-                      wmsLayer: norm.wmslayer ? decodeURIComponent(norm.wmslayer.trim()) : "default"
-                    };
-                  }).filter(b => b.id && b.url);
-                  if (parsedBMs.length > 0) {
-                    setBasemapsRegistry(prev => {
-                      const merged = [...prev];
-                      parsedBMs.forEach(bm => {
-                        const existIdx = merged.findIndex(m => m.id === bm.id);
-                        if (existIdx >= 0) merged[existIdx] = bm;
-                        else merged.push(bm);
-                      });
-                      return merged;
-                    });
-                  }
-                }
+        }).filter(b => b.id && b.url);
+        setBasemapsRegistry(basemaps);
+        addLog(`Basemaps registry parsed. Found ${basemaps.length} configured tile services.`, 'info');
+      } else {
+        setBasemapsRegistry([{ id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: true, attrText: 'OpenStreetMap', attrLink: 'https://openstreetmap.org' }]);
+      }
 
-                const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
-                if (results.errors.length > 0) {
-                  results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
-                }
-        
-                const exactGet = (normObj, key) => {
-                  const val = normObj[key];
-                  return val !== undefined && val !== null ? String(val).trim() : "";
-                };
-        
-                const firstRowNorm = {};
-                if (results.data.length > 0) {
-                  for (let k in results.data.at(0)) firstRowNorm[k.toLowerCase().trim()] = results.data.at(0)[k];
-                }
-        
-                const aboutDataObj = {
-                  title: exactGet(firstRowNorm, 'title') || 'Dataset Overview',
-                  description: exactGet(firstRowNorm, 'description') || 'No project description provided.',
-                  rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source,
-                  downloadUrl: fetchUrlPrimary
-                };
-                setAboutData(aboutDataObj);
-        
-                let activeMode = dateEngineMode;
-                if (activeMode === 'auto') {
-                  const hasEDTF = results.data.some(row => {
-                    const norm = {};
-                    for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                    return exactGet(norm, 'start edtf') !== '';
-                  });
-                  activeMode = hasEDTF ? 'edtf' : 'legacy';
-                }
-                const isUS = dateLocale === 'en-US';
-                
-                // Re-instated dynamic flattener [REF: MED-11]
-                const omniSplitRegex = /\||\r?\n/;
-
-                const cleaned = results.data.map((row, index) => {
-                  const norm = {};
-                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                  const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
-        
-                const parseChronoNode = (legacyStr, edtfStr) => {
-                  const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
-                  const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
-                  if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
-                    try {
-                      if (cleanEdtf) {
-                        const parsed = compileCartiMapAST(cleanEdtf);
-                        if (parsed) {
-                          return {
-                            isEDTF: true,
-                            min: parsed.min,
-                            max: parsed.max,
-                            obj: parsed,
-                            // Corrected strict-type comparison of complex AST objects [REF: CHRONO-08]
-                            isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY),
-                            text: cleanEdtf
-                          };
-                        }
-                      }
-                    } catch (e) {
-                      addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
-                    }
-                  }
-                  
-                  if (!cleanLegacy) {
-                    if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
-                    return null;
-                  }
-                    
-                    if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
-                      const serialVal = parseFloat(cleanLegacy);
-                      const ts = (serialVal - 25569) * 86400 * 1000;
-                      return { 
-                        isEDTF: false, 
-                        min: ts, 
-                        max: ts, 
-                        date: new Date(ts), 
-                        text: cleanLegacy 
-                      };
-                    }
-                    
-                    const parts = cleanLegacy.split(' ');
-                    if (parts.length >= 1) {
-                      const dateStr = parts.at(0) || '';
-                      const timeStr = parts.at(1) || '';
-                      const dParts = dateStr.split(/[\/\\.-]/);
-                      if (dParts.length >= 3) {
-                        const tParts = timeStr ? timeStr.split(':') : [];
-                        const secParts = String(tParts.at(2) || '0').split('.');
-                        const dYear = parseInt(dParts.at(2), 10);
-                        const dMonth = parseInt(dParts.at(isUS ? 0 : 1), 10) - 1;
-                        const dDay = parseInt(dParts.at(isUS ? 1 : 0), 10);
-                        const tHour = parseInt(tParts.at(0) || 0, 10);
-                        const tMin = parseInt(tParts.at(1) || 0, 10);
-                        const tSec = parseInt(secParts.at(0) || 0, 10);
-                        const tMs = parseInt(secParts.at(1) || 0, 10);
-                        const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
-                        const ts = dateObj.getTime();
-                        if (!isNaN(ts)) {
-                          return { 
-                            isEDTF: false, 
-                            min: ts, 
-                            max: ts, 
-                            date: dateObj, 
-                            text: cleanLegacy 
-                          };
-                        }
-                      }
-                    }
-            
-                    if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Failed to parse. Rendering as Undated.`, 'warning');
-                    return null;
-                  };
-        
-                  const locStr = exactGet(norm, 'location');
-                  return {
-                    id: index,
-                    title: rowTitle,
-                    startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf')),
-                    endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf')),
-                    description: exactGet(norm, 'description'),
-                    place: exactGet(norm, 'place'),
-                    location: locStr,
-                    subLabels: exactGet(norm, 'sublabels') || exactGet(norm, 'sub-labels') || exactGet(norm, 'sub labels') || '',
-                    priority: exactGet(norm, 'priority'),
-                    media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
-                    mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
-                    mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
-                    tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/[, \r\n|;·]+/).map(t => t.trim()).filter(Boolean) : []
-                  };
-                });
-            
-                const valid = cleaned.sort((a, b) => {
-                  const aMin = a.startDate ? a.startDate.min : 0;
-                  const bMin = b.startDate ? b.startDate.min : 0;
-                  if (aMin !== bMin) return aMin - bMin;
-                  return a.id - b.id;
-                });
-            
-                const indexedData = valid.map(d => ({
-                  ...d,
-                  _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
-                }));
-                setUnfilteredData(indexedData);
-            
-                const tagsMap = new Set();
-                indexedData.forEach(d => {
-                  let rawTags = d.tags || [];
-                  let arr = [];
-                  (Array.isArray(rawTags) ? rawTags : [rawTags]).forEach(t => {
-                    if (typeof t === 'string') arr.push(...t.split(omniSplitRegex));
-                    else arr.push(t);
-                  });
-                  arr.map(s => String(s).trim()).filter(Boolean).forEach(t => tagsMap.add(t));
-                });
-            
-                const uniqueTagsList = Array.from(tagsMap).sort();
-                setAllTags(uniqueTagsList);
-                setActiveTags(uniqueTagsList);
-            
-                if (!hasInitializedRef.current) {
-                  const paramSlide = getOmniParam('slide');
-                  const paramDate = getOmniParam('date');
-                  let initialIdx = 0;
-                  if (paramSlide) {
-                    const sVal = parseInt(paramSlide, 10);
-                    if (!isNaN(sVal) && sVal >= 0 && sVal < indexedData.length) initialIdx = sVal;
-                  } else if (paramDate) {
-                    const targetTime = new Date(paramDate).getTime();
-                    if (!isNaN(targetTime)) {
-                      let closestIdx = 0; let minDiff = Infinity;
-                      indexedData.forEach((d, i) => {
-                        if (d.startDate) {
-                          const diff = Math.abs(d.startDate.min - targetTime);
-                          if (diff < minDiff) { minDiff = diff; closestIdx = i; }
-                        }
-                      });
-                      initialIdx = closestIdx;
-                    }
-                  }
-                  setActiveIndex(initialIdx);
-                  hasInitializedRef.current = true;
-                }
-                setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
-                setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
-              } catch (parseErr) {
-                console.error("Fatal Syntactical Parsing Aborted:", parseErr);
-                setStatus({ text: 'Dataset Parse Error', progress: 100, isFading: false, active: false });
-                addLog(`Dataset Parse Error: ${parseErr.message}`, 'error');
+      if (!hasInitializedRef.current) {
+        const paramSlide = getOmniParam('slide');
+        const paramDate = getOmniParam('date');
+        let initialIdx = 0;
+        if (paramSlide) {
+          const sVal = parseInt(paramSlide, 10);
+          if (!isNaN(sVal) && sVal >= 0 && sVal < indexedData.length) initialIdx = sVal;
+        } else if (paramDate) {
+          const targetTime = new Date(paramDate).getTime();
+          if (!isNaN(targetTime)) {
+            let closestIdx = 0; let minDiff = Infinity;
+            indexedData.forEach((d, i) => {
+              if (d.startDate) {
+                const diff = Math.abs(d.startDate.min - targetTime);
+                if (diff < minDiff) { minDiff = diff; closestIdx = i; }
               }
             });
-          }, [rawCsvRows, dateEngineMode, dateLocale]);
+            initialIdx = closestIdx;
+          }
+        }
+        setActiveIndex(initialIdx);
+        hasInitializedRef.current = true;
+      }
+      setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
+      setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
+    }).catch(err => {
+      console.error("Fatal CMS Connection Failure:", err);
+      setStatus({ text: 'Database Sync Failure', progress: 100, isFading: false, active: false });
+      addLog(`Database Sync Error: ${err.message}`, 'error');
+    });
+  }, [rawCsvRows, dateEngineMode, dateLocale]);
+
+  // --- [ PART Δ: Filtering Effect & Active Dataset Intersection ] ---
+  useEffect(() => {
+    if (unfilteredData.length === 0) return;
+    const filtered = unfilteredData.filter(d => 
+      (d.tags.length === 0 || d.tags.some(t => activeTags.includes(t))) &&
+      activeExtractTypes.includes(d.extractType)
+    );
+    setData(filtered);
+    
+    if (activeIndex >= filtered.length) {
+      setActiveIndex(Math.max(0, filtered.length - 1));
+    }
+    
+    const tagsMap = new Set();
+    filtered.forEach(d => {
+      d.tags.forEach(t => tagsMap.add(t));
+    });
+    const laneCount = tagsMap.size > 0 ? tagsMap.size : 1;
+    setTimelineRequiredHeight((laneCount * 24) + 40);
+  }, [unfilteredData, activeTags, activeExtractTypes]);
+
+  const handleToggleTag = (tag) => {
+    if (activeTags.includes(tag)) {
+      if (activeTags.length > 1) {
+        setActiveTags(activeTags.filter(t => t !== tag));
+      } else {
+        addLog('Cannot deselect all swimlanes. At least one must remain active.', 'warning');
+      }
+    } else {
+      setActiveTags([...activeTags, tag]);
+    }
+  };
+
+  const handleToggleExtractType = (type) => {
+    if (activeExtractTypes.includes(type)) {
+      if (activeExtractTypes.length > 1) {
+        setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
+      } else {
+        addLog('At least one data stream must remain active.', 'warning');
+      }
+    } else {
+      setActiveExtractTypes([...activeExtractTypes, type]);
+    }
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 4: RESIZER EVENT LISTENERS ] ===
+  // =========================================================================
+  const startPrimaryResize = (e) => {
+    e.preventDefault();
+    const startX = e.clientX || (e.touches && e.touches.clientX);
+    const startSplit = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--primary-split')) || 50;
+    const docW = window.innerWidth;
+
+    const doDrag = (moveEvent) => {
+      const currentX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches.clientX);
+      const diffX = currentX - startX;
+      const pctDiff = (diffX / docW) * 100;
+      const newSplit = Math.max(20, Math.min(80, startSplit + pctDiff));
+      document.documentElement.style.setProperty('--primary-split', `${newSplit}%`);
+    };
+
+    const stopDrag = () => {
+      window.removeEventListener('mousemove', doDrag);
+      window.removeEventListener('mouseup', stopDrag);
+      window.removeEventListener('touchmove', doDrag);
+      window.removeEventListener('touchend', stopDrag);
+    };
+
+    window.addEventListener('mousemove', doDrag);
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchmove', doDrag, { passive: true });
+    window.addEventListener('touchend', stopDrag);
+  };
+
+  const startSecondaryResize = (e) => {
+    e.preventDefault();
+    const startY = e.clientY || (e.touches && e.touches.clientY);
+    const startSplit = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--secondary-split')) || 50;
+    const docH = window.innerHeight;
+
+    const doDrag = (moveEvent) => {
+      const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches.clientY);
+      const diffY = currentY - startY;
+      const pctDiff = (diffY / docH) * 100;
+      const newSplit = Math.max(20, Math.min(80, startSplit + pctDiff));
+      document.documentElement.style.setProperty('--secondary-split', `${newSplit}%`);
+    };
+
+    const stopDrag = () => {
+      window.removeEventListener('mousemove', doDrag);
+      window.removeEventListener('mouseup', stopDrag);
+      window.removeEventListener('touchmove', doDrag);
+      window.removeEventListener('touchend', stopDrag);
+    };
+
+    window.addEventListener('mousemove', doDrag);
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchmove', doDrag, { passive: true });
+    window.addEventListener('touchend', stopDrag);
+  };
+
+  const startTimelineResize = (e) => {
+    e.preventDefault();
+    const startY = e.clientY || (e.touches && e.touches.clientY);
+    const startHeight = timelineRequiredHeight;
+
+    const doDrag = (moveEvent) => {
+      const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches.clientY);
+      const diffY = startY - currentY;
+      const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
+      setTimelineRequiredHeight(newHeight);
+    };
+
+    const stopDrag = () => {
+      window.removeEventListener('mousemove', doDrag);
+      window.removeEventListener('mouseup', stopDrag);
+      window.removeEventListener('touchmove', doDrag);
+      window.removeEventListener('touchend', stopDrag);
+    };
+
+    window.addEventListener('mousemove', doDrag);
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchmove', doDrag, { passive: true });
+    window.addEventListener('touchend', stopDrag);
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 5: CHRONOLOGICALLY REALIGNED SEARCH ] ===
+  // =========================================================================
+  const handleResultClick = (id, qString) => {
+    const sortedIdx = data.findIndex(d => d.id === id);
+    if (sortedIdx >= 0) jumpToSlide(sortedIdx);
+    setIsSearchOpen(false);
+    if (qString && !searchHistory.includes(qString)) {
+      const newH = [qString, ...searchHistory].slice(0, 8);
+      setSearchHistory(newH);
+      localStorage.setItem('tm_search_history', JSON.stringify(newH));
+    }
+  };
+
+  // --- [ PART Γ: Reverted Contains-Matching Search Logic ] ---
+  const executeSearch = (query) => {
+    if (!query.trim()) return [];
+    const q = stripAndNormalize(query);
+    return data.filter(d => 
+      (d.title && stripAndNormalize(d.title).includes(q)) ||
+      (d.description && stripAndNormalize(d.description).includes(q)) ||
+      (d.place && stripAndNormalize(d.place).includes(q)) ||
+      (d.tags && d.tags.some(t => stripAndNormalize(t).includes(q)))
+    );
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 7: VIEWPORT BOUNDS TRACKING ] ===
+  // =========================================================================
+  useEffect(() => {
+    if (data.length === 0) return;
+    const minTimes = data.map(d => d.startDate?.min).filter(Boolean);
+    const maxTimes = data.map(d => d.endDate?.max || d.startDate?.max).filter(Boolean);
+    if (minTimes.length > 0) {
+      const globalMin = Math.min(...minTimes);
+      const globalMax = maxTimes.length > 0 ? Math.max(...maxTimes) : globalMin;
+      setVisibleTimeBounds([globalMin, globalMax]);
+    }
+  }, [data]);
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 8: TIMED AUTOFOCUS FOCUS GATES ] ===
+  // =========================================================================
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+      if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
+      else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeIndex, data.length]);
+
+  useEffect(() => {
+    if (isSearchOpen) {
+      setTimeout(() => {
+        const inputNode = document.querySelector('.search-input');
+        if (inputNode) inputNode.focus();
+      }, 150);
+    }
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    updateAppHeight();
+    let wasDesktop = window.innerWidth >= 1024;
+    const handleResize = () => {
+      updateAppHeight();
+      const isDesktop = window.innerWidth >= 1024;
+      if (isDesktop !== wasDesktop) {
+        window.dispatchEvent(new Event('resize'));
+      }
+      wasDesktop = isDesktop;
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const jumpToSlide = (newIdx, isSequential = false) => {
+    if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
+      if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
+      setActiveIndex(newIdx);
+    }
+  };
+
+  const goBack = () => {
+    if (slideHistory.length > 0) {
+      const prev = slideHistory[slideHistory.length - 1];
+      setSlideHistory(h => h.slice(0, -1));
+      setActiveIndex(prev);
+    }
+  };
+
+  const searchResults = executeSearch(debouncedSearchQuery);
+  const activeSlide = data[activeIndex];
+  const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
+  // =========================================================================
+  const CarTiMapperLogo = ({ context, appVersion }) => {
+    const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
+    if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
+    if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 24px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.85rem; color: #444; line-height: 1;">CarTiMap</span><span style="font-size: 0.65rem; color: #888; line-height: 1;">${appVersion}</span></div></div>`;
+    return html`
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
+        <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <h2 style="margin: 0; font-size: 2.4rem; color: #222; letter-spacing: -0.5px; line-height: 1.1;">CarTiMap Engine</h2>
+          <div style="font-family: monospace; color: #007acc; font-size: 1.1rem; font-weight: 600; margin-top: 6px;">${appVersion}</div>
+        </div>
+      </div>
+    `;
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
+  // =========================================================================
+  const downloadBtn = (aboutData && aboutData.downloadUrl) 
+    ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
+    : '';
+
+  const backBtnText = showButtonText ? html`<span>Back</span>` : '';
+  const resetLayoutBtnText = showButtonText ? html`<span>Reset Layout</span>` : '';
+  const settingsBtnText = showButtonText ? html`<span>Settings</span>` : '';
+  const telemetryBtnText = showButtonText ? html`<span>Telemetry</span>` : '';
+  const prevBtnText = showButtonText ? html`<span>Prev</span>` : '';
+  const nextBtnText = showButtonText ? html`<span>Next</span>` : '';
+  const searchBtnText = showButtonText ? html`<span>Search</span>` : '';
+  const filterBtnText = showButtonText ? html`<span>Filters</span>` : '';
+
+  const backBtn = (slideHistory && slideHistory.length > 0)
+    ? html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`
+    : '';
+
+  const resetLayoutBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(140); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><polyline points="16 3 21 8 16 13"></polyline><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><polyline points="8 21 3 16 8 11"></polyline></svg>
+      ${resetLayoutBtnText}
+    </button>
+  `;
+
+  const settingsBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(true)} title="Engine Configurations">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      ${settingsBtnText}
+    </button>
+  `;
+
+  const telemetryBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Logs">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      ${telemetryBtnText}
+    </button>
+  `;
+
+  const prevBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      ${prevBtnText}
+    </button>
+  `;
+
+  const nextBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next Node">
+      ${nextBtnText}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  `;
+
+  const searchBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSearchOpen(true)} title="Interactive Query Index">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      ${searchBtnText}
+    </button>
+  `;
+
+  const filterBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+      ${filterBtnText}
+    </button>
+  `;
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
+  // =========================================================================
+  const aboutBtn = aboutData 
+    ? html`<button class="status-btn" style="width: 48px; height: 28px; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs">
+        <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
+      </button>`
+    : '';
+
+  const availableExtractTypes = ['Storyline', 'Context', 'Related history', 'Presentation'];
+
+  const filterPopup = isFilterOpen
+    ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
+        <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
+          <span>Active Swimlanes</span>
+          <button style="border: none; background: transparent; color: #007acc; font-size: 0.8rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; padding-right: 4px;">
+          ${allTags.map(tag => html`
+            <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+              <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
+              <span style="font-family: monospace; color: #555;">${tag}</span>
+            </label>
+          `)}
+        </div>
+        <!-- Dedicated Extract Type Data Streams Filter Selector Group [REF: ETL-14c] -->
+        <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 8px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
+          <span>Data Streams</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          ${availableExtractTypes.map(type => html`
+            <label key=${type} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+              <input type="checkbox" checked=${activeExtractTypes.includes(type)} onChange=${() => handleToggleExtractType(type)} style="cursor: pointer;" />
+              <span style="font-family: monospace; color: #555;">${type}</span>
+            </label>
+          `)}
+        </div>
+      </div>`
+    : '';
+
+  const searchHistoryLayout = (searchHistory.length > 0 && !searchQuery)
+    ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>`
+    : '';
+
+  const searchResultsList = searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">${res.title}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`);
+
+  const loadingScreen = (!status.active)
+    ? html`<div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
+        <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
+        <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%"></div></div>
+        <div class="status-text" style="font-family: monospace; font-size: 0.95rem;">${status.text}</div>
+      </div>`
+    : '';
+
+  const appLayout = (data.length > 0 && status.active)
+    ? html`<div id="app-layout" ref=${appRef} style="display: flex; flex-direction: column; height: 100%; width: 100%; overflow: hidden;">
         
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 4: SWIMLANE TIMELINE CALCULATION ] ===
-          // =========================================================================
-          useEffect(() => {
-            if (unfilteredData.length === 0) return;
-            const filtered = unfilteredData.filter(d => 
-              d.tags.length === 0 || d.tags.some(t => activeTags.includes(t))
-            );
-            setData(filtered);
+        <!-- Core Viewports Container wrapping ContentSlider and VisualPane [REF: UI-175] -->
+        <div class="core-viewports ${maxPane === 'text' ? 'max-text' : ''} ${maxPane === 'map' ? 'max-map' : ''} ${maxPane === 'media' ? 'max-media' : ''}" style="display: flex; flex-direction: row; flex-grow: 1; width: 100%; min-height: 0; overflow: hidden; position: relative; z-index: 10;">
+          
+          <!-- Conformed Text Pane containing ContentSlider -->
+          <div class="content-slider-pane" style="width: var(--primary-split, 50%); height: 100%; flex-shrink: 0; display: flex; flex-direction: column; overflow: hidden; z-index: 15; background: #fcfcfc;">
+            <${ContentSlider}
+              data=${data}
+              activeIndex=${activeIndex}
+              setActiveIndex=${jumpToSlide}
+              maxPane=${maxPane}
+              setMaxPane=${setMaxPane}
+              dateLocale=${dateLocale}
+              formatSmartDate=${formatSmartDate}
+            />
+          </div>
+          
+          <!-- Primary Vertical Column Resizer Splitter -->
+          <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize} style="width: 4px; background: #eee; cursor: col-resize; z-index: 50; flex-shrink: 0;"></div>
+          
+          <!-- Visual Pane containing MapViewer and MediaViewer -->
+          <div class="visual-pane ${!activeSlide.media || activeSlide.media.length === 0 ? 'no-media' : ''}" style="flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; z-index: 20; height: 100%;">
             
-            if (activeIndex >= filtered.length) {
-              setActiveIndex(Math.max(0, filtered.length - 1));
-            }
-            
-            const tagsMap = new Set();
-            filtered.forEach(d => {
-              d.tags.forEach(t => tagsMap.add(t));
-            });
-            const laneCount = tagsMap.size > 0 ? tagsMap.size : 1;
-            setTimelineRequiredHeight((laneCount * 24) + 40);
-          }, [unfilteredData, activeTags]);
-        
-          const handleToggleTag = (tag) => {
-            if (activeTags.includes(tag)) {
-              if (activeTags.length > 1) {
-                setActiveTags(activeTags.filter(t => t !== tag));
-              } else {
-                addLog('Cannot deselect all swimlanes. At least one must remain active.', 'warning');
-              }
-            } else {
-              setActiveTags([...activeTags, tag]);
-            }
-          };
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 5: CHRONOLOGICALLY REALIGNED SEARCH ] ===
-          // =========================================================================
-          const handleResultClick = (id, qString) => {
-            const sortedIdx = data.findIndex(d => d.id === id);
-            if (sortedIdx >= 0) jumpToSlide(sortedIdx);
-            setIsSearchOpen(false);
-            if (qString && !searchHistory.includes(qString)) {
-              const newH = [qString, ...searchHistory].slice(0, 8);
-              setSearchHistory(newH);
-              localStorage.setItem('tm_search_history', JSON.stringify(newH));
-            }
-          };
-        
-          const executeSearch = (query) => {
-            if (!query.trim()) return [];
-            const q = stripAndNormalize(query);
-            return data.filter(d => d._searchIndex && d._searchIndex.includes(q));
-          };
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 6: INTERSECTION & RESIZING LISTENERS ] ===
-          // =========================================================================
-          const startTimelineResize = (e) => {
-            e.preventDefault();
-            const startY = e.clientY || (e.touches && e.touches.clientY);
-            const startHeight = timelineRequiredHeight;
-            
-            const doDrag = (moveEvent) => {
-              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches.clientY);
-              const diffY = startY - currentY;
-              const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
-              setTimelineRequiredHeight(newHeight);
-            };
-            
-            const stopDrag = () => {
-              window.removeEventListener('mousemove', doDrag);
-              window.removeEventListener('mouseup', stopDrag);
-              window.removeEventListener('touchmove', doDrag);
-              window.removeEventListener('touchend', stopDrag);
-            };
-            
-            window.addEventListener('mousemove', doDrag);
-            window.addEventListener('mouseup', stopDrag);
-            window.addEventListener('touchmove', doDrag, { passive: true });
-            window.addEventListener('touchend', stopDrag);
-          };
-
-          const startPrimaryResize = (e) => {
-            if (maxPane) return; 
-            const startX = e.touches ? e.touches.clientX : e.clientX; 
-            const startY = e.touches ? e.touches.clientY : e.clientY; 
-            const isDesktop = window.innerWidth >= 1024; 
-            const containerNode = appRef.current.querySelector('.core-viewports'); 
-            const startVal = isDesktop ? appRef.current.querySelector('.content-slider-pane').offsetWidth : appRef.current.querySelector('.content-slider-pane').offsetHeight; 
-            const containerSize = isDesktop ? containerNode.offsetWidth : containerNode.offsetHeight;
-            const onMove = (e2) => { 
-              const currentX = e2.touches ? e2.touches.clientX : e2.clientX; 
-              const currentY = e2.touches ? e2.touches.clientY : e2.clientY; 
-              const delta = isDesktop ? (currentX - startX) : (startY - currentY); 
-              let pct = ((startVal + delta) / containerSize) * 100; 
-              if (pct < 15) pct = 15; 
-              if (pct > 85) pct = 85; 
-              appRef.current.style.setProperty('--primary-split', pct + '%'); 
-            };
-            const onUp = () => { 
-              document.removeEventListener('mousemove', onMove); 
-              document.removeEventListener('mouseup', onUp); 
-              document.removeEventListener('touchmove', onMove); 
-              document.removeEventListener('touchend', onUp); 
-              window.dispatchEvent(new Event('resize')); 
-            };
-            document.addEventListener('mousemove', onMove); 
-            document.addEventListener('mouseup', onUp); 
-            document.addEventListener('touchmove', onMove, { passive: false }); 
-            document.addEventListener('touchend', onUp);
-          };
-
-          const startSecondaryResize = (e) => {
-            if (maxPane) return; 
-            const startX = e.touches ? e.touches.clientX : e.clientX; 
-            const startY = e.touches ? e.touches.clientY : e.clientY; 
-            const isDesktop = window.innerWidth >= 1024; 
-            const containerNode = appRef.current.querySelector('.visual-pane'); 
-            const startVal = isDesktop ? appRef.current.querySelector('.map-pane').offsetHeight : appRef.current.querySelector('.map-pane').offsetWidth; 
-            const containerSize = isDesktop ? containerNode.offsetHeight : containerNode.offsetWidth;
-            const onMove = (e2) => { 
-              const currentX = e2.touches ? e2.touches.clientX : e2.clientX; 
-              const currentY = e2.touches ? e2.touches.clientY : e2.clientY; 
-              const delta = isDesktop ? (currentY - startY) : (currentX - startX); 
-              let pct = ((startVal + delta) / containerSize) * 100; 
-              if (pct < 10) pct = 10; 
-              if (pct > 90) pct = 90; 
-              appRef.current.style.setProperty('--secondary-split', pct + '%'); 
-            };
-            const onUp = () => { 
-              document.removeEventListener('mousemove', onMove); 
-              document.removeEventListener('mouseup', onUp); 
-              document.removeEventListener('touchmove', onMove); 
-              document.removeEventListener('touchend', onUp); 
-              window.dispatchEvent(new Event('resize')); 
-            };
-            document.addEventListener('mousemove', onMove); 
-            document.addEventListener('mouseup', onUp); 
-            document.addEventListener('touchmove', onMove, { passive: false }); 
-            document.addEventListener('touchend', onUp);
-          };
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 7: VIEWPORT BOUNDS TRACKING ] ===
-          // =========================================================================
-          useEffect(() => {
-            if (data.length === 0) return;
-            const minTimes = data.map(d => d.startDate?.min).filter(Boolean);
-            const maxTimes = data.map(d => d.endDate?.max || d.startDate?.max).filter(Boolean);
-            if (minTimes.length > 0) {
-              const globalMin = Math.min(...minTimes);
-              const globalMax = maxTimes.length > 0 ? Math.max(...maxTimes) : globalMin;
-              setVisibleTimeBounds([globalMin, globalMax]);
-            }
-          }, [data]);
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 8: TIMED AUTOFOCUS FOCUS GATES ] ===
-          // =========================================================================
-          useEffect(() => {
-            const handleKeyDown = (e) => {
-              if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
-              if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
-              else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
-            };
-            window.addEventListener('keydown', handleKeyDown);
-            return () => window.removeEventListener('keydown', handleKeyDown);
-          }, [activeIndex, data.length]);
-        
-          useEffect(() => {
-            if (isSearchOpen) {
-              setTimeout(() => {
-                const inputNode = document.querySelector('.search-input');
-                if (inputNode) inputNode.focus();
-              }, 150);
-            }
-          }, [isSearchOpen]);
-        
-          useEffect(() => {
-            const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
-            updateAppHeight();
-            let wasDesktop = window.innerWidth >= 1024;
-            const handleResize = () => {
-              updateAppHeight();
-              const isDesktop = window.innerWidth >= 1024;
-              if (isDesktop !== wasDesktop) {
-                window.dispatchEvent(new Event('resize'));
-              }
-              wasDesktop = isDesktop;
-            };
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
-          }, []);
-        
-          const jumpToSlide = (newIdx, isSequential = false) => {
-            if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
-              if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
-              setActiveIndex(newIdx);
-            }
-          };
-        
-          const goBack = () => {
-            if (slideHistory.length > 0) {
-              const prev = slideHistory[slideHistory.length - 1];
-              setSlideHistory(h => h.slice(0, -1));
-              setActiveIndex(prev);
-            }
-          };
-        
-          const searchResults = executeSearch(debouncedSearchQuery);
-          const activeSlide = data[activeIndex];
-          const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
-          // =========================================================================
-            // High-fidelity Compass & Bracket Base Vector Graphics Restored [REF: UI-236b]
-          const CarTiMapperLogo = ({ context, appVersion }) => {
-            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
-            
-            if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper" style="width: 120px; height: 80px; margin-bottom: 10px;">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
-            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 26px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.9rem; color: #111; font-weight: bold; line-height: 1; font-family: monospace;">CarTiMap</span><span style="font-size: 0.7rem; color: #888; line-height: 1; font-family: monospace;">${appVersion}</span></div></div>`;
-            
-            return html`
-              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eee; text-align: center;">
-                <div style="width: 85%; max-width: 450px; height: auto; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.1)); margin-bottom: 15px;">${svgIcon}</div>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                  <h2 style="margin: 0; font-size: 2.2rem; color: #222; letter-spacing: -0.5px; line-height: 1.1; font-family: monospace;">CarTiMap Engine</h2>
-                  <div style="font-family: monospace; color: #007acc; font-size: 1.05rem; font-weight: 600; margin-top: 6px;">${appVersion}</div>
-                </div>
-              </div>
-            `;
-          };
-
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
-          // =========================================================================
-          const downloadBtn = (aboutData && aboutData.downloadUrl) 
-            ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
-            : '';
-        
-          const backBtnText = showButtonText ? html`<span>Back</span>` : '';
-          const resetLayoutBtnText = showButtonText ? html`<span>Reset Layout</span>` : '';
-          const settingsBtnText = showButtonText ? html`<span>Settings</span>` : '';
-          const telemetryBtnText = showButtonText ? html`<span>Telemetry</span>` : '';
-          const prevBtnText = showButtonText ? html`<span>Prev</span>` : '';
-          const nextBtnText = showButtonText ? html`<span>Next</span>` : '';
-          const searchBtnText = showButtonText ? html`<span>Search</span>` : '';
-          const filterBtnText = showButtonText ? html`<span>Filters</span>` : '';
-
-          const backBtn = (slideHistory && slideHistory.length > 0)
-            ? html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`
-            : '';
-        
-          const resetLayoutBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(200); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><polyline points="16 3 21 8 16 13"></polyline><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><polyline points="8 21 3 16 8 11"></polyline></svg>
-              ${resetLayoutBtnText}
-            </button>
-          `;
-        
-          const settingsBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(true)} title="Engine Configurations">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              ${settingsBtnText}
-            </button>
-          `;
-        
-          const telemetryBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Logs">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              ${telemetryBtnText}
-            </button>
-          `;
-        
-          const prevBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-              ${prevBtnText}
-            </button>
-          `;
-        
-          const nextBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next Node">
-              ${nextBtnText}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-          `;
-        
-          const searchBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSearchOpen(true)} title="Interactive Query Index">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              ${searchBtnText}
-            </button>
-          `;
-        
-          const filterBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-              ${filterBtnText}
-            </button>
-          `;
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
-          // =========================================================================
-          const aboutBtn = aboutData 
-            ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;" onClick=${() => setIsAboutOpen(true)} title="Dataset Specs">
-                <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
-              </button>`
-            : '';
-
-          const filterPopup = isFilterOpen
-            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
-                <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
-                  <span>Active Swimlanes</span>
-                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.8rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; padding-right: 4px;">
-                  ${allTags.map(tag => html`
-                    <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
-                      <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
-                      <span style="font-family: monospace; color: #555;">${tag}</span>
-                    </label>
-                  `)}
-                </div>
-              </div>`
-            : '';
-
-          const searchHistoryLayout = (searchHistory.length > 0 && !searchQuery)
-            ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>`
-            : '';
-
-          const searchResultsList = searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">${res.title}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`);
-
-          const loadingScreen = (!status.active)
-            ? html`<div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
-                <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
-                <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%"></div></div>
-                <div class="status-text" style="font-family: monospace; font-size: 0.95rem;">${status.text}</div>
-              </div>`
-            : '';
-
-          const appLayout = (data.length > 0 && status.active)
-            ? html`<div id="app-layout" ref=${appRef} style="display: flex; flex-direction: column; height: 100%; width: 100%; overflow: hidden;">
-                
-                <!-- Core Viewports Container wrapping ContentSlider and VisualPane [REF: UI-175] -->
-                <div class="core-viewports ${maxPane === 'text' ? 'max-text' : ''} ${maxPane === 'map' ? 'max-map' : ''} ${maxPane === 'media' ? 'max-media' : ''}" style="display: flex; flex-direction: row; flex-grow: 1; width: 100%; min-height: 0; overflow: hidden; position: relative; z-index: 10;">
-                  
-                  <!-- Conformed Text Pane containing ContentSlider -->
-                  <div class="content-slider-pane" style="width: var(--primary-split, 50%); height: 100%; flex-shrink: 0; display: flex; flex-direction: column; overflow: hidden; z-index: 15; background: #fcfcfc;">
-                    <${ContentSlider}
-                      data=${data}
-                      activeIndex=${activeIndex}
-                      setActiveIndex=${jumpToSlide}
-                      maxPane=${maxPane}
-                      setMaxPane=${setMaxPane}
-                      dateLocale=${dateLocale}
-                      formatSmartDate=${formatSmartDate}
-                    />
-                  </div>
-                  
-                  <!-- Primary Vertical Column Resizer Splitter -->
-                  <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize} style="width: 4px; background: #eee; cursor: col-resize; z-index: 50; flex-shrink: 0;"></div>
-                  
-                  <!-- Visual Pane containing MapViewer and MediaViewer -->
-                  <div class="visual-pane ${!activeSlide.media || activeSlide.media.length === 0 ? 'no-media' : ''}" style="flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; z-index: 20; height: 100%;">
-                    
-                    <!-- Map Viewer Container -->
-                    <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}" style="flex: 0 0 var(--secondary-split, 50%); height: var(--secondary-split, 50%); position: relative; z-index: 30;">
-                      <${MapViewer}
-                        data=${data}
-                        activeIndex=${activeIndex}
-                        setActiveIndex=${jumpToSlide}
-                        addLog=${addLog}
-                        basemapsRegistry=${basemapsRegistry}
-                        maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
-                        minimapOffset=${minimapOffset}
-                        setMinimapOffset=${setMinimapOffset}
-                        maxPane=${maxPane}
-                        setMaxPane=${setMaxPane}
-                        polygonOpacity=${polygonOpacity}
-                        showButtonText=${showButtonText}
-                        visibleTimeBounds=${visibleTimeBounds}
-                      />
-                    </div>
-                    
-                    <!-- Secondary Horizontal Row Resizer Splitter -->
-                    <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize} style="height: 4px; background: #eee; cursor: row-resize; z-index: 50; flex-shrink: 0;"></div>
-                    
-                    <!-- Media Viewer Container -->
-                    <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}" style="flex: 1; position: relative; min-height: 0; z-index: 30; background: #111;">
-                      <${MediaViewer}
-                        activeSlide=${activeSlide}
-                        maxPane=${maxPane}
-                        setMaxPane=${setMaxPane}
-                      />
-                    </div>
-                  </div>
-                </div>
-      
-                <!-- Conformed 38px Status Cockpit sitting clean in the vertical column flow -->
-                <div class="status-bar" style="height: 38px; flex-shrink: 0; display: flex; align-items: center; background: #fff; border-top: 1px solid #ddd; box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative;">
-                  <style>
-                    .record-select-input::-webkit-outer-spin-button,
-                    .record-select-input::-webkit-inner-spin-button {
-                      -webkit-appearance: none;
-                      margin: 0;
-                    }
-                    .record-select-input[type=number] {
-                      -moz-appearance: textfield;
-                    }
-                  </style>
-                  <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
-                    ${aboutBtn}
-                    ${resetLayoutBtn}
-                    ${settingsBtn}
-                    ${telemetryBtn}
-                  </div>
-      
-                  <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
-                  <div class="status-center" style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; z-index: 101; font-size: 0.95rem;">
-                    ${prevBtn}
-      
-                    <div style="display: flex; align-items: center; gap: 4px; font-family: monospace; font-size: 0.95rem;">
-                      <input
-                        type="number"
-                        class="record-select-input"
-                        min="1"
-                        max=${data.length}
-                        value=${activeIndex + 1}
-                        onChange=${(e) => {
-                          const val = parseInt(e.target.value, 10);
-                          if (!isNaN(val) && val >= 1 && val <= data.length) {
-                            jumpToSlide(val - 1);
-                          }
-                        }}
-                        onKeyDown=${(e) => {
-                          e.stopPropagation();
-                        }}
-                        style="width: 50px; background: rgba(0, 0, 0, 0.05); border: 1px solid #999; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.95rem; padding: 3px 0; color: inherit; outline: none;"
-                      />
-                      <span style="user-select: none; opacity: 0.8;">/ ${data.length}</span>
-                    </div>
-      
-                    ${nextBtn}
-
-                    <!-- Non-bold left-aligned dynamic scale metrics directly adjacent to Next navigation control [REF: UI-164c, TL-15] -->
-                    ${visibleTimeSpan ? (() => {
-                      const parts = visibleTimeSpan.split(' (');
-                      const spanStr = parts[0] ? parts[0].replace('Span: ', '') : '';
-                      const zoomStr = parts[1] ? parts[1].replace('Zoom: ', '').replace(')', '') : '';
-                      return html`
-                        <div class="telemetry-span-zoom" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin-left: 12px; font-size: 0.8rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none;">
-                          <div style="display: flex; align-items: center; gap: 4px;">
-                            <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>
-                            <span style="font-family: monospace; color: #333;">${spanStr}</span>
-                          </div>
-                          ${zoomStr ? html`
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                              <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>
-                              <span style="font-family: monospace; color: #333;">${zoomStr}</span>
-                            </div>
-                          ` : ''}
-                        </div>
-                      `;
-                    })() : ''}
-                  </div>
-      
-                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
-                    ${filterBtn}
-                    ${filterPopup}
-                    ${searchBtn}
-                    ${backBtn}
-                  </div>
-                </div>
-      
-                <!-- Resizer divider sits clean above the timeline pane [REF: UI-175] -->
-                <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style="height: 4px; background: #eee; cursor: ns-resize; z-index: 90; flex-shrink: 0; border-top: 1px solid #ddd; position: relative;"></div>
-      
-                <!-- Dedicated static-flow Timeline Pane (border-top duplicate removed) -->
-                <div class="timeline-pane ${maxPane === 'timeline' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'timeline' ? 'pane-hidden' : ''}" style="height: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}; min-height: ${isTimelineMinimized ? '0px' : '45px'}; flex-shrink: 0; border-top: none; overflow: hidden; position: relative; z-index: 5;">
-                  <${TimelineScrubber}
-                    data=${data}
-                    activeIndex=${activeIndex}
-                    setActiveIndex=${jumpToSlide}
-                    addLog=${addLog}
-                    activeTags=${activeTags}
-                    isTimelineExpanded=${isTimelineExpanded}
-                    setIsTimelineExpanded=${setIsTimelineExpanded}
-                    maxPane=${maxPane}
-                    setMaxPane=${setMaxPane}
-                    showButtonText=${showButtonText}
-                    visibleTimeBounds=${visibleTimeBounds}
-                    setVisibleTimeBounds=${setVisibleTimeBounds}
-                    visibleTimeSpan=${visibleTimeSpan}
-                    setVisibleTimeSpan=${setVisibleTimeSpan}
-                    zoomLock=${zoomLock}
-                    setZoomLock=${setZoomLock}
-                    isTimelineMinimized=${isTimelineMinimized}
-                    setIsTimelineMinimized=${setIsTimelineMinimized}
-                    dateLocale=${dateLocale}
-                    timelineRequiredHeight=${timelineRequiredHeight}
-                  />
-                </div>
-      
-                ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline" style="z-index: 2000;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
-              </div>`
-            : '';
-			
-          return html`
-            <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
-              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
-              
-              ${loadingScreen}${appLayout}
-        
-              <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 10000;"></div>
-              <div id="search-modal" class="tm-modal ${isSearchOpen ? 'open' : ''}" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column;">
-                <button class="modal-close" onClick=${() => setIsSearchOpen(false)} title="Close">✕</button>
-                <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 15px; font-family: monospace;">Search Dataset</h3>
-                <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} autoFocus style="font-family: monospace; font-size: 1rem; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;" />
-                ${searchHistoryLayout}
-                <div style="flex-grow: 1; overflow-y: auto; border-top: 1px solid #eee;">
-                  ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888; font-family: monospace;">No events found for "${searchQuery}"</div>` : ''}
-                  ${searchResultsList}
-                </div>
-              </div>
-        
-              <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 10000;"></div>
-              
-              <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;">
-                <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">✕</button>
-                <div style="margin-bottom: 25px;">
-                  <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
-                  <h2 style="margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50; font-family: monospace;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Specifications'}}></h2>
-                  <div style="font-size: 1.05rem; line-height: 1.5; color: #333; margin-bottom: 15px; font-family: monospace;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
-                  <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.8rem; margin-bottom: 12px; line-height: 1.4;">
-                    <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
-                    <strong>Source File Reference:</strong> ${aboutData?.rawSource}
-                  </div>
-                  <div style="display: flex; gap: 8px; margin-bottom: 25px;">
-                    <button class="status-btn-text" style="width: max-content; padding: 6px 12px; background: #007acc; color: #fff; border: none; cursor: pointer; font-family: monospace;" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>Play Overview Slide</button>
-                    ${downloadBtn}
-                  </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; background: #fcfcfc; border-radius: 8px; padding: 20px; border: 1px solid #eee; font-family: monospace;">
-                  <div>
-                    <h4 style="margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;">📍 Map Symbology</h4>
-                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;">
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#007acc; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div></div>
-                        <span>Standard Event Node</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:14px; height:14px; border-radius:50%; background:#28a745; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:3px; height:16px; background:#28a745;"></div></div>
-                        <span>Active / Selected Event Node</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#ffb300; border:2px solid #fff; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div></div>
-                        <span>VIP / Priority Event</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 28px; position: relative; display: flex; align-items: flex-end; justify-content: center;"><div style="width:12px; height:12px; border-radius:50%; background:#007acc; position:absolute; top:0;"></div><div style="width:2px; height:16px; background:#333;"></div><div style="position:absolute; top:-4px; right:-6px; background:#d32f2f; color:#fff; border-radius:50%; width:12px; height:12px; font-size:7px; display:flex; align-items:center; justify-content:center; border:1px solid #fff;">4</div></div>
-                        <span>Stacked Pin (Exact Identical Coords)</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 20px; height: 20px; background: rgba(0,122,204,0.15); border: 2px dashed #007acc;"></div>
-                        <span>Geofence / Polygon / Area Bounds</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 style="margin: 0 0 15px 0; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 5px;">⏱ Timeline Symbology</h4>
-                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: #555;">
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 16px; background: #fff; border: 1px solid #ddd; border-left: 2px solid #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));"></div>
-                        <span>Gregorian Event Block</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 16px; background: #007acc; clip-path: polygon(0 2px, 4px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 2px));"></div>
-                        <span>Active Selected Event Block</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 6px; background: rgba(0, 122, 204, 0.3); border-left: 2px solid #007acc;"></div>
-                        <span>Event Duration Span Bar</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 24px; height: 8px; background: rgba(255, 179, 0, 0.15); border: 1px dashed #ffb300; border-radius: 4px;"></div>
-                        <span>EDTF Approximation Uncertainty Span</span>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">←</span>
-                        <span style="background: #eee; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">→</span>
-                        <span>Keyboard Nav Controls</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <details style="background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; padding: 0; margin-bottom: 20px; font-family: monospace;">
-                  <summary style="background: #f1f1f1; padding: 12px 15px; font-weight: 600; cursor: pointer; color: #333; outline: none; user-select: none;">⚙️ System Architecture & Routing Syntax</summary>
-                  <div style="padding: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; border-top: 1px solid #eee;">
-                    <p style="margin-top: 0;">The <b>CarTiMap Engine</b> is a high-performance, single-file spatial-temporal processing suite. It dynamically parses raw Google Sheet datasets directly in the browser via zero-build Vanilla JS and Preact, executing R-Tree spatial indexing and ISO 8601-2 EDTF chronologies on the fly.</p>
-                    <h5 style="margin: 15px 0 5px 0; color: #222;">Analytical URL Parameters</h5>
-                    <ul style="margin: 0; padding-left: 20px; font-family: monospace; color: #007acc; line-height: 1.6;">
-                      <li><span style="color:#555">?source=ID</span> (Google Sheet Base ID)</li>
-                      <li><span style="color:#555">&amp;gid=ID</span> (Primary Data Tab ID)</li>
-                      <li><span style="color:#555">&amp;bgid=ID</span> (Basemaps/Overlays Tab ID)</li>
-                      <li><span style="color:#555">&amp;slide=X</span> (Target integer slide index bypass)</li>
-                      <li><span style="color:#555">&amp;date=YYYY-MM-DD</span> (Temporal anchor bypass)</li>
-                      <li><span style="color:#555">&amp;mapzoom=Z</span> (Initial geographic zoom override)</li>
-                      <li><span style="color:#555">&amp;theme=dark</span> (System dark mode override)</li>
-                    </ul>
-                  </div>
-                </details>
-              </div>
-        
-              <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
-              <div id="settings-modal" class="tm-modal ${isSettingsOpen ? 'open' : ''}" style="display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px; font-family: monospace;">
-                <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close">✕</button>
-                <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 20px; color: #222;">Engine Settings</h3>
-                <div style="display: flex; flex-direction: column; gap: 20px;">
-                  <div>
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.95rem; color: #444;">Data Locale Format</label>
-                    <select value=${dateLocale} onChange=${e => { setDateLocale(e.target.value); localStorage.setItem('tm_date_locale', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.95rem; font-family: monospace;">
-                      <option value="en-GB">European (DD/MM/YYYY)</option>
-                      <option value="en-US">American (MM/DD/YYYY)</option>
-                      <option value="el-GR">Greek (ΗΗ/ΜΜ/ΕΕΕΕ)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.95rem; color: #444;">Chrono Parse Engine Mode</label>
-                    <select value=${dateEngineMode} onChange=${e => { setDateEngineMode(e.target.value); localStorage.setItem('tm_date_engine_mode', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.95rem; font-family: monospace;">
-                      <option value="auto">Auto-Detect Chronologies (Default)</option>
-                      <option value="edtf">Strict ISO 8601-2 / EDTF Only</option>
-                      <option value="legacy">Strict Gregorian Serial / DD-MM-YYYY Fallback</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.95rem; color: #444;">Global Polygon Opacity</label>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                      <input type="range" min="0.1" max="1" step="0.1" value=${polygonOpacity} onInput=${e => { setPolygonOpacity(parseFloat(e.target.value)); localStorage.setItem('tm_polygon_opacity', e.target.value); }} style="flex-grow: 1; -webkit-appearance: none; height: 4px; background: #ddd; border-radius: 2px; outline: none;" />
-                      <span style="font-family: monospace; font-size: 1rem; color: #007acc; font-weight: 600; width: 30px; text-align: right;">${polygonOpacity.toFixed(1)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <!-- Map Viewer Container -->
+            <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}" style="flex: 0 0 var(--secondary-split, 50%); height: var(--secondary-split, 50%); position: relative; z-index: 30;">
+              <${MapViewer}
+                data=${data}
+                activeIndex=${activeIndex}
+                setActiveIndex=${jumpToSlide}
+                addLog=${addLog}
+                basemapsRegistry=${basemapsRegistry}
+                maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
+                minimapOffset=${minimapOffset}
+                setMinimapOffset=${setMinimapOffset}
+                maxPane=${maxPane}
+                setMaxPane=${setMaxPane}
+                polygonOpacity=${polygonOpacity}
+                showButtonText=${showButtonText}
+                visibleTimeBounds=${visibleTimeBounds}
+              />
             </div>
-          `;
-        };        
-		
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.20';
+            
+            <!-- Secondary Horizontal Row Resizer Splitter -->
+            <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize} style="height: 4px; background: #eee; cursor: row-resize; z-index: 50; flex-shrink: 0;"></div>
+            
+            <!-- Media Viewer Container -->
+            <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}" style="flex: 1; position: relative; min-height: 0; z-index: 30; background: #111;">
+              <${MediaViewer}
+                activeSlide=${activeSlide}
+                maxPane=${maxPane}
+                setMaxPane=${setMaxPane}
+              />
+            </div>
+          </div>
+        </div>
+      
+        <!-- Conformed 38px Status Cockpit sitting clean in the vertical column flow -->
+        <div class="status-bar" style="height: 38px; flex-shrink: 0; display: flex; align-items: center; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative;">
+          <style>
+            .record-select-input::-webkit-outer-spin-button,
+            .record-select-input::-webkit-inner-spin-button {
+              -webkit-appearance: none;
+              margin: 0;
+            }
+            .record-select-input[type=number] {
+              -moz-appearance: textfield;
+            }
+          </style>
+          <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
+            ${aboutBtn}
+            ${resetLayoutBtn}
+            ${settingsBtn}
+            ${telemetryBtn}
+          </div>
+      
+          <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
+          <div class="status-center" style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; z-index: 101; font-size: 0.95rem;">
+            ${prevBtn}
+      
+            <div style="display: flex; align-items: center; gap: 4px; font-family: monospace; font-size: 0.95rem;">
+              <input
+                type="number"
+                class="record-select-input"
+                min="1"
+                max=${data.length}
+                value=${activeIndex + 1}
+                onChange=${(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  if (!isNaN(val) && val >= 1 && val <= data.length) {
+                    jumpToSlide(val - 1);
+                  }
+                }}
+                onKeyDown=${(e) => {
+                  e.stopPropagation();
+                }}
+                style="width: 50px; background: rgba(0, 0, 0, 0.05); border: 1px solid #999; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.95rem; padding: 3px 0; color: inherit; outline: none;"
+              />
+              <span style="user-select: none; opacity: 0.8;">/ ${data.length}</span>
+            </div>
+      
+            ${nextBtn}
+
+            <!-- Non-bold left-aligned dynamic scale metrics directly adjacent to Next navigation control [REF: UI-164c, TL-15] -->
+            ${visibleTimeSpan ? (() => {
+              const parts = visibleTimeSpan.split(' (');
+              const spanStr = parts ? parts.replace('Span: ', '') : '';
+              const zoomStr = parts ? parts.replace('Zoom: ', '').replace(')', '') : '';
+              return html`
+                <div class="telemetry-span-zoom" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin-left: 12px; font-size: 0.8rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none;">
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>
+                    <span style="font-family: monospace; color: #333;">${spanStr}</span>
+                  </div>
+                  ${zoomStr ? html`
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                      <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>
+                      <span style="font-family: monospace; color: #333;">${zoomStr}</span>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            })() : ''}
+          </div>
+      
+          <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
+            ${filterBtn}
+            ${filterPopup}
+            ${searchBtn}
+            ${backBtn}
+          </div>
+        </div>
+      
+        <!-- Resizer divider sits clean above the timeline pane [REF: UI-175] -->
+        <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style="height: 4px; background: #eee; cursor: ns-resize; z-index: 90; flex-shrink: 0; border-top: 1px solid #ddd; position: relative;"></div>
+      
+        <!-- Dedicated static-flow Timeline Pane (border-top duplicate removed) -->
+        <div class="timeline-pane" style="height: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}; min-height: ${isTimelineMinimized ? '0px' : '45px'}; flex-shrink: 0; border-top: none; overflow: hidden; position: relative; z-index: 5;">
+          <${TimelineScrubber}
+            data=${data}
+            activeIndex=${activeIndex}
+            setActiveIndex=${jumpToSlide}
+            addLog=${addLog}
+            activeTags=${activeTags}
+            isTimelineExpanded=${isTimelineExpanded}
+            setIsTimelineExpanded=${setIsTimelineExpanded}
+            maxPane=${maxPane}
+            setMaxPane=${setMaxPane}
+            showButtonText=${showButtonText}
+            visibleTimeBounds=${visibleTimeBounds}
+            setVisibleTimeBounds=${setVisibleTimeBounds}
+            visibleTimeSpan=${visibleTimeSpan}
+            setVisibleTimeSpan=${setVisibleTimeSpan}
+            zoomLock=${zoomLock}
+            setZoomLock=${setZoomLock}
+            isTimelineMinimized=${isTimelineMinimized}
+            setIsTimelineMinimized=${setIsTimelineMinimized}
+            dateLocale=${dateLocale}
+            timelineRequiredHeight=${timelineRequiredHeight}
+          />
+        </div>
+      
+        ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline" style="z-index: 2000;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
+        
+        <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
+        <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
+        <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 30px;">
+          <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;">&times;</button>
+          <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
+            <div style="display: flex; justify-content: center; width: 100%; margin-bottom: 20px;">
+              <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
+            </div>
+            <h3>${aboutData ? aboutData.title : 'Dataset Specs'}</h3>
+            <p style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #444;">${aboutData ? aboutData.description : 'No project description provided.'}</p>
+            <div style="border-top: 1px solid #eee; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
+              <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
+              <strong>Active Modules:</strong><br/>
+              ${Object.entries(MODULE_VERSIONS).map(([k, v]) => `• ${k}: ${v}`).join('\n')}
+            </div>
+          </div>
+        </div>
+
+        <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 99999 !important;"></div>
+        <div id="search-modal" class="tm-modal" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; height: 80vh; padding: 30px;">
+          <button class="modal-close" onClick=${() => setIsSearchOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;">&times;</button>
+          <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} style="flex-shrink: 0; width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
+          <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
+            ${searchHistoryLayout}
+            ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
+            ${searchResultsList}
+          </div>
+        </div>
+
+      </div>`
+    : '';
+
+  return html`
+    <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
+      <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
+      
+      ${loadingScreen}
+      ${appLayout}
+    </div>
+  `;
+};
+
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.23';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
-
 
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
         render(html`<${ErrorBoundary}><${App} /></${ErrorBoundary}>`, document.getElementById('root'));
