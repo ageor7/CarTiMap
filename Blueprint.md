@@ -102,7 +102,6 @@ The engine strictly abandons external CDNs for spatial-temporal processing of br
 ### [REF: ETL-09] AST Hierarchical Evaluation
 The `compileCartiMapAST` decorator strictly enforces mathematical order of operations to prevent array geometry collapse. It must always evaluate Sets `[]` and Lists `{}` via comma delimiter splitting *before* analyzing elements for Range Expansions. Attempting to split ranges before arrays mathematically orphans the array commas, feeding illegal string fragments into the native Nearley AST tree and causing catastrophic `SyntaxError` crashes. Furthermore, the decorator actively intercepts and strips uncertainty qualifiers (`~`, `?`) from explicit durations (`PT30~M`) prior to native evaluation, coercing the approximate boolean flag onto the final object to bypass `edtf.js` Level 2 duration limitations.
 
-
 ### [REF: ETL-12] Parallel Media, Caption, and Credit Sync [UPDATED]
 To prevent index de-synchronization across multi-value media carousels in the presentation layer, all grouped timeline media columns must be sorted in perfect parallel with the description snippets. The upstream ETL compiler (`MAKEARRAY`) is strictly prohibited from running flat deduplication on Media (Col 6), Media Caption (Col 7), and Media Credit (Col 8). The compiler must construct an in-memory `HSTACK` table binding each column's vector to the parallel sort_data (Col IQ), execute a descending sort on the priority weight, extract the sorted values, filter out empty fields, and finally apply a stable `UNIQUE` deduplication before compiling the final cell string via `TEXTJOIN`. This mathematically guarantees that `mediaItems[i]` always maps to its true historical `captions[i]` and `credits[i]` on the Hero Stage. This protocol strictly respects all manual overrides defined in `v6.1.2b` (specifically target sheet `ExtractsT` and `first_record_cols, {5,39}`).
 
@@ -167,6 +166,9 @@ The synchronization lifecycle must execute within two isolated boundaries to pro
 
 #### [REF: MED-11] Local Splitting Closures [UPDATED - 2026-08-30]
 Multi-valued fields (media URLs, credits, captions, and tags) must be split on the fly inside the local parsing scope. Symmetrically, the `/\||\r?\n/` regex (`omniSplitRegex`) must be anchored within the core parsing context to avoid hoisting reference errors during rapid client-side compiles.
+
+#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
+The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
 
 ---
 
@@ -482,6 +484,12 @@ To maintain GIS database standards, the fallback regex marker generation is enti
 
 #### [REF: MAP-01c] Parenthetical-Depth Tokenizer [NEW - 2026-09-02]
 Multiline cells containing raw WKT geometry definitions are protected from newline-splitting bugs using a parenthetical identifier scanner. If a cell matches WKT signatures (POINT, LINESTRING, POLYGON, etc.), the parser bypasses string splitting, cleans whitespace, and passes the WKT block cleanly to the compilation engine.
+
+#### [REF: SEARCH-02] Advanced Normalization & Agnosticism (Search Engine) [UPDATED - 2026-09-02]
+To ensure a frictionless retrieval experience —especially critical for Polytonic Greek historical archives— the search indexer is explicitly decoupled from raw data strings. The search indexer utilizes contains-matching over raw fields to preserve indexing properties of diacritics and HTML-formatted slides like the Help card. Symmetrically, the AppOrchestrator utilizes a specialized `stripAndNormalize` regex closure. This engine sequentially: 1) Executes NFD Unicode decomposition to mathematically separate base characters from their diacritics. 2) Strips the tonal markers, enforcing a perfect case-and-accent-agnostic search matrix.
+
+#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
+Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
 
 ---
 

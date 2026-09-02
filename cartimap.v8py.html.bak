@@ -1483,8 +1483,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.22b ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v6.4.22b ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.25 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v6.4.25 ] ===
 
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
   const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -2089,7 +2089,7 @@ return html`
   `;
 };
 
-MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.25';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
