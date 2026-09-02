@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.20';
+        const APP_VERSION = 'v8.13.21';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1483,8 +1483,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.22b ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v6.4.22b ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.25 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v6.4.25 ] ===
 
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
   const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -1764,36 +1764,46 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
   // --- [ END_SUBBLOCK: Overlay Toggle Hook ] ---
 
   // --- [ START_SUBBLOCK: Spatial Ingestion & Telemetry Parser ] ---
-  useEffect(() => {
+useEffect(() => {
     const map = mapInstance.current; if (!map || data.length === 0) return;
     markerLayer.current.clearLayers(); clusterLayer.current.clearLayers();
     markersRef.current = {}; let validMarkers = 0;
+    
     data.forEach((item, idx) => {
       const locStr = String(item.location || '').trim(); if (!locStr) return;
       const activeLayersArray = [];
+      const parts = [];
       
-      // Symmetrically splits geometries on HTML breaks and platform newlines (\r\n, \n, \r) [REF: MAP-01f]
-      const parts = locStr.split(/<br\s*\/?>/i).flatMap(p => p.split(/\r?\n|\r/)).map(s => s.trim()).filter(Boolean);
+      // Parenthetical-aware tokenizer: Protects multiline WKT geometry blocks from splitting [REF: MAP-01c]
+      const isWKT = locStr.match(/^\s*(POINT|LINESTRING|POLYGON|GEOMETRYCOLLECTION|MULTIPOINT|MULTIPOLYGON)\s*\(/i);
+      if (isWKT) {
+        const sanitized = locStr.replace(/<br\s*\/?>/gi, ' ').replace(/[\r\n]+/g, ' ').trim();
+        if (sanitized) parts.push(sanitized);
+      } else {
+        locStr.split(/<br\s*\/?>/i).forEach(block => {
+          block.split('\n').forEach(line => {
+            const trimmed = line.trim();
+            if (trimmed) parts.push(trimmed);
+          });
+        });
+      }
       
       parts.forEach(part => {
         let featureLayers = [];
         try {
           if (part.match(/^\s*GEOMETRYCOLLECTION/i)) {
             featureLayers = parseGeometryCollection(part, item);
-          } else if (part.match(/^\s*[A-Z]+\s*\(/)) { 
+          } else if (part.match(/^\s*[A-Z]+\s*\(/)) { // Case-insensitive bypass removed as per strict QGIS database output standards [REF: MAP-01b]
             const wkt = new window.Wkt.Wkt(); 
             wkt.read(part); 
             featureLayers = extractLayers(wkt.toObject()); 
           } else if (part.startsWith(String.fromCharCode(123)) && part.includes('"type"')) {
             featureLayers = extractLayers(L.geoJSON(JSON.parse(part)));
           } else {
-            const coordMatch = part.match(/^\s*(-?\\d+(?:\\.\\d+)?)[,\\s]+(-?\\d+(?:\\.\\d+)?)\\s*$/);
+            // Coordinate points validation
+            const coordMatch = part.match(/^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/);
             if (coordMatch) {
-              // Direct indices compilation prevents numeric parsing failures [REF: MAP-01f]
               featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch[1]), parseFloat(coordMatch[2]))));
-            } else {
-              // Direct error dispatch to block syntax deviations [REF: MAP-01f]
-              throw new Error(`Invalid or unidentifiable coordinates: "${part}"`);
             }
           }
           
@@ -1816,6 +1826,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const subLabels = item.subLabels ? item.subLabels.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
           const places = item.place ? item.place.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
           const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
+          
           validFeatureLayers.forEach((layer, layerIdx) => {
             const isPolyline = layer instanceof L.Polyline && !(layer instanceof L.Polygon);
             const polyInfo = isPolyline ? parsePolylineLabels(item.place) : null;
@@ -1900,14 +1911,15 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           });
           if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
         } catch(e) { 
+          // Reverted point fallback parser completely to block oceanic projections [REF: MAP-01b]
           console.error("Map Error Row", idx, e); 
-          // Direct real-time Telemetry logger integration with DB row feedback [REF: MAP-01f]
           if (addLog) {
             addLog(`[Map-Engine] Malformed geometry parsing on Row ${item.id + 2} ("${item.title || 'Untitled'}"): ${e.message}`, 'error');
           }
         }
       });
     });
+    
     setTimeout(() => {
       if (map && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
         const bounds = L.latLngBounds();
@@ -2077,7 +2089,7 @@ return html`
   `;
 };
 
-MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.25';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2176,700 +2188,619 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.20] 🔽🔽🔽
-		// === [ MAJOR BLOCK: AppOrchestrator v3.7.20 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.21] 🔽🔽🔽
+		// === [ MAJOR BLOCK: AppOrchestrator v3.7.21 ] ===
 
-        const App = () => {
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
-          // =========================================================================
-          const [logs, setLogs] = useState ([]);
-          const [rawCsvRows, setRawCsvRows] = useState ([]);
-          const [unfilteredData, setUnfilteredData] = useState ([]);
-          const [data, setData] = useState ([]);
-          const [aboutData, setAboutData] = useState (null);
-          const [status, setStatus] = useState ({"text": 'Initializing Engine...', "progress": 10, "isFading": false, "active": false});
-          const [activeIndex, setActiveIndex] = useState (0);
-          const [slideHistory, setSlideHistory] = useState ([]);
-          
-          // Core layout-governing states
-          const [visibleTimeSpan, setVisibleTimeSpan] = useState ('');
-          const [zoomLock, setZoomLock] = useState ('auto');
-          const [isTimelineMinimized, setIsTimelineMinimized] = useState (false);
-          const [isTimelineExpanded, setIsTimelineExpanded] = useState (false);
-          const [timelineRequiredHeight, setTimelineRequiredHeight] = useState (200);
+const App = () => {
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
+  // =========================================================================
+  const [logs, setLogs] = useState([]);
+  const [rawCsvRows, setRawCsvRows] = useState([]);
+  const [unfilteredData, setUnfilteredData] = useState([]);
+  const [data, setData] = useState([]);
+  const [aboutData, setAboutData] = useState(null);
+  const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [slideHistory, setSlideHistory] = useState([]);
+  const [isMonitorOpen, setIsMonitorOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [searchHistory, setSearchHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; }
+    catch (e) { return []; }
+  });
+  const [maxPane, setMaxPane] = useState(null);
+  const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
+  const [isTimelineMinimized, setIsTimelineMinimized] = useState(false);
+  const [timelineRequiredHeight, setTimelineRequiredHeight] = useState(140);
+  const [polygonOpacity, setPolygonOpacity] = useState(() => {
+    try { return parseFloat(localStorage.getItem('tm_polygon_opacity')) || 0.4; }
+    catch (e) { return 0.4; }
+  });
+  const [showButtonText, setShowButtonText] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('tm_show_button_text')) ?? false; }
+    catch (e) { return false; }\n  });
+  const [dateLocale, setDateLocale] = useState(() => {
+    try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
+    catch (e) { return 'en-GB'; }
+  });
+  const [dateEngineMode, setDateEngineMode] = useState(() => {
+    try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
+    catch (e) { return 'auto'; }
+  });
+  const [allTags, setAllTags] = useState([]);
+  
+  // --- [ PART Β: Global Active Filtering States ] ---
+  const [activeTags, setActiveTags] = useState([]);
+  const [activeExtractTypes, setActiveExtractTypes] = useState(['Storyline', 'Context', 'Related history', 'Presentation']);
+  
+  const [visibleTimeBounds, setVisibleTimeBounds] = useState(null);
+  const [minimapOffset, setMinimapOffset] = useState(-4);
 
-          const [isMonitorOpen, setIsMonitorOpen] = useState (false);
-          const [isAboutOpen, setIsAboutOpen] = useState (false);
-          const [isSettingsOpen, setIsSettingsOpen] = useState (false);
-          const [isMenuOpen, setIsMenuOpen] = useState (false);
-          const [isFilterOpen, setIsFilterOpen] = useState (false);
-          const [isSearchOpen, setIsSearchOpen] = useState (false);
-          const [searchQuery, setSearchQuery] = useState ('');
-          const [debouncedSearchQuery, setDebouncedSearchQuery] = useState ('');
-          
-          const [searchHistory, setSearchHistory] = useState (() => {
-            try { return JSON.parse (localStorage.getItem ('tm_search_history')) || []; }
-            catch (e) { return []; }
-          });
-          const [maxPane, setMaxPane] = useState (null);
-          
-          const [polygonOpacity, setPolygonOpacity] = useState (() => {
-            try { return parseFloat (localStorage.getItem ('tm_polygon_opacity')) || 0.4; }
-            catch (e) { return 0.4; }
-          });
-          const [showButtonText, setShowButtonText] = useState (() => {
-            try { return JSON.parse (localStorage.getItem ('tm_show_button_text')) ?? false; }
-            catch (e) { return false; }
-          });
-          const [dateLocale, setDateLocale] = useState (() => {
-            try { return localStorage.getItem ('tm_date_locale') || 'en-GB'; }
-            catch (e) { return 'en-GB'; }
-          });
-          const [dateEngineMode, setDateEngineMode] = useState (() => {
-            try { return localStorage.getItem ('tm_date_engine_mode') || 'auto'; }
-            catch (e) { return 'auto'; }
-          });
+  const appRef = useRef(null);
+  const hasInitializedRef = useRef(false);
 
-          const [allTags, setAllTags] = useState ([]);
-          const [activeTags, setActiveTags] = useState ([]);
-          const [visibleTimeBounds, setVisibleTimeBounds] = useState (null);
-          const [minimapOffset, setMinimapOffset] = useState (-4);
+  const addLog = (msg, type = 'info') => {
+    const timeStr = new Date().toTimeString().split(' ').at(0);
+    setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
+  };
 
-          // Restored standard basemaps configurations [REF: MAP-01b]
-          const DEFAULT_BASEMAPS = [
-            {"id": 'carto-light', "label": 'CartoDB Light', "type": 'base', "url": 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', "format": 'xyz', "maxZoom": 19, "active": true, "attrText": '© CartoDB', "attrLink": 'https://carto.com/attributions', "defaultOpacity": 1.0},
-            {"id": 'esri-sat', "label": 'Esri Worlds Satellite', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
-            {"id": 'esri-street', "label": 'Esri World Street', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
-            {"id": 'esri-topo', "label": 'Esri World Topo', "type": 'base', "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": 'Tiles © Esri', "attrLink": 'https://www.esri.com/', "defaultOpacity": 1.0},
-            {"id": 'osm', "label": 'OpenStreetMap', "type": 'base', "url": 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', "format": 'xyz', "maxZoom": 19, "active": false, "attrText": '© OSM', "attrLink": 'https://openstreetmap.org/copyright', "defaultOpacity": 1.0},
-            {"id": 'opentopo', "label": 'OpenTopoMap (OSM)', "type": 'base', "url": 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', "format": 'xyz', "maxZoom": 17, "active": false, "attrText": '© OpenTopoMap', "attrLink": 'https://opentopomap.org', "defaultOpacity": 1.0},
-            {"id": 'protomaps-vector', "label": 'Protomaps Vector Light (OSM)', "type": 'base', "url": 'https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=YOUR_API_KEY_HERE', "format": 'pbf', "maxZoom": 15, "active": false, "attrText": '© Protomaps', "attrLink": 'https://protomaps.com', "defaultOpacity": 1.0},
-            {"id": 'no-basemap', "label": 'No Basemap (Blank Canvas)', "type": 'base', "url": 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', "format": 'xyz', "maxZoom": 22, "active": false, "attrText": 'Canvas', "attrLink": '', "defaultOpacity": 1.0}
-          ];
-        
-          const [basemapsRegistry, setBasemapsRegistry] = useState ([...DEFAULT_BASEMAPS]);
-        
-          const appRef = useRef (null);
-          const hasInitializedRef = useRef (false);      
-		  
-          const addLog = (msg, type = 'info') => {
-            const timeStr = new Date().toTimeString().split(' ').at(0);
-            setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
-          };
-        
-          const stripAndNormalize = (str) => {
-            if (!str) return '';
-            const noHtml = String(str).replace(/<[^>]*>?/gm, '');
-            return noHtml.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-          };
+  const stripAndNormalize = (str) => {
+    if (!str) return '';
+    const noHtml = String(str).replace(/<[^>]*>?/gm, '');
+    return noHtml.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').toLowerCase().trim();
+  };
 
-          // Re-instated URL query & Hash parser [REF: URL-01]
-          const getOmniParam = (key) => {
-            const sp = new URLSearchParams(window.location.search);
-            let val = sp.get(key) || sp.get(`amp;${key}`);
-            if (val) return val;
-            const hp = new URLSearchParams(window.location.hash.replace(/^#\/?\??/, ''));
-            return hp.get(key) || hp.get(`amp;${key}`);
-          };
-        
-          const formatSmartDate = (startObj, endObj, locale) => {
-            if (!startObj) return 'Undated';
-            if (startObj.isEDTF) return startObj.text;
-            const d = startObj.date; if (!d || isNaN(d.getTime())) return 'Invalid Date';
-            if (endObj && endObj.date && !isNaN(endObj.date.getTime())) {
-              const dEnd = endObj.date;
-              if (dEnd.getTime() === d.getTime()) return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
-              return `${d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })} — ${dEnd.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}`;
+  const formatSmartDate = (startObj, endObj, locale) => {
+    if (!startObj) return 'Undated';
+    if (startObj.isEDTF) return startObj.text;
+    const d = startObj.date; if (!d || isNaN(d.getTime())) return 'Invalid Date';
+    if (endObj && endObj.date && !isNaN(endObj.date.getTime())) {
+      const dEnd = endObj.date;
+      if (dEnd.getTime() === d.getTime()) return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+      return `${d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })} — ${dEnd.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}`;
+    }
+    return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
+  const formatPlaces = (placeStr) => {
+    if (!placeStr) return '';
+    const stripped = placeStr.replace(/^\s*\[.*?\]\s*/, '');
+    return stripped.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean).join(' · ');
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 2: CHRONO ENGINE - DATAFRAME PARSING ] ===
+  // =========================================================================
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    let source = urlParams.get('source') || urlParams.get('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+    const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
+    const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid');
+
+    setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
+    addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
+
+    const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+    const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
+
+    Promise.all([
+      fetch(fetchUrlPrimary).then(res => {
+        if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
+        return res.text();
+      }),
+      fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
+        if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status ${res.status})`);
+        return res.text();
+      }) : Promise.resolve(null)
+    ]).then(([primaryCsv, basemapsCsv]) => {
+      setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
+      
+      const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
+      if (results.errors.length > 0) {
+        results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
+      }
+
+      const exactGet = (normObj, key) => {
+        const val = normObj[key];
+        return val !== undefined && val !== null ? String(val).trim() : "";
+      };
+
+      const firstRowNorm = {};
+      if (results.data.length > 0) {
+        for (let k in results.data.at(0)) firstRowNorm[k.toLowerCase().trim()] = results.data.at(0)[k];
+      }
+
+      const aboutDataObj = {
+        title: exactGet(firstRowNorm, 'title') || 'Dataset Overview',
+        description: exactGet(firstRowNorm, 'description') || 'No project description provided.',
+        rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source,
+        downloadUrl: fetchUrlPrimary
+      };
+      setAboutData(aboutDataObj);
+
+      let activeMode = dateEngineMode;
+      if (activeMode === 'auto') {
+        const hasEDTF = results.data.some(row => {
+          const norm = {};
+          for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+          return exactGet(norm, 'start edtf') !== '';
+        });
+        activeMode = hasEDTF ? 'edtf' : 'legacy';
+      }
+      const isUS = dateLocale === 'en-US';
+      const omniSplitRegex = /\||\r?\n/;
+      const rows = results.data.slice(1);
+
+      const parseChronoNode = (legacyStr, edtfStr) => {
+        const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
+        const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
+        if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
+          try {
+            if (cleanEdtf) {
+              const parsed = compileCartiMapAST(cleanEdtf);
+              if (parsed) {
+                return {
+                  isEDTF: true,
+                  min: parsed.min,
+                  max: parsed.max,
+                  obj: parsed,
+                  isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
+                  text: cleanEdtf
+                };
+              }
             }
-            return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+          } catch (e) {
+            addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
+          }
+        }
+        
+        if (!cleanLegacy) {
+          if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
+          return null;
+        }
+        
+        if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
+          const serialVal = parseFloat(cleanLegacy);
+          const ts = (serialVal - 25569) * 86400 * 1000;
+          return { 
+            isEDTF: false, 
+            min: ts, 
+            max: ts, 
+            date: new Date(ts), 
+            text: cleanLegacy 
           };
+        }
         
-          const formatPlaces = (placeStr) => {
-            if (!placeStr) return '';
-            const stripped = placeStr.replace(/^\s*\[.*?\]\s*/, '');
-            return stripped.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean).join(' · ');
+        const parts = cleanLegacy.split(' ');
+        if (parts.length >= 1) {
+          const dateStr = parts.at(0) || '';
+          const timeStr = parts.at(1) || '';
+          const dParts = dateStr.split(/[\/\.\-]/);
+          if (dParts.length >= 3) {
+            const tParts = timeStr ? timeStr.split(':') : [];
+            const secParts = String(tParts.at(2) || '0').split('.');
+            const dYear = parseInt(dParts.at(2), 10);
+            const dMonth = parseInt(dParts.at(isUS ? 0 : 1), 10) - 1;
+            const dDay = parseInt(dParts.at(isUS ? 1 : 0), 10);
+            const tHour = parseInt(tParts.at(0) || 0, 10);
+            const tMin = parseInt(tParts.at(1) || 0, 10);
+            const tSec = parseInt(secParts.at(0) || 0, 10);
+            const tMs = parseInt(secParts.at(1) || 0, 10);
+            const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
+            const ts = dateObj.getTime();
+            if (!isNaN(ts)) {
+              return { 
+                isEDTF: false, 
+                min: ts, 
+                max: ts, 
+                date: dateObj, 
+                text: cleanLegacy 
+              };
+            }
+          }
+        }
+
+        if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Failed to parse. Rendering as Undated.`, 'warning');
+        return null;
+      };
+
+      // --- [ PART Α: Ingestion Mapping & Column Extraction ] ---
+      const cleaned = rows.map((row, index) => {
+        const norm = {};
+        for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+        const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
+
+        return {
+          id: index,
+          title: rowTitle,
+          startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf')),
+          endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf')),
+          description: exactGet(norm, 'description'),
+          place: exactGet(norm, 'place'),
+          location: exactGet(norm, 'location'),
+          subLabels: exactGet(norm, 'sublabels') || exactGet(norm, 'sub-labels') || exactGet(norm, 'sub labels') || '',
+          priority: exactGet(norm, 'priority'),
+          media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
+          mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
+          mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
+          tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/[, \r\n|;·]+/).map(t => t.trim()).filter(Boolean) : [],
+          extractType: exactGet(norm, 'extract type') || 'Storyline'
+        };
+      });
+
+      const valid = cleaned.sort((a, b) => {
+        const aMin = a.startDate ? a.startDate.min : 0;
+        const bMin = b.startDate ? b.startDate.min : 0;
+        if (aMin !== bMin) return aMin - bMin;
+        return a.id - b.id;
+      });
+
+      // =========================================================================
+      // === [ APP_ORCHESTRATOR SUBBLOCK 3: VECTOR SEARCH INDEXING ] ===
+      // =========================================================================
+      const indexedData = valid.map(d => ({
+        ...d,
+        _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
+      }));
+      setUnfilteredData(indexedData);
+
+      const tagsMap = new Set();
+      indexedData.forEach(d => {
+        let rawTags = d.tags || [];
+        let arr = [];
+        (Array.isArray(rawTags) ? rawTags : [rawTags]).forEach(t => {
+          if (typeof t === 'string') arr.push(...t.split(omniSplitRegex));
+          else arr.push(t);
+        });
+        arr.map(s => String(s).trim()).filter(Boolean).forEach(t => tagsMap.add(t));
+      });
+
+      const uniqueTagsList = Array.from(tagsMap).sort();
+      setAllTags(uniqueTagsList);
+      setActiveTags(uniqueTagsList);
+
+      if (basemapsCsv) {
+        const baseResult = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
+        const basemaps = baseResult.data.map(row => {
+          const norm = {};
+          for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+          return {
+            id: exactGet(norm, 'id'),
+            label: exactGet(norm, 'label'),
+            type: exactGet(norm, 'type'),
+            url: exactGet(norm, 'url'),
+            format: exactGet(norm, 'format'),
+            maxZoom: parseInt(exactGet(norm, 'maxzoom') || 19, 10),
+            active: exactGet(norm, 'active').toLowerCase() === 'true',
+            attrText: exactGet(norm, 'attribution text'),
+            attrLink: exactGet(norm, 'attribution link'),
+            wmsLayer: exactGet(norm, 'wms layer'),
+            defaultOpacity: exactGet(norm, 'default opacity') !== '' ? parseFloat(exactGet(norm, 'default opacity')) : 1.0
           };
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 2: DECOUPLED DATA CONNECTION PIPELINE ] ===
-          // =========================================================================
-          useEffect(() => {
-            // Memory Parameter Cache [REF: PERF-36]
-            const source = getOmniParam('source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
-            const gid = getOmniParam('gid') || '0';
-            const bgid = getOmniParam('bgid');
-        
-            setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
-            addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
-        
-            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
-            const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
-        
-            // --- [ ZONE 1: PURE NETWORK INGESTION ] ---
-            Promise.all([
-              fetch(fetchUrlPrimary)
-                .catch(err => { throw new Error(`Primary unreachable: ${err.message}`); })
-                .then(res => {
-                  if (!res.ok) throw new Error(`HTTP ${res.status} Primary`);
-                  return res.text();
-                }),
-              fetchUrlBasemaps 
-                ? fetch(fetchUrlBasemaps)
-                    .catch(err => { throw new Error(`Basemaps unreachable: ${err.message}`); })
-                    .then(res => {
-                      if (!res.ok) throw new Error(`HTTP ${res.status} Basemaps`);
-                      return res.text();
-                    })
-                : Promise.resolve(null)
-            ])
-            .catch(netErr => {
-              console.error("CMS Connection Aborted:", netErr);
-              setStatus({ text: 'Connection Timeout', progress: 100, isFading: false, active: false });
-              addLog(`Connection Timeout: ${netErr.message}`, 'error');
-              throw netErr;
-            })
-            // --- [ ZONE 2: DECOUPLED DATA PARSING ] ---
-            .then(([primaryCsv, basemapsCsv]) => {
-              setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
-              
-              try {
-                // Parse basemaps config if provided by Google Sheets [REF: MAP-01b]
-                if (basemapsCsv) {
-                  const bResults = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
-                  const parsedBMs = bResults.data.map(row => {
-                    const norm = {};
-                    for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                    const isActive = /^(true|yes)$/i.test(String(norm.active || '').trim());
-                    const rawOpac = parseFloat(norm.defaultopacity);
-                    return {
-                      id: norm.id || "", label: norm.label || "", type: norm.type?.toLowerCase() === "overlay" ? "overlay" : "base",
-                      url: norm.url || "", maxZoom: parseInt(norm.maxzoom, 10) || 19,
-                      active: isActive, attrText: norm.attrtext || "", attrLink: norm.attrlink || "",
-                      defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac, format: norm.format || "xyz",
-                      wmsLayer: norm.wmslayer ? decodeURIComponent(norm.wmslayer.trim()) : "default"
-                    };
-                  }).filter(b => b.id && b.url);
-                  if (parsedBMs.length > 0) {
-                    setBasemapsRegistry(prev => {
-                      const merged = [...prev];
-                      parsedBMs.forEach(bm => {
-                        const existIdx = merged.findIndex(m => m.id === bm.id);
-                        if (existIdx >= 0) merged[existIdx] = bm;
-                        else merged.push(bm);
-                      });
-                      return merged;
-                    });
-                  }
-                }
+        }).filter(b => b.id && b.url);
+        setBasemapsRegistry(basemaps);
+        addLog(`Basemaps registry parsed. Found ${basemaps.length} configured tile services.`, 'info');
+      } else {
+        setBasemapsRegistry([{ id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: true, attrText: 'OpenStreetMap', attrLink: 'https://openstreetmap.org' }]);
+      }
 
-                const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
-                if (results.errors.length > 0) {
-                  results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
-                }
-        
-                const exactGet = (normObj, key) => {
-                  const val = normObj[key];
-                  return val !== undefined && val !== null ? String(val).trim() : "";
-                };
-        
-                const firstRowNorm = {};
-                if (results.data.length > 0) {
-                  for (let k in results.data.at(0)) firstRowNorm[k.toLowerCase().trim()] = results.data.at(0)[k];
-                }
-        
-                const aboutDataObj = {
-                  title: exactGet(firstRowNorm, 'title') || 'Dataset Overview',
-                  description: exactGet(firstRowNorm, 'description') || 'No project description provided.',
-                  rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source,
-                  downloadUrl: fetchUrlPrimary
-                };
-                setAboutData(aboutDataObj);
-        
-                let activeMode = dateEngineMode;
-                if (activeMode === 'auto') {
-                  const hasEDTF = results.data.some(row => {
-                    const norm = {};
-                    for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                    return exactGet(norm, 'start edtf') !== '';
-                  });
-                  activeMode = hasEDTF ? 'edtf' : 'legacy';
-                }
-                const isUS = dateLocale === 'en-US';
-                
-                // Re-instated dynamic flattener [REF: MED-11]
-                const omniSplitRegex = /\||\r?\n/;
-
-                const cleaned = results.data.map((row, index) => {
-                  const norm = {};
-                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                  const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
-        
-                const parseChronoNode = (legacyStr, edtfStr) => {
-                  const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
-                  const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
-                  if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
-                    try {
-                      if (cleanEdtf) {
-                        const parsed = compileCartiMapAST(cleanEdtf);
-                        if (parsed) {
-                          return {
-                            isEDTF: true,
-                            min: parsed.min,
-                            max: parsed.max,
-                            obj: parsed,
-                            // Corrected strict-type comparison of complex AST objects [REF: CHRONO-08]
-                            isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY),
-                            text: cleanEdtf
-                          };
-                        }
-                      }
-                    } catch (e) {
-                      addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
-                    }
-                  }
-                  
-                  if (!cleanLegacy) {
-                    if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
-                    return null;
-                  }
-                    
-                    if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
-                      const serialVal = parseFloat(cleanLegacy);
-                      const ts = (serialVal - 25569) * 86400 * 1000;
-                      return { 
-                        isEDTF: false, 
-                        min: ts, 
-                        max: ts, 
-                        date: new Date(ts), 
-                        text: cleanLegacy 
-                      };
-                    }
-                    
-                    const parts = cleanLegacy.split(' ');
-                    if (parts.length >= 1) {
-                      const dateStr = parts.at(0) || '';
-                      const timeStr = parts.at(1) || '';
-                      const dParts = dateStr.split(/[\/\\.-]/);
-                      if (dParts.length >= 3) {
-                        const tParts = timeStr ? timeStr.split(':') : [];
-                        const secParts = String(tParts.at(2) || '0').split('.');
-                        const dYear = parseInt(dParts.at(2), 10);
-                        const dMonth = parseInt(dParts.at(isUS ? 0 : 1), 10) - 1;
-                        const dDay = parseInt(dParts.at(isUS ? 1 : 0), 10);
-                        const tHour = parseInt(tParts.at(0) || 0, 10);
-                        const tMin = parseInt(tParts.at(1) || 0, 10);
-                        const tSec = parseInt(secParts.at(0) || 0, 10);
-                        const tMs = parseInt(secParts.at(1) || 0, 10);
-                        const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
-                        const ts = dateObj.getTime();
-                        if (!isNaN(ts)) {
-                          return { 
-                            isEDTF: false, 
-                            min: ts, 
-                            max: ts, 
-                            date: dateObj, 
-                            text: cleanLegacy 
-                          };
-                        }
-                      }
-                    }
-            
-                    if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Failed to parse. Rendering as Undated.`, 'warning');
-                    return null;
-                  };
-        
-                  const locStr = exactGet(norm, 'location');
-                  return {
-                    id: index,
-                    title: rowTitle,
-                    startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf')),
-                    endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf')),
-                    description: exactGet(norm, 'description'),
-                    place: exactGet(norm, 'place'),
-                    location: locStr,
-                    subLabels: exactGet(norm, 'sublabels') || exactGet(norm, 'sub-labels') || exactGet(norm, 'sub labels') || '',
-                    priority: exactGet(norm, 'priority'),
-                    media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
-                    mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
-                    mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
-                    tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/[, \r\n|;·]+/).map(t => t.trim()).filter(Boolean) : []
-                  };
-                });
-            
-                const valid = cleaned.sort((a, b) => {
-                  const aMin = a.startDate ? a.startDate.min : 0;
-                  const bMin = b.startDate ? b.startDate.min : 0;
-                  if (aMin !== bMin) return aMin - bMin;
-                  return a.id - b.id;
-                });
-            
-                const indexedData = valid.map(d => ({
-                  ...d,
-                  _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
-                }));
-                setUnfilteredData(indexedData);
-            
-                const tagsMap = new Set();
-                indexedData.forEach(d => {
-                  let rawTags = d.tags || [];
-                  let arr = [];
-                  (Array.isArray(rawTags) ? rawTags : [rawTags]).forEach(t => {
-                    if (typeof t === 'string') arr.push(...t.split(omniSplitRegex));
-                    else arr.push(t);
-                  });
-                  arr.map(s => String(s).trim()).filter(Boolean).forEach(t => tagsMap.add(t));
-                });
-            
-                const uniqueTagsList = Array.from(tagsMap).sort();
-                setAllTags(uniqueTagsList);
-                setActiveTags(uniqueTagsList);
-            
-                if (!hasInitializedRef.current) {
-                  const paramSlide = getOmniParam('slide');
-                  const paramDate = getOmniParam('date');
-                  let initialIdx = 0;
-                  if (paramSlide) {
-                    const sVal = parseInt(paramSlide, 10);
-                    if (!isNaN(sVal) && sVal >= 0 && sVal < indexedData.length) initialIdx = sVal;
-                  } else if (paramDate) {
-                    const targetTime = new Date(paramDate).getTime();
-                    if (!isNaN(targetTime)) {
-                      let closestIdx = 0; let minDiff = Infinity;
-                      indexedData.forEach((d, i) => {
-                        if (d.startDate) {
-                          const diff = Math.abs(d.startDate.min - targetTime);
-                          if (diff < minDiff) { minDiff = diff; closestIdx = i; }
-                        }
-                      });
-                      initialIdx = closestIdx;
-                    }
-                  }
-                  setActiveIndex(initialIdx);
-                  hasInitializedRef.current = true;
-                }
-                setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
-                setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
-              } catch (parseErr) {
-                console.error("Fatal Syntactical Parsing Aborted:", parseErr);
-                setStatus({ text: 'Dataset Parse Error', progress: 100, isFading: false, active: false });
-                addLog(`Dataset Parse Error: ${parseErr.message}`, 'error');
+      if (!hasInitializedRef.current) {
+        const paramSlide = getOmniParam('slide');
+        const paramDate = getOmniParam('date');
+        let initialIdx = 0;
+        if (paramSlide) {
+          const sVal = parseInt(paramSlide, 10);
+          if (!isNaN(sVal) && sVal >= 0 && sVal < indexedData.length) initialIdx = sVal;
+        } else if (paramDate) {
+          const targetTime = new Date(paramDate).getTime();
+          if (!isNaN(targetTime)) {
+            let closestIdx = 0; let minDiff = Infinity;
+            indexedData.forEach((d, i) => {
+              if (d.startDate) {
+                const diff = Math.abs(d.startDate.min - targetTime);
+                if (diff < minDiff) { minDiff = diff; closestIdx = i; }
               }
             });
-          }, [rawCsvRows, dateEngineMode, dateLocale]);
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 4: SWIMLANE TIMELINE CALCULATION ] ===
-          // =========================================================================
-          useEffect(() => {
-            if (unfilteredData.length === 0) return;
-            const filtered = unfilteredData.filter(d => 
-              d.tags.length === 0 || d.tags.some(t => activeTags.includes(t))
-            );
-            setData(filtered);
-            
-            if (activeIndex >= filtered.length) {
-              setActiveIndex(Math.max(0, filtered.length - 1));
-            }
-            
-            const tagsMap = new Set();
-            filtered.forEach(d => {
-              d.tags.forEach(t => tagsMap.add(t));
-            });
-            const laneCount = tagsMap.size > 0 ? tagsMap.size : 1;
-            setTimelineRequiredHeight((laneCount * 24) + 40);
-          }, [unfilteredData, activeTags]);
-        
-          const handleToggleTag = (tag) => {
-            if (activeTags.includes(tag)) {
-              if (activeTags.length > 1) {
-                setActiveTags(activeTags.filter(t => t !== tag));
-              } else {
-                addLog('Cannot deselect all swimlanes. At least one must remain active.', 'warning');
-              }
-            } else {
-              setActiveTags([...activeTags, tag]);
-            }
-          };
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 5: CHRONOLOGICALLY REALIGNED SEARCH ] ===
-          // =========================================================================
-          const handleResultClick = (id, qString) => {
-            const sortedIdx = data.findIndex(d => d.id === id);
-            if (sortedIdx >= 0) jumpToSlide(sortedIdx);
-            setIsSearchOpen(false);
-            if (qString && !searchHistory.includes(qString)) {
-              const newH = [qString, ...searchHistory].slice(0, 8);
-              setSearchHistory(newH);
-              localStorage.setItem('tm_search_history', JSON.stringify(newH));
-            }
-          };
-        
-          const executeSearch = (query) => {
-            if (!query.trim()) return [];
-            const q = stripAndNormalize(query);
-            return data.filter(d => d._searchIndex && d._searchIndex.includes(q));
-          };
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 6: INTERSECTION & RESIZING LISTENERS ] ===
-          // =========================================================================
-          const startTimelineResize = (e) => {
-            e.preventDefault();
-            const startY = e.clientY || (e.touches && e.touches.clientY);
-            const startHeight = timelineRequiredHeight;
-            
-            const doDrag = (moveEvent) => {
-              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches.clientY);
-              const diffY = startY - currentY;
-              const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
-              setTimelineRequiredHeight(newHeight);
-            };
-            
-            const stopDrag = () => {
-              window.removeEventListener('mousemove', doDrag);
-              window.removeEventListener('mouseup', stopDrag);
-              window.removeEventListener('touchmove', doDrag);
-              window.removeEventListener('touchend', stopDrag);
-            };
-            
-            window.addEventListener('mousemove', doDrag);
-            window.addEventListener('mouseup', stopDrag);
-            window.addEventListener('touchmove', doDrag, { passive: true });
-            window.addEventListener('touchend', stopDrag);
-          };
+            initialIdx = closestIdx;
+          }
+        }
+        setActiveIndex(initialIdx);
+        hasInitializedRef.current = true;
+      }
+      setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
+      setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
+    }).catch(err => {
+      console.error("Fatal CMS Connection Failure:", err);
+      setStatus({ text: 'Database Sync Failure', progress: 100, isFading: false, active: false });
+      addLog(`Database Sync Error: ${err.message}`, 'error');
+    });
+  }, [rawCsvRows, dateEngineMode, dateLocale]);
 
-          const startPrimaryResize = (e) => {
-            if (maxPane) return; 
-            const startX = e.touches ? e.touches.clientX : e.clientX; 
-            const startY = e.touches ? e.touches.clientY : e.clientY; 
-            const isDesktop = window.innerWidth >= 1024; 
-            const containerNode = appRef.current.querySelector('.core-viewports'); 
-            const startVal = isDesktop ? appRef.current.querySelector('.content-slider-pane').offsetWidth : appRef.current.querySelector('.content-slider-pane').offsetHeight; 
-            const containerSize = isDesktop ? containerNode.offsetWidth : containerNode.offsetHeight;
-            const onMove = (e2) => { 
-              const currentX = e2.touches ? e2.touches.clientX : e2.clientX; 
-              const currentY = e2.touches ? e2.touches.clientY : e2.clientY; 
-              const delta = isDesktop ? (currentX - startX) : (startY - currentY); 
-              let pct = ((startVal + delta) / containerSize) * 100; 
-              if (pct < 15) pct = 15; 
-              if (pct > 85) pct = 85; 
-              appRef.current.style.setProperty('--primary-split', pct + '%'); 
-            };
-            const onUp = () => { 
-              document.removeEventListener('mousemove', onMove); 
-              document.removeEventListener('mouseup', onUp); 
-              document.removeEventListener('touchmove', onMove); 
-              document.removeEventListener('touchend', onUp); 
-              window.dispatchEvent(new Event('resize')); 
-            };
-            document.addEventListener('mousemove', onMove); 
-            document.addEventListener('mouseup', onUp); 
-            document.addEventListener('touchmove', onMove, { passive: false }); 
-            document.addEventListener('touchend', onUp);
-          };
+  // --- [ PART Δ: Filtering Effect & Active Dataset Intersection ] ---
+  useEffect(() => {
+    if (unfilteredData.length === 0) return;
+    const filtered = unfilteredData.filter(d => 
+      (d.tags.length === 0 || d.tags.some(t => activeTags.includes(t))) &&
+      activeExtractTypes.includes(d.extractType)
+    );
+    setData(filtered);
+    
+    if (activeIndex >= filtered.length) {
+      setActiveIndex(Math.max(0, filtered.length - 1));
+    }
+    
+    const tagsMap = new Set();
+    filtered.forEach(d => {
+      d.tags.forEach(t => tagsMap.add(t));
+    });
+    const laneCount = tagsMap.size > 0 ? tagsMap.size : 1;
+    setTimelineRequiredHeight((laneCount * 24) + 40);
+  }, [unfilteredData, activeTags, activeExtractTypes]);
 
-          const startSecondaryResize = (e) => {
-            if (maxPane) return; 
-            const startX = e.touches ? e.touches.clientX : e.clientX; 
-            const startY = e.touches ? e.touches.clientY : e.clientY; 
-            const isDesktop = window.innerWidth >= 1024; 
-            const containerNode = appRef.current.querySelector('.visual-pane'); 
-            const startVal = isDesktop ? appRef.current.querySelector('.map-pane').offsetHeight : appRef.current.querySelector('.map-pane').offsetWidth; 
-            const containerSize = isDesktop ? containerNode.offsetHeight : containerNode.offsetWidth;
-            const onMove = (e2) => { 
-              const currentX = e2.touches ? e2.touches.clientX : e2.clientX; 
-              const currentY = e2.touches ? e2.touches.clientY : e2.clientY; 
-              const delta = isDesktop ? (currentY - startY) : (currentX - startX); 
-              let pct = ((startVal + delta) / containerSize) * 100; 
-              if (pct < 10) pct = 10; 
-              if (pct > 90) pct = 90; 
-              appRef.current.style.setProperty('--secondary-split', pct + '%'); 
-            };
-            const onUp = () => { 
-              document.removeEventListener('mousemove', onMove); 
-              document.removeEventListener('mouseup', onUp); 
-              document.removeEventListener('touchmove', onMove); 
-              document.removeEventListener('touchend', onUp); 
-              window.dispatchEvent(new Event('resize')); 
-            };
-            document.addEventListener('mousemove', onMove); 
-            document.addEventListener('mouseup', onUp); 
-            document.addEventListener('touchmove', onMove, { passive: false }); 
-            document.addEventListener('touchend', onUp);
-          };
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 7: VIEWPORT BOUNDS TRACKING ] ===
-          // =========================================================================
-          useEffect(() => {
-            if (data.length === 0) return;
-            const minTimes = data.map(d => d.startDate?.min).filter(Boolean);
-            const maxTimes = data.map(d => d.endDate?.max || d.startDate?.max).filter(Boolean);
-            if (minTimes.length > 0) {
-              const globalMin = Math.min(...minTimes);
-              const globalMax = maxTimes.length > 0 ? Math.max(...maxTimes) : globalMin;
-              setVisibleTimeBounds([globalMin, globalMax]);
-            }
-          }, [data]);
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 8: TIMED AUTOFOCUS FOCUS GATES ] ===
-          // =========================================================================
-          useEffect(() => {
-            const handleKeyDown = (e) => {
-              if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
-              if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
-              else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
-            };
-            window.addEventListener('keydown', handleKeyDown);
-            return () => window.removeEventListener('keydown', handleKeyDown);
-          }, [activeIndex, data.length]);
-        
-          useEffect(() => {
-            if (isSearchOpen) {
-              setTimeout(() => {
-                const inputNode = document.querySelector('.search-input');
-                if (inputNode) inputNode.focus();
-              }, 150);
-            }
-          }, [isSearchOpen]);
-        
-          useEffect(() => {
-            const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
-            updateAppHeight();
-            let wasDesktop = window.innerWidth >= 1024;
-            const handleResize = () => {
-              updateAppHeight();
-              const isDesktop = window.innerWidth >= 1024;
-              if (isDesktop !== wasDesktop) {
-                window.dispatchEvent(new Event('resize'));
-              }
-              wasDesktop = isDesktop;
-            };
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
-          }, []);
-        
-          const jumpToSlide = (newIdx, isSequential = false) => {
-            if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
-              if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
-              setActiveIndex(newIdx);
-            }
-          };
-        
-          const goBack = () => {
-            if (slideHistory.length > 0) {
-              const prev = slideHistory[slideHistory.length - 1];
-              setSlideHistory(h => h.slice(0, -1));
-              setActiveIndex(prev);
-            }
-          };
-        
-          const searchResults = executeSearch(debouncedSearchQuery);
-          const activeSlide = data[activeIndex];
-          const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
-          // =========================================================================
-            // High-fidelity Compass & Bracket Base Vector Graphics Restored [REF: UI-236b]
-          const CarTiMapperLogo = ({ context, appVersion }) => {
-            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
-            
-            if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper" style="width: 120px; height: 80px; margin-bottom: 10px;">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
-            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 26px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.9rem; color: #111; font-weight: bold; line-height: 1; font-family: monospace;">CarTiMap</span><span style="font-size: 0.7rem; color: #888; line-height: 1; font-family: monospace;">${appVersion}</span></div></div>`;
-            
-            return html`
-              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eee; text-align: center;">
-                <div style="width: 85%; max-width: 450px; height: auto; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.1)); margin-bottom: 15px;">${svgIcon}</div>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                  <h2 style="margin: 0; font-size: 2.2rem; color: #222; letter-spacing: -0.5px; line-height: 1.1; font-family: monospace;">CarTiMap Engine</h2>
-                  <div style="font-family: monospace; color: #007acc; font-size: 1.05rem; font-weight: 600; margin-top: 6px;">${appVersion}</div>
-                </div>
-              </div>
-            `;
-          };
+  const handleToggleTag = (tag) => {
+    if (activeTags.includes(tag)) {
+      if (activeTags.length > 1) {
+        setActiveTags(activeTags.filter(t => t !== tag));
+      } else {
+        addLog('Cannot deselect all swimlanes. At least one must remain active.', 'warning');
+      }
+    } else {
+      setActiveTags([...activeTags, tag]);
+    }
+  };
 
-        
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
-          // =========================================================================
-          const downloadBtn = (aboutData && aboutData.downloadUrl) 
-            ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
-            : '';
-        
-          const backBtnText = showButtonText ? html`<span>Back</span>` : '';
-          const resetLayoutBtnText = showButtonText ? html`<span>Reset Layout</span>` : '';
-          const settingsBtnText = showButtonText ? html`<span>Settings</span>` : '';
-          const telemetryBtnText = showButtonText ? html`<span>Telemetry</span>` : '';
-          const prevBtnText = showButtonText ? html`<span>Prev</span>` : '';
-          const nextBtnText = showButtonText ? html`<span>Next</span>` : '';
-          const searchBtnText = showButtonText ? html`<span>Search</span>` : '';
-          const filterBtnText = showButtonText ? html`<span>Filters</span>` : '';
+  const handleToggleExtractType = (type) => {
+    if (activeExtractTypes.includes(type)) {
+      if (activeExtractTypes.length > 1) {
+        setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
+      } else {
+        addLog('At least one data stream must remain active.', 'warning');
+      }
+    } else {
+      setActiveExtractTypes([...activeExtractTypes, type]);
+    }
+  };
 
-          const backBtn = (slideHistory && slideHistory.length > 0)
-            ? html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`
-            : '';
-        
-          const resetLayoutBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(200); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><polyline points="16 3 21 8 16 13"></polyline><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><polyline points="8 21 3 16 8 11"></polyline></svg>
-              ${resetLayoutBtnText}
-            </button>
-          `;
-        
-          const settingsBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(true)} title="Engine Configurations">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              ${settingsBtnText}
-            </button>
-          `;
-        
-          const telemetryBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Logs">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              ${telemetryBtnText}
-            </button>
-          `;
-        
-          const prevBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-              ${prevBtnText}
-            </button>
-          `;
-        
-          const nextBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next Node">
-              ${nextBtnText}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-          `;
-        
-          const searchBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSearchOpen(true)} title="Interactive Query Index">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              ${searchBtnText}
-            </button>
-          `;
-        
-          const filterBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-              ${filterBtnText}
-            </button>
-          `;
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 5: CHRONOLOGICALLY REALIGNED SEARCH ] ===
+  // =========================================================================
+  const handleResultClick = (id, qString) => {
+    const sortedIdx = data.findIndex(d => d.id === id);
+    if (sortedIdx >= 0) jumpToSlide(sortedIdx);
+    setIsSearchOpen(false);
+    if (qString && !searchHistory.includes(qString)) {
+      const newH = [qString, ...searchHistory].slice(0, 8);
+      setSearchHistory(newH);
+      localStorage.setItem('tm_search_history', JSON.stringify(newH));
+    }
+  };
+
+  // --- [ PART Γ: Reverted Contains-Matching Search Logic ] ---
+  const executeSearch = (query) => {
+    if (!query.trim()) return [];
+    const q = stripAndNormalize(query);
+    return data.filter(d => 
+      (d.title && stripAndNormalize(d.title).includes(q)) ||
+      (d.description && stripAndNormalize(d.description).includes(q)) ||
+      (d.place && stripAndNormalize(d.place).includes(q)) ||
+      (d.tags && d.tags.some(t => stripAndNormalize(t).includes(q)))
+    );
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 6: INTERSECTION & RESIZING LISTENERS ] ===
+  // =========================================================================
+  const startTimelineResize = (e) => {
+    e.preventDefault();
+    const startY = e.clientY || (e.touches && e.touches.clientY);
+    const startHeight = timelineRequiredHeight;
+    
+    const doDrag = (moveEvent) => {
+      const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches.clientY);
+      const diffY = startY - currentY;
+      const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
+      setTimelineRequiredHeight(newHeight);
+    };
+    
+    const stopDrag = () => {
+      window.removeEventListener('mousemove', doDrag);
+      window.removeEventListener('mouseup', stopDrag);
+      window.removeEventListener('touchmove', doDrag);
+      window.removeEventListener('touchend', stopDrag);
+    };
+    
+    window.addEventListener('mousemove', doDrag);
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchmove', doDrag, { passive: true });
+    window.addEventListener('touchend', stopDrag);
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 7: VIEWPORT BOUNDS TRACKING ] ===
+  // =========================================================================
+  useEffect(() => {
+    if (data.length === 0) return;
+    const minTimes = data.map(d => d.startDate?.min).filter(Boolean);
+    const maxTimes = data.map(d => d.endDate?.max || d.startDate?.max).filter(Boolean);
+    if (minTimes.length > 0) {
+      const globalMin = Math.min(...minTimes);
+      const globalMax = maxTimes.length > 0 ? Math.max(...maxTimes) : globalMin;
+      setVisibleTimeBounds([globalMin, globalMax]);
+    }
+  }, [data]);
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 8: TIMED AUTOFOCUS FOCUS GATES ] ===
+  // =========================================================================
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+      if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
+      else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeIndex, data.length]);
+
+  useEffect(() => {
+    if (isSearchOpen) {
+      setTimeout(() => {
+        const inputNode = document.querySelector('.search-input');
+        if (inputNode) inputNode.focus();
+      }, 150);
+    }
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    updateAppHeight();
+    let wasDesktop = window.innerWidth >= 1024;
+    const handleResize = () => {
+      updateAppHeight();
+      const isDesktop = window.innerWidth >= 1024;
+      if (isDesktop !== wasDesktop) {
+        window.dispatchEvent(new Event('resize'));
+      }
+      wasDesktop = isDesktop;
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const jumpToSlide = (newIdx, isSequential = false) => {
+    if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
+      if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
+      setActiveIndex(newIdx);
+    }
+  };
+
+  const goBack = () => {
+    if (slideHistory.length > 0) {
+      const prev = slideHistory[slideHistory.length - 1];
+      setSlideHistory(h => h.slice(0, -1));
+      setActiveIndex(prev);
+    }
+  };
+
+  const searchResults = executeSearch(debouncedSearchQuery);
+  const activeSlide = data[activeIndex];
+  const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
+  // =========================================================================
+  const CarTiMapperLogo = ({ context, appVersion }) => {
+    const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"/><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1" /><rect x="71" y="19" width="4" height="6" rx="1" /><rect x="87" y="19" width="4" height="6" rx="1" /><rect x="103" y="19" width="4" height="6" rx="1" /><rect x="119" y="19" width="4" height="6" rx="1" /><rect x="135" y="19" width="4" height="6" rx="1" /><rect x="151" y="19" width="4" height="6" rx="1" /><rect x="167" y="19" width="4" height="6" rx="1" /><rect x="55" y="75" width="4" height="6" rx="1" /><rect x="71" y="75" width="4" height="6" rx="1" /><rect x="87" y="75" width="4" height="6" rx="1" /><rect x="103" y="75" width="4" height="6" rx="1" /><rect x="119" y="75" width="4" height="6" rx="1" /><rect x="135" y="75" width="4" height="6" rx="1" /><rect x="151" y="75" width="4" height="6" rx="1" /><rect x="167" y="75" width="4" height="6" rx="1" /></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"/><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2" /><circle cx="21.6" cy="-12.5" r="1.2" /><circle cx="21.6" cy="12.5" r="1.2" /><circle cx="12.5" cy="21.6" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /><circle cx="-21.6" cy="12.5" r="1.2" /><circle cx="-21.6" cy="-12.5" r="1.2" /><circle cx="-12.5" cy="-21.6" r="1.2" /></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999" /><circle cx="0" cy="-20" r="2.8" fill="#007acc" /></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999" /><circle cx="0" cy="-13" r="2.8" fill="#28a745" /></g><circle cx="0" cy="0" r="1.5" fill="#fff" /></g></svg>`;
+    if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
+    if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 24px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.85rem; color: #444; line-height: 1;">CarTiMap</span><span style="font-size: 0.65rem; color: #888; line-height: 1;">${appVersion}</span></div></div>`;
+    return html`
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
+        <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <h2 style="margin: 0; font-size: 2.4rem; color: #222; letter-spacing: -0.5px; line-height: 1.1;">CarTiMap Engine</h2>
+          <div style="font-family: monospace; color: #007acc; font-size: 1.1rem; font-weight: 600; margin-top: 6px;">${appVersion}</div>
+        </div>
+      </div>
+    `;
+  };
+
+  // =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
+  // =========================================================================
+  const downloadBtn = (aboutData && aboutData.downloadUrl) 
+    ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
+    : '';
+
+  const backBtnText = showButtonText ? html`<span>Back</span>` : '';
+  const resetLayoutBtnText = showButtonText ? html`<span>Reset Layout</span>` : '';
+  const settingsBtnText = showButtonText ? html`<span>Settings</span>` : '';
+  const telemetryBtnText = showButtonText ? html`<span>Telemetry</span>` : '';
+  const prevBtnText = showButtonText ? html`<span>Prev</span>` : '';
+  const nextBtnText = showButtonText ? html`<span>Next</span>` : '';
+  const searchBtnText = showButtonText ? html`<span>Search</span>` : '';
+  const filterBtnText = showButtonText ? html`<span>Filters</span>` : '';
+
+  const backBtn = (slideHistory && slideHistory.length > 0)
+    ? html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`
+    : '';
+
+  const resetLayoutBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(140); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><polyline points="16 3 21 8 16 13"></polyline><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><polyline points="8 21 3 16 8 11"></polyline></svg>
+      ${resetLayoutBtnText}
+    </button>
+  `;
+
+  const settingsBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(true)} title="Engine Configurations">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      ${settingsBtnText}
+    </button>
+  `;
+
+  const telemetryBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Logs">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4\"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      ${telemetryBtnText}
+    </button>
+  `;
+
+  const prevBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      ${prevBtnText}
+    </button>
+  `;
+
+  const nextBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next Node">
+      ${nextBtnText}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  `;
+
+  const searchBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSearchOpen(true)} title="Interactive Query Index">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      ${searchBtnText}
+    </button>
+  `;
+
+  const filterBtn = html`
+    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+      ${filterBtnText}
+    </button>
+  `;
 
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
           // =========================================================================
           const aboutBtn = aboutData 
-            ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;" onClick=${() => setIsAboutOpen(true)} title="Dataset Specs">
+            ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;" onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs">
                 <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
               </button>`
             : '';
+
+          const availableExtractTypes = ['Storyline', 'Context', 'Related history', 'Presentation'];
+          const handleToggleExtractType = (type) => {
+            if (activeExtractTypes.includes(type)) {
+              if (activeExtractTypes.length > 1) {
+                setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
+              } else {
+                addLog('At least one data stream must remain active.', 'warning');
+              }
+            } else {
+              setActiveExtractTypes([...activeExtractTypes, type]);
+            }
+          };
 
           const filterPopup = isFilterOpen
             ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
@@ -2877,11 +2808,23 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
                   <span>Active Swimlanes</span>
                   <button style="border: none; background: transparent; color: #007acc; font-size: 0.8rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; padding-right: 4px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; padding-right: 4px;">
                   ${allTags.map(tag => html`
                     <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
                       <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
                       <span style="font-family: monospace; color: #555;">${tag}</span>
+                    </label>
+                  `)}
+                </div>
+                <!-- Dedicated Extract Type Data Streams Filter Selector Group [REF: ETL-14c] -->
+                <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 8px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
+                  <span>Data Streams</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  ${availableExtractTypes.map(type => html`
+                    <label key=${type} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+                      <input type="checkbox" checked=${activeExtractTypes.includes(type)} onChange=${() => handleToggleExtractType(type)} style="cursor: pointer;" />
+                      <span style="font-family: monospace; color: #555;">${type}</span>
                     </label>
                   `)}
                 </div>
@@ -3066,9 +3009,39 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
                 </div>
       
                 ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline" style="z-index: 2000;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
+                
+                <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
+                <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)}></div>
+                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000;">
+                  <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000;">&times;</button>
+                  <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                      <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} style="margin: 0 auto; display: block; max-width: 120px;" />
+                    </div>
+                    <h3>${aboutData ? aboutData.title : 'Dataset Specs'}</h3>
+                    <p style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #444;">${aboutData ? aboutData.description : 'No project description provided.'}</p>
+                    <div style="border-top: 1px solid #eee; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
+                      <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
+                      <strong>Active Modules:</strong><br/>
+                      ${Object.entries(MODULE_VERSIONS).map(([k, v]) => `• ${k}: ${v}`).join('\n')}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)}></div>
+                <div id="search-modal" class="tm-modal" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000; height: 80vh;">
+                  <button class="modal-close" onClick=${() => setIsSearchOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000;">&times;</button>
+                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} style="flex-shrink: 0;" />
+                  <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box;">
+                    ${searchHistoryLayout}
+                    ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
+                    ${searchResultsList}
+                  </div>
+                </div>
+
               </div>`
             : '';
-			
+
           return html`
             <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
               <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
@@ -3212,7 +3185,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
           `;
         };        
 		
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.20';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.21';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 

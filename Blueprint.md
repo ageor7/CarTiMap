@@ -477,6 +477,12 @@ To preserve brand geometry across variable screen sizes, inline logo assets are 
     [REF: UI-199c] Center Cockpit Navigation: Centers Prev, Input, and Next buttons, locking pagination coordinates.
     [REF: UI-201b] Minimap Gutter Scale Clearance: Sets minimap coordinates to bottom: 55px, freeing up the Leaflet bottom-left scale bar vertical clearance.
 
+#### [REF: MAP-01b] Strict WKT Parser Isolation [UPDATED - 2026-09-02]
+To maintain GIS database standards, the fallback regex marker generation is entirely deprecated. If Wicket fails to compile a coordinate cell, the feature is caught, an error warning is dispatched to the Telemetry monitor, and the rendering loop skips the element. Under no circumstances is a fallback pin plotted, preventing out-of-bounds rendering anomalies.
+
+#### [REF: MAP-01c] Parenthetical-Depth Tokenizer [NEW - 2026-09-02]
+Multiline cells containing raw WKT geometry definitions are protected from newline-splitting bugs using a parenthetical identifier scanner. If a cell matches WKT signatures (POINT, LINESTRING, POLYGON, etc.), the parser bypasses string splitting, cleans whitespace, and passes the WKT block cleanly to the compilation engine.
+
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>
@@ -652,6 +658,12 @@ Within this matrix:
 2. The 38px `.status-bar` and the 4px `.resizer-dyn-timeline` act as static vertical blocks.
 3. Minimizing the `.timeline-pane` to `0px` forces the parent layout to automatically stretch the core mapping and media viewports to the bottom, preventing layout voids.
 4. Symmetrically, global modal overlay frames (`.tm-modal` and `.tm-backdrop`) are anchored with dominant z-indexes (`z-index: 100000` and `99999`), isolating them from lower resizer handlers.
+
+#### [REF: ETL-14c] Extract Type Data Streams [NEW - 2026-09-02]
+The engine ingests the "Extract Type" column mapping (Column 18) directly from the unified database paradata. Symmetrically, four stream streams (Storyline, Context, Related history, Presentation) are registered in the global state machine, allowing users to toggle entire narrative classes from the Filter cockpit.
+
+#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
+To prevent key interface controls from scrolling out of viewport bounds, modal dialogs are configured with structured flex layers. The close button is locked in a static top-right position inside the non-scrolling parent block, while content scrolling is delegated entirely to a nested child container.
 
 
 ---

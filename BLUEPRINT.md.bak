@@ -642,6 +642,17 @@ When geometry compilation encounters an un-geocodable entry or coordinate syntax
 #### [REF: UI-164c] Integrated Navigation and Telemetry Cockpit [UPDATED - 2026-08-30]
 To maximize vertical workspace, the Status/Toolbar height is locked to 38px (single-line layout). Interactive buttons and input indicators must scale up by one click (e.g., font-size: 0.95rem; button padding: 4px 10px;). Timeline scale measurements (`visibleTimeSpan`) must be rendered inside the center cockpit immediately to the right of the Next control button to minimize eye tracking fatigue.
 
+#### [REF: UI-175] Strict Flex-Column Flow & Stacking Hierarchy [UPDATED - 2026-09-02]
+To prevent absolute-position layout calculations from colliding across fluid resize boundaries, the master application shell is locked into an active CSS Flexbox layout. 
+
+`#app-layout { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }`
+
+Within this matrix:
+1. `.core-viewports` is configured as a flexible item (`flex: 1; min-height: 0;`), absorbing all available vertical pixels.
+2. The 38px `.status-bar` and the 4px `.resizer-dyn-timeline` act as static vertical blocks.
+3. Minimizing the `.timeline-pane` to `0px` forces the parent layout to automatically stretch the core mapping and media viewports to the bottom, preventing layout voids.
+4. Symmetrically, global modal overlay frames (`.tm-modal` and `.tm-backdrop`) are anchored with dominant z-indexes (`z-index: 100000` and `99999`), isolating them from lower resizer handlers.
+
 
 ---
 
