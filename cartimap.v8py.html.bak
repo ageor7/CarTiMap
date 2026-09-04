@@ -1875,7 +1875,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             activeLayersArray.push(layer); validMarkers++;
           });
           if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
-        } catch(e) { console.error("Map Error Row", idx, e); }
+        } catch (e) { 
+          console.error ("Map Error Row", idx, e); 
+          if (addLog) {
+            addLog (`[Map-Engine] Malformed geometry parsing on Row ${item.id + 2} ("${item.title || 'Untitled'}"): ${e.message}`, 'error');
+          }
+        }
       });
     });
     setTimeout(() => {
@@ -2417,9 +2422,9 @@ const App = () => {
       // =========================================================================
       // === [ APP_ORCHESTRATOR SUBBLOCK 3: VECTOR SEARCH INDEXING ] ===
       // =========================================================================
-      const indexedData = valid.map(d => ({
+      const indexedData = valid.map (d => ({
         ...d,
-        _searchIndex: stripAndNormalize(`\\${d.title} \\${d.description} \\${d.place} \\${d.tags.join(' ')} \\${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
+        _searchIndex: stripAndNormalize (`${d.title} ${d.description} ${d.place} ${d.tags.join (' ')} ${formatSmartDate (d.startDate, d.endDate, dateLocale)}`)
       }));
       setUnfilteredData(indexedData);
 
@@ -2805,7 +2810,7 @@ const App = () => {
             </button>
           `;
 
-// =========================================================================
+          // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
           // =========================================================================
           const aboutBtn = aboutData 

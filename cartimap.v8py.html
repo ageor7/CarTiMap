@@ -2422,9 +2422,9 @@ const App = () => {
       // =========================================================================
       // === [ APP_ORCHESTRATOR SUBBLOCK 3: VECTOR SEARCH INDEXING ] ===
       // =========================================================================
-      const indexedData = valid.map(d => ({
+      const indexedData = valid.map (d => ({
         ...d,
-        _searchIndex: stripAndNormalize(`\\${d.title} \\${d.description} \\${d.place} \\${d.tags.join(' ')} \\${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
+        _searchIndex: stripAndNormalize (`${d.title} ${d.description} ${d.place} ${d.tags.join (' ')} ${formatSmartDate (d.startDate, d.endDate, dateLocale)}`)
       }));
       setUnfilteredData(indexedData);
 
@@ -2559,7 +2559,7 @@ const App = () => {
       const diffX = currentX - startX;
       const pctDiff = (diffX / docW) * 100;
       const newSplit = Math.max(20, Math.min(80, startSplit + pctDiff));
-      document.documentElement.style.setProperty('--primary-split', `\\${newSplit}%`);
+     document.documentElement.style.setProperty ('--primary-split', `${newSplit}%`);
     };
 
     const stopDrag = () => {
@@ -2586,7 +2586,7 @@ const App = () => {
       const diffY = currentY - startY;
       const pctDiff = (diffY / docH) * 100;
       const newSplit = Math.max(20, Math.min(80, startSplit + pctDiff));
-      document.documentElement.style.setProperty('--secondary-split', `\\${newSplit}%`);
+      document.documentElement.style.setProperty('--secondary-split', `${newSplit}%`);
     };
 
     const stopDrag = () => {
@@ -2810,7 +2810,7 @@ const App = () => {
             </button>
           `;
 
-// =========================================================================
+          // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
           // =========================================================================
           const aboutBtn = aboutData 
