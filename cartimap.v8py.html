@@ -2142,8 +2142,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.21';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.23 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.23 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.23gp1 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.23gp1 ] ===
 
 const App = () => {
   // =========================================================================
@@ -2694,16 +2694,17 @@ const App = () => {
         </div>
 
         <div class="tm-backdrop \${isSearchOpen ? 'open' : ''}" onClick=\${() => setIsSearchOpen(false)} style="z-index: 99999 !important;"></div>
-        <div id="search-modal" class="tm-modal" style="display: \${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; height: 80vh; padding: 30px;">
+		   // Gemini Pro debugging
+		 <div id="search-modal" class="tm-modal" style="display: \${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; height: 80vh; padding: 30px;">
           <button class="modal-close" onClick=\${() => setIsSearchOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;">&times;</button>
           <input type="text" class="search-input" placeholder="Search events, places, dates..." value=\${searchQuery} onInput=\${e => setSearchQuery(e.target.value)} style="flex-shrink: 0; width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
           <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
             \${searchHistoryLayout}
-            \smatch\${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "\${searchQuery}"</div>` : ''}
+            \${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "\${searchQuery}"</div>` : ''}
             \${searchResultsList}
           </div>
         </div>
-
+		 // Gemini Pro debugging End 
       </div>`
     : '';
 
@@ -2717,7 +2718,7 @@ const App = () => {
   `;
 };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.23';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.23gp1';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
