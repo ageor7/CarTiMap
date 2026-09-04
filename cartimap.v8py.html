@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.24bGP3';
+        const APP_VERSION = 'v8.13.24bGP4';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1612,43 +1612,44 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
         maxClusterRadius: 40,
         spiderfyOnMaxZoom: true,
         zoomToBoundsOnClick: false,
-        iconCreateFunction: function(cluster) {
-          const children = cluster.getAllChildMarkers();
-          const firstLatLng = children.at(0).getLatLng();
-          const isExactSame = children.every(m => m.getLatLng().equals(firstLatLng));
+
+        "iconCreateFunction": function (cluster) {
+          const children = cluster.getAllChildMarkers ();
+          const firstLatLng = children.at (0).getLatLng ();
+          const isExactSame = children.every (m => m.getLatLng ().equals (firstLatLng));
           if (isExactSame) {
             const count = children.length;
-            const html = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;"><div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4)"></div><div class="pin-stem" style="background: #333; width: 2px"></div><div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3)">\${count}</div></div>`;
-            return L.divIcon({ className: 'custom-div-icon', html: html, iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
+            const html = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;"><div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4)"></div><div class="pin-stem" style="background: #333; width: 2px"></div><div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3)">${count}</div></div>`;
+            return L.divIcon ({"className": 'custom-div-icon', "html": html, "iconSize": new L.Point (24, 34), "iconAnchor": new L.Point (12, 34)});
           }
           let c = ' marker-cluster-';
           if (children.length < 10) c += 'small';
           else if (children.length < 100) c += 'medium';
           else c += 'large';
-          return new L.DivIcon({ html: '<div><span>' + children.length + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+          return new L.DivIcon ({"html": '<div><span>' + children.length + '</span></div>', "className": 'marker-cluster' + c, "iconSize": new L.Point (40, 40)});
         }
-      }).addTo(map);
+      }).addTo (map);
 
-      clusterLayer.current.on('clusterclick', (c) => {
+      clusterLayer.current.on ('clusterclick', (c) => {
         const m = mapInstance.current;
-        if (m.getZoom() < 10) { m.fitBounds(c.layer.getBounds(), { padding: new L.Point(40, 40) }); }
-        else { c.layer.spiderfy(); }
+        if (m.getZoom () < 10) { m.fitBounds (c.layer.getBounds (), {"padding": new L.Point (40, 40)}); }
+        else { c.layer.spiderfy (); }
       });
 
-      gridLayerRef.current = L.layerGroup().addTo(map);
-      clusterLayer.current.on('clustermouseover', (c) => {
-        const children = c.layer.getAllChildMarkers();
-        const places = [...new Set(children.map(m => m.itemPlace).filter(Boolean))];
-        const titles = [...new Set(children.map(m => m.itemTitle).filter(Boolean))];
+      gridLayerRef.current = L.layerGroup ().addTo (map);
+      clusterLayer.current.on ('clustermouseover', (c) => {
+        const children = c.layer.getAllChildMarkers ();
+        const places = [...new Set (children.map (m => m.itemPlace).filter (Boolean))];
+        const titles = [...new Set (children.map (m => m.itemTitle).filter (Boolean))];
         let displayHtml = '';
-        if (places.length > 0) { displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center">\${places.slice(0, 2).join(' / ')}\${places.length > 2 ? '...' : ''}</div>`; }
+        if (places.length > 0) { displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center">${places.slice (0, 2).join (' / ')}${places.length > 2 ? '...' : ''}</div>`; }
         displayHtml += `<div style="text-align: left; line-height: 1.3">`;
-        displayHtml += titles.slice(0, 5).map(t => `• \${t}`).join('<br/>');
-        if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%">+\\${titles.length - 5} more events...</em>`;
+        displayHtml += titles.slice (0, 5).map (t => `• ${t}`).join ('<br/>');
+        if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%">+${titles.length - 5} more events...</em>`;
         displayHtml += `</div>`;
-        c.layer.bindTooltip(displayHtml, { direction: 'top', className: 'custom-cluster-tooltip' }).openTooltip();
+        c.layer.bindTooltip (displayHtml, {"direction": 'top', "className": 'custom-cluster-tooltip'}).openTooltip ();
       });
-      clusterLayer.current.on('clustermouseout', (c) => c.layer.unbindTooltip());
+      clusterLayer.current.on ('clustermouseout', (c) => c.layer.unbindTooltip ());
 
       const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: true, scrollWheelZoom: true, doubleClickZoom: true, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), 0);
       const boundsRect = L.rectangle(map.getBounds(), { color: '#007acc', weight: 2, fillOpacity: 0.15 }).addTo(miniMap);
@@ -1776,13 +1777,13 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           featureLayers.forEach(layer => {
             if (!layer) return; let sig = null;
             if (layer.getLatLng) {
-              const ll = layer.getLatLng();
-              if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
-              sig = `P_\${ll.lat.toFixed(5)}_\${ll.lng.toFixed(5)}`;
+              const ll = layer.getLatLng ();
+              if (!ll || ll.lat == null || ll.lng == null || isNaN (ll.lat) || isNaN (ll.lng)) return;
+              sig = `P_${ll.lat.toFixed (5)}_${ll.lng.toFixed (5)}`;
             } else if (layer.getBounds) {
-              const b = layer.getBounds();
-              if (!b || !b.isValid()) return;
-              sig = `B_\${b.toBBoxString()}`;
+              const b = layer.getBounds ();
+              if (!b || !b.isValid ()) return;
+              sig = `B_${b.toBBoxString ()}`;
             }
             if (sig) { if (uniqueSignatures.has(sig)) return; uniqueSignatures.add(sig); }
             validFeatureLayers.push(layer);
@@ -1874,7 +1875,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             activeLayersArray.push(layer); validMarkers++;
           });
           if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
-        } catch(e) { console.error("Map Error Row", idx, e); }
+        } catch (e) { 
+          console.error ("Map Error Row", idx, e); 
+          if (addLog) {
+            addLog (`[Map-Engine] Malformed geometry parsing on Row ${item.id + 2} ("${item.title || 'Untitled'}"): ${e.message}`, 'error');
+          }
+        }
       });
     });
     setTimeout(() => {
@@ -2158,8 +2164,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.21';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.23GP3 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.23GP3 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.23GP4 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.23GP4 ] ===
 
 const App = () => {
   // =========================================================================
@@ -2245,33 +2251,33 @@ const App = () => {
     return stripped.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean).join(' · ');
   };
 
+// =========================================================================
+  // === [ APP_ORCHESTRATOR SUBBLOCK 2: DECOUPLED DATA CONNECTION PIPELINE ] ===
   // =========================================================================
-  // === [ APP_ORCHESTRATOR SUBBLOCK 2: CHRONO ENGINE - DATAFRAME PARSING ] ===
-  // =========================================================================
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    let source = urlParams.get('source') || urlParams.get('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
-    const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
-    const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid');
+  useEffect (() => {
+    const urlParams = new URLSearchParams (window.location.search);
+    let source = urlParams.get ('source') || urlParams.get ('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+    const gid = urlParams.get ('gid') || urlParams.get ('amp;gid') || '0';
+    const bgid = urlParams.get ('bgid') || urlParams.get ('amp;bgid');
 
-    setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
-    addLog(`Initializing connection: ID=\${source}, GID=\${gid}`, 'info');
+    setStatus ({"text": 'Fetching CSV payload from Google Sheets...', "progress": 30, "isFading": false, "active": false});
+    addLog (`Initializing connection: ID=${source}, GID=${gid}`, 'info');
 
     // CORS-relaxed Google Visualization API endpoints mapped under [REF: CRASH-02]
-    const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/\${source}/gviz/tq?tqx=out:csv&gid=\${gid}`;
-    const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/\${source}/gviz/tq?tqx=out:csv&gid=\${bgid}` : null;
+    const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+    const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
 
-    Promise.all([
-      fetch(fetchUrlPrimary).then(res => {
-        if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status \${res.status})`);
-        return res.text();
+    Promise.all ([
+      fetch (fetchUrlPrimary).then (res => {
+        if (!res.ok) throw new Error (`HTTP network failure fetching primary dataset (status ${res.status})`);
+        return res.text ();
       }),
-      fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
-        if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status \${res.status})`);
-        return res.text();
-      }) : Promise.resolve(null)
-    ]).then(([primaryCsv, basemapsCsv]) => {
-      setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
+      fetchUrlBasemaps ? fetch (fetchUrlBasemaps).then (res => {
+        if (!res.ok) throw new Error (`HTTP network failure fetching basemaps config (status ${res.status})`);
+        return res.text ();
+      }) : Promise.resolve (null)
+    ]).then (([primaryCsv, basemapsCsv]) => {
+      setStatus ({"text": 'Compiling core datasets...', "progress": 60, "isFading": false, "active": false});
       
       const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
       if (results.errors.length > 0) {
@@ -3113,7 +3119,7 @@ const App = () => {
           `;
         };
 
-		MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.23GP3';
+		MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.23GP4';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
