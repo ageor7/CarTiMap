@@ -2559,7 +2559,7 @@ const App = () => {
       const diffX = currentX - startX;
       const pctDiff = (diffX / docW) * 100;
       const newSplit = Math.max(20, Math.min(80, startSplit + pctDiff));
-      document.documentElement.style.setProperty('--primary-split', `\\${newSplit}%`);
+     document.documentElement.style.setProperty ('--primary-split', `${newSplit}%`);
     };
 
     const stopDrag = () => {
@@ -2586,7 +2586,7 @@ const App = () => {
       const diffY = currentY - startY;
       const pctDiff = (diffY / docH) * 100;
       const newSplit = Math.max(20, Math.min(80, startSplit + pctDiff));
-      document.documentElement.style.setProperty('--secondary-split', `\\${newSplit}%`);
+      document.documentElement.style.setProperty('--secondary-split', `${newSplit}%`);
     };
 
     const stopDrag = () => {
