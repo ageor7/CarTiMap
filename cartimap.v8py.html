@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.24bGP';
+        const APP_VERSION = 'v8.13.24bGP3';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1970,7 +1970,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
   const bases = basemapsRegistry.filter(b => b.type !== 'overlay'); const overlays = basemapsRegistry.filter(b => b.type === 'overlay');
 
-  return html`
+return html`
     <style id="layers-menu-zindex-fix">
       .map-pane { z-index: 110 !important; }
       .media-pane { z-index: 10 !important; }
@@ -1979,8 +1979,8 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
       <div style="overflow: hidden; width:100%; height:100%; position: absolute; top:0; left:0; z-index:1;"><div ref=${mapDomRef} style="width:100%; height:100%;"></div></div>
       <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn \${maxPane === 'map' ? 'active' : ''}" onClick=\${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=\${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">
-            \${maxPane === 'map'
+          <button class="status-btn ${maxPane === 'map' ? 'active' : ''}" onClick=${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">
+            ${maxPane === 'map'
               ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
               : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
             }
@@ -1988,45 +1988,45 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
         </div>
 
         <div style="display: flex; flex-direction: column; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn" onClick=\${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
+          <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
-          <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">\${mapZoom}</div>
-          <button class="status-btn" onClick=\${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
+          <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">${mapZoom}</div>
+          <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
         </div>
 
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn \${showGrid ? 'active' : ''}" onClick=\${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;">
+          <button class="status-btn ${showGrid ? 'active' : ''}" onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
           </button>
         </div>
 
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn \${showLayersMenu ? 'active' : ''}" onClick=\${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;">
+          <button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
           </button>
         </div>
       </div>
 
-      \${showLayersMenu ? html`
+      ${showLayersMenu ? html`
         <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 40px; top: 130px; z-index: 2000;">
           <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
           <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-            \${bases.map(b => html`
+            ${bases.map(b => html`
               <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px;">
                 <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
-                  <input type="radio" id="base_\${b.id}" name="basemap_radio" checked=\${activeBasemap === b.id} onChange=\${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${activeBasemap === b.id} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
-                    <label for="base_\${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">\${b.label}</label>
-                    \smatch\${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="\${b.attrLink || '#'}" target="_blank" onClick=\${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>\${b.attrText}</a></span>` : ''}
+                    <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
+                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
                   </div>
                 </div>
-                \${activeBasemap === b.id ? html`
+                ${activeBasemap === b.id ? html`
                   <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 0.65rem; color: #888;">Opacity</span>
-                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${basemapOpacity} onChange=\${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
+                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${basemapOpacity} onChange=${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
                   </div>
                 ` : ''}
               </div>
@@ -2034,12 +2034,28 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           </div>
           <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            \smatch\${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_\${o.id}" checked=\${activeOverlays.includes(o.id)} onChange=\${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="over_\${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">\${o.label}</label>\${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="\\\\\\\\\${o.attrLink || '#'}" target="_blank" onClick=\\\${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>\\${o.attrText}</a></span>` : ''}</div></div>\${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=\${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;\\">No overlays available.</div>`}
+            ${overlays.length > 0 ? overlays.map(o => html`
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
+                  <input type="checkbox" id="over_${o.id}" checked=${activeOverlays.includes(o.id)} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <div style="display: inline; margin: 0;">
+                    <label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
+                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
+                  </div>
+                </div>
+                ${activeOverlays.includes(o.id) ? html`
+                  <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 0.65rem; color: #888;">Opacity</span>
+                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" />
+                  </div>
+                ` : ''}
+              </div>
+            `) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
           </div>
         </div>
       ` : ''}
     </div>
-    <div class="minimap-container" ref=\${miniMapDomRef}></div>
+    <div class="minimap-container" ref=${miniMapDomRef}></div>
   `;
 };
 
@@ -2142,8 +2158,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.21';
         MODULE_VERSIONS['ASTCompiler'] = 'v1.2.4';
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.23GP2 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.23GP2 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.23GP3 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.23GP3 ] ===
 
 const App = () => {
   // =========================================================================
@@ -2788,25 +2804,25 @@ const App = () => {
             </button>
           `;
 
-          // =========================================================================
+// =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
           // =========================================================================
           const aboutBtn = aboutData 
-            ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;" onClick=${() => setIsAboutOpen (true)} title="Dataset Specs">
+            ? html`<button class="status-btn" style="width: auto; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer;" onClick=${() => setIsAboutOpen(true)} title="Dataset Specs">
                 <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
               </button>`
             : '';
 
           const filterPopup = isFilterOpen
-            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation ()}>
+            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
                 <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
                   <span>Active Swimlanes</span>
-                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.8rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags (allTags); addLog ('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
+                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.8rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; padding-right: 4px;">
-                  ${allTags.map (tag => html`
+                  ${allTags.map(tag => html`
                     <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
-                      <input type="checkbox" checked=${activeTags.includes (tag)} onChange=${() => handleToggleTag (tag)} style="cursor: pointer;" />
+                      <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
                       <span style="font-family: monospace; color: #555;">${tag}</span>
                     </label>
                   `)}
@@ -2815,10 +2831,10 @@ const App = () => {
             : '';
 
           const searchHistoryLayout = (searchHistory.length > 0 && !searchQuery)
-            ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map (h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=${() => setSearchQuery (h)}>${h}</button>`)}</div></div>`
+            ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>`
             : '';
 
-          const searchResultsList = searchResults.map (res => html`<div class="search-result-item" onClick=${() => handleResultClick (res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">${res.title}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">${formatSmartDate (res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces (res.place)}` : ''}</div></div>`);
+          const searchResultsList = searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">${res.title}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`);
 
           const loadingScreen = (!status.active)
             ? html`<div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
@@ -2876,11 +2892,11 @@ const App = () => {
                   </div>
                 </div>
       
-				<div class="timeline-pane ${maxPane === 'timeline' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'timeline' ? 'pane-hidden' : ''}" style="height: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}; min-height: ${isTimelineMinimized ? '0px' : '45px'}">
-				  <${TimelineScrubber}
+                <div class="timeline-pane ${maxPane === 'timeline' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'timeline' ? 'pane-hidden' : ''}" style="height: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}; min-height: ${isTimelineMinimized ? '0px' : '45px'}">
+                  <${TimelineScrubber}
                     data=${data}
                     activeIndex=${activeIndex}
-                    setActiveIndex=${setActiveIndex}
+                    setActiveIndex=${jumpToSlide}
                     addLog=${addLog}
                     activeTags=${activeTags}
                     isTimelineExpanded=${isTimelineExpanded}
@@ -2890,10 +2906,10 @@ const App = () => {
                     showButtonText=${showButtonText}
                     visibleTimeBounds=${visibleTimeBounds}
                     setVisibleTimeBounds=${setVisibleTimeBounds}
-                    zoomLock=${zoomLock}
-                    setZoomLock=${setZoomLock}
                     visibleTimeSpan=${visibleTimeSpan}
                     setVisibleTimeSpan=${setVisibleTimeSpan}
+                    zoomLock=${zoomLock}
+                    setZoomLock=${setZoomLock}
                     isTimelineMinimized=${isTimelineMinimized}
                     setIsTimelineMinimized=${setIsTimelineMinimized}
                     dateLocale=${dateLocale}
@@ -2920,13 +2936,13 @@ const App = () => {
                         max=${data.length}
                         value=${activeIndex + 1}
                         onChange=${(e) => {
-                          const val = parseInt (e.target.value, 10);
-                          if (!isNaN (val) && val >= 1 && val <= data.length) {
-                            jumpToSlide (val - 1);
+                          const val = parseInt(e.target.value, 10);
+                          if (!isNaN(val) && val >= 1 && val <= data.length) {
+                            jumpToSlide(val - 1);
                           }
                         }}
                         onKeyDown=${(e) => {
-                          e.stopPropagation ();
+                          e.stopPropagation();
                         }}
                         style="width: 45px; background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.8rem; padding: 2px 0; color: inherit; outline: none;"
                       />
@@ -2948,23 +2964,23 @@ const App = () => {
       
                 <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style="bottom: ${isTimelineMinimized ? '0px' : timelineRequiredHeight + 'px'}"></div>
       
-                ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized (false)} title="Restore Timeline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
+                ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
               </div>`
             : '';
 
         
           return html`
-            <div id="tm-root" onClick=${() => { setIsMenuOpen (false); setIsFilterOpen (false); }}>
+            <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
               <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
               
               ${loadingScreen}
               ${appLayout}
         
-              <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen (false)} style="z-index: 10000;"></div>
+              <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 10000;"></div>
               <div id="search-modal" class="tm-modal ${isSearchOpen ? 'open' : ''}" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column;">
-                <button class="modal-close" onClick=${() => setIsSearchOpen (false)} title="Close">✕</button>
+                <button class="modal-close" onClick=${() => setIsSearchOpen(false)} title="Close">✕</button>
                 <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 15px; font-family: monospace;">Search Dataset</h3>
-                <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery (e.target.value)} autoFocus style="font-family: monospace; font-size: 1rem; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;" />
+                <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} autoFocus style="font-family: monospace; font-size: 1rem; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;" />
                 ${searchHistoryLayout}
                 <div style="flex-grow: 1; overflow-y: auto; border-top: 1px solid #eee;">
                   ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888; font-family: monospace;">No events found for "${searchQuery}"</div>` : ''}
@@ -2972,20 +2988,20 @@ const App = () => {
                 </div>
               </div>
         
-              <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen (false)} style="z-index: 10000;"></div>
+              <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 10000;"></div>
               
               <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto;">
-                <button class="modal-close" onClick=${() => setIsAboutOpen (false)} title="Close">✕</button>
+                <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close">✕</button>
                 <div style="margin-bottom: 25px;">
                   <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
-                  <h2 style="margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50; font-family: monospace;" dangerouslySetInnerHTML=${{"__html": aboutData ? aboutData.title : 'Dataset Specifications'}}></h2>
-                  <div style="font-size: 1.05rem; line-height: 1.5; color: #333; margin-bottom: 15px; font-family: monospace;" dangerouslySetInnerHTML=${{"__html": aboutData ? aboutData.description : ''}}></div>
+                  <h2 style="margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50; font-family: monospace;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.title : 'Dataset Specifications'}}></h2>
+                  <div style="font-size: 1.05rem; line-height: 1.5; color: #333; margin-bottom: 15px; font-family: monospace;" dangerouslySetInnerHTML=${{__html: aboutData ? aboutData.description : ''}}></div>
                   <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 0.8rem; margin-bottom: 12px; line-height: 1.4;">
-                    <strong>Ingested GID:</strong> ${new URLSearchParams (window.location.search).get ('gid') || 'Default'}<br/>
+                    <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
                     <strong>Source File Reference:</strong> ${aboutData?.rawSource}
                   </div>
                   <div style="display: flex; gap: 8px; margin-bottom: 25px;">
-                    <button class="status-btn-text" style="width: max-content; padding: 6px 12px; background: #007acc; color: #fff; border: none; cursor: pointer; font-family: monospace;" onClick=${() => { jumpToSlide (0); setIsAboutOpen (false); }}>Play Overview Slide</button>
+                    <button class="status-btn-text" style="width: max-content; padding: 6px 12px; background: #007acc; color: #fff; border: none; cursor: pointer; font-family: monospace;" onClick=${() => { jumpToSlide(0); setIsAboutOpen(false); }}>Play Overview Slide</button>
                     ${downloadBtn}
                   </div>
                 </div>
@@ -3063,14 +3079,14 @@ const App = () => {
                 </details>
               </div>
         
-              <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen (false)} style="z-index: 10000;"></div>
+              <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 10000;"></div>
               <div id="settings-modal" class="tm-modal ${isSettingsOpen ? 'open' : ''}" style="display: ${isSettingsOpen ? 'block' : 'none'}; max-width: 450px; font-family: monospace;">
-                <button class="modal-close" onClick=${() => setIsSettingsOpen (false)} title="Close">✕</button>
+                <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close">✕</button>
                 <h3 style="margin-top: 0; font-size: 1.3rem; margin-bottom: 20px; color: #222;">Engine Settings</h3>
                 <div style="display: flex; flex-direction: column; gap: 20px;">
                   <div>
                     <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.95rem; color: #444;">Data Locale Format</label>
-                    <select value=${dateLocale} onChange=${e => { setDateLocale (e.target.value); localStorage.setItem ('tm_date_locale', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.95rem; font-family: monospace;">
+                    <select value=${dateLocale} onChange=${e => { setDateLocale(e.target.value); localStorage.setItem('tm_date_locale', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.95rem; font-family: monospace;">
                       <option value="en-GB">European (DD/MM/YYYY)</option>
                       <option value="en-US">American (MM/DD/YYYY)</option>
                       <option value="el-GR">Greek (ΗΗ/ΜΜ/ΕΕΕΕ)</option>
@@ -3078,7 +3094,7 @@ const App = () => {
                   </div>
                   <div>
                     <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.95rem; color: #444;">Chrono Parse Engine Mode</label>
-                    <select value=${dateEngineMode} onChange=${e => { setDateEngineMode (e.target.value); localStorage.setItem ('tm_date_engine_mode', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.95rem; font-family: monospace;">
+                    <select value=${dateEngineMode} onChange=${e => { setDateEngineMode(e.target.value); localStorage.setItem('tm_date_engine_mode', e.target.value); }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.95rem; font-family: monospace;">
                       <option value="auto">Auto-Detect Chronologies (Default)</option>
                       <option value="edtf">Strict ISO 8601-2 / EDTF Only</option>
                       <option value="legacy">Strict Gregorian Serial / DD-MM-YYYY Fallback</option>
@@ -3087,17 +3103,17 @@ const App = () => {
                   <div>
                     <label style="font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.95rem; color: #444;">Global Polygon Opacity</label>
                     <div style="display: flex; align-items: center; gap: 15px;">
-                      <input type="range" min="0.1" max="1" step="0.1" value=${polygonOpacity} onInput=${e => { setPolygonOpacity (parseFloat (e.target.value)); localStorage.setItem ('tm_polygon_opacity', e.target.value); }} style="flex-grow: 1; -webkit-appearance: none; height: 4px; background: #ddd; border-radius: 2px; outline: none;" />
-                      <span style="font-family: monospace; font-size: 1rem; color: #007acc; font-weight: 600; width: 30px; text-align: right;">${polygonOpacity.toFixed (1)}</span>
+                      <input type="range" min="0.1" max="1" step="0.1" value=${polygonOpacity} onInput=${e => { setPolygonOpacity(parseFloat(e.target.value)); localStorage.setItem('tm_polygon_opacity', e.target.value); }} style="flex-grow: 1; -webkit-appearance: none; height: 4px; background: #ddd; border-radius: 2px; outline: none;" />
+                      <span style="font-family: monospace; font-size: 1rem; color: #007acc; font-weight: 600; width: 30px; text-align: right;">${polygonOpacity.toFixed(1)}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           `;
-		  };
+        };
 
-		MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.23GP2';
+		MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.23GP3';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
