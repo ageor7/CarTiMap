@@ -1483,8 +1483,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.21 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v6.4.21 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.22b ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v6.4.22b ] ===
 
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
   const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -1503,13 +1503,14 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
   const minimapOffsetRef = useRef(minimapOffset || -4);
   const isSyncingRef = useRef(false);
   
+  // --- [ START_SUBBLOCK: Helper Parsers & Loaders ] ---
   const parsePolylineLabels = (placeStr) => {
     if (!placeStr) return null;
     const match = placeStr.match(/^\s*\[(.*?)\].*$/);
     if (match) {
-      const lineName = match.trim();
+      const lineName = match[1].trim();
       const details = placeStr.replace(/^\s*\[.*?\]\s*/, '').split(/[,|·;]/).map(s => s.trim()).filter(Boolean);
-      return { lineName, startLabel: details || '', endLabel: details || '' };
+      return { lineName, startLabel: details[0] || '', endLabel: details[1] || '' };
     }
     return null;
   };
@@ -1531,7 +1532,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
   };
 
   const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
+  // --- [ END_SUBBLOCK: Helper Parsers & Loaders ] ---
 
+  // --- [ START_SUBBLOCK: Layer Registry Lifecycle Hooks ] ---
   useEffect(() => {
     if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
       const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
@@ -1555,7 +1558,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     if (baseLayerRef.current && baseLayerRef.current.setOpacity) baseLayerRef.current.setOpacity(basemapOpacity);
     if (miniBaseLayerRef.current && miniBaseLayerRef.current.setOpacity) miniBaseLayerRef.current.setOpacity(basemapOpacity);
   }, [basemapOpacity]);
+  // --- [ END_SUBBLOCK: Layer Registry Lifecycle Hooks ] ---
 
+  // --- [ START_SUBBLOCK: GIS Drawing Primitives ] ---
   const createPinHtml = (isActive, isVip) => {
     const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
     return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'}"><div class="pin-head" style="background: ${color}"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'}"></div></div>`;
@@ -1569,7 +1574,8 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     return layers;
   };
 
-  const parseGeometryCollection = (wktStr) => {
+  // Iterates and parses composite WKT layouts. Captures syntax failures directly to Telemetry Logs. [REF: MAP-01f]
+  const parseGeometryCollection = (wktStr, item) => {
     const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\s*\(/i, '').replace(/\)\s*$/, '');
     let inParen = 0; let currentGeom = ''; const geometries = [];
     for (let i = 0; i < cleanStr.length; i++) {
@@ -1585,19 +1591,17 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
         const wkt = new window.Wkt.Wkt(); wkt.read(geomStr);
         extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
       } catch (e) {
-        const upper = geomStr.toUpperCase();
-        if (upper.startsWith('POINT')) {
-          const m = geomStr.match(/(-?\d+\.?\d*)\s+(-?\\d+\\.?\\d*)/);
-          if (m) extractedLayers.push(L.marker(new L.LatLng(parseFloat(m[1]), parseFloat(m[2]))));
-        } else if (upper.startsWith('LINESTRING') || upper.startsWith('POLYGON')) {
-          const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
-          if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))));
+        console.warn("WKT parsing failed for geometry component:", geomStr, e);
+        if (addLog) {
+          addLog(`[Map-Engine] Malformed geometry component on Row ${item ? item.id + 2 : 'unknown'} ("${item ? item.title : ''}"): ${e.message}`, 'error');
         }
       }
     });
     return extractedLayers;
   };
+  // --- [ END_SUBBLOCK: GIS Drawing Primitives ] ---
 
+  // --- [ START_SUBBLOCK: Leaflet Canvas Initialization ] ---
   useEffect(() => {
     if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
       const urlParams = new URLSearchParams(window.location.search);
@@ -1618,7 +1622,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const isExactSame = children.every(m => m.getLatLng().equals(firstLatLng));
           if (isExactSame) {
             const count = children.length;
-            const html = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;"><div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4)"></div><div class="pin-stem" style="background: #333; width: 2px"></div><div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3)">\${count}</div></div>`;
+            const html = `<div class="custom-map-pin" style="transform: scale(1.05); z-index: 500;"><div class="pin-head" style="background: #007acc; box-shadow: 2px 2px 0px rgba(0,0,0,0.4)"></div><div class="pin-stem" style="background: #333; width: 2px"></div><div style="position: absolute; top: -6px; right: -8px; background: #d32f2f; color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; line-height: 15px; font-weight: bold; text-align: center; border: 1px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3)">${count}</div></div>`;
             return L.divIcon({ className: 'custom-div-icon', html: html, iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
           }
           let c = ' marker-cluster-';
@@ -1641,10 +1645,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
         const places = [...new Set(children.map(m => m.itemPlace).filter(Boolean))];
         const titles = [...new Set(children.map(m => m.itemTitle).filter(Boolean))];
         let displayHtml = '';
-        if (places.length > 0) { displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center">\${places.slice(0, 2).join(' / ')}\${places.length > 2 ? '...' : ''}</div>`; }
+        if (places.length > 0) { displayHtml += `<div style="font-weight: 600; color: #007acc; border-bottom: 1px solid #ccc; margin-bottom: 4px; padding-bottom: 4px; text-align: center">${places.slice(0, 2).join(' / ')}${places.length > 2 ? '...' : ''}</div>`; }
         displayHtml += `<div style="text-align: left; line-height: 1.3">`;
-        displayHtml += titles.slice(0, 5).map(t => `• \${t}`).join('<br/>');
-        if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%">+\\${titles.length - 5} more events...</em>`;
+        displayHtml += titles.slice(0, 5).map(t => `• ${t}`).join('<br/>');
+        if (titles.length > 5) displayHtml += `<br/><em style="color: #666; font-size: 0.8em; margin-top: 4px; display: inline-block; text-align: center; width: 100%">+${titles.length - 5} more events...</em>`;
         displayHtml += `</div>`;
         c.layer.bindTooltip(displayHtml, { direction: 'top', className: 'custom-cluster-tooltip' }).openTooltip();
       });
@@ -1688,7 +1692,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
       }
     }
   }, [basemapsRegistry]);
+  // --- [ END_SUBBLOCK: Leaflet Canvas Initialization ] ---
 
+  // --- [ START_SUBBLOCK: Grid Overlay Logic ] ---
   useEffect(() => {
     const map = mapInstance.current; if (!map || !gridLayerRef.current) return;
     const updateGrid = () => {
@@ -1703,7 +1709,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     };
     updateGrid(); map.on('moveend', updateGrid); return () => map.off('moveend', updateGrid);
   }, [showGrid]);
+  // --- [ END_SUBBLOCK: Grid Overlay Logic ] ---
 
+  // --- [ START_SUBBLOCK: Basemap Tile Rendering Hook ] ---
   useEffect(() => {
     const map = mapInstance.current; const miniMap = miniMapInstance.current;
     if (!map || !miniMap || !basemapsRegistry || !activeBasemap) return;
@@ -1713,10 +1721,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
       if (miniBaseLayerRef.current) miniMap.removeLayer(miniBaseLayerRef.current);
       const isVector = config.format === "pbf" || config.format === "mvt";
       if (isVector && window.L.maplibreGL) {
-        baseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: `<a href="\\${config.attrLink}" target="_blank">\\${config.attrText}</a>`, zIndex: 0, opacity: basemapOpacity }).addTo(map);
+        baseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0, opacity: basemapOpacity }).addTo(map);
         miniBaseLayerRef.current = L.maplibreGL({ style: './style.json', attribution: false, zIndex: 0, opacity: basemapOpacity }).addTo(miniMap);
       } else {
-        baseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="\\${config.attrLink}" target="_blank">\\${config.attrText}</a>`, zIndex: 0, keepBuffer: 4, updateWhenZooming: false, opacity: basemapOpacity }).addTo(map);
+        baseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: 0, keepBuffer: 4, updateWhenZooming: false, opacity: basemapOpacity }).addTo(map);
         miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, attribution: false, zIndex: 0, keepBuffer: 4, updateWhenZooming: false, opacity: basemapOpacity }).addTo(miniMap);
       }
     };
@@ -1725,7 +1733,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
       Promise.all([loadScript('https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js')]).then(() => loadScript('https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js')).then(() => renderBasemap()).catch(e => console.error("Vector Library Failed", e));
     } else renderBasemap();
   }, [activeBasemap, basemapsRegistry, maxGlobalZoom]);
+  // --- [ END_SUBBLOCK: Basemap Tile Rendering Hook ] ---
 
+  // --- [ START_SUBBLOCK: Overlay Toggle Hook ] ---
   useEffect(() => {
     const map = mapInstance.current; const miniMap = miniMapInstance.current;
     if (!map || !miniMap || !basemapsRegistry) return;
@@ -1739,9 +1749,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const z = idx + 10; const op = overlayOpacities[id] !== undefined ? overlayOpacities[id] : (config.defaultOpacity ?? 1.0);
           const isWms = config.format === "wms" || config.url.toLowerCase().includes("wms");
           if (isWms) {
-            overlayLayersRef.current[id] = L.tileLayer.wms(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, layers: config.wmsLayer || "default", format: "image/png", transparent: true, opacity: op, attribution: `<a href="\\${config.attrLink}" target="_blank">\\${config.attrText}</a>`, zIndex: z, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
+            overlayLayersRef.current[id] = L.tileLayer.wms(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, layers: config.wmsLayer || "default", format: "image/png", transparent: true, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
           } else {
-            overlayLayersRef.current[id] = L.tileLayer(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: op, attribution: `<a href="\\${config.attrLink}" target="_blank">\\${config.attrText}</a>`, zIndex: z, transparent: true, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
+            overlayLayersRef.current[id] = L.tileLayer(config.url, {maxNativeZoom: config.maxZoom, maxZoom: maxGlobalZoom, opacity: op, attribution: `<a href="${config.attrLink}" target="_blank">${config.attrText}</a>`, zIndex: z, transparent: true, keepBuffer: 4, updateWhenZooming: false, updateWhenIdle: true}).addTo(map);
           }
         }
       }
@@ -1751,7 +1761,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
   useEffect(() => {
     Object.keys(overlayOpacities).forEach(id => { if (overlayLayersRef.current[id]) overlayLayersRef.current[id].setOpacity(overlayOpacities[id]); });
   }, [overlayOpacities]);
+  // --- [ END_SUBBLOCK: Overlay Toggle Hook ] ---
 
+  // --- [ START_SUBBLOCK: Spatial Ingestion & Telemetry Parser ] ---
   useEffect(() => {
     const map = mapInstance.current; if (!map || data.length === 0) return;
     markerLayer.current.clearLayers(); clusterLayer.current.clearLayers();
@@ -1759,17 +1771,30 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     data.forEach((item, idx) => {
       const locStr = String(item.location || '').trim(); if (!locStr) return;
       const activeLayersArray = [];
-      const parts = locStr.split(/<br\s*\/?>/i).map(s => s.trim()).filter(Boolean);
+      
+      // Symmetrically splits geometries on HTML breaks and platform newlines (\r\n, \n, \r) [REF: MAP-01f]
+      const parts = locStr.split(/<br\s*\/?>/i).flatMap(p => p.split(/\r?\n|\r/)).map(s => s.trim()).filter(Boolean);
       
       parts.forEach(part => {
         let featureLayers = [];
         try {
-          if (part.match(/^\s*GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(part);
-          else if (part.match(/^\s*[A-Z]+\s*\(/)) { const wkt = new window.Wkt.Wkt(); wkt.read(part); featureLayers = extractLayers(wkt.toObject()); }
-          else if (part.startsWith(String.fromCharCode(123)) && part.includes('"type"')) featureLayers = extractLayers(L.geoJSON(JSON.parse(part)));
-          else {
-            const coordMatch = part.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
-            if (coordMatch) featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch.at(1)), parseFloat(coordMatch.at(2)))));
+          if (part.match(/^\s*GEOMETRYCOLLECTION/i)) {
+            featureLayers = parseGeometryCollection(part, item);
+          } else if (part.match(/^\s*[A-Z]+\s*\(/)) { 
+            const wkt = new window.Wkt.Wkt(); 
+            wkt.read(part); 
+            featureLayers = extractLayers(wkt.toObject()); 
+          } else if (part.startsWith(String.fromCharCode(123)) && part.includes('"type"')) {
+            featureLayers = extractLayers(L.geoJSON(JSON.parse(part)));
+          } else {
+            const coordMatch = part.match(/^\s*(-?\\d+(?:\\.\\d+)?)[,\\s]+(-?\\d+(?:\\.\\d+)?)\\s*$/);
+            if (coordMatch) {
+              // Direct indices compilation prevents numeric parsing failures [REF: MAP-01f]
+              featureLayers.push(L.marker(new L.LatLng(parseFloat(coordMatch[1]), parseFloat(coordMatch[2]))));
+            } else {
+              // Direct error dispatch to block syntax deviations [REF: MAP-01f]
+              throw new Error(`Invalid or unidentifiable coordinates: "${part}"`);
+            }
           }
           
           const uniqueSignatures = new Set(); const validFeatureLayers = [];
@@ -1778,11 +1803,11 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             if (layer.getLatLng) {
               const ll = layer.getLatLng();
               if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
-              sig = `P_\${ll.lat.toFixed(5)}_\${ll.lng.toFixed(5)}`;
+              sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
             } else if (layer.getBounds) {
               const b = layer.getBounds();
               if (!b || !b.isValid()) return;
-              sig = `B_\${b.toBBoxString()}`;
+              sig = `B_${b.toBBoxString()}`;
             }
             if (sig) { if (uniqueSignatures.has(sig)) return; uniqueSignatures.add(sig); }
             validFeatureLayers.push(layer);
@@ -1824,7 +1849,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             if (polyInfo) {
               const latlngs = layer.getLatLngs();
               if (latlngs && latlngs.length >= 2) {
-                const startLL = latlngs;
+                const startLL = latlngs[0];
                 const endLL = latlngs[latlngs.length - 1];
 
                 const startMarker = L.marker(startLL, {
@@ -1874,18 +1899,25 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             activeLayersArray.push(layer); validMarkers++;
           });
           if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
-        } catch(e) { console.error("Map Error Row", idx, e); }
+        } catch(e) { 
+          console.error("Map Error Row", idx, e); 
+          // Direct real-time Telemetry logger integration with DB row feedback [REF: MAP-01f]
+          if (addLog) {
+            addLog(`[Map-Engine] Malformed geometry parsing on Row ${item.id + 2} ("${item.title || 'Untitled'}"): ${e.message}`, 'error');
+          }
+        }
       });
     });
     setTimeout(() => {
-      if (mapInstance.current && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
+      if (map && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
         const bounds = L.latLngBounds();
         markerLayer.current.eachLayer(l => { if (l.getLatLng) bounds.extend(l.getLatLng()); else if (l.getBounds) bounds.extend(l.getBounds()); });
         clusterLayer.current.eachLayer(l => bounds.extend(l.getLatLng()));
-        if (bounds.isValid()) { mapInstance.current.fitBounds(bounds, { padding: new L.Point(6, 6), maxZoom: 6 }); hasFitBounds.current = true; }
+        if (bounds.isValid()) { map.fitBounds(bounds, { padding: new L.Point(6, 6), maxZoom: 6 }); hasFitBounds.current = true; }
       }
     }, 100);
   }, [data, polygonOpacity]);
+  // --- [ END_SUBBLOCK: Spatial Ingestion & Telemetry Parser ] ---
 
   // --- [ START_SUBBLOCK: Map Temporal Ghosting Loop ] ---
   useEffect(() => {
@@ -1893,7 +1925,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
     if (!map || Object.keys(markers).length === 0) return;
 
     const visibleBounds = visibleTimeBounds || new Array(0, Infinity);
-    const vLeft = visibleBounds.at(0); const vRight = visibleBounds.at(1);
+    const vLeft = visibleBounds[0]; const vRight = visibleBounds[1];
     let clusterAdd = []; let clusterRemove = [];
 
     Object.keys(markers).forEach(idxStr => {
@@ -1970,7 +2002,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
   const bases = basemapsRegistry.filter(b => b.type !== 'overlay'); const overlays = basemapsRegistry.filter(b => b.type === 'overlay');
 
-  return html`
+return html`
     <style id="layers-menu-zindex-fix">
       .map-pane { z-index: 110 !important; }
       .media-pane { z-index: 10 !important; }
@@ -1979,8 +2011,8 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
       <div style="overflow: hidden; width:100%; height:100%; position: absolute; top:0; left:0; z-index:1;"><div ref=${mapDomRef} style="width:100%; height:100%;"></div></div>
       <div style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn \${maxPane === 'map' ? 'active' : ''}" onClick=\${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=\${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">
-            \${maxPane === 'map'
+          <button class="status-btn ${maxPane === 'map' ? 'active' : ''}" onClick=${() => setMaxPane(maxPane === 'map' ? null : 'map')} title=${maxPane === 'map' ? "Restore Layout" : "Maximize Map"} style="border: none;">
+            ${maxPane === 'map'
               ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
               : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`
             }
@@ -1988,45 +2020,45 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
         </div>
 
         <div style="display: flex; flex-direction: column; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn" onClick=\${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
+          <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} style="border: none; border-bottom: 1px solid #e0e0e0; border-radius: 0;" title="Zoom In">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
-          <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">\${mapZoom}</div>
-          <button class="status-btn" onClick=\${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
+          <div title="Current Zoom Level" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">${mapZoom}</div>
+          <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} style="border: none; border-radius: 0;" title="Zoom Out">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
         </div>
 
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn \${showGrid ? 'active' : ''}" onClick=\${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;">
+          <button class="status-btn ${showGrid ? 'active' : ''}" onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
           </button>
         </div>
 
         <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff;">
-          <button class="status-btn \${showLayersMenu ? 'active' : ''}" onClick=\${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;">
+          <button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
           </button>
         </div>
       </div>
 
-      \${showLayersMenu ? html`
+      ${showLayersMenu ? html`
         <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 40px; top: 130px; z-index: 2000;">
           <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
           <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-            \${bases.map(b => html`
+            ${bases.map(b => html`
               <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px;">
                 <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
-                  <input type="radio" id="base_\${b.id}" name="basemap_radio" checked=\${activeBasemap === b.id} onChange=\${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${activeBasemap === b.id} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
-                    <label for="base_\${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">\${b.label}</label>
-                    \${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="\${b.attrLink || '#'}" target="_blank" onClick=\${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>\${b.attrText}</a></span>` : ''}
+                    <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
+                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
                   </div>
                 </div>
-                \${activeBasemap === b.id ? html`
+                ${activeBasemap === b.id ? html`
                   <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 0.65rem; color: #888;">Opacity</span>
-                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${basemapOpacity} onChange=\${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
+                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${basemapOpacity} onChange=${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
                   </div>
                 ` : ''}
               </div>
@@ -2034,18 +2066,21 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           </div>
           <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            \${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;"><input type="checkbox" id="over_\${o.id}" checked=\${activeOverlays.includes(o.id)} onChange=\${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" /><div style="display: inline; margin: 0;"><label for="over_\${o.id}" style="cursor: pointer; font-weight: 500; color: #222;\">\${o.label}</label>\${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;\">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;\"><a href="\\${o.attrLink || '#'}" target="_blank" onClick=\${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>\${o.attrText}</a></span>` : ''}</div></div>\${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;\"><span style="font-size: 0.65rem; color: #888;\">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=\${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=\${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;\">No overlays available.</div>`}
+            ${overlays.length > 0 ? overlays.map(o => html`<div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
+                  <input type="checkbox" id="over_${o.id}" checked=${activeOverlays.includes(o.id)} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <div style="display: inline; margin: 0;"><label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}</div></div>${activeOverlays.includes(o.id) ? html`<div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;"><span style="font-size: 0.65rem; color: #888;">Opacity</span><input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" /></div>` : ''}</div>`) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
           </div>
         </div>
       ` : ''}
     </div>
-    <div class="minimap-container" ref=\${miniMapDomRef}></div>
+    <div class="minimap-container" ref=${miniMapDomRef}></div>
   `;
 };
 
-MODULE_VERSIONS['MapViewer'] = 'v6.4.21';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.22b';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
+
 // 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.4 ] 🔽🔽🔽
 		const compileCartiMapAST = (str) => {
 		  if (!str) return null;
@@ -3188,5 +3223,4 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.20';
     </script>
 </body>
 </html>
-
 
