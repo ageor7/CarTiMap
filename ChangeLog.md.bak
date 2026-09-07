@@ -1,13 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-## [v8.13.24] — 2026-09-02 — AppOrchestrator v3.7.23, MapViewer v6.4.21, TimelineScrubber v26.11.12 [CONFORMED]
-### Fixed
-- **Multi-Line WKT Geometry Rendering [REF: MAP-01e]:** Resolved map-rendering breakdowns where Well-Known Text coordinate blocks (polygons, linestrings) failed to draw. Purged `.split('\n')` and newline splits, restricting coordinate array divisions strictly to HTML `<br>` tags. This prevents valid OGC multi-line shapes from being fractured into invalid strings before compilation.
-- **CORS Database Ingestion Repair [REF: CRASH-02]:** Restored primary data ingestion (`fetchUrlPrimary`) and secondary basemaps config (`fetchUrlBasemaps`) transport channels to the CORS-relaxed Google Visualization API queries (`/gviz/tq?tqx=out:csv`). This bypasses direct un-CORSed `/export` downloads to secure remote origins.
-- **Sticky Close Geometry [REF: UI-176b]:** Restructured the Search and About modals using flexbox constraints. Locked close buttons (`[X]`) in a stationary, top-right anchor while delegating scrollability strictly to nested body viewports (`overflow-y: auto`).
-- **Resizer Stack Overlaps:** Resolved timeline sizer bleed-through by lowering the `.resizer-dyn-timeline` layer weight to `z-index: 90` to render cleanly below global overlay dialogs.
+# CHANGELOG: [v8.13.24b] - 2026-09-02 - AppOrchestrator v3.7.23, MapViewer v6.4.21, TimelineScrubber v26.11.12
+- **Syntax Resolution [REF: CRASH-03b]:** Restored compiler execution by terminating the unclosed single-quote literal at Line 1984 in the retired `# CarTiMap v8.11.23` text deployment block of `cartimap.v8py.html`. String assignment properly conformed to `MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.1';` to resolve browser syntax exceptions.
+- **WKT Multi-Line Parser Hardening [REF: MAP-01e]:** Resolved map-rendering breakdowns where Well-Known Text coordinate blocks (polygons, linestrings) failed to draw. Restricted coordinate array divisions strictly to HTML `<br>` tags, preventing valid OGC multi-line shapes from being fractured into invalid strings by physical newlines (`\n`).
+- **CMS Transport Ingestion Guard [REF: CRASH-02]:** Restored primary data ingestion (`fetchUrlPrimary`) and secondary basemaps config (`fetchUrlBasemaps`) transport channels to the CORS-relaxed Google Visualization API queries (`/gviz/tq?tqx=out:csv`). This bypasses direct un-CORSed `/export` downloads to secure remote origins.
+- **Flex Sticky Modal Geometry [REF: UI-176b]:** Restructured the Search and About modals using flexbox constraints. Locked close buttons (`[X]`) in a stationary, top-right anchor while delegating scrollability strictly to nested body viewports (`overflow-y: auto`).
 - **About Modal Logo Centering [REF: UI-176c]:** Encapsulated the brand vector asset inside a horizontal flex centering container to resolve the off-center rightward alignment.
+- **Extract Type Stream Filtering [REF: ETL-14c]:** Added native database ingestion for Column 18 ("Extract Type") and configured active state hooks to dynamically split event rendering across four narrative streams: `Storyline` (default), `Context`, `Related history`, and `Presentation`.
+- **Double-Sized Brand Navigation Target [REF: UI-156b]:** Increased the brand about button to a 48px footprint inside the navigation status line to improve tactile ergonomics.
 
 ### Added
 - **Extract Type Stream Filtering [REF: ETL-14c]:** Added native database ingestion for Column 18 ("Extract Type") and configured active state hooks to dynamically split event rendering across four narrative streams: `Storyline` (default), `Context`, `Related history`, and `Presentation`.

@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.24c] - 2026-09-07 - AppOrchestrator v3.7.23 [CONFORMED]
+- **Generation Self-Healing [REF: CRASH-03b]:** Resolved the catastrophic mid-logo truncation exception that fractured the sub-pixel SVG compass definition on Line 71. The entire `AppOrchestrator` block has been delivered intact.
+- **Indentation Alignment:** Symmetrically formatted the codebase to strictly declare exactly 8 spaces of indentation for the entire component block while preserving nested conditional code spaces.
+- **D-Sign Eradication:** Eradicated all invalid backslash diacritics and corrupted regex tags from template variables, converting `\${` and `\smatch\${` structures back into raw ES6 template literals.
+
 # CHANGELOG: [v8.13.24b] - 2026-09-02 - AppOrchestrator v3.7.23, MapViewer v6.4.21, TimelineScrubber v26.11.12
 - **Syntax Resolution [REF: CRASH-03b]:** Restored compiler execution by terminating the unclosed single-quote literal at Line 1984 in the retired `# CarTiMap v8.11.23` text deployment block of `cartimap.v8py.html`. String assignment properly conformed to `MODULE_VERSIONS['AppOrchestrator'] = 'v3.5.1';` to resolve browser syntax exceptions.
 - **WKT Multi-Line Parser Hardening [REF: MAP-01e]:** Resolved map-rendering breakdowns where Well-Known Text coordinate blocks (polygons, linestrings) failed to draw. Restricted coordinate array divisions strictly to HTML `<br>` tags, preventing valid OGC multi-line shapes from being fractured into invalid strings by physical newlines (`\n`).
