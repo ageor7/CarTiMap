@@ -92,6 +92,9 @@ To prevent compiler crashes due to truncated state declarations, unresolved depe
 #### [REF: BOOT-CRASH-05c] Monolithic Script Literal Protection [NEW - 2026-09-07]
 To preserve absolute execution fluidity of the single-file Preact runtime, all component return statements utilizing the tagged template literal `html`` must remain entirely un-escaped on outer boundaries. Symmetrically, escaping template backticks (e.g. `html\``) is strictly prohibited as it triggers catastrophic parser crashes across modern browser engines.
 
+#### [REF: BOOT-CRASH-05d] Escape Protection & Component Hygiene [NEW - 2026-09-07]
+To preserve absolute execution fluidity of the single-file Preact runtime, all component return statements and dynamic mapping loops utilizing the tagged template literal `html`` must remain entirely un-escaped on outer boundaries. Escaping template backticks or interpolation variables (e.g. `\${}`, `\\${`) is strictly prohibited. Symmetrically, a compiler-gate audit must be run before every release to prevent double-escaping syntax errors from corrupting runtime Virtual DOM properties.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>
