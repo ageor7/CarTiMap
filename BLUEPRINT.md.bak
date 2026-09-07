@@ -551,6 +551,9 @@ Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout box
 #### [REF: UI-176c] Perfect Modal X-Axis Alignment [NEW - 2026-08-30]
 Vector brand logos nested inside vertical modular overlays are isolated inside horizontal flex alignment wrappers (`display: flex; justify-content: center; width: 100%;`). This prohibits structural text nodes from inducing asymmetrical margins, centering assets regardless of viewport dimension.
 
+#### [REF: UI-156c] Sub-Pixel Logo Compass Completeness [NEW - 2026-09-07]
+The scaleless logo vector asset `CarTiMapperLogo` is strictly protected against code generation truncations. Its layout properties, bounding box filters, and path vectors must remain unified in a single file block to preserve rendering stability.
+
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>

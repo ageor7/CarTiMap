@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.25] — 2026-09-07 — MapViewer v6.4.22, AppOrchestrator v3.7.24 [CONFORMED]
+- **Surgical Escape Fix [REF: CRASH-04b]:** Completely cleared the escaping anomalies inside MapViewer's return block. Replaced all double-escaped backslash structures with clean, native ES6 template interpolations (e.g., `${basemapOpacity}`), restoring full Preact/htm compilation fluidity.
+- **Bracket Index Preservation [REF: CRASH-06b]:** Restored the `parts` array coordinate accessors inside `AppOrchestrator - parseChronoNode` to prevent `.replace` type errors during Google serial-to-ISO date conversions.
+- **Block Indentation Compliance:** Formatted both blocks with exactly 8 spaces of indentation to enforce zero-deviation styling standards.
+
 # CHANGELOG: [v8.13.24c] - 2026-09-07 - AppOrchestrator v3.7.23 [CONFORMED]
 - **Generation Self-Healing [REF: CRASH-03b]:** Resolved the catastrophic mid-logo truncation exception that fractured the sub-pixel SVG compass definition on Line 71. The entire `AppOrchestrator` block has been delivered intact.
 - **Indentation Alignment:** Symmetrically formatted the codebase to strictly declare exactly 8 spaces of indentation for the entire component block while preserving nested conditional code spaces.

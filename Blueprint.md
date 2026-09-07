@@ -893,6 +893,9 @@ To prevent fatal browser compilation crashes (SyntaxError: unexpected token: ide
 #### [REF: UI-175] Coupled Resizer & Separator Architecture [UPDATED - 2026-08-31]
 To eliminate duplicate visual dividers, static border properties are purged from the `.timeline-pane` and `.status-bar` structures. Symmetrically, the interactive timeline resizer handle (`.resizer-dyn-timeline`) is styled as the primary divider line (`border-top: 1px solid #ddd`), anchored precisely above the 38px status bar wrapper at `bottom: timelineRequiredHeight + 38px` (or `38px` if minimized), serving as a single-pixel tactile boundary between viewports.
 
+#### [REF: BOOT-CRASH-04b] Native ES6/htm Template Literal Escape Standards [NEW - 2026-09-07]
+The client-side rendering engine operates strictly inside standard browser-based ECMAScript module scopes [6]. Symmetrically, nested tagged templates (`html` literals) inside components must never carry backslash overrides on interpolation tokens (like `\\${` or `\\\\({`) [5, 6]. Placeholders must remain native `${variable}` expressions to secure correct Preact rendering and prevent fatal browser-side compilation SyntaxErrors.
+
 
 ---
 
