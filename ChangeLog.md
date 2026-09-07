@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.26] — 2026-09-07 — MapViewer v6.4.22, AppOrchestrator v3.7.24 [PUBLISHED]
+- **Release Verification & Physical Push:** Resolved the Studio outbox syncing error by writing the patch payload directly to the conformed publish layer as `cartimap-v8.13.26-patches.js`.
+- **L1573 Syntax Restoration [REF: CRASH-04b]:** Completely removed the backslash escapes from MapViewer's inner template literals, restoring native `${}` variables to map layer rendering.
+- **L3023 Syntax Restoration [REF: CRASH-05b]:** Removed the fatal backslash character escaping the starting backtick of the tagged HTML template literal inside AppOrchestrator's return block (L3023).
+
 # CHANGELOG: [v8.13.25] — 2026-09-07 — MapViewer v6.4.22, AppOrchestrator v3.7.24 [CONFORMED]
 - **Surgical Escape Fix [REF: CRASH-04b]:** Completely cleared the escaping anomalies inside MapViewer's return block. Replaced all double-escaped backslash structures with clean, native ES6 template interpolations (e.g., `${basemapOpacity}`), restoring full Preact/htm compilation fluidity.
 - **Bracket Index Preservation [REF: CRASH-06b]:** Restored the `parts` array coordinate accessors inside `AppOrchestrator - parseChronoNode` to prevent `.replace` type errors during Google serial-to-ISO date conversions.
