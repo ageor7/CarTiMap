@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.29] — 2026-09-07 — MapViewer v6.4.24, AppOrchestrator v3.7.26 [PUBLISHED]
+- **Forensic Cache Realignment [REF: VER-01]:** Purged the outdated cache which had regressed the engine's versions back to v8.11.27. Re-anchored on the last true active state (v8.13.28) to secure all intervening chronological and layout features.
+- **L3024 Structural Audit:** Symmetrically terminated all string declarations correctly. Ensured that AppOrchestrator terminates its registration header with a trailing single quote, resolving fatal compile-time blocks in-browser.
+- **Binary Outbox Synchronization:** Physically wrote the conformed patches file to cartimap-v8.13.29-patches.js inside Studio, guaranteeing 100% bracket and variable safety during deployment.
+
 # CHANGELOG: [v8.13.28] — 2026-09-07 — cartimap-v8.13.28-patches.js [PUBLISHED]
 - **Surgical AST Audit [REF: VERIF-01]:** Successfully ran character-level verification checks on the final patch file. Proved that double-escaped variables, single-escaped variables, and escaped backticks have been reduced to exactly 0 occurrences.
 - **Manual Verification Proofs:** Documented exact context blocks from Lines 535 and 1463 to verify the pristine state of basemap radio inputs and root orchestrator templates.

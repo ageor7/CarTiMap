@@ -877,6 +877,9 @@ To permanently insulate the Preact Virtual DOM from browser-level lexer crashes 
 #### [REF: CRASH-05b] Nested Template Literal Escaping [NEW - 2026-08-29]
 To prevent fatal browser compilation crashes (SyntaxError: unexpected token: identifier), any secondary Preact html template string nested inside the main App component's return literal must explicitly escape its backticks using backslashes (\`). If unescaped, the browser's parser interprets the first nested backtick as the termination of the outer template literal, forcing the following HTML markup to parse as raw JavaScript execution code. This instantly breaks the document thread, preventing the Virtual DOM from mounting. Escaping nested backticks isolates the inner arrays, securing 100% rendering stability.
 
+#### [REF: BOOT-CRASH-07c] Manual Character Verification Standard [NEW - 2026-09-07]
+To preserve absolute baseline reliability when build scripts are bypassed, manual quality control checks must verify the zero-escape state of virtual DOM properties in both MapViewer and AppOrchestrator templates. The architecture mandates that any patch release must be inspected to ensure that occurrences of escaped variable syntax or unclosed template brackets are mathematically equal to zero before pushing code to github production baselines.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

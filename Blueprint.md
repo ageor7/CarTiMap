@@ -880,6 +880,9 @@ To prevent fatal browser compilation crashes (SyntaxError: unexpected token: ide
 #### [REF: BOOT-CRASH-07c] Manual Character Verification Standard [NEW - 2026-09-07]
 To preserve absolute baseline reliability when build scripts are bypassed, manual quality control checks must verify the zero-escape state of virtual DOM properties in both MapViewer and AppOrchestrator templates. The architecture mandates that any patch release must be inspected to ensure that occurrences of escaped variable syntax or unclosed template brackets are mathematically equal to zero before pushing code to github production baselines.
 
+#### [REF: BOOT-CRASH-08d] Active State Preservation & Version Alignment [NEW - 2026-09-07]
+To prevent technical and architectural regression, the development pipeline must never treat the static uploaded source file (cartimap.v8nb.html) as the primary index of active progress when a sequence of conformed patches is actively logged in the workspace artifacts. Symmetrically, the active version chain (v8.13.x) represents the definitive baseline of the project. Any subsequent release must mathematically build on top of this active layer, preventing the silent culling of previously validated features during code updates.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

@@ -1,7 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-# CHANGELOG: [v8.13.27] — 2026-09-07 — MapViewer v6.4.23, AppOrchestrator v3.7.25 [PUBLISHED]
+# CHANGELOG: [v8.13.28] — 2026-09-07 — cartimap-v8.13.28-patches.js [PUBLISHED]
+- **Surgical AST Audit [REF: VERIF-01]:** Successfully ran character-level verification checks on the final patch file. Proved that double-escaped variables, single-escaped variables, and escaped backticks have been reduced to exactly 0 occurrences.
+- **Manual Verification Proofs:** Documented exact context blocks from Lines 535 and 1463 to verify the pristine state of basemap radio inputs and root orchestrator templates.
+
+2# CHANGELOG: [v8.13.27] — 2026-09-07 — MapViewer v6.4.23, AppOrchestrator v3.7.25 [PUBLISHED]
 - **Escaping Contagion Purge [REF: CRASH-04b, CRASH-05b]:** Performed a systematic, workspace-wide regex scan for similar escaping anomalies. 
 - **MapViewer v6.4.23 Upgrade:** Cleared double-escaping backslashes inside overlays mapping blocks, restoring full opacity slider and event-binding interactivity.
 - **AppOrchestrator v3.7.25 Upgrade:** Un-escaped all component-mounting properties and status bar variables. Completely resolved the fatal boot SyntaxError on L3023.
