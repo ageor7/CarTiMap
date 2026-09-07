@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.27] — 2026-09-07 — MapViewer v6.4.23, AppOrchestrator v3.7.25 [PUBLISHED]
+- **Escaping Contagion Purge [REF: CRASH-04b, CRASH-05b]:** Performed a systematic, workspace-wide regex scan for similar escaping anomalies. 
+- **MapViewer v6.4.23 Upgrade:** Cleared double-escaping backslashes inside overlays mapping blocks, restoring full opacity slider and event-binding interactivity.
+- **AppOrchestrator v3.7.25 Upgrade:** Un-escaped all component-mounting properties and status bar variables. Completely resolved the fatal boot SyntaxError on L3023.
+- **Block Alignment Enforced:** Maintained a strict 8-space indentation baseline across both major component files.
+
 # CHANGELOG: [v8.13.26] — 2026-09-07 — MapViewer v6.4.22, AppOrchestrator v3.7.24 [PUBLISHED]
 - **Release Verification & Physical Push:** Resolved the Studio outbox syncing error by writing the patch payload directly to the conformed publish layer as `cartimap-v8.13.26-patches.js`.
 - **L1573 Syntax Restoration [REF: CRASH-04b]:** Completely removed the backslash escapes from MapViewer's inner template literals, restoring native `${}` variables to map layer rendering.

@@ -89,6 +89,9 @@ This isolation guarantees that Virtual DOM transitions, kinetic camera calculati
 #### [REF: PROT-16] Whole-Block Delivery Mandate [NEW - 2026-09-02]
 To prevent compiler crashes due to truncated state declarations, unresolved dependencies, or orphaned variable scope, the developer AI is strictly prohibited from delivering fragmented code line suggestions. All updates must be delivered purely in the form of 100% intact, complete component Blocks, or fully compiled, self-contained Subblocks. Every delivered block must contain all required state declarations, React hooks, and render streams intact, guaranteeing browser-native compilation on a single copy-paste transaction.
 
+#### [REF: BOOT-CRASH-05c] Monolithic Script Literal Protection [NEW - 2026-09-07]
+To preserve absolute execution fluidity of the single-file Preact runtime, all component return statements utilizing the tagged template literal `html`` must remain entirely un-escaped on outer boundaries. Symmetrically, escaping template backticks (e.g. `html\``) is strictly prohibited as it triggers catastrophic parser crashes across modern browser engines.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>
