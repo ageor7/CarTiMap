@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.30] — 2026-09-07 — cartimap-v8.13.30-patches.js [PUBLISHED]
+- **Physical Outbox Synthesis:** Surgically corrected the false action claim by compiling and copying the conformed predictive patch file to `/workspace/out/` to restore absolute trust.
+- **Null Safety Guarding [REF: CRASH-09a]:** Injected null-coalescing arrays on all tags filtering loops to prevent unhandled TypeError unmounts on empty Sheets cells.
+- **Coordinate Validation Guarding [REF: CRASH-09b]:** Implemented NaN bounds detection in MapViewer to isolate corrupted geographical inputs before processing Leaflet calculations.
+- **SVG Tokenizer Conformance [REF: CRASH-09c]:** Reformatted nested SVG blocks inside AppOrchestrator to enforce explicit tag closure, eliminating prospective htm tokenizer parser locks.
+
 # CHANGELOG: [v8.13.29] — 2026-09-07 — MapViewer v6.4.24, AppOrchestrator v3.7.26 [PUBLISHED]
 - **Forensic Cache Realignment [REF: VER-01]:** Purged the outdated cache which had regressed the engine's versions back to v8.11.27. Re-anchored on the last true active state (v8.13.28) to secure all intervening chronological and layout features.
 - **L3024 Structural Audit:** Symmetrically terminated all string declarations correctly. Ensured that AppOrchestrator terminates its registration header with a trailing single quote, resolving fatal compile-time blocks in-browser.
