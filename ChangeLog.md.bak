@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.48b] — 2026-09-08 — MapViewer v6.4.36, ASTCompiler v1.2.16, AppOrchestrator v3.7.42 [PUBLISHED]
+- **ES6 Destructuring Standardization [REF: COD-02]:** Standardized array destructuring across all coordinate regex matches and date splitters to prevent intermediate platform parsers from stripping active numerical bracket values.
+- **Base-Template Syntax Termination [REF: CRASH-10]:** Resolved the boot-blocking unterminated string literal crash near line 1574 by surgically closing the single-quote sentinel on the AppOrchestrator version tracking parameter, unblocking the browser's compiler.
+
 # CHANGELOG: [v8.13.48] — 2026-09-08 — MapViewer v6.4.36, ASTCompiler v1.2.16, AppOrchestrator v3.7.42 [PUBLISHED]
 - **ES6 Destructuring Standardization [REF: COD-02]:** Rolled out strict, comprehensive array destructuring across all spatial coordinate splitters, WKT parsers, and chronological date processors to insulate compiled code blocks from platform-level footnote-stripping filters.
 - **Pr pristine V8 Compilation Security:** Formally promoted global baseline to v8.13.48, validating 0 open brackets and complete thread safety across all interactive components.
