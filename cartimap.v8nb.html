@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.36';
+        const APP_VERSION = 'v8.13.37';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2337,19 +2337,20 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
                 const parts = cleanLegacy.split(' ');
                 if (parts.length >= 1) {
-                  const dateStr = parts[0] ? parts[0] : '';
-                  const timeStr = parts[1] ? parts[1] : '';
-                  const dParts = dateStr.split(/[\/\.\-]/);
+                  const dateStr = parts[ 0 ] ? parts[ 0 ] : '';
+                  const timeStr = parts[ 1 ] ? parts[ 1 ] : '';
+                  const dParts = dateStr.split(/[\/\\.\-]/);
                   if (dParts.length >= 3) {
                     const tParts = timeStr ? timeStr.split(':') : [];
-                    const secParts = String(tParts[2] || '0').split('.');
-                    const dYear = parseInt(dParts[2], 10);
-                    const dMonth = parseInt(dParts[isUS ? 0 : 1], 10) - 1;
-                    const dDay = parseInt(dParts[isUS ? 1 : 0], 10);
-                    const tHour = parseInt(tParts[0] || 0, 10);
-                    const tMin = parseInt(tParts[1] || 0, 10);
-                    const tSec = parseInt(secParts[0] || 0, 10);
-                    const tMs = parseInt(secParts[1] || 0, 10);
+                    const secParts = String(tParts[ 2 ] || '0').split('.');
+                    const dYear = parseInt(dParts[ 2 ], 10);
+                    const dMonth = parseInt(dParts[ isUS ? 0 : 1 ], 10) - 1;
+                    const dDay = parseInt(dParts[ isUS ? 1 : 0 ], 10);
+                    const tHour = parseInt(tParts[ 0 ] || 0, 10);
+                    const tMin = parseInt(tParts[ 1 ] || 0, 10);
+                    const tSec = parseInt(secParts[ 0 ] || 0, 10);
+                    const tMs = parseInt(secParts[ 1 ] || 0, 10);
+
                     const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
                     const ts = dateObj.getTime();
                     if (!isNaN(ts)) {
