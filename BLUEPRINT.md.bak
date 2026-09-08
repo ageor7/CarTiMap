@@ -892,6 +892,9 @@ To guarantee absolute execution resilience under the zero-build Single-File Prea
 #### [REF: BOOT-CRASH-09d] Cumulative Version Promotion Protocols [NEW - 2026-09-08]
 When a sequence of conformed patches experiences local-to-remote collision or cache contamination, the SCM protocol mandates skipping the contaminated range entirely on the main trunk. Symmetrically, the clean baseline must be promoted to a fresh coordinate (v8.13.32) carrying all intervening feature layers (e.g., multi-stream tags, parenthetical coordinate tokenizers) alongside the predictive defensive gates (NaN range checks, null-coalescers, explicit SVG tag closures). This maintains absolute cryptographic uniqueness of the release logs and keeps client-side telemetry deterministic.
 
+#### [REF: BOOT-CRASH-11] Dynamic State Safety & VDOM Key Locking [NEW - 2026-09-08]
+To prevent Preact reconciliation collapses during active stream-filtering, all dynamically generated slide and coordinate nodes must carry strict, immutable key parameters mapped to their primary database ID. Furthermore, the GIS engine must reject out-of-bounds coordinates (Lat outside [-90, 90], Lon outside [-180, 180]) and NaNs at the ingestion boundary, cleanly logging invalid nodes to Telemetry to prevent Leaflet from dropping the UI camera thread.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

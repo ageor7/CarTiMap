@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.33] — 2026-09-08 — MapViewer v6.4.28, AppOrchestrator v3.7.30 [PUBLISHED]
+- **AST Integrity Realignment [REF: VER-01d]:** Resolved the compile-blocking unclosed literal spillover by aligning strictly to the decoupled GitHub v8.13.32 baseline.
+- **VDOM Dynamic Keys [REF: CRASH-04]:** Added unique XML keys on all loop renders to stabilize Preact's diffing loops during dynamic stream-filtering transitions.
+- **Geospatial Clamping Gates [REF: BOOT-CRASH-02]:** Configured MapViewer to validate coordinate ranges and NaNs before flying camera viewports, blocking Leaflet camera locks.
+- **Tablet TouchList Safeguards [REF: CRASH-06]:** Replaced ES6 .at() selectors with standard array bracket indexers inside swipe and resize event handlers to secure mobile compatibility.
+
 # CHANGELOG: [v8.13.32] — 2026-09-08 — MapViewer v6.4.27, AppOrchestrator v3.7.29 [PUBLISHED]
 - **Cumulative Trunk Synchronization [REF: VER-01c]:** Aligned the engine with the true baseline trunk (v8.13.24), skipping the deprecated collision range (v8.13.25 - v8.13.31) to maintain version determinism.
 - **Syntactic Escape Purge [REF: CRASH-07b]:** Surgically resolved all unclosed single quote headers and escaped template variables inside the htm tagged template literals, reducing active parser warnings to exactly 0.
