@@ -905,6 +905,9 @@ To prevent Preact reconciliation collapses during active stream-filtering, all d
 #### [REF: CRASH-07b] Interface-Layer Whitespace Bracket Escaping [NEW - 2026-09-08]
 When compiling static index references within active template loaders, the code parser is vulnerable to regex-based citation or footnote-stripping utilities operating in transit. To insulate JavaScript array accessors against being flattened or emptied, all bracket index structures must utilize defensive inner padding spaces (e.g., parts[ 0 ] instead of parts). Standard browser V8 engines ignore this whitespace, maintaining native high-performance compile times while guaranteeing that file deliveries remain structurally intact.
 
+#### [REF: CRASH-07b] Spaced-Bracket Array Indexing [UPDATED - 2026-09-08]
+To insulate native JavaScript array lookups from aggressive markdown citation filters operating during workspace payload transmissions, all bracket-enclosed integers must implement inner padding spaces (e.g., parts[ 0 ]). Browser-native JS engines ignore this whitespace, while intermediate parsers fail to match the standard citation signature, preserving 100% compilation and rendering accuracy.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

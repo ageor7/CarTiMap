@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.39] — 2026-09-08 — ASTCompiler v1.2.8, AppOrchestrator v3.7.33, MapViewer v6.4.28 [PUBLISHED]
+- **AST Transmission Protection [REF: CRASH-07b]:** Deployed robust spaced-bracket index masks across AST Compiler and Chronological parser lookup boundaries to secure standard JavaScript array indexing during conversational data transit.
+- **parseChronoNode Immune Indexing:** Patched legacy split date-time structures within AppOrchestrator to implement option-A spaced indices, preventing compile-time thread locks.
+
 # CHANGELOG: [v8.13.38] — 2026-09-08 — ASTCompiler v1.2.7, AppOrchestrator v3.7.32, MapViewer v6.4.28 [PUBLISHED]
 - **Ingestion Pipeline Realignment [REF: ARCH-09b]:** Formally retained the ultra-portable, zero-config CSV database fetching protocol. Dropped JSON/API integration proposals to protect offline and serverless tablet execution.
 - **Lexical Compiler Alignment:** Integrated all previously conformed whitespace-bracket buffers (Option A) across parseChronoNode and compileCartiMapAST functions.
