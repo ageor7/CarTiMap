@@ -908,6 +908,9 @@ When compiling static index references within active template loaders, the code 
 #### [REF: CRASH-07b] Spaced-Bracket Array Indexing [UPDATED - 2026-09-08]
 To insulate native JavaScript array lookups from aggressive markdown citation filters operating during workspace payload transmissions, all bracket-enclosed integers must implement inner padding spaces (e.g., parts[ 0 ]). Browser-native JS engines ignore this whitespace, while intermediate parsers fail to match the standard citation signature, preserving 100% compilation and rendering accuracy.
 
+#### [REF: CRASH-08b] Lenient Bracket Parsing Heuristics [NEW - 2026-09-08]
+Compilation scripts executing regex replacements on monolithic single-file distributions must strictly support lenient escaping parameters for brackets on starting and ending anchors. The parser pattern must support optional backslashes (\\?[\s*START_INJECT) to prevent pipeline execution halts when processing payloads that have transitioned across markdown rendering environments.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.
