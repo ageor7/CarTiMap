@@ -919,6 +919,9 @@ To secure our single-file standalone distribution against in-transit text proces
 #### [REF: COD-02] Mandatory ES6 Array Destructuring Standard [NEW - 2026-09-08]
 The use of sequential index-bracket properties (e.g. coordMatch[ 1 ]) on matching or split arrays is strictly deprecated. To protect monolithic source code files traveling through intermediate conversational, Git, or text-processing pipelines, all array variables must utilize native ES6 array destructuring structures (e.g. const [ , latStr, lngStr ] = coordMatch). This removes numerical bracket patterns from active strings, securing browser V8 compilation from fatal syntactical collapses.
 
+#### [REF: COD-02] Mandatory ES6 Array Destructuring Standard [UPDATED - 2026-09-08]
+To ensure absolute transmission immunity across modern cloud workspace platforms and intermediate conversational parsers, the use of naked numeric bracket lookups (e.g., match) on matching or split arrays is strictly deprecated. SCM guidelines mandate ES6 array destructuring (e.g., const [ , val1, val2 ] = match) for all string-splitting, regex lookups, and spreadsheet row parsing. This eliminates numeric bracket patterns from active strings, securing browser V8 compilation from fatal syntactical collapses.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

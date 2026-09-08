@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.45] — 2026-09-08 — MapViewer v6.4.33, ASTCompiler v1.2.13, AppOrchestrator v3.7.39 [PUBLISHED]
+- **ES6 Destructuring Standardization (Production Rollout):** Formally elevated all modules to baseline v8.13.45, incorporating absolute array-destructuring across ASTCompiler, MapViewer, and AppOrchestrator to secure long-term spatial and temporal parsing parameters.
+- **Lexical Citation Deflection:** Cleared all contiguous square-bracket array lookups to prevent platform-level footnote-stripping filters from corrupting active variables.
+
 # CHANGELOG: [v8.13.44] — 2026-09-08 — MapViewer v6.4.32, ASTCompiler v1.2.12, AppOrchestrator v3.7.38 [PUBLISHED]
 - **ES6 Destructuring Standardization [REF: COD-02]:** Migrated all array-traversal sequences and regex match lookups inside ASTCompiler, MapViewer, and AppOrchestrator from index-bracket lookups to native ES6 array destructuring.
 - **Permanent Bracket Purge:** Physically eliminated square-bracket integers inside matched indices to insulate in-transit JS templates from aggressive platform-level footnote-stripping filters.
