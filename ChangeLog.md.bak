@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.44] — 2026-09-08 — MapViewer v6.4.32, ASTCompiler v1.2.12, AppOrchestrator v3.7.38 [PUBLISHED]
+- **ES6 Destructuring Standardization [REF: COD-02]:** Migrated all array-traversal sequences and regex match lookups inside ASTCompiler, MapViewer, and AppOrchestrator from index-bracket lookups to native ES6 array destructuring.
+- **Permanent Bracket Purge:** Physically eliminated square-bracket integers inside matched indices to insulate in-transit JS templates from aggressive platform-level footnote-stripping filters.
+- **Touch-Event Destructuring:** Refactored touch coordinate vectors within resizer closures to leverage variable-destructured client metrics, preserving fluid touchscreen scaling.
+
 # CHANGELOG: [v8.13.43] — 2026-09-08 — MapViewer v6.4.31, ASTCompiler v1.2.11, AppOrchestrator v3.7.37 [PUBLISHED]
 - **Systematic Spaced Brackets [REF: CRASH-07c]:** Extended the spaced-bracket indexing standard to all 23 unspaced single-digit array accessors across MapViewer, AppOrchestrator, and AST Compiler modules.
 - **CoordMatch Evaluation Restoration:** Solved the boot-blocking NaN assignment on coordinate parsing that triggered Database Sync Failures at line 2183.
