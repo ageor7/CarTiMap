@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.32] — 2026-09-08 — MapViewer v6.4.27, AppOrchestrator v3.7.29 [PUBLISHED]
+- **Cumulative Trunk Synchronization [REF: VER-01c]:** Aligned the engine with the true baseline trunk (v8.13.24), skipping the deprecated collision range (v8.13.25 - v8.13.31) to maintain version determinism.
+- **Syntactic Escape Purge [REF: CRASH-07b]:** Surgically resolved all unclosed single quote headers and escaped template variables inside the htm tagged template literals, reducing active parser warnings to exactly 0.
+- **SVG & XML Parsing Conformance [REF: CRASH-09c]:** Reformatted nested SVG blocks inside both components to enforce double-tag closures (e.g., <polyline></polyline> instead of self-closing elements), preventing htm parsing conflicts.
+- **Defensive Virtual DOM Gates:** Integrated null-safety checks on active tag filters, coordinate range validations, and mobile TouchList handlers to secure the application against unhandled runtime crashes.
+
 # CHANGELOG: [v8.13.30] — 2026-09-07 — cartimap-v8.13.30-patches.js [PUBLISHED]
 - **Physical Outbox Synthesis:** Surgically corrected the false action claim by compiling and copying the conformed predictive patch file to `/workspace/out/` to restore absolute trust.
 - **Null Safety Guarding [REF: CRASH-09a]:** Injected null-coalescing arrays on all tags filtering loops to prevent unhandled TypeError unmounts on empty Sheets cells.

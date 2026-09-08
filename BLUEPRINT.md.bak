@@ -883,6 +883,12 @@ To preserve absolute baseline reliability when build scripts are bypassed, manua
 #### [REF: BOOT-CRASH-08d] Active State Preservation & Version Alignment [NEW - 2026-09-07]
 To prevent technical and architectural regression, the development pipeline must never treat the static uploaded source file (cartimap.v8nb.html) as the primary index of active progress when a sequence of conformed patches is actively logged in the workspace artifacts. Symmetrically, the active version chain (v8.13.x) represents the definitive baseline of the project. Any subsequent release must mathematically build on top of this active layer, preventing the silent culling of previously validated features during code updates.
 
+#### [REF: BOOT-CRASH-09] Multi-Layered Defensive VDOM Gates [NEW - 2026-09-07]
+To guarantee absolute execution resilience under the zero-build Single-File Preact paradigm, the runtime must never bind un-sanitized external database values directly to VDOM strings. Symmetrically, the architecture mandates:
+1. Strict Null-Coalescing array checks on all data filtration loops.
+2. Mandatory mathematical validation of extracted coordinates before triggering Leaflet bounding transformations.
+3. Explicit double-tag closure on all nested SVG elements to prevent htm compile-time parser crashes.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.
