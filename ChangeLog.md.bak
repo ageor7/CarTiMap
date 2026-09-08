@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.35] — 2026-09-08 — ASTCompiler v1.2.5 [PUBLISHED]
+- **AST Recursion Resolution [REF: ETL-08c]:** Corrected a fatal indexing error within the compileCartiMapAST recursive range evaluator where split duration ranges passed raw arrays instead of primitive elements. This restores absolute structural safety for Level 2 approximate durations (..) and choice sets.
+- **Incremental Inline Documentation:** Injected highly localized comments outlining array geometry splitting, range boundaries, and regular expression qualifiers.
+- **V8 Compiler Crash Bypasses:** Verified complete parenthetical, brace, and bracket balance across all conformed inject blocks, guaranteeing clean browser-native parses.
+
 # CHANGELOG: [v8.13.33] — 2026-09-08 — MapViewer v6.4.28, AppOrchestrator v3.7.30 [PUBLISHED]
 - **AST Integrity Realignment [REF: VER-01d]:** Resolved the compile-blocking unclosed literal spillover by aligning strictly to the decoupled GitHub v8.13.32 baseline.
 - **VDOM Dynamic Keys [REF: CRASH-04]:** Added unique XML keys on all loop renders to stabilize Preact's diffing loops during dynamic stream-filtering transitions.

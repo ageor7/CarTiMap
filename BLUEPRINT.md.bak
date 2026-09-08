@@ -195,6 +195,10 @@ The engine ingests the exact database header "Extract Type" from the unified dat
 
 #### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
 The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
+
+#### [REF: ETL-08c] Non-Array Recursive Coercion for ISO 8601-2 Ranges [NEW - 2026-09-08]
+When evaluating duration range expansions (..) within the zero-build compileCartiMapAST parser, the compiler must strictly bypass passing the raw split array (parts) into the recursive evaluator. Doing so forces array-to-string coercion, resulting in comma-separated strings that fail Nearley Level 3 evaluation and return a fatal null. The parser is strictly required to target isolated string indices (v1 = parts and v2 = parts[1]) prior to execution, guaranteeing that primitive date strings are cleanly computed.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>

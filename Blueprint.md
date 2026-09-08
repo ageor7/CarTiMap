@@ -899,6 +899,9 @@ When a sequence of conformed patches experiences local-to-remote collision or ca
 #### [REF: BOOT-CRASH-11] Dynamic State Safety & VDOM Key Locking [NEW - 2026-09-08]
 To prevent Preact reconciliation collapses during active stream-filtering, all dynamically generated slide and coordinate nodes must carry strict, immutable key parameters mapped to their primary database ID. Furthermore, the GIS engine must reject out-of-bounds coordinates (Lat outside [-90, 90], Lon outside [-180, 180]) and NaNs at the ingestion boundary, cleanly logging invalid nodes to Telemetry to prevent Leaflet from dropping the UI camera thread.
 
+#### [REF: CRASH-07b] Interface-Layer Whitespace Bracket Escaping [NEW - 2026-09-08]
+When compiling static index references within active template loaders, the code parser is vulnerable to regex-based citation or footnote-stripping utilities operating in transit. To insulate JavaScript array accessors against being flattened or emptied, all bracket index structures must utilize defensive inner padding spaces (e.g., parts[ 0 ] instead of parts). Standard browser V8 engines ignore this whitespace, maintaining native high-performance compile times while guaranteeing that file deliveries remain structurally intact.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

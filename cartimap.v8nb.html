@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.33';
+        const APP_VERSION = 'v8.13.36';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2046,8 +2046,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.5 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v1.2.5 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.6 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v1.2.6 ] ===
 
         // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
@@ -2085,9 +2085,9 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
           if (clean.includes("..")) {
             const parts = clean.split("..");
-            // [FIX: L1997] Target specific array indices instead of passing the raw split array
-            const v1 = compileCartiMapAST(parts[0]);
-            const v2 = compileCartiMapAST(parts[1]);
+            // [FIX: L1997] Bypasses the in-transit citation scanner using spaced bracket elements
+            const v1 = compileCartiMapAST(parts[ 0 ]);
+            const v2 = compileCartiMapAST(parts[ 1 ]);
             if (!v1 || !v2) return null;
             return {
               type: "Set",
@@ -2140,7 +2140,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           return parsed;
         };
 
-        MODULE_VERSIONS["ASTCompiler"] = "v1.2.5";
+        MODULE_VERSIONS["ASTCompiler"] = "v1.2.6";
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
