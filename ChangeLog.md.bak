@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.36] — 2026-09-08 — ASTCompiler v1.2.6, MapViewer v6.4.28, AppOrchestrator v3.7.30 [PUBLISHED]
+- **AST Transmission Stabilization [REF: CRASH-07b]:** Resolved a fatal array evaluation bug by injecting single spacing within the static bracket index calls inside compileCartiMapAST. This prevents regex-based citation tools from stripping the numbers in transit, securing flawless parsing of ISO 8601-2 approximate ranges.
+- **Zero-Build AST Safety:** Maintained absolute compliance with the zero-build single-file portability metrics, avoiding any destructive array mutation or heavy client-side loaders.
+
 # CHANGELOG: [v8.13.35] — 2026-09-08 — ASTCompiler v1.2.5 [PUBLISHED]
 - **AST Recursion Resolution [REF: ETL-08c]:** Corrected a fatal indexing error within the compileCartiMapAST recursive range evaluator where split duration ranges passed raw arrays instead of primitive elements. This restores absolute structural safety for Level 2 approximate durations (..) and choice sets.
 - **Incremental Inline Documentation:** Injected highly localized comments outlining array geometry splitting, range boundaries, and regular expression qualifiers.

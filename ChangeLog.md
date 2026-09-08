@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.38] — 2026-09-08 — ASTCompiler v1.2.7, AppOrchestrator v3.7.32, MapViewer v6.4.28 [PUBLISHED]
+- **Ingestion Pipeline Realignment [REF: ARCH-09b]:** Formally retained the ultra-portable, zero-config CSV database fetching protocol. Dropped JSON/API integration proposals to protect offline and serverless tablet execution.
+- **Lexical Compiler Alignment:** Integrated all previously conformed whitespace-bracket buffers (Option A) across parseChronoNode and compileCartiMapAST functions.
+
 # CHANGELOG: [v8.13.36] — 2026-09-08 — ASTCompiler v1.2.6, MapViewer v6.4.28, AppOrchestrator v3.7.30 [PUBLISHED]
 - **AST Transmission Stabilization [REF: CRASH-07b]:** Resolved a fatal array evaluation bug by injecting single spacing within the static bracket index calls inside compileCartiMapAST. This prevents regex-based citation tools from stripping the numbers in transit, securing flawless parsing of ISO 8601-2 approximate ranges.
 - **Zero-Build AST Safety:** Maintained absolute compliance with the zero-build single-file portability metrics, avoiding any destructive array mutation or heavy client-side loaders.

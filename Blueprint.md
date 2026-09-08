@@ -199,6 +199,9 @@ The engine ingests the exact database header "Extract Type" from the unified dat
 #### [REF: ETL-08c] Non-Array Recursive Coercion for ISO 8601-2 Ranges [NEW - 2026-09-08]
 When evaluating duration range expansions (..) within the zero-build compileCartiMapAST parser, the compiler must strictly bypass passing the raw split array (parts) into the recursive evaluator. Doing so forces array-to-string coercion, resulting in comma-separated strings that fail Nearley Level 3 evaluation and return a fatal null. The parser is strictly required to target isolated string indices (v1 = parts and v2 = parts[1]) prior to execution, guaranteeing that primitive date strings are cleanly computed.
 
+#### [REF: ARCH-09b] CSV Ingestion Architecture Retention [NEW - 2026-09-08]
+The CarTiMap engine strictly mandates client-side CSV fetching (via Google Sheets 'gviz/tq?tqx=out:csv' endpoints) to act as its primary database transport layer. The architecture explicitly rejects transition paths to Google Sheets API v4 or Visualization JSONP blocks to prevent credential leakage (API keys) and protect standalone, zero-build offline performance across mobile and tablet viewports.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
