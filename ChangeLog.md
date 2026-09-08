@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.43] — 2026-09-08 — MapViewer v6.4.31, ASTCompiler v1.2.11, AppOrchestrator v3.7.37 [PUBLISHED]
+- **Systematic Spaced Brackets [REF: CRASH-07c]:** Extended the spaced-bracket indexing standard to all 23 unspaced single-digit array accessors across MapViewer, AppOrchestrator, and AST Compiler modules.
+- **CoordMatch Evaluation Restoration:** Solved the boot-blocking NaN assignment on coordinate parsing that triggered Database Sync Failures at line 2183.
+
 # CHANGELOG: [v8.13.42] — 2026-09-08 — MapViewer v6.4.30, ASTCompiler v1.2.10, AppOrchestrator v3.7.36 [PUBLISHED]
 - **API Offset Immunization [REF: CRASH-09c]:** Refactored the tooltip array literal offset option [0, -48] inside MapViewer to utilize a native Leaflet Point constructor (L.point(0, -48)). This permanently immunizes coordinate parsing against platform-level citation filters during copy-paste operations.
 - **V8 Thread Stability:** Re-secured the complete database synchronization sequence, resolving the line 2377 compilation blocks.
