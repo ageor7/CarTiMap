@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.41] — 2026-09-08 — ASTCompiler v1.2.10, AppOrchestrator v3.7.35, MapViewer v6.4.28 [PUBLISHED]
+- **Lenient Anchor Compilation [REF: CRASH-08b]:** Patched compile_cartimap.py to utilize lenient bracket matching (\\?[\s*START_INJECT). This permits seamless, uncorrupted block injections whether using raw files with unescaped brackets or markdown-escaped text.
+- **Pristine Dollar Evaluation:** Consolidated and verified the unescaping of all 256 dynamic template literals ($) inside active component viewports, securing baseline compilation safety.
+- **Styles Version Elevation:** Incremented local styles version to force baseline CSS clearing.
+
 # CHANGELOG: [v8.13.39] — 2026-09-08 — ASTCompiler v1.2.8, AppOrchestrator v3.7.33, MapViewer v6.4.28 [PUBLISHED]
 - **AST Transmission Protection [REF: CRASH-07b]:** Deployed robust spaced-bracket index masks across AST Compiler and Chronological parser lookup boundaries to secure standard JavaScript array indexing during conversational data transit.
 - **parseChronoNode Immune Indexing:** Patched legacy split date-time structures within AppOrchestrator to implement option-A spaced indices, preventing compile-time thread locks.

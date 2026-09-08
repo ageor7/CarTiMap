@@ -749,6 +749,8 @@ The engine ingests the "Extract Type" column mapping (Column 18) directly from t
 #### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
 To prevent key interface controls from scrolling out of viewport bounds, modal dialogs are configured with structured flex layers. The close button is locked in a static top-right position inside the non-scrolling parent block, while content scrolling is delegated entirely to a nested child container.
 
+#### [REF: CRASH-09c] Leaflet Coordinate Array-to-Point Coercion [NEW - 2026-09-08]
+To prevent in-transit regex sanitizers or footnote-strippers from eating raw coordinate arrays inside Javascript modules, all Leaflet configurations utilizing static numeric arrays (e.g. tooltip offsets) must declare strict Leaflet constructors (e.g. L.point(x, y)) instead of bracketed arrays. This preserves 100% lexical parsing immunity while natively conforming to Leaflet's coordinate schemas.
 
 ---
 

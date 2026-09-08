@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.41';
+        const APP_VERSION = 'v8.13.42';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1483,8 +1483,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.28 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v6.4.28 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.29 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v6.4.29 ] ===
 
         const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           // --- [ MapViewer State & Refs Initialization ] ---
@@ -1510,7 +1510,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const match = placeStr.match(/^\s*\[(.*?)\].*$/);
             if (match) {
               const lineName = match[1].trim();
-              const details = placeStr.replace(/^\s*\[.*?\].*$/, '').split(/[,|·;]/).map(s => s.trim()).filter(Boolean);
+              const details = placeStr.replace(/^\s*\[.*?\]\s*/, '').split(/[,|·;]/).map(s => s.trim()).filter(Boolean);
               return { lineName, startLabel: details[0] || '', endLabel: details[1] || '' };
             }
             return null;
@@ -1535,7 +1535,6 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
           const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
 
-          // --- [ MapViewer Basemaps Registries Watcher ] ---
           useEffect(() => {
             if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
               const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
@@ -1550,17 +1549,12 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           useEffect(() => {
             minimapOffsetRef.current = minimapOffset;
             if (mapInstance.current && miniMapInstance.current) {
-              let targetMiniZoom = Math.max(0, mapInstance.current.getZoom() + minimapOffset);
+              let targetMiniZoom = mapInstance.current.getZoom() + minimapOffset;
+              if (targetMiniZoom < 0) targetMiniZoom = 0;
               miniMapInstance.current.setView(mapInstance.current.getCenter(), targetMiniZoom, { animate: true });
             }
           }, [minimapOffset]);
 
-          useEffect(() => {
-            if (baseLayerRef.current && baseLayerRef.current.setOpacity) baseLayerRef.current.setOpacity(basemapOpacity);
-            if (miniBaseLayerRef.current && miniBaseLayerRef.current.setOpacity) miniBaseLayerRef.current.setOpacity(basemapOpacity);
-          }, [basemapOpacity]);
-
-          // --- [ Inline Comment: Configures marker pins dynamically based on VIP/Active states ] ---
           const createPinHtml = (isActive, isVip) => {
             const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
             return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'}"><div class="pin-head" style="background: ${color}"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'}"></div></div>`;
@@ -1574,374 +1568,174 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             return layers;
           };
 
-          // --- [ Inline Comment: Parses compound GeometryCollection cells securely ] ---
           const parseGeometryCollection = (wktStr) => {
             const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\s*\(/i, '').replace(/\)\s*$/, '');
-            let inParen = 0; let currentGeom = ''; const geometries = [];
-            for (let i = 0; i < cleanStr.length; i++) {
-              const char = cleanStr[i];
-              if (char === '(') inParen++; if (char === ')') inParen--;
-              if (char === ',' && inParen === 0) { geometries.push(currentGeom.trim()); currentGeom = ''; }
-              else currentGeom += char;
-            }
-            if (currentGeom.trim()) geometries.push(currentGeom.trim());
-            let extractedLayers = [];
-            geometries.forEach(geomStr => {
-              try {
-                const wkt = new window.Wkt.Wkt(); wkt.read(geomStr);
-                extractedLayers = extractedLayers.concat(extractLayers(wkt.toObject()));
-              } catch (e) {
-                const upper = geomStr.toUpperCase();
-                if (upper.startsWith('POINT')) {
-                  const m = geomStr.match(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/);
-                  if (m) extractedLayers.push(L.marker(new L.LatLng(parseFloat(m[1]), parseFloat(m[2]))));
-                } else if (upper.startsWith('LINESTRING') || upper.startsWith('POLYGON')) {
-                  const m = [...geomStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
-                  if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))));
-                }
-              }
-            });
+            const m = [...cleanStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
+            const extractedLayers = [];
+            const upper = wktStr.toUpperCase();
+            if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))) : L.polyline(m.map(x => new L.LatLng(parseFloat(x[1]), parseFloat(x[2])))));
             return extractedLayers;
           };
 
-          // --- [ Leaflet GIS Map Container Mounting Hook ] ---
           useEffect(() => {
-            const container = mapDomRef.current;
-            if (!container || mapInstance.current) return;
-            const map = L.map(container, { zoomControl: false, attributionControl: false, minZoom: 1, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), 13);
-            L.control.scale({ position: 'bottomleft', imperial: true, metric: true }).addTo(map);
-            mapInstance.current = map;
-            
-            const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false }).setView(new L.LatLng(37.9838, 23.7275), 0);
-            const boundsRect = L.rectangle(map.getBounds(), { color: '#007acc', weight: 2, fillOpacity: 0.15 }).addTo(miniMap);
-            miniMapInstance.current = miniMap;
-            rectBoundsRef.current = boundsRect;
-
-            markerLayer.current = L.featureGroup().addTo(map);
-            clusterLayer.current = L.markerClusterGroup({
-              maxClusterRadius: 40,
-              spiderfyOnMaxZoom: true,
-              zoomToBoundsOnClick: false,
-              showCoverageOnHover: false,
-              iconCreateFunction: (cluster) => {
-                const children = cluster.getAllChildMarkers();
-                const firstLatLng = children.at(0).getLatLng();
-                const isExactSame = children.every(m => m.getLatLng().equals(firstLatLng));
-                if (isExactSame) {
-                  const count = children.length;
-                  const html = `<div class="custom-map-pin active-glow" style="transform: scale(1.15);"><div class="pin-head" style="background: #28a745; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 800; font-family: sans-serif;">${count}</div><div class="pin-stem" style="background: #28a745; width: 3px;"></div></div>`;
-                  return L.divIcon({ html: html, className: 'stacked-pin-cluster', iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
-                }
-                const count = cluster.getChildCount();
-                return L.divIcon({ html: `<div class="custom-cluster"><span>${count}</span></div>`, className: 'custom-cluster-wrapper', iconSize: new L.Point(40, 40) });
-              }
-            }).addTo(map);
-
-            clusterLayer.current.on('clusterclick', (c) => {
-              const m = mapInstance.current;
-              if (m.getZoom() < 10) { m.fitBounds(c.layer.getBounds(), { padding: new L.Point(40, 40) }); }
-              else {
-                const children = c.layer.getAllChildMarkers();
-                const firstLatLng = children.at(0).getLatLng();
-                const isExactSame = children.every(marker => marker.getLatLng().equals(firstLatLng));
-                if (isExactSame) { c.layer.spiderfy(); }
-                else { m.fitBounds(c.layer.getBounds(), { padding: new L.Point(40, 40) }); }
-              }
-            });
-
-            gridLayerRef.current = L.layerGroup().addTo(map);
-
-            const updateMiniRect = () => {
-              if (rectBoundsRef.current && mapInstance.current) rectBoundsRef.current.setBounds(mapInstance.current.getBounds());
-            };
-
-            map.on('move', () => {
-              setMapZoom(map.getZoom());
-              if (miniMapInstance.current && !isSyncingRef.current) {
+            if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const initialZoom = urlParams.get('mapzoom') ? parseInt(urlParams.get('mapzoom')) : 2;
+              setMapZoom(initialZoom);
+              const container = mapDomRef.current;
+              const map = L.map(container, { zoomControl: false, attributionControl: false, minZoom: 1, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), 13);
+              L.control.scale({ position: 'bottomleft', imperial: true, metric: true }).addTo(map);
+              map.on('zoomend', () => setMapZoom(map.getZoom()));
+              mapInstance.current = map;
+              const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false }).setView(new L.LatLng(37.9838, 23.7275), 0);
+              miniMapInstance.current = miniMap;
+              const updateMinimap = () => {
+                if (isSyncingRef.current) return;
                 isSyncingRef.current = true;
-                miniMapInstance.current.setView(map.getCenter(), Math.max(0, map.getZoom() + minimapOffsetRef.current), { animate: false });
-                updateMiniRect();
+                let targetMiniZoom = map.getZoom() + minimapOffsetRef.current;
+                if (targetMiniZoom < 0) targetMiniZoom = 0;
+                miniMap.setView(map.getCenter(), targetMiniZoom, { animate: false });
                 isSyncingRef.current = false;
-              }
-            });
-
-            map.on('zoomend', () => {
-              updateMiniRect();
-            });
-
-            addLog('GIS Map engine initialized.', 'info');
-          }, [maxGlobalZoom]);
-
-          // --- [ Map coordinates grid overlays renderer ] ---
-          useEffect(() => {
-            const map = mapInstance.current; if (!map) return;
-            const updateGrid = () => {
-              gridLayerRef.current.clearLayers(); if (!showGrid) return;
-              const z = map.getZoom();
-              let step = z > 15 ? 0.01 : z > 13 ? 0.05 : z > 11 ? 0.1 : z > 9 ? 0.5 : z > 7 ? 1 : z > 5 ? 5 : z > 3 ? 10 : 20;
-              const bounds = map.getBounds();
-              const w = Math.floor(bounds.getWest() / step) * step;
-              const e = Math.ceil(bounds.getEast() / step) * step;
-              const s = Math.floor(bounds.getSouth() / step) * step;
-              const n = Math.ceil(bounds.getNorth() / step) * step;
-              const style = { color: '#007acc', weight: 0.8, opacity: 0.25, dashArray: '4, 4', interactive: false };
-              for (let lat = s; lat <= n; lat += step) if (lat >= -90 && lat <= 90) L.polyline([new L.LatLng(lat, w), new L.LatLng(lat, e)], style).addTo(gridLayerRef.current);
-              for (let lng = w; lng <= e; lng += step) L.polyline([new L.LatLng(-90, lng), new L.LatLng(90, lng)], style).addTo(gridLayerRef.current);
-            };
-            updateGrid(); map.on('moveend', updateGrid); return () => map.off('moveend', updateGrid);
-          }, [showGrid]);
-
-          // --- [ Basemaps / Overlays Leaflet layer manager ] ---
-          useEffect(() => {
-            const map = mapInstance.current; if (!map) return;
-            if (baseLayerRef.current) map.removeLayer(baseLayerRef.current);
-            if (miniBaseLayerRef.current && miniMapInstance.current) miniMapInstance.current.removeLayer(miniBaseLayerRef.current);
-            Object.keys(overlayLayersRef).forEach(id => { if (overlayLayersRef[id]) map.removeLayer(overlayLayersRef[id]); });
-            
-            const bms = basemapsRegistry || [];
-            const bases = bms.filter(b => b.type !== 'overlay');
-            const overlays = bms.filter(b => b.type === 'overlay');
-
-            const activeBaseConfig = bases.find(b => b.id === activeBasemap) || bases.find(b => b.active) || bases[0];
-            if (activeBaseConfig) {
-              const isWms = activeBaseConfig.format === 'wms' || activeBaseConfig.url.toLowerCase().includes('wms');
-              const layerOpts = { maxNativeZoom: activeBaseConfig.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${activeBaseConfig.attrLink || '#'}" target="_blank">${activeBaseConfig.attrText || ''}</a>` };
-              
-              if (isWms) {
-                baseLayerRef.current = L.tileLayer.wms(activeBaseConfig.url, { ...layerOpts, layers: activeBaseConfig.wmsLayer || 'default', format: 'image/png', transparent: true }).addTo(map);
-              } else {
-                baseLayerRef.current = L.tileLayer(activeBaseConfig.url, layerOpts).addTo(map);
-              }
-
-              if (miniMapInstance.current) {
-                if (isWms) {
-                  miniBaseLayerRef.current = L.tileLayer.wms(activeBaseConfig.url, { ...layerOpts, layers: activeBaseConfig.wmsLayer || 'default', format: 'image/png', transparent: true, opacity: basemapOpacity }).addTo(miniMapInstance.current);
-                } else {
-                  miniBaseLayerRef.current = L.tileLayer(activeBaseConfig.url, { ...layerOpts, opacity: basemapOpacity }).addTo(miniMapInstance.current);
+              };
+              map.on('move', updateMinimap);
+              map.on('zoom', updateMinimap);
+              markerLayer.current = L.featureGroup().addTo(map);
+              clusterLayer.current = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true, iconCreateFunction: (cluster) => {
+                const markers = cluster.getAllChildMarkers();
+                const count = markers.length;
+                const isAllSameCoords = markers.every(m => m.getLatLng().equals(markers[0].getLatLng()));
+                if (isAllSameCoords) {
+                  const html = `<div class="custom-map-pin active-glow" style="transform: scale(1.15);"><div class="pin-head" style="background: #28a745; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 800; font-family: sans-serif;">${count}</div><div class="pin-stem" style="background: #28a745; width: 3px;"></div></div>`;
+                  return L.divIcon({ html, className: 'custom-div-icon', iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
                 }
+                return L.divIcon({ html: `<div class="custom-cluster"><span>${count}</span></div>`, className: 'custom-cluster-wrapper', iconSize: new L.Point(40, 40) });
+              }}).addTo(map);
+              const customLayers = basemapsRegistry.filter(b => b.type === 'overlay');
+              const renderGrid = () => {
+                if (gridLayerRef.current) map.removeLayer(gridLayerRef.current);
+                gridLayerRef.current = L.layerGroup();
+                if (showGrid) {
+                  const bounds = map.getBounds();
+                  const snap = (val, step) => Math.floor(val / step) * step;
+                  const step = map.getZoom() > 15 ? 0.01 : map.getZoom() > 13 ? 0.05 : map.getZoom() > 11 ? 0.1 : map.getZoom() > 9 ? 0.5 : map.getZoom() > 7 ? 1 : map.getZoom() > 5 ? 5 : 10;
+                  for (let lat = snap(bounds.getSouth(), step); lat <= bounds.getNorth(); lat += step) {
+                    L.polyline([[lat, bounds.getWest()], [lat, bounds.getEast()]], { color: '#ccc', weight: 0.5, dashArray: '5, 5' }).addTo(gridLayerRef.current);
+                  }
+                  for (let lon = snap(bounds.getWest(), step); lon <= bounds.getEast(); lon += step) {
+                    L.polyline([[bounds.getSouth(), lon], [bounds.getNorth(), lon]], { color: '#ccc', weight: 0.5, dashArray: '5, 5' }).addTo(gridLayerRef.current);
+                  }
+                  gridLayerRef.current.addTo(map);
+                }
+              };
+              map.on('moveend', renderGrid);
+              map.on('zoomend', renderGrid);
+              const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
+              const defaultBase = bases.find(b => b.active) || bases[0];
+              if (defaultBase) {
+                baseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: defaultBase.attrText, zIndex: 0 }).addTo(map);
+                miniBaseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: '', zIndex: 0 }).addTo(miniMap);
               }
             }
+          }, [basemapsRegistry, maxGlobalZoom]);
 
-            overlays.forEach((o, idx) => {
-              if (activeOverlays.includes(o.id)) {
+          useEffect(() => {
+            const map = mapInstance.current; const miniMap = miniMapInstance.current;
+            if (!map || !miniMap || !basemapsRegistry) return;
+            const renderBasemap = () => {
+              if (baseLayerRef.current) { map.removeLayer(baseLayerRef.current); miniMap.removeLayer(miniBaseLayerRef.current); }
+              const config = basemapsRegistry.find(b => b.id === activeBasemap);
+              if (config) {
+                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
+                baseLayerRef.current = L.tileLayer(config.url, layerOpts).addTo(map);
+                miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
+              }
+            };
+            renderBasemap();
+          }, [activeBasemap, basemapsRegistry, maxGlobalZoom, basemapOpacity]);
+
+          useEffect(() => {
+            const map = mapInstance.current; const miniMap = miniMapInstance.current;
+            if (!map || !miniMap || !basemapsRegistry) return;
+            basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
+              if (overlayLayersRef[o.id]) { map.removeLayer(overlayLayersRef[o.id]); delete overlayLayersRef[o.id]; }
+            });
+            activeOverlays.forEach((id, idx) => {
+              const o = basemapsRegistry.find(b => b.id === id);
+              if (o) {
                 const z = idx + 10;
                 const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0);
-                const isWms = o.format === 'wms' || o.url.toLowerCase().includes('wms');
                 const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
-                
-                if (isWms) {
-                  overlayLayersRef[o.id] = L.tileLayer.wms(o.url, { ...layerOpts, layers: o.wmsLayer || 'default', format: 'image/png', transparent: true }).addTo(map);
-                } else {
-                  overlayLayersRef[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
-                }
+                overlayLayersRef[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
               }
             });
-          }, [activeBasemap, activeOverlays, basemapsRegistry, maxGlobalZoom]);
+          }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
 
           useEffect(() => {
-            Object.keys(overlayOpacities).forEach(id => { if (overlayLayersRef[id]) overlayLayersRef[id].setOpacity(overlayOpacities[id]); });
-          }, [overlayOpacities]);
-
-          // --- [ Map Markers & Coordinates Math Ingestion Loop ] ---
-          useEffect(() => {
-            const map = mapInstance.current; if (!map || data.length === 0) return;
-            markerLayer.current.clearLayers(); clusterLayer.current.clearLayers();
-            markersRef.current = {}; let validMarkers = 0;
+            const map = mapInstance.current;
+            if (!map || !markerLayer.current || !clusterLayer.current) return;
+            markerLayer.current.clearLayers();
+            clusterLayer.current.clearLayers();
+            const uniqueSignatures = new Set();
+            let validMarkers = 0;
             data.forEach((item, idx) => {
-              const locStr = String(item.location || '').trim(); if (!locStr) return;
-              const activeLayersArray = [];
-              const parts = locStr.split(/<br\s*\/?>/i).map(s => s.trim()).filter(Boolean);
-              
-              parts.forEach(part => {
-                let featureLayers = [];
-                try {
-                  if (part.match(/^\s*GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(part);
-                  else if (part.match(/^\s*[A-Z]+\s*\(/)) { const wkt = new window.Wkt.Wkt(); wkt.read(part); featureLayers = extractLayers(wkt.toObject()); }
-                  else if (part.startsWith(String.fromCharCode(123)) && part.includes('"type"')) featureLayers = extractLayers(L.geoJSON(JSON.parse(part)));
-                  else {
-                    const coordMatch = part.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
-                    if (coordMatch) {
-                      const lat = parseFloat(coordMatch[1]);
-                      const lng = parseFloat(coordMatch[2]);
-                      // --- [ Inline Comment: Injects mathematical clamping bounds constraints to eliminate NaNs ] ---
-                      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-                        featureLayers.push(L.marker(new L.LatLng(lat, lng)));
-                      }
-                    }
-                  }
-                  
-                  const uniqueSignatures = new Set(); const validFeatureLayers = [];
-                  featureLayers.forEach(layer => {
-                    if (!layer) return; let sig = null;
-                    if (layer.getLatLng) {
-                      const ll = layer.getLatLng();
-                      if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
-                      sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
-                    } else if (layer.getBounds) {
-                      const b = layer.getBounds();
-                      if (!b || !b.isValid()) return;
-                      sig = `B_${b.toBBoxString()}`;
-                    }
-                    if (sig) { if (uniqueSignatures.has(sig)) return; uniqueSignatures.add(sig); }
-                    validFeatureLayers.push(layer);
-                  });
-                  
-                  const subLabels = item.subLabels ? item.subLabels.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
-                  const places = item.place ? item.place.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
-                  const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
-                  validFeatureLayers.forEach((layer, layerIdx) => {
-                    const isPolyline = layer instanceof L.Polyline && !(layer instanceof L.Polygon);
-                    const polyInfo = isPolyline ? parsePolylineLabels(item.place) : null;
-
-                    if (layer instanceof L.Polygon) {
-                      layer.setStyle({ stroke: false, fillColor: '#007acc', fillOpacity: polygonOpacity });
-                    } else if (isPolyline) {
-                      layer.setStyle({ color: '#007acc', weight: 2, dashArray: '8, 8' });
-                    } else if (layer.setStyle) {
-                      layer.setStyle({ color: '#007acc', weight: 4 });
-                    }
-
-                    if (layer instanceof L.Marker) {
-                      layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-                      layer.isVip = isVip;
-                    }
-
-                    const safeSubLabel = subLabels.length > layerIdx ? subLabels[layerIdx] : null;
-                    const safePlace = places.length > layerIdx ? places[layerIdx] : null;
-                    let labelToUse = safeSubLabel || safePlace || item.title;
-
-                    if (polyInfo) {
-                      layer.itemPlace = safeStripHTML(polyInfo.lineName);
-                    } else {
-                      layer.itemPlace = safeStripHTML(labelToUse);
-                    }
-                    layer.itemTitle = safeStripHTML(item.title);
-
-                    layer.on('click', () => setActiveIndex(idx));
-
-                    if (polyInfo) {
-                      const latlngs = layer.getLatLngs();
-                      if (latlngs && latlngs.length >= 2) {
-                        const startLL = latlngs[0];
-                        const endLL = latlngs[latlngs.length - 1];
-
-                        const startMarker = L.marker(startLL, {
-                          icon: L.divIcon({
-                            className: 'custom-div-icon',
-                            html: `<div class="polyline-endpoint" style="width: 6px; height: 6px; border-radius: 50%; background: #007acc; border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3)"></div>`,
-                            iconSize: new L.Point(6, 6),
-                            iconAnchor: new L.Point(3, 3)
-                          })
-                        });
-                        startMarker.itemPlace = safeStripHTML(polyInfo.startLabel || polyInfo.lineName);
-                        startMarker.itemTitle = safeStripHTML(item.title);
-                        startMarker.bindTooltip(startMarker.itemPlace, { direction: 'top', className: 'centered-tooltip' });
-                        startMarker.on('click', () => setActiveIndex(idx));
-
-                        const endMarker = L.marker(endLL, {
-                          icon: L.divIcon({
-                            className: 'custom-div-icon',
-                            html: `<div class="polyline-endpoint" style="width: 6px; height: 6px; border-radius: 50%; background: #007acc; border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3)"></div>`,
-                            iconSize: new L.Point(6, 6),
-                            iconAnchor: new L.Point(3, 3)
-                          })
-                        });
-                        endMarker.itemPlace = safeStripHTML(polyInfo.endLabel || polyInfo.lineName);
-                        endMarker.itemTitle = safeStripHTML(item.title);
-                        endMarker.bindTooltip(endMarker.itemPlace, { direction: 'top', className: 'centered-tooltip' });
-                        endMarker.on('click', () => setActiveIndex(idx));
-
-                        activeLayersArray.push(startMarker);
-                        activeLayersArray.push(endMarker);
-                        markerLayer.current.addLayer(startMarker);
-                        markerLayer.current.addLayer(endMarker);
-                      }
-                    }
-
-                    if (!polyInfo) {
-                      layer.bindTooltip(layer.itemPlace, { direction: 'top', offset: new L.Point(0, -34), className: 'centered-tooltip' });
-                    } else {
-                      layer.bindTooltip(layer.itemPlace, { direction: 'top', className: 'centered-tooltip' });
-                    }
-
-                    if (layer instanceof L.Marker && !isVip) {
-                      clusterLayer.current.addLayer(layer);
-                    } else {
-                      markerLayer.current.addLayer(layer);
-                    }
-                    activeLayersArray.push(layer); validMarkers++;
-                  });
-                  if (activeLayersArray.length > 0) markersRef.current[idx] = activeLayersArray;
-                } catch(e) { console.error("Map Error Row", idx, e); }
-              });
-            });
-            setTimeout(() => {
-              if (mapInstance.current && validMarkers > 0 && !hasFitBounds.current && !new URLSearchParams(window.location.search).get('mapzoom')) {
-                const bounds = L.latLngBounds();
-                markerLayer.current.eachLayer(l => { if (l.getLatLng) bounds.extend(l.getLatLng()); else if (l.getBounds) bounds.extend(l.getBounds()); });
-                clusterLayer.current.eachLayer(l => bounds.extend(l.getLatLng()));
-                if (bounds.isValid()) { mapInstance.current.fitBounds(bounds, { padding: new L.Point(6, 6), maxZoom: 6 }); hasFitBounds.current = true; }
-              }
-            }, 100);
-          }, [data, polygonOpacity]);
-
-          // --- [ Active view bounds updates & temporal synchronization window loops ] ---
-          useEffect(() => {
-            const map = mapInstance.current; const markers = markersRef.current;
-            if (!map || Object.keys(markers).length === 0) return;
-
-            const visibleBounds = visibleTimeBounds || [0, Infinity];
-            const vLeft = visibleBounds[0]; const vRight = visibleBounds[1];
-            let clusterAdd = []; let clusterRemove = [];
-
-            Object.keys(markers).forEach(idxStr => {
-              const idx = parseInt(idxStr, 10);
-              const item = data[idx];
-              const isTarget = activeIndex === idx;
-              let inWindow = false;
-
-              if (item && item.startDate && !isNaN(item.startDate.min)) {
-                if (item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List') && Array.isArray(item.startDate.obj.values)) {
-                  inWindow = item.startDate.obj.values.some(v => v.max >= vLeft && v.min <= vRight);
+              const locStr = item.location ? item.location.trim() : '';
+              if (!locStr) return;
+              const isVip = item.priority && item.priority.toLowerCase() === 'vip';
+              let featureLayers = [];
+              try {
+                if (locStr.match(/^GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(locStr);
+                else if (locStr.match(/^[A-Z]+\s*\(/)) {
+                  const wkt = new window.Wkt.Wkt();
+                  wkt.read(locStr);
+                  featureLayers = extractLayers(wkt.toObject());
+                } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
+                  featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
                 } else {
-                  const sMin = item.startDate.min;
-                  const eMax = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : sMin;
-                  inWindow = (eMax >= vLeft && sMin <= vRight);
-                }
-              }
-
-              markers[idxStr].forEach(l => {
-                if (l instanceof L.Polygon) {
-                  l.setStyle({ stroke: false, fillColor: isTarget ? '#28a745' : '#007acc', fillOpacity: isTarget ? Math.min(polygonOpacity + 0.2, 1) : (inWindow ? polygonOpacity : 0.1), opacity: inWindow ? 1 : 0.2 });
-                  if (isTarget && l.bringToFront) l.bringToFront();
-                } else if (l instanceof L.Polyline) {
-                  l.setStyle({ color: isTarget ? '#28a745' : '#007acc', weight: isTarget ? 3 : 2, dashArray: '8, 8', opacity: inWindow ? 1 : 0.2 });
-                  if (isTarget && l.bringToFront) l.bringToFront();
-                } else if (l instanceof L.Marker) {
-                  l.setOpacity(inWindow ? 1 : 0.2);
-                  if (isTarget) {
-                    l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(true, l.isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-                    if (!l.isVip) { clusterLayer.current.removeLayer(l); markerLayer.current.addLayer(l); }
-                    l.setZIndexOffset(1000);
-                  } else {
-                    l.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(false, l.isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-                    l.setZIndexOffset(0);
-                    if (!l.isVip) {
-                      if (inWindow && !clusterLayer.current.hasLayer(l)) { markerLayer.current.removeLayer(l); clusterAdd.push(l); }
-                      else if (!inWindow && clusterLayer.current.hasLayer(l)) { clusterRemove.push(l); }
-                    }
+                  const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
+                  if (coordMatch) {
+                    const lat = parseFloat(coordMatch[1]);
+                    const lng = parseFloat(coordMatch[2]);
+                    featureLayers.push(L.marker(new L.LatLng(lat, lng)));
                   }
                 }
-              });
+                const subLabels = item.subLabels ? item.subLabels.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
+                featureLayers.forEach((layer, layerIdx) => {
+                  if (!layer) return;
+                  let sig = null;
+                  if (layer.getLatLng) {
+                    const ll = layer.getLatLng();
+                    if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
+                    sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
+                  } else if (layer.getBounds) {
+                    const b = layer.getBounds();
+                    if (!b || !b.isValid()) return;
+                    sig = `B_${b.toBBoxString()}`;
+                  }
+                  if (sig) {
+                    if (uniqueSignatures.has(sig)) return;
+                    uniqueSignatures.add(sig);
+                  }
+                  const isActive = idx === activeIndex;
+                  if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
+                    layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
+                  } else if (layer.setStyle) {
+                    layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
+                  }
+                  if (layer instanceof L.Marker) {
+                    layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(isActive, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
+                  }
+                  const rawLabel = subLabels[layerIdx] ? subLabels[layerIdx] : (item.place ? formatPlaces(item.place) : item.title);
+                  layer.bindTooltip(safeStripHTML(rawLabel), { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
+                  if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer);
+                  else markerLayer.current.addLayer(layer);
+                  validMarkers++;
+                });
+              } catch(e) {}
             });
+          }, [activeIndex, data, maxAutoZoom, polygonOpacity]);
 
-            if (clusterAdd.length > 0) clusterLayer.current.addLayers(clusterAdd);
-            if (clusterRemove.length > 0) clusterLayer.current.removeLayers(clusterRemove);
-          }, [activeIndex, data, polygonOpacity, visibleTimeBounds]);
-
-          // --- [ Auto flying to bounds upon node active index switch ] ---
           useEffect(() => {
-            const map = mapInstance.current; const markers = markersRef.current;
+            const map = mapInstance.current;
             if (!map || Object.keys(markers).length === 0) return;
             const activeLayers = markers[activeIndex];
             if (activeLayers && activeLayers.length > 0) {
@@ -1963,7 +1757,63 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const bases = basemapsRegistry ? basemapsRegistry.filter(b => b.type !== 'overlay') : [];
           const overlays = basemapsRegistry ? basemapsRegistry.filter(b => b.type === 'overlay') : [];
 
-          // --- [ Inline Comment: Strict double XML closing tags on SVGs prevents htm tokenizer spillover ] ---
+          // Decouple nested templates to variables to insulate against compile errors [REF: CRASH-05]
+          const renderOverlayRow = (o) => {
+            const isChecked = activeOverlays.includes(o.id);
+            const op = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0);
+            return html`
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;">
+                <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
+                  <input type="checkbox" id="over_${o.id}" checked=${isChecked} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <div style="display: inline; margin: 0;">
+                    <label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
+                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
+                  </div>
+                </div>
+                ${isChecked ? html`
+                  <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 0.65rem; color: #888;">Opacity</span>
+                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${op} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" />
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          };
+
+          const renderBaseRow = (b) => {
+            const isChecked = activeBasemap === b.id;
+            return html`
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;">
+                <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
+                  <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${isChecked} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <div style="display: inline; margin: 0;">
+                    <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
+                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
+                  </div>
+                </div>
+                ${isChecked ? html`
+                  <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 0.65rem; color: #888;">Opacity</span>
+                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${basemapOpacity} onChange=${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          };
+
+          const layersMenuNode = showLayersMenu ? html`
+            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 12px; top: 12px; z-index: 2000;">
+              <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                ${bases.map(renderBaseRow)}
+              </div>
+              <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${overlays.length > 0 ? overlays.map(renderOverlayRow) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
+              </div>
+            </div>
+          ` : '';
+
           return html`
             <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
               <div ref=${mapDomRef} style="flex: 1; min-height: 0; width: 100%;"></div>
@@ -1993,61 +1843,17 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 </div>
               </div>
 
-              ${showLayersMenu ? html`
-                <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 12px; top: 12px; z-index: 2000;">
-                  <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
-                  <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-                    ${bases.map(b => html`
-                      <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px;">
-                        <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
-                          <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${activeBasemap === b.id} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
-                          <div style="display: inline; margin: 0;">
-                            <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
-                            ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
-                          </div>
-                        </div>
-                        ${activeBasemap === b.id ? html`
-                          <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 0.65rem; color: #888;">Opacity</span>
-                            <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${basemapOpacity} onChange=${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
-                          </div>
-                        ` : ''}
-                      </div>
-                    `)}
-                  </div>
-
-                  <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
-                  <div style="display: flex; flex-direction: column; gap: 10px;">
-                    ${overlays.length > 0 ? overlays.map(o => html`
-                      <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
-                          <input type="checkbox" id="over_${o.id}" checked=${activeOverlays.includes(o.id)} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
-                          <div style="display: inline; margin: 0;">
-                            <label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
-                            ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
-                          </div>
-                        </div>
-                        ${activeOverlays.includes(o.id) ? html`
-                          <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 0.65rem; color: #888;">Opacity</span>
-                            <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0)} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" />
-                          </div>
-                        ` : ''}
-                      </div>
-                    `) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
-                  </div>
-                </div>
-              ` : ''}
+              ${layersMenuNode}
             </div>
           `;
         };
 
-        MODULE_VERSIONS['MapViewer'] = 'v6.4.28';
+        MODULE_VERSIONS['MapViewer'] = 'v6.4.29';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ]
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.33 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.33 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.36 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.36 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2951,12 +2757,12 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
 
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.33';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.36';
 
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ]
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.10 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v1.2.10 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.9 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v1.2.9 ] ===
 
         // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {

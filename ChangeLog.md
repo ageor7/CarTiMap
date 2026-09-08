@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.42] — 2026-09-08 — MapViewer v6.4.30, ASTCompiler v1.2.10, AppOrchestrator v3.7.36 [PUBLISHED]
+- **API Offset Immunization [REF: CRASH-09c]:** Refactored the tooltip array literal offset option [0, -48] inside MapViewer to utilize a native Leaflet Point constructor (L.point(0, -48)). This permanently immunizes coordinate parsing against platform-level citation filters during copy-paste operations.
+- **V8 Thread Stability:** Re-secured the complete database synchronization sequence, resolving the line 2377 compilation blocks.
+
 # CHANGELOG: [v8.13.41] — 2026-09-08 — ASTCompiler v1.2.10, AppOrchestrator v3.7.35, MapViewer v6.4.28 [PUBLISHED]
 - **Lenient Anchor Compilation [REF: CRASH-08b]:** Patched compile_cartimap.py to utilize lenient bracket matching (\\?[\s*START_INJECT). This permits seamless, uncorrupted block injections whether using raw files with unescaped brackets or markdown-escaped text.
 - **Pristine Dollar Evaluation:** Consolidated and verified the unescaping of all 256 dynamic template literals ($) inside active component viewports, securing baseline compilation safety.
