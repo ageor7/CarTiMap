@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.56] — 2026-09-10 — MapViewer v6.4.40, AppOrchestrator v3.7.50 [PUBLISHED]
+- **WKT Dynamic RegExp Construction [REF: GIS-04]:** Refactored WKT geometry detection to runtime `String.fromCharCode(91, 93)` building (`/^[A-Za-z]+\s*\(/`), eliminating literal brackets and preventing transmission stripping. Restored 100% of WKT geometries.
+- **Side Story Swimlane Population [REF: ETL-10]:** Included `'Side Story'` in default active extract types and dynamic extract category discovery, unblocking full record rendering.
+- **Viewport-Aware Touch/Mouse Resizers [REF: UI-182]:** Updated primary and secondary resizer handlers to track Y-axis dragging in portrait mode (< 1024px) and X-axis dragging in landscape mode.
+- **Scale Control Relocation [REF: UI-183]:** Moved Leaflet scale control to `bottomright` position.
+
 # CHANGELOG: [v8.13.55] — 2026-09-10 — MapViewer v6.4.39, AppOrchestrator v3.7.49, ASTCompiler v1.2.19 [PUBLISHED]
 - **Delimiter Delimitation Standardization [REF: ETL-09]:** Removed space character from tag and extract-type split regexes (`/(?:,|\r|\n|\||;|·)+/`). Restored multi-word extract types ("Side Story") and unblocked dataset truncation at 87 records.
 - **Persistent Overlay Layer Ref [REF: MAP-04]:** Converted `overlayLayersRef` in `MapViewer` from a plain JS object to `useRef({})`, enabling proper Leaflet tile layer detachment upon overlay uncheck.

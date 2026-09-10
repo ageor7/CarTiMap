@@ -1,6 +1,12 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.55] — 2026-09-10 — MapViewer v6.4.39, AppOrchestrator v3.7.49, ASTCompiler v1.2.19 [PUBLISHED]
+- **Delimiter Delimitation Standardization [REF: ETL-09]:** Removed space character from tag and extract-type split regexes (`/(?:,|\r|\n|\||;|·)+/`). Restored multi-word extract types ("Side Story") and unblocked dataset truncation at 87 records.
+- **Persistent Overlay Layer Ref [REF: MAP-04]:** Converted `overlayLayersRef` in `MapViewer` from a plain JS object to `useRef({})`, enabling proper Leaflet tile layer detachment upon overlay uncheck.
+- **Global EDTF Scope Resolver [REF: CHRONO-03]:** Added safe global function binding for `window.edtf` / `window.EDTF.parse` in `ASTCompiler`, resolving EDTF parser runtime exceptions.
+- **Minimap Layout De-collision [REF: UI-180]:** Shifted minimap container positioning to `bottom: 24px; right: 12px;`, eliminating visual overlap with Leaflet scale controls.
+
 # CHANGELOG: [v1.2.0 Compiler / v8.13.54b Baseline] — 2026-09-10
 - **Compiler Self-Healing Heuristic Refactor [REF: CRASH-11]:** Upgraded `compile_cartimap.py` to v1.2.0. Removed `// ===` subblock headers from boundary search regex in `heal_html_anchors()`. Boundary search now anchors cleanly to `MODULE_VERSIONS['Component']` or next `START_INJECT` marker.
 - **Redeclaration Fix:** Resolved duplicate `AppOrchestrator` payload injection that caused `SyntaxError: redeclaration of const logs`.

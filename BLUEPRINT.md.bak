@@ -214,6 +214,9 @@ When evaluating duration range expansions (..) within the zero-build compileCart
 #### [REF: ARCH-09b] CSV Ingestion Architecture Retention [NEW - 2026-09-08]
 The CarTiMap engine strictly mandates client-side CSV fetching (via Google Sheets 'gviz/tq?tqx=out:csv' endpoints) to act as its primary database transport layer. The architecture explicitly rejects transition paths to Google Sheets API v4 or Visualization JSONP blocks to prevent credential leakage (API keys) and protect standalone, zero-build offline performance across mobile and tablet viewports.
 
+#### [REF: ETL-09] Delimiter Isolation for Multi-Word Metadata Tokens [NEW - 2026-09-10]
+When tokenizing structured spreadsheet fields (such as `tags` or `extractType`), split regexes must explicitly exclude ASCII space characters (`' '`) to prevent fracturing multi-word category labels (e.g. `"Side Story"` -> `"Side"` + `"Story"`). Fractured tokens fail exact string inclusion checks against active filter arrays, resulting in silent record drops and broken timeline swimlanes.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -578,6 +581,9 @@ Vector brand logos nested inside vertical modular overlays are isolated inside h
 
 #### [REF: UI-156c] Sub-Pixel Logo Compass Completeness [NEW - 2026-09-07]
 The scaleless logo vector asset `CarTiMapperLogo` is strictly protected against code generation truncations. Its layout properties, bounding box filters, and path vectors must remain unified in a single file block to preserve rendering stability.
+
+#### [REF: GIS-04] Transmission-Immune WKT Geometry Regex [NEW - 2026-09-10]
+WKT character-matching regular expressions must avoid literal bracket tokens `[A-Za-z]` to prevent intermediate markdown processors from stripping them. Constructing regex objects via `new RegExp('^' + String.fromCharCode(91) + 'A-Za-z' + String.fromCharCode(93) + '+\\s*\\(')` guarantees full execution safety for all spatial features (`POLYGON`, `LINESTRING`, `POINT`).
 
 ---
 
@@ -945,6 +951,9 @@ To ensure absolute transmission immunity across modern cloud workspace platforms
 
 #### [REF: COD-03] Absolute Bracket-Free Character Classes [NEW - 2026-09-08]
 To preserve compilation stability across modern cloud workspace environments, the use of literal RegExp character class square brackets (/[...]/) is strictly deprecated. All delimiter parsers and token splitters must utilize non-capturing alternation groups (/(?:a|b|c)/) or construct RegExp classes dynamically using hexadecimal escape sequences (\x5b and \x5d) or standard character codes (String.fromCharCode(91) and String.fromCharCode(93)). This prevents intermediate parsing engines from corrupting regular expressions during code distribution.
+
+#### [REF: CRASH-11] Monolithic Injection Boundary Isolation Standard [NEW - 2026-09-10]
+Patch compiler self-healing heuristics must distinguish between major component boundaries (`START_INJECT` / `END_INJECT` / `MODULE_VERSIONS`) and internal subblock section headers (`// === [ SUBBLOCK N ... ] ===`). Including subblock headers in boundary detection regexes causes premature termination of injection windows, creating duplicated component bodies and fatal const redeclaration errors inside browser V8 engines.
 
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 

@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.54b';
+        const APP_VERSION = 'v8.13.55';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1483,8 +1483,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.38 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v6.4.37 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.39 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer ] ===
 
         const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           // --- [ MapViewer State & Refs Initialization ] ---
@@ -1500,7 +1500,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const [overlayOpacities, setOverlayOpacities] = useState({});
           const [basemapOpacity, setBasemapOpacity] = useState(1.0);
           const initialLoadRef = useRef(false); const baseLayerRef = useRef(null);
-          const miniBaseLayerRef = useRef(null); const overlayLayersRef = {}
+          const miniBaseLayerRef = useRef(null); const overlayLayersRef = useRef({});
           const minimapOffsetRef = useRef(minimapOffset || -4);
           const isSyncingRef = useRef(false);
           
@@ -1657,7 +1657,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const map = mapInstance.current; const miniMap = miniMapInstance.current;
             if (!map || !miniMap || !basemapsRegistry) return;
             basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
-              if (overlayLayersRef[o.id]) { map.removeLayer(overlayLayersRef[o.id]); delete overlayLayersRef[o.id]; }
+              if (overlayLayersRef.current[o.id]) { map.removeLayer(overlayLayersRef.current[o.id]); delete overlayLayersRef.current[o.id]; }
             });
             activeOverlays.forEach((id, idx) => {
               const o = basemapsRegistry.find(b => b.id === id);
@@ -1665,7 +1665,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 const z = idx + 10;
                 const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0);
                 const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
-                overlayLayersRef[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
+                overlayLayersRef.current[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
               }
             });
           }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
@@ -1685,7 +1685,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               let featureLayers = [];
               try {
                 if (locStr.match(/^GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(locStr);
-                else if (locStr.match(/^[A-Z]+\s*\(/)) {
+                else if (locStr.match(/^[A-Za-z]+\s*\(/)) {
                   const wkt = new window.Wkt.Wkt();
                   wkt.read(locStr);
                   featureLayers = extractLayers(wkt.toObject());
@@ -1823,7 +1823,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           return html`
             <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
               <div ref=${mapDomRef} style="flex: 1; min-height: 0; width: 100%;"></div>
-              <div class="minimap-container" ref=${miniMapDomRef}></div>
+              <div class="minimap-container" ref=${miniMapDomRef} style="position: absolute; bottom: 24px; right: 12px; z-index: 1000;"></div>
 
               <div class="map-control-cluster" style="position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2000;">
                 <div class="map-control-btn-group" style="display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border: 1px solid #ccc; background: #fff; width: 24px; box-sizing: border-box;">
@@ -1854,12 +1854,12 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
 
-        MODULE_VERSIONS['MapViewer'] = 'v6.4.38';
+        MODULE_VERSIONS['MapViewer'] = 'v6.4.39';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.48b ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.48b ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.49 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator ] CarTiMap ===
 
         const App = () => {
           // =========================================================================
@@ -2104,7 +2104,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
                   mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
                   mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
-                  tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/(?:,| |\r|\n|\||;|·)+/).map(t => t.trim()).filter(Boolean) : [],
+                  tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/(?:,|\r|\n|\||;|·)+/).map(t => t.trim()).filter(Boolean) : [],
                   extractType: exactGet(norm, 'extract type') || 'Storyline'
                 };
               });
@@ -2768,13 +2768,13 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
 
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.48b';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.49';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.18 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v1.2.17 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.19 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler ] ===
 
         // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
@@ -2855,7 +2855,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           // 6. Native AST Evaluation (Level 3 for Season/Summer compliance)
           let parsed = null;
           try {
-            parsed = edtf(mathStr, { level: 3 });
+            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null); parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
           } catch (e) {
             return null;
           }
@@ -2869,9 +2869,9 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           return parsed;
         };
 
-        MODULE_VERSIONS["ASTCompiler"] = "v1.2.18";
+        MODULE_VERSIONS["ASTCompiler"] = "v1.2.19";
 
-// === [ END MAJOR BLOCK ] ===
+        // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===

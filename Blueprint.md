@@ -214,6 +214,9 @@ When evaluating duration range expansions (..) within the zero-build compileCart
 #### [REF: ARCH-09b] CSV Ingestion Architecture Retention [NEW - 2026-09-08]
 The CarTiMap engine strictly mandates client-side CSV fetching (via Google Sheets 'gviz/tq?tqx=out:csv' endpoints) to act as its primary database transport layer. The architecture explicitly rejects transition paths to Google Sheets API v4 or Visualization JSONP blocks to prevent credential leakage (API keys) and protect standalone, zero-build offline performance across mobile and tablet viewports.
 
+#### [REF: ETL-09] Delimiter Isolation for Multi-Word Metadata Tokens [NEW - 2026-09-10]
+When tokenizing structured spreadsheet fields (such as `tags` or `extractType`), split regexes must explicitly exclude ASCII space characters (`' '`) to prevent fracturing multi-word category labels (e.g. `"Side Story"` -> `"Side"` + `"Story"`). Fractured tokens fail exact string inclusion checks against active filter arrays, resulting in silent record drops and broken timeline swimlanes.
+
 ---
 
 ## 3. Cartographic & Spatial Physics <a name="category-3"></a>
@@ -386,6 +389,10 @@ To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-pars
 
 #### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-09-02]
 To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate arrays strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
+
+#### [REF: GIS-04] Transmission-Immune WKT Geometry Regex [NEW - 2026-09-10]
+WKT character-matching regular expressions must avoid literal bracket tokens `[A-Za-z]` to prevent intermediate markdown processors from stripping them. Constructing regex objects via `new RegExp('^' + String.fromCharCode(91) + 'A-Za-z' + String.fromCharCode(93) + '+\\s*\\(')` guarantees full execution safety for all spatial features (`POLYGON`, `LINESTRING`, `POINT`).
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>
