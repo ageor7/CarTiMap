@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.52';
+        const APP_VERSION = 'v8.13.53';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1858,8 +1858,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.46 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.46 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.47 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.47 ] ===
 
         const App = () => {
           // =========================================================================
@@ -1950,6 +1950,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           // =========================================================================
           useEffect(() => {
             const urlParams = new URLSearchParams(window.location.search);
+            const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
             let source = urlParams.get('source') || urlParams.get('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
             const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid');
@@ -2763,7 +2764,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
 
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.46';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.47';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼

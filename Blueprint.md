@@ -104,6 +104,9 @@ Helper functions invoked during dataset initialization (such as `getOmniParam`) 
 #### [REF: CLOSURE-08b] Component-Scoped Utility Binding Standard [UPDATED - 2026-09-10]
 When injecting utility closures into monolithic multi-component distributions, patch compilers must scope-check target anchor occurrences against specific major block headers (`AppOrchestrator` vs `MapViewer`) rather than performing global string replacements. Utilities invoked within asynchronous hooks (such as `getOmniParam` in SubBlock 2) must reside in the exact function scope of the calling `useEffect`.
 
+#### [REF: STATE-05] Subcomponent Prop Mirroring & State Declaration Standard [NEW - 2026-09-10]
+Every state variable passed down to subcomponents in JSX/htm template literals (such as `zoomLock` and `setZoomLock` for `TimelineScrubber`) must be explicitly declared in the parent component's top-level state block. Subcomponent prop assignments referencing undeclared local variables trigger immediate compile/render-time `ReferenceError` crashes before component mounting completes.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>

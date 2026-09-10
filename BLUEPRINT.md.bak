@@ -101,6 +101,9 @@ All state hooks referenced in asynchronous CSV ingestion pipelines (e.g., `setBa
 #### [REF: CLOSURE-08] Deep-Link URL Parameter Extraction Helper [NEW - 2026-09-10]
 Helper functions invoked during dataset initialization (such as `getOmniParam`) must be explicitly declared within the scope of the `useEffect` hook prior to execution. To handle both unescaped and HTML-entity-encoded URL search strings from iframe or CMS embeds, `getOmniParam` falls back to `urlParams.get('amp;' + key)` when `urlParams.get(key)` returns null.
 
+#### [REF: CLOSURE-08b] Component-Scoped Utility Binding Standard [UPDATED - 2026-09-10]
+When injecting utility closures into monolithic multi-component distributions, patch compilers must scope-check target anchor occurrences against specific major block headers (`AppOrchestrator` vs `MapViewer`) rather than performing global string replacements. Utilities invoked within asynchronous hooks (such as `getOmniParam` in SubBlock 2) must reside in the exact function scope of the calling `useEffect`.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>
