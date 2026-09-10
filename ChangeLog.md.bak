@@ -1,6 +1,14 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v1.2.0 Compiler / v8.13.54b Baseline] — 2026-09-10
+- **Compiler Self-Healing Heuristic Refactor [REF: CRASH-11]:** Upgraded `compile_cartimap.py` to v1.2.0. Removed `// ===` subblock headers from boundary search regex in `heal_html_anchors()`. Boundary search now anchors cleanly to `MODULE_VERSIONS['Component']` or next `START_INJECT` marker.
+- **Redeclaration Fix:** Resolved duplicate `AppOrchestrator` payload injection that caused `SyntaxError: redeclaration of const logs`.
+
+# CHANGELOG: [v8.13.54] — 2026-09-10 — AppOrchestrator v3.7.48 [PUBLISHED]
+- **Timeline ZoomLock State Declaration [REF: STATE-05]:** Declared missing `zoomLock` / `setZoomLock` state hook in `AppOrchestrator` SubBlock 1 (`useState` with `localStorage` persistence under key `tm_zoom_lock`).
+- **Render Engine Stabilization:** Cleared `ReferenceError: zoomLock is not defined`, allowing `<${TimelineScrubber}>` to mount without crashing Preact's virtual DOM tree.
+
 # CHANGELOG: [v8.13.53] — 2026-09-10 — AppOrchestrator v3.7.47 [PUBLISHED]
 - **Scope Alignment for Omni-Parameter Helper [REF: CLOSURE-08b]:** Re-targeted `getOmniParam` helper injection specifically to `AppOrchestrator` SubBlock 2 (`useEffect` ingestion hook), resolving the scoping mismatch in v8.13.52 where the helper was mistakenly injected into `MapViewer`.
 - **Deep-Link Initialization Unblocked:** Cleared `ReferenceError: getOmniParam is not defined` at `cartimap.v8nb.html:2164`, enabling smooth URL query parameter parsing for `?slide=` and `?date=`.
