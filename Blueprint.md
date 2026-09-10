@@ -946,6 +946,9 @@ To ensure absolute transmission immunity across modern cloud workspace platforms
 #### [REF: COD-03] Absolute Bracket-Free Character Classes [NEW - 2026-09-08]
 To preserve compilation stability across modern cloud workspace environments, the use of literal RegExp character class square brackets (/[...]/) is strictly deprecated. All delimiter parsers and token splitters must utilize non-capturing alternation groups (/(?:a|b|c)/) or construct RegExp classes dynamically using hexadecimal escape sequences (\x5b and \x5d) or standard character codes (String.fromCharCode(91) and String.fromCharCode(93)). This prevents intermediate parsing engines from corrupting regular expressions during code distribution.
 
+#### [REF: CRASH-11] Monolithic Injection Boundary Isolation Standard [NEW - 2026-09-10]
+Patch compiler self-healing heuristics must distinguish between major component boundaries (`START_INJECT` / `END_INJECT` / `MODULE_VERSIONS`) and internal subblock section headers (`// === [ SUBBLOCK N ... ] ===`). Including subblock headers in boundary detection regexes causes premature termination of injection windows, creating duplicated component bodies and fatal const redeclaration errors inside browser V8 engines.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

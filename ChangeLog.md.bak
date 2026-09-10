@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.53] — 2026-09-10 — AppOrchestrator v3.7.47 [PUBLISHED]
+- **Scope Alignment for Omni-Parameter Helper [REF: CLOSURE-08b]:** Re-targeted `getOmniParam` helper injection specifically to `AppOrchestrator` SubBlock 2 (`useEffect` ingestion hook), resolving the scoping mismatch in v8.13.52 where the helper was mistakenly injected into `MapViewer`.
+- **Deep-Link Initialization Unblocked:** Cleared `ReferenceError: getOmniParam is not defined` at `cartimap.v8nb.html:2164`, enabling smooth URL query parameter parsing for `?slide=` and `?date=`.
+
 # CHANGELOG: [v8.13.52] — 2026-09-10 — AppOrchestrator v3.7.46 [PUBLISHED]
 - **Omni-Parameter Helper Declaration [REF: CLOSURE-08]:** Declared `getOmniParam` inside `AppOrchestrator` SubBlock 2 (`useEffect` ingestion hook), binding deep-link URL parameter parsing for both standard (`?slide=`) and HTML-encoded (`?amp;slide=`) query parameters.
 - **Initialization Error Resolution:** Resolved `ReferenceError: getOmniParam is not defined` at `cartimap.v8nb.html:2164`, unblocking post-ingestion slide/date navigation routing.
