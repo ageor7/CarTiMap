@@ -393,6 +393,9 @@ To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-pars
 #### [REF: GIS-04] Transmission-Immune WKT Geometry Regex [NEW - 2026-09-10]
 WKT character-matching regular expressions must avoid literal bracket tokens `[A-Za-z]` to prevent intermediate markdown processors from stripping them. Constructing regex objects via `new RegExp('^' + String.fromCharCode(91) + 'A-Za-z' + String.fromCharCode(93) + '+\\s*\\(')` guarantees full execution safety for all spatial features (`POLYGON`, `LINESTRING`, `POINT`).
 
+#### [REF: UI-184] Map Control Cluster Legend HUD & Spatial Keys [NEW - 2026-09-10]
+The `.map-control-cluster` action bar must include a dedicated Map Legend control (`showLegendMenu`) alongside Zoom, Grid, and Layers tools. The Legend HUD provides visual key references for active story pins (green), VIP features (gold), standard markers (blue), and spatial vector polylines/polygons.
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>

@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.59] — 2026-09-10 — MapViewer v6.4.43, AppOrchestrator v3.7.53, ASTCompiler v1.2.22 [PUBLISHED]
+- **Complete Default Basemap Registry [REF: MAP-06]:** Coded all 8 baseline basemap definitions (CartoDB Light/Dark, OSM, Esri, OpenTopoMap, Protomaps, Academic WMS, No Basemap) into `AppOrchestrator` `useState` initialization.
+- **Weighted Gravity Swimlane Matrix [REF: TL-30]:** Recovered tag-pair adjacency sorting algorithm from `v8.13.20`, placing co-occurring tags into neighboring swimlane tracks.
+- **Reactive Graticule Engine [REF: UI-187]:** Created dedicated `useEffect([showGrid, mapZoom])` in `MapViewer`, restoring interactive toggling and dynamic zoom re-snapping for coordinate gridlines.
+- **Data Streams Filter Purge [REF: ETL-12]:** Removed `'Side Story'` from extract filters while maintaining its placement in the dynamic swimlane matrix.
+- **Map Legend Control Integration [REF: UI-184]:** Added Map Legend toggle button to `.map-control-cluster` bar.
+
 # CHANGELOG: [v8.13.57] — 2026-09-10 — MapViewer v6.4.41, AppOrchestrator v3.7.51, ASTCompiler v1.2.20 [PUBLISHED]
 - **Side Story Swimlane Isolation [REF: ETL-11]:** Removed `'Side Story'` from `availableExtractTypes` and `activeExtractTypes` in `AppOrchestrator`. Disambiguated Data Streams (tags) from Timeline Swimlanes.
 - **Map Legend HUD & Control [REF: UI-184]:** Integrated Map Legend toggle button (`showLegendMenu`) in `.map-control-cluster` and rendered floating Map Legend HUD displaying pin indicator keys.
