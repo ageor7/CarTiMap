@@ -95,6 +95,9 @@ To preserve absolute execution fluidity of the single-file Preact runtime, all c
 #### [REF: BOOT-CRASH-05d] Escape Protection & Component Hygiene [NEW - 2026-09-07]
 To preserve absolute execution fluidity of the single-file Preact runtime, all component return statements and dynamic mapping loops utilizing the tagged template literal `html`` must remain entirely un-escaped on outer boundaries. Escaping template backticks or interpolation variables (e.g. `\${}`, `\\${`) is strictly prohibited. Symmetrically, a compiler-gate audit must be run before every release to prevent double-escaping syntax errors from corrupting runtime Virtual DOM properties.
 
+#### [REF: STATE-04] Dynamic Tile Registry State Hook Binding [NEW - 2026-09-10]
+All state hooks referenced in asynchronous CSV ingestion pipelines (e.g., `setBasemapsRegistry`) must be explicitly declared at the root level of `AppOrchestrator` SubBlock 1 during state initialization. Omitting state setter definitions while invoking them in asynchronous `.then()` promises creates an unhandled `ReferenceError` that trips top-level error boundaries, resulting in a simulated CMS Connection Failure.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>

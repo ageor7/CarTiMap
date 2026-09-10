@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.52] — 2026-09-10 — AppOrchestrator v3.7.46 [PUBLISHED]
+- **Omni-Parameter Helper Declaration [REF: CLOSURE-08]:** Declared `getOmniParam` inside `AppOrchestrator` SubBlock 2 (`useEffect` ingestion hook), binding deep-link URL parameter parsing for both standard (`?slide=`) and HTML-encoded (`?amp;slide=`) query parameters.
+- **Initialization Error Resolution:** Resolved `ReferenceError: getOmniParam is not defined` at `cartimap.v8nb.html:2164`, unblocking post-ingestion slide/date navigation routing.
+
 # CHANGELOG: [v8.13.51] — 2026-09-10 — AppOrchestrator v3.7.45 [PUBLISHED]
 - **State Closure Fix [REF: STATE-04]:** Injected the omitted `basemapsRegistry` state hook (`const [basemapsRegistry, setBasemapsRegistry] = useState([])`) into `AppOrchestrator` SubBlock 1.
 - **CMS Connection Failure Resolution:** Restored runtime execution flow when parsing spreadsheet tile configurations (`LayersT` / `bgid=1652171772`), resolving the unhandled `ReferenceError: setBasemapsRegistry is not defined`.

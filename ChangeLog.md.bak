@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.51] — 2026-09-10 — AppOrchestrator v3.7.45 [PUBLISHED]
+- **State Closure Fix [REF: STATE-04]:** Injected the omitted `basemapsRegistry` state hook (`const [basemapsRegistry, setBasemapsRegistry] = useState([])`) into `AppOrchestrator` SubBlock 1.
+- **CMS Connection Failure Resolution:** Restored runtime execution flow when parsing spreadsheet tile configurations (`LayersT` / `bgid=1652171772`), resolving the unhandled `ReferenceError: setBasemapsRegistry is not defined`.
+
 ## CHANGELOG: [v8.13.50] — 2026-09-08 — MapViewer v6.4.38, AppOrchestrator v3.7.44, ASTCompiler v1.2.18 [PUBLISHED]
 - **Unification of Regex Alternations [REF: COD-03]:** Systematically refactored all RegExp character class bracket patterns (/[...]/) across MapViewer, AppOrchestrator, and ASTCompiler. Replaced them with bracket-free non-capturing alternation groups (/(?:a|b|c)/) and String.fromCharCode boundaries to achieve 100% transmission immunity.
 - **Error L2188 Resolution:** Restored compilation boundaries on subLabel parsing to unblock browser-level V8 execution and mount Preact.
