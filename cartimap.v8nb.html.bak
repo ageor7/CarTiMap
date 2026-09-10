@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.51';
+        const APP_VERSION = 'v8.13.52';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1858,8 +1858,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.45 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.45 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.46 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v3.7.46 ] ===
 
         const App = () => {
           // =========================================================================
@@ -2763,7 +2763,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
 
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.45';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.46';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼

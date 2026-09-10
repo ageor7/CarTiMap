@@ -98,6 +98,9 @@ To preserve absolute execution fluidity of the single-file Preact runtime, all c
 #### [REF: STATE-04] Dynamic Tile Registry State Hook Binding [NEW - 2026-09-10]
 All state hooks referenced in asynchronous CSV ingestion pipelines (e.g., `setBasemapsRegistry`) must be explicitly declared at the root level of `AppOrchestrator` SubBlock 1 during state initialization. Omitting state setter definitions while invoking them in asynchronous `.then()` promises creates an unhandled `ReferenceError` that trips top-level error boundaries, resulting in a simulated CMS Connection Failure.
 
+#### [REF: CLOSURE-08] Deep-Link URL Parameter Extraction Helper [NEW - 2026-09-10]
+Helper functions invoked during dataset initialization (such as `getOmniParam`) must be explicitly declared within the scope of the `useEffect` hook prior to execution. To handle both unescaped and HTML-entity-encoded URL search strings from iframe or CMS embeds, `getOmniParam` falls back to `urlParams.get('amp;' + key)` when `urlParams.get(key)` returns null.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>
