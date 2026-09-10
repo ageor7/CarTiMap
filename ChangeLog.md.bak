@@ -1,7 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
-# CHANGELOG: [v8.13.49] — 2026-09-08 — MapViewer v6.4.37, AppOrchestrator v3.7.43, ASTCompiler v1.2.17 [PUBLISHED]
+## CHANGELOG: [v8.13.50] — 2026-09-08 — MapViewer v6.4.38, AppOrchestrator v3.7.44, ASTCompiler v1.2.18 [PUBLISHED]
+- **Unification of Regex Alternations [REF: COD-03]:** Systematically refactored all RegExp character class bracket patterns (/[...]/) across MapViewer, AppOrchestrator, and ASTCompiler. Replaced them with bracket-free non-capturing alternation groups (/(?:a|b|c)/) and String.fromCharCode boundaries to achieve 100% transmission immunity.
+- **Error L2188 Resolution:** Restored compilation boundaries on subLabel parsing to unblock browser-level V8 execution and mount Preact.
+
+ CHANGELOG: [v8.13.49] — 2026-09-08 — MapViewer v6.4.37, AppOrchestrator v3.7.43, ASTCompiler v1.2.17 [PUBLISHED]
 - **Comprehensive ES6 Destructuring Standardization [REF: COD-02]:** Systematic transition of all variable-based array lookups (including map sublabels, active slide selectors, and Leaflet layer indices) to ES6 .at() array traversal. Completely purged numeric square brackets [X] to prevent platform-level citation filters from corrupting compiled code.
 - **Geographic Fly-To Restoration [REF: MAP-03b]:** Resolved a critical functional regression introduced in v8.13.41 where the markersRef dictionary population was truncated. Re-engineered markersRef as an array (useRef([])), enforcing sequential pushes and automatic blank array buffering for empty locations. Fully restored active-slide zoom-animations.
 
