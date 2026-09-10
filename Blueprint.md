@@ -961,6 +961,9 @@ To preserve compilation stability across modern cloud workspace environments, th
 #### [REF: CRASH-11] Monolithic Injection Boundary Isolation Standard [NEW - 2026-09-10]
 Patch compiler self-healing heuristics must distinguish between major component boundaries (`START_INJECT` / `END_INJECT` / `MODULE_VERSIONS`) and internal subblock section headers (`// === [ SUBBLOCK N ... ] ===`). Including subblock headers in boundary detection regexes causes premature termination of injection windows, creating duplicated component bodies and fatal const redeclaration errors inside browser V8 engines.
 
+#### [REF: CRASH-12] Component Truncation Prevention Standard [NEW - 2026-09-10]
+Patch generation scripts must execute an automated line-count assertion on exported component blocks prior to publishing. A `MapViewer` payload falling below 400 lines indicates buffer truncation, which strips the JSX return template and causes runtime `ReferenceError` crashes during manual or script-based HTML injection.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.

@@ -107,6 +107,9 @@ When injecting utility closures into monolithic multi-component distributions, p
 #### [REF: STATE-05] Subcomponent Prop Mirroring & State Declaration Standard [NEW - 2026-09-10]
 Every state variable passed down to subcomponents in JSX/htm template literals (such as `zoomLock` and `setZoomLock` for `TimelineScrubber`) must be explicitly declared in the parent component's top-level state block. Subcomponent prop assignments referencing undeclared local variables trigger immediate compile/render-time `ReferenceError` crashes before component mounting completes.
 
+#### [REF: MAP-06] Pre-Coded Basemap Registry Standard [UPDATED - 2026-09-10]
+To guarantee immediate tile service availability across air-gapped or asynchronous network conditions, `AppOrchestrator` state must initialize with the complete 8-item basemap array (including WMS and `none` Blank Canvas). Secondary spreadsheet ingestion (`LayersT` / `bgid`) merges onto this pre-coded baseline without overriding default offline fallbacks.
+
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>
@@ -131,7 +134,6 @@ The `compileCartiMapAST` decorator strictly enforces mathematical order of opera
 
 ### [REF: ETL-12] Parallel Media, Caption, and Credit Sync [UPDATED]
 To prevent index de-synchronization across multi-value media carousels in the presentation layer, all grouped timeline media columns must be sorted in perfect parallel with the description snippets. The upstream ETL compiler (`MAKEARRAY`) is strictly prohibited from running flat deduplication on Media (Col 6), Media Caption (Col 7), and Media Credit (Col 8). The compiler must construct an in-memory `HSTACK` table binding each column's vector to the parallel sort_data (Col IQ), execute a descending sort on the priority weight, extract the sorted values, filter out empty fields, and finally apply a stable `UNIQUE` deduplication before compiling the final cell string via `TEXTJOIN`. This mathematically guarantees that `mediaItems[i]` always maps to its true historical `captions[i]` and `credits[i]` on the Hero Stage. This protocol strictly respects all manual overrides defined in `v6.1.2b` (specifically target sheet `ExtractsT` and `first_record_cols, {5,39}`).
-
 
 ### [REF: DATA-02] The Cartographer's Dilemma
 Humans use `[Lat, Lon]`. GIS standards (GeoJSON, WKT) demand Cartesian `[Lon, Lat]`. The spreadsheet translates this natively, ensuring export interoperability with QGIS/PostGIS.
