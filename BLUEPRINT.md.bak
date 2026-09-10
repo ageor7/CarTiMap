@@ -389,6 +389,10 @@ To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-pars
 
 #### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-09-02]
 To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate arrays strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
+
+#### [REF: GIS-04] Transmission-Immune WKT Geometry Regex [NEW - 2026-09-10]
+WKT character-matching regular expressions must avoid literal bracket tokens `[A-Za-z]` to prevent intermediate markdown processors from stripping them. Constructing regex objects via `new RegExp('^' + String.fromCharCode(91) + 'A-Za-z' + String.fromCharCode(93) + '+\\s*\\(')` guarantees full execution safety for all spatial features (`POLYGON`, `LINESTRING`, `POINT`).
+
 ---
 
 ## 4. UI/UX Elements & Design Solutions <a name="category-4"></a>
@@ -581,9 +585,6 @@ Vector brand logos nested inside vertical modular overlays are isolated inside h
 
 #### [REF: UI-156c] Sub-Pixel Logo Compass Completeness [NEW - 2026-09-07]
 The scaleless logo vector asset `CarTiMapperLogo` is strictly protected against code generation truncations. Its layout properties, bounding box filters, and path vectors must remain unified in a single file block to preserve rendering stability.
-
-#### [REF: GIS-04] Transmission-Immune WKT Geometry Regex [NEW - 2026-09-10]
-WKT character-matching regular expressions must avoid literal bracket tokens `[A-Za-z]` to prevent intermediate markdown processors from stripping them. Constructing regex objects via `new RegExp('^' + String.fromCharCode(91) + 'A-Za-z' + String.fromCharCode(93) + '+\\s*\\(')` guarantees full execution safety for all spatial features (`POLYGON`, `LINESTRING`, `POINT`).
 
 ---
 

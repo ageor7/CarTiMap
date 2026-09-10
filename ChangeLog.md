@@ -1,6 +1,13 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.57] — 2026-09-10 — MapViewer v6.4.41, AppOrchestrator v3.7.51, ASTCompiler v1.2.20 [PUBLISHED]
+- **Side Story Swimlane Isolation [REF: ETL-11]:** Removed `'Side Story'` from `availableExtractTypes` and `activeExtractTypes` in `AppOrchestrator`. Disambiguated Data Streams (tags) from Timeline Swimlanes.
+- **Map Legend HUD & Control [REF: UI-184]:** Integrated Map Legend toggle button (`showLegendMenu`) in `.map-control-cluster` and rendered floating Map Legend HUD displaying pin indicator keys.
+- **About Modal Telemetry Ingestion [REF: UI-185]:** Added clean HTML stripping and URL Configuration Parameters breakdown HUD inside About Modal (`source`, `gid`, `bgid`, `slide`, `date`).
+- **Clean Basemap Fallback [REF: MAP-05]:** Removed hardcoded CartoDB tile provider overrides from JS source, relying strictly on `LayersT` (`bgid`) with clean keyless OpenStreetMap (`osm`) fallback.
+- **Portrait Responsive Layout Restructuring [REF: UI-186]:** Enforced 100% full-width stacked columns for `#app-layout`, `.content-slider-pane`, `#visual-pane-container`, `.map-pane`, and `.media-pane` under `@media (max-width: 1023px)`, preventing Map Pane from shifting left out of view.
+
 # CHANGELOG: [v8.13.56] — 2026-09-10 — MapViewer v6.4.40, AppOrchestrator v3.7.50 [PUBLISHED]
 - **WKT Dynamic RegExp Construction [REF: GIS-04]:** Refactored WKT geometry detection to runtime `String.fromCharCode(91, 93)` building (`/^[A-Za-z]+\s*\(/`), eliminating literal brackets and preventing transmission stripping. Restored 100% of WKT geometries.
 - **Side Story Swimlane Population [REF: ETL-10]:** Included `'Side Story'` in default active extract types and dynamic extract category discovery, unblocking full record rendering.
