@@ -1,6 +1,11 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.61] — 2026-09-10 — MapViewer v6.4.44, AppOrchestrator v3.7.54, ASTCompiler v1.2.22 [PUBLISHED]
+- **MapViewer Full Payload Restoration [REF: CRASH-12]:** Restored full 438-line `MapViewer` component block, resolving serialization truncation from `v8.13.59`.
+- **UI Control Cluster Recovery:** Restored map DOM containers, minimap, zoom controls, gridlines button, legend HUD, and layer panel inside `MapViewer`.
+- **Complete Basemap Parity:** Pre-coded all 8 default basemaps directly inside `AppOrchestrator` initial state.
+
 # CHANGELOG: [v8.13.59] — 2026-09-10 — MapViewer v6.4.43, AppOrchestrator v3.7.53, ASTCompiler v1.2.22 [PUBLISHED]
 - **Complete Default Basemap Registry [REF: MAP-06]:** Coded all 8 baseline basemap definitions (CartoDB Light/Dark, OSM, Esri, OpenTopoMap, Protomaps, Academic WMS, No Basemap) into `AppOrchestrator` `useState` initialization.
 - **Weighted Gravity Swimlane Matrix [REF: TL-30]:** Recovered tag-pair adjacency sorting algorithm from `v8.13.20`, placing co-occurring tags into neighboring swimlane tracks.
