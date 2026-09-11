@@ -239,6 +239,19 @@ All notable changes to this project will be documented in this file.
 - **Media Pane Vertical Compression:** Resolved the spatial clamping of the Media Viewer, allowing it to dynamically stretch down to the top of the 38px status bar when the timeline drawer is collapsed.
 - **Z-Index Modals Stacking:** Patched `.tm-modal` and `.tm-backdrop` style rules with dominant layer depths, ensuring they render cleanly on top of active timeline splitters.
 
+# CHANGELOG: [v8.13.65] — 2026-09-11 — MapViewer v6.4.47, AppOrchestrator v3.7.58, ASTCompiler v1.2.23 [CANDIDATE RELEASE]
+
+### Added & Enhanced Features
+- **Backslash Purge & Literal RegExp Refactoring [REF: JS-SYNTAX-ESCAPE]:** Replaced dynamic `new RegExp` string constructors with clean RegExp literals in `formatPlaces`, resolving `Uncaught SyntaxError: invalid escape sequence` template literal crashes.
+- **WKT Spatial Engine Restoration [REF: MAP-01]:** Fixed case-insensitive WKT matching (`/^[A-Za-z]+\s*\(/i`) and string trimming, restoring polygon/linestring rendering and piping geometry failures to `VibeMonitor`.
+- **EDTF Interval Space Sanitization [REF: ETL-08]:** Stripped spaces around interval slashes and commas inside `compileCartiMapAST`, restoring 100% EDTF multi-date parsing without legacy rerouting.
+- **Surgical Infiltration Compiler [REF: COMPILER-v1.3.3]:** Upgraded `compile_cartimap.py` to v1.3.3 with exact string slice replacement and single-version anchor matching.
+
+### Layout & Usability Alignment
+- **Map Control Cluster & Scale Alignment [REF: UI-70]:** Relocated Leaflet map scale bar to `bottomright` to clear the minimap keep-out zone at `bottomleft`.
+- **Right-Aligned Elevated Layers Menu [REF: UI-159]:** Re-anchored map Layers HUD to `right: 40px; top: 130px; z-index: 20000;` over Media Pane iframes and resizer lines.
+- **Search Modal Auto-Focus & Absolute ID Jump [REF: UI-66]:** Auto-focuses `.search-input` upon opening search modal and binds result clicks to absolute dataset `d.id`.
+
 # CHANGELOG: [v8.13.64] — 2026-09-11 — Candidate Build #144 [VERIFIED & SEALED]
 
 ### Added & Enhanced Capabilities

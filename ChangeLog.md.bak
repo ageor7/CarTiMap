@@ -239,6 +239,17 @@ All notable changes to this project will be documented in this file.
 - **Media Pane Vertical Compression:** Resolved the spatial clamping of the Media Viewer, allowing it to dynamically stretch down to the top of the 38px status bar when the timeline drawer is collapsed.
 - **Z-Index Modals Stacking:** Patched `.tm-modal` and `.tm-backdrop` style rules with dominant layer depths, ensuring they render cleanly on top of active timeline splitters.
 
+# CHANGELOG: [v8.13.64] — 2026-09-11 — Candidate Build #144 [VERIFIED & SEALED]
+
+### Added & Enhanced Capabilities
+- **Data Streams Extract Filtering [REF: ETL-12]:** Implemented pure relational projection over `d.extractType` in `AppOrchestrator`. Dynamically populates stream filters ('Storyline', 'Context', 'Related history', 'Presentation') while naturally isolating swimlane tags (`Side Story`) [3].
+- **Unified Filter Highlight Indicator:** Bounded `.status-btn.active` styling to the status bar Filter button whenever Data Stream or Swimlane Tag filters are active [3].
+- **Right-Aligned Elevated Layers HUD [REF: UI-159]:** Re-anchored the Leaflet map Layers Menu to `right: 40px; top: 130px; z-index: 20000;`, elevating it above horizontal resizer splitters and Media Pane iframes [3, 4].
+
+### Critical Defect & Lexical Scope Fixes
+- **Lexical Scope TDZ Hoisting [REF: JS-TDZ-CRASH]:** Hoisted `availableExtractTypes` and `aboutBtn` declarations above dependent UI booleans (`isExtractFiltered`) and sub-template nodes (`filterBtn`, `filterPopup`) inside `AppOrchestrator`, permanently resolving runtime `ReferenceError` boot crashes [3].
+- **Automated Candidate Build Counter [REF: COMPILER-v1.3.0]:** Upgraded `compile_cartimap.py` to v1.3.0 to manage repository `.build_sequence` tracking and auto-inject `APP_BUILD` tags.
+
 ## [v8.13.19] — 2026-08-31 - AppOrchestrator v3.7.19, MapViewer v6.4.23, TimelineScrubber v26.11.10
 ### Added
 - **White Runway Theme:** Implemented a pure, high-contrast white runway background under the timeline duration track, substantially improving the legibility of overlapping patterns.

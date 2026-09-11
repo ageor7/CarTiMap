@@ -967,6 +967,18 @@ Patch generation scripts must execute an automated line-count assertion on expor
 #### [REF: UNBOUND-HOOK-SCOPE] Functional Scope Encapsulation for Reactive Hooks [NEW - 2026-09-10]
 All React/Preact state hooks (`useState`, `useRef`, `useEffect`) must sit strictly inside the function component closure prior to the `return` statement. Placing hooks outside the component body causes V8 to evaluate state variables against the global `window` object, throwing `Uncaught ReferenceError`.
 
+#### [REF: JS-TDZ-CRASH] ES6 Lexical Scope Hoisting & TDZ Prevention [NEW - 2026-09-11]
+All derived dataset projections (e.g., `availableExtractTypes`) and sub-component JSX templates (e.g., `aboutBtn`) must be declared at top-level component scope prior to evaluating dependent UI booleans (`isExtractFiltered`) or rendering parent JSX nodes (`filterBtn`, `${aboutBtn}`). Accessing `const` identifiers above their initialization line triggers immediate ES6 Temporal Dead Zone (TDZ) `ReferenceError` crashes in V8 during initial Preact render ticks.
+
+#### [REF: ETL-12] Pure Relational Projection for Data Streams [NEW - 2026-09-11]
+Data Stream filter menus must derive options strictly through unique attribute projection (`unfilteredData.map(d => d.extractType)`). Attribute domain isolation prevents cross-contamination between categorical swimlane tags (`d.tags`) and structural stream types (`d.extractType`) without relying on imperative string-exclusion blacklists [3, 5].
+
+#### [REF: JS-SYNTAX-ESCAPE] Template Literal Escaping & RegExp Literal Rule [NEW - 2026-09-11]
+Tagged template literal parsers (`htm`) require un-corrupted string literals and unescaped `${...}` boundaries to construct the Virtual DOM. String-based `new RegExp("...")` constructors containing backslashes must be completely eliminated in favor of clean JavaScript RegExp literals (e.g., `/^\s*\\[.*?\\]\s*/`) or `String.fromCharCode()` constants to prevent backslash exponential expansion collisions during Python build transformations.
+
+#### [REF: COMPILER-v1.3.3] Single-Version Anchor Placement & Slice Infiltration [NEW - 2026-09-11]
+Infiltration compilers must enforce single-version anchor placement: version strings reside exclusively inside opening tags (`START_INJECT: Component vX.Y.Z`). Closing tags (`END_INJECT: Component`) contain titles only. Patch infiltration must execute via exact string slice replacement (`content[:start] + payload + content[end:]`) to guarantee zero regex backslash backreference corruption during single-file compilation.
+
 ### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
 
 *   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.
