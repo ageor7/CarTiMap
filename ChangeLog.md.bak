@@ -1,6 +1,10 @@
 # CarTiMapper Changelog
 All notable changes to this project will be documented in this file.
 
+# CHANGELOG: [v8.13.62] — 2026-09-10 — MapViewer v6.4.45, AppOrchestrator v3.7.55, ASTCompiler v1.2.22 [PUBLISHED]
+- **Grid Hook Scope Relocation [REF: UNBOUND-HOOK-SCOPE]:** Relocated `useEffect([showGrid, mapZoom])` inside `MapViewer` before `return html`, restoring lexical binding to `showGrid` state and resolving top-level `ReferenceError`.
+- **Pre-Coded Basemaps Parity:** Maintained all 8 default basemaps directly inside `AppOrchestrator` state.
+
 # CHANGELOG: [v8.13.61] — 2026-09-10 — MapViewer v6.4.44, AppOrchestrator v3.7.54, ASTCompiler v1.2.22 [PUBLISHED]
 - **MapViewer Full Payload Restoration [REF: CRASH-12]:** Restored full 438-line `MapViewer` component block, resolving serialization truncation from `v8.13.59`.
 - **UI Control Cluster Recovery:** Restored map DOM containers, minimap, zoom controls, gridlines button, legend HUD, and layer panel inside `MapViewer`.
