@@ -360,7 +360,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
         import edtf from 'https://esm.sh/edtf@4.11.0';
 
         const html = htm.bind(h);
-        const APP_VERSION = 'v8.13.65-b147';
+        const APP_VERSION = 'v8.13.66-b148';
         document.title = `CarTiMap Core - ${APP_VERSION}`;
         const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
         const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1483,8 +1483,9 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.47 ] 🔽🔽🔽
+// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.48 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: MapViewer ] ===
+
         const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           // --- [ MapViewer State & Refs Initialization ] ---
           const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -1503,24 +1504,34 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const miniBaseLayerRef = useRef(null); const overlayLayersRef = useRef({});
           const minimapOffsetRef = useRef(minimapOffset || -4);
           const isSyncingRef = useRef(false);
-
+          
+          // --- [ Inline Comment: Helper to parse names and coordinates from polyline place strings ] ---
           const parsePolylineLabels = (placeStr) => {
             if (!placeStr) return null;
-            const match = placeStr.match(/^\s*\[(.*?)\]/);
+            const match = placeStr.match(/^\s*\x5b(.*?)\x5d.*$/);
             if (match) {
-              const [ , lineNameRaw ] = match;
-              const lineName = lineNameRaw.trim();
-              const details = placeStr.replace(/^\s*\[.*?\]\s*/, '').split(/(?:,|\||·|;)/).map(s => s.trim()).filter(Boolean);
-              const [ startLabel = '', endLabel = '' ] = details;
-              return { lineName, startLabel, endLabel };
+              const [ , lineNameRaw ] = match; const lineName = lineNameRaw.trim();
+              const details = placeStr.replace(/^\s*\x5b.*?\x5d\s*/, '').split(/(?:,|\||·|;)/).map(s => s.trim()).filter(Boolean);
+              const [ startLabelRaw = '', endLabelRaw = '' ] = details; return { lineName, startLabel: startLabelRaw, endLabel: endLabelRaw };
             }
             return null;
           };
 
+          // --- [ Inline Comment: Securely strips HTML elements from spatial label strings ] ---
           const safeStripHTML = (str) => {
             if (!str) return '';
-            const withDashes = String(str).replace(/<p[^>]*>/gi, ' - ');
-            return withDashes.replace(/<[^>]*>?/gm, '').trim();
+            const withDashes = String(str).replace(new RegExp("<p\\x5b^>\\x5d*>", "gi"), ' - ');
+            return withDashes.replace(new RegExp("<\\x5b^>\\x5d*>?", "gm"), '').trim();
+          };
+
+          const loadScript = (src) => new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${src}"]`)) return resolve();
+            const script = document.createElement('script'); script.src = src; script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
+          });
+
+          const loadStyle = (href) => {
+            if (document.querySelector(`link[href="${href}"]`)) return;
+            const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = href; document.head.appendChild(link);
           };
 
           const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
@@ -1531,7 +1542,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               if (defaultBase) setActiveBasemap(defaultBase.id);
               const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
               setActiveOverlays(defaultOverlays);
-              const initOpac = {}; basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => { initOpac[o.id] = o.defaultOpacity ?? 1.0; });
+              const initOpac = {}; basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => { initOpac[o.id] = o.defaultOpacity ?? 0.3; });
               setOverlayOpacities(initOpac); initialLoadRef.current = true;
             }
           }, [basemapsRegistry]);
@@ -1545,6 +1556,11 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             }
           }, [minimapOffset]);
 
+          const createPinHtml = (isActive, isVip) => {
+            const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
+            return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'}"><div class="pin-head" style="background: ${color}"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'}"></div></div>`;
+          };
+
           const extractLayers = (layerObj) => {
             let layers = [];
             if (Array.isArray(layerObj)) layerObj.forEach(l => layers = layers.concat(extractLayers(l)));
@@ -1555,12 +1571,10 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
 
           const parseGeometryCollection = (wktStr) => {
             const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\s*\(/i, '').replace(/\)\s*$/, '');
-            const m = [...cleanStr.matchAll(/(-?\d+\.\d*)\s+(-?\d+\.\d*)/g)];
+            const m = [...cleanStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
             const extractedLayers = [];
-            if (m.length > 0) {
-              const latLngs = m.map(match => [parseFloat(match[2]), parseFloat(match[1])]);
-              extractedLayers.push(L.polyline(latLngs, { color: '#007acc', weight: 3 }));
-            }
+            const upper = wktStr.toUpperCase();
+            if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(([ , x1, x2 ]) => new L.LatLng(parseFloat(x1), parseFloat(x2)))) : L.polyline(m.map(([ , x1, x2 ]) => new L.LatLng(parseFloat(x1), parseFloat(x2)))));
             return extractedLayers;
           };
 
@@ -1571,15 +1585,11 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               setMapZoom(initialZoom);
               const container = mapDomRef.current;
               const map = L.map(container, { zoomControl: false, attributionControl: false, minZoom: 1, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), 13);
-              
-              // Scale Bar positioned on bottomright to clear minimap
               L.control.scale({ position: 'bottomright', imperial: true, metric: true }).addTo(map);
               map.on('zoomend', () => setMapZoom(map.getZoom()));
               mapInstance.current = map;
-
               const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false }).setView(new L.LatLng(37.9838, 23.7275), 0);
               miniMapInstance.current = miniMap;
-
               const updateMinimap = () => {
                 if (isSyncingRef.current) return;
                 isSyncingRef.current = true;
@@ -1588,15 +1598,40 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                 miniMap.setView(map.getCenter(), targetMiniZoom, { animate: false });
                 isSyncingRef.current = false;
               };
-
               map.on('move', updateMinimap);
               map.on('zoom', updateMinimap);
-
               markerLayer.current = L.featureGroup().addTo(map);
-              clusterLayer.current = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true }).addTo(map);
-
+              clusterLayer.current = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true, iconCreateFunction: (cluster) => {
+                const markers = cluster.getAllChildMarkers();
+                const count = markers.length;
+                const [ firstMarker ] = markers; const isAllSameCoords = markers.every(m => m.getLatLng().equals(firstMarker.getLatLng()));
+                if (isAllSameCoords) {
+                  const html = `<div class="custom-map-pin active-glow" style="transform: scale(1.15);"><div class="pin-head" style="background: #28a745; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 800; font-family: sans-serif;">${count}</div><div class="pin-stem" style="background: #28a745; width: 3px;"></div></div>`;
+                  return L.divIcon({ html, className: 'custom-div-icon', iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
+                }
+                return L.divIcon({ html: `<div class="custom-cluster"><span>${count}</span></div>`, className: 'custom-cluster-wrapper', iconSize: new L.Point(40, 40) });
+              }}).addTo(map);
+              const customLayers = basemapsRegistry.filter(b => b.type === 'overlay');
+              const renderGrid = () => {
+                if (gridLayerRef.current) map.removeLayer(gridLayerRef.current);
+                gridLayerRef.current = L.layerGroup();
+                if (showGrid) {
+                  const bounds = map.getBounds();
+                  const snap = (val, step) => Math.floor(val / step) * step;
+                  const step = map.getZoom() > 15 ? 0.01 : map.getZoom() > 13 ? 0.05 : map.getZoom() > 11 ? 0.1 : map.getZoom() > 9 ? 0.5 : map.getZoom() > 7 ? 1 : map.getZoom() > 5 ? 5 : 10;
+                  for (let lat = snap(bounds.getSouth(), step); lat <= bounds.getNorth(); lat += step) {
+                    L.polyline([[lat, bounds.getWest()], [lat, bounds.getEast()]], { color: '#ccc', weight: 0.5, dashArray: '5, 5' }).addTo(gridLayerRef.current);
+                  }
+                  for (let lon = snap(bounds.getWest(), step); lon <= bounds.getEast(); lon += step) {
+                    L.polyline([[bounds.getSouth(), lon], [bounds.getNorth(), lon]], { color: '#ccc', weight: 0.5, dashArray: '5, 5' }).addTo(gridLayerRef.current);
+                  }
+                  gridLayerRef.current.addTo(map);
+                }
+              };
+              map.on('moveend', renderGrid);
+              map.on('zoomend', renderGrid);
               const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
-              const [ defaultBase ] = bases;
+              const [ firstBase ] = bases; const defaultBase = bases.find(b => b.active) || firstBase;
               if (defaultBase) {
                 baseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: defaultBase.attrText, zIndex: 0 }).addTo(map);
                 miniBaseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: '', zIndex: 0 }).addTo(miniMap);
@@ -1607,28 +1642,31 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           useEffect(() => {
             const map = mapInstance.current; const miniMap = miniMapInstance.current;
             if (!map || !miniMap || !basemapsRegistry) return;
-            if (baseLayerRef.current) { map.removeLayer(baseLayerRef.current); miniMap.removeLayer(miniBaseLayerRef.current); }
-            const config = basemapsRegistry.find(b => b.id === activeBasemap);
-            if (config) {
-              const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
-              baseLayerRef.current = L.tileLayer(config.url, layerOpts).addTo(map);
-              miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
-            }
+            const renderBasemap = () => {
+              if (baseLayerRef.current) { map.removeLayer(baseLayerRef.current); miniMap.removeLayer(miniBaseLayerRef.current); }
+              const config = basemapsRegistry.find(b => b.id === activeBasemap);
+              if (config) {
+                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
+                baseLayerRef.current = L.tileLayer(config.url, layerOpts).addTo(map);
+                miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
+              }
+            };
+            renderBasemap();
           }, [activeBasemap, basemapsRegistry, maxGlobalZoom, basemapOpacity]);
 
           useEffect(() => {
-            const map = mapInstance.current;
-            if (!map || !basemapsRegistry) return;
+            const map = mapInstance.current; const miniMap = miniMapInstance.current;
+            if (!map || !miniMap || !basemapsRegistry) return;
             basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
-              if (overlayLayersRef[o.id]) { map.removeLayer(overlayLayersRef[o.id]); delete overlayLayersRef[o.id]; }
+              if (overlayLayersRef.current[o.id]) { map.removeLayer(overlayLayersRef.current[o.id]); delete overlayLayersRef.current[o.id]; }
             });
             activeOverlays.forEach((id, idx) => {
               const o = basemapsRegistry.find(b => b.id === id);
               if (o) {
                 const z = idx + 10;
-                const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0);
+                const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
                 const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
-                overlayLayersRef[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
+                overlayLayersRef.current[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
               }
             });
           }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
@@ -1636,43 +1674,74 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           useEffect(() => {
             const map = mapInstance.current;
             if (!map || !markerLayer.current || !clusterLayer.current) return;
+            markersRef.current = [];
             markerLayer.current.clearLayers();
             clusterLayer.current.clearLayers();
-            markersRef.current = [];
-
+            const uniqueSignatures = new Set();
+            let validMarkers = 0;
             data.forEach((item, idx) => {
               const locStr = item.location ? item.location.trim() : '';
               if (!locStr) { markersRef.current.push([]); return; }
               const isVip = item.priority && item.priority.toLowerCase() === 'vip';
               let featureLayers = [];
               try {
-                if (locStr.match(/^GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(locStr);
-                else if (locStr.match(/^[A-Za-z]+\s*\(/i)) {
-                  const wkt = new window.Wkt.Wkt();
-                  wkt.read(locStr);
-                  featureLayers = extractLayers(wkt.toObject());
-                } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
+                if (locStr.match(/^GEOMETRYCOLLECTION/i)) {
+                const wkt = new window.Wkt.Wkt();
+                wkt.read(locStr);
+                featureLayers = extractLayers(wkt.toObject());
+              } else if (locStr.match(/^[A-Za-z]+\s*\(/i)) {
+                const wkt = new window.Wkt.Wkt();
+                wkt.read(locStr);
+                featureLayers = extractLayers(wkt.toObject());
+              } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
+                try {
                   featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
-                } else {
-                  const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
-                  if (coordMatch) {
-                    const [ , latStr, lngStr ] = coordMatch;
-                    const lat = parseFloat(latStr);
-                    const lng = parseFloat(lngStr);
-                    featureLayers.push(L.marker(new L.LatLng(lat, lng)));
-                  }
+                } catch (jsonErr) {
+                  if (typeof addLog === 'function') addLog(`[MapViewer] Corrupted GeoJSON in row ${idx + 2} ("${item.title || 'Untitled'}"): ${jsonErr.message}`, 'warning');
                 }
-                const subLabels = item.subLabels ? item.subLabels.split(/(?:\||·|;|·|\n|\-)/).map(s => s.trim()).filter(Boolean) : [];
-                featureLayers.forEach((layer, layerIdx) => {
+              } else {
+                const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
+                if (coordMatch) {
+                  const [ , latStr, lngStr ] = coordMatch;
+                  const lat = parseFloat(latStr);
+                  const lng = parseFloat(lngStr);
+                  featureLayers.push(L.marker(new L.LatLng(lat, lng)));
+                }
+              }
+              const subLabels = item.subLabels ? item.subLabels.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
+              featureLayers.forEach((layer, layerIdx) => {
                   if (!layer) return;
-                  const rawLabel = subLabels[layerIdx] ? subLabels[layerIdx] : (item.place ? item.place : item.title);
+                  let sig = null;
+                  if (layer.getLatLng) {
+                    const ll = layer.getLatLng();
+                    if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
+                    sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
+                  } else if (layer.getBounds) {
+                    const b = layer.getBounds();
+                    if (!b || !b.isValid()) return;
+                    sig = `B_${b.toBBoxString()}`;
+                  }
+                  if (sig) {
+                    if (uniqueSignatures.has(sig)) return;
+                    uniqueSignatures.add(sig);
+                  }
+                  const isActive = idx === activeIndex;
+                  if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
+                    layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
+                  } else if (layer.setStyle) {
+                    layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
+                  }
+                  if (layer instanceof L.Marker) {
+                    layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(isActive, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
+                  }
+                  const rawLabel = subLabels.at(layerIdx) || (item.place ? formatPlaces(item.place) : item.title);
                   layer.bindTooltip(safeStripHTML(rawLabel), { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
                   if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer);
                   else markerLayer.current.addLayer(layer);
+                  validMarkers++;
                 });
                 markersRef.current.push(featureLayers);
               } catch(e) {
-                if (typeof addLog === 'function') addLog(`[MapViewer] Failed parsing geometry for row ${idx + 2} ("${item.title || 'Untitled'}"): ${e.message}. Location string: "${locStr}"`, 'warning');
                 markersRef.current.push([]);
               }
             });
@@ -1682,7 +1751,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
             const map = mapInstance.current;
             const markers = markersRef.current;
             if (!map || markers.length === 0) return;
-            const activeLayers = markers[activeIndex];
+            const activeLayers = markers.at(activeIndex);
             if (activeLayers && activeLayers.length > 0) {
               const activeFeatureGroup = L.featureGroup(activeLayers);
               setTimeout(() => {
@@ -1702,18 +1771,17 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           const bases = basemapsRegistry ? basemapsRegistry.filter(b => b.type !== 'overlay') : [];
           const overlays = basemapsRegistry ? basemapsRegistry.filter(b => b.type === 'overlay') : [];
 
+          // Decouple nested templates to variables to insulate against compile errors [REF: CRASH-05]
           const renderOverlayRow = (o) => {
             const isChecked = activeOverlays.includes(o.id);
-            const op = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 1.0);
+            const op = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
             return html`
               <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;">
                 <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
-                  <input type="checkbox" id="overlay_${o.id}" checked=${isChecked} onChange=${() => {
-                    if (isChecked) setActiveOverlays(activeOverlays.filter(id => id !== o.id));
-                    else setActiveOverlays([...activeOverlays, o.id]);
-                  }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <input type="checkbox" id="over_${o.id}" checked=${isChecked} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
-                    <label for="overlay_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
+                    <label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
+                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
                   </div>
                 </div>
                 ${isChecked ? html`
@@ -1734,6 +1802,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                   <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${isChecked} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
                     <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
+                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
                   </div>
                 </div>
                 ${isChecked ? html`
@@ -1745,6 +1814,60 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               </div>
             `;
           };
+
+          
+                    useEffect(() => {
+            const map = mapInstance.current;
+            if (!map) return;
+            if (gridLayerRef.current) {
+              map.removeLayer(gridLayerRef.current);
+              gridLayerRef.current = null;
+            }
+            if (showGrid) {
+              const gridGroup = L.layerGroup();
+              const bounds = map.getBounds();
+              if (bounds && bounds.isValid()) {
+                const snap = (val, step) => Math.floor(val / step) * step;
+                const zoom = map.getZoom();
+                const step = zoom > 15 ? 0.01 : zoom > 13 ? 0.05 : zoom > 11 ? 0.1 : zoom > 9 ? 0.5 : zoom > 7 ? 1 : zoom > 5 ? 5 : 10;
+                for (let lat = snap(bounds.getSouth(), step); lat <= bounds.getNorth(); lat += step) {
+                  L.polyline([[lat, bounds.getWest()], [lat, bounds.getEast()]], { color: '#666', weight: 0.8, opacity: 0.6, dashArray: '4, 4' }).addTo(gridGroup);
+                }
+                for (let lon = snap(bounds.getWest(), step); lon <= bounds.getNorth(); lon += step) {
+                  L.polyline([[bounds.getSouth(), lon], [bounds.getNorth(), lon]], { color: '#666', weight: 0.8, opacity: 0.6, dashArray: '4, 4' }).addTo(gridGroup);
+                }
+                gridGroup.addTo(map);
+                gridLayerRef.current = gridGroup;
+              }
+            }
+          }, [showGrid, mapZoom]);
+
+          const legendMenuNode = showLegendMenu ? html`
+            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 280px; font-size: 0.82rem; color: #333; position: absolute; left: 44px; top: 12px; z-index: 2000;">
+              <div style="font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Map Legend</span>
+                <button onClick=${() => setShowLegendMenu(false)} style="border: none; background: none; cursor: pointer; font-size: 0.9rem; color: #888;">&times;</button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #28a745; display: inline-block;"></span>
+                  <span>Active Story Event</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffb300; display: inline-block;"></span>
+                  <span>VIP Feature</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #007acc; display: inline-block;"></span>
+                  <span>Standard Marker</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 18px; height: 3px; background: #007acc; display: inline-block;"></span>
+                  <span>Spatial Polyline / Polygon</span>
+                </div>
+              </div>
+            </div>
+          ` : '';
 
           const layersMenuNode = showLayersMenu ? html`
             <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 40px; top: 130px; z-index: 20000;">
@@ -1762,7 +1885,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           return html`
             <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
               <div ref=${mapDomRef} style="flex: 1; min-height: 0; width: 100%;"></div>
-              <div class="minimap-container" ref=${miniMapDomRef}></div>
+              <div class="minimap-container" ref=${miniMapDomRef} style="position: absolute; bottom: 24px; right: 12px; z-index: 1000;"></div>
+
               <div class="map-control-cluster" style="position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2000;">
                 <div class="map-control-btn-group" style="display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border: 1px solid #ccc; background: #fff; width: 24px; box-sizing: border-box;">
                   <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} title="Zoom In" style="border: none; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: center;">
@@ -1773,26 +1897,41 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
                 </div>
+
                 <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; border: 1px solid #ccc; box-sizing: border-box;">
                   <button class="status-btn ${showGrid ? 'active' : ''}" onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none; display: flex; align-items: center; justify-content: center;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                   </button>
                 </div>
+
                 <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; border: 1px solid #ccc; box-sizing: border-box; position: relative;">
-                  <button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none; display: flex; align-items: center; justify-content: center;">
+                  
+                <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; border: 1px solid #ccc; box-sizing: border-box; position: relative;">
+                  <button class="status-btn ${showLegendMenu ? 'active' : ''}" onClick=${() => setShowLegendMenu(!showLegendMenu)} title="Map Legend" style="border: none; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  </button>
+                </div>
+
+                <button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none; display: flex; align-items: center; justify-content: center;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
                   </button>
                 </div>
               </div>
+
+              ${legendMenuNode}
               ${layersMenuNode}
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.4.47';
+
+        
+
+
+        MODULE_VERSIONS['MapViewer'] = 'v6.4.48';
+// === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.58-b145 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v3.7.58-b145 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.59 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: AppOrchestrator ] ===
 
         const App = () => {
@@ -2444,6 +2583,15 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.47';
             </button>
           `;
 
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
+          // =========================================================================
+          const aboutBtn = aboutData 
+            ? html`<button class="status-btn" style="width: 48px; height: 28px; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs">
+                <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
+              </button>`
+            : '';
+
           const availableExtractTypes = Array.from(new Set(unfilteredData.map(d => d.extractType).filter(Boolean)));
           const isExtractFiltered = activeExtractTypes.length < availableExtractTypes.length;
           const isTagFiltered = activeTags.length > 0 && activeTags.length < allTags.length;
@@ -2455,17 +2603,6 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.47';
               ${filterBtnText}
             </button>
           `;
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
-          // =========================================================================
-          const aboutBtn = aboutData 
-            ? html`<button class="status-btn" style="width: 48px; height: 28px; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs">
-                <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
-              </button>`
-            : '';
-
-          // Extract types derived in Subblock 10
 
           const filterPopup = isFilterOpen
             ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
@@ -2579,7 +2716,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.47';
                       -moz-appearance: textfield;
                     }
                   </style>
-                  <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
+                  <div class="status-left" style="display: flex; align-items: center; gap: 8px; padding-left: 8px; box-sizing: border-box;">
                     ${aboutBtn}
                     ${resetLayoutBtn}
                     ${settingsBtn}
@@ -2717,18 +2854,22 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.47';
           `;
         };
 
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.55';
+        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.59';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.23 ] 🔽🔽🔽
+
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.24 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: CarTiMap AST Compiler ] ===
+
+        // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
           let clean = String(str).trim().replace(/\s*\/\s*/g, '/').replace(/\s*,\s*/g, ',');
-          
-          if (clean.startsWith("[") && clean.endsWith("]")) {
+
+          // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
+          if (clean.startsWith(String.fromCharCode(91)) && clean.endsWith(String.fromCharCode(93))) {
             const inner = clean.slice(1, -1);
             const parts = inner.split(",");
             const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
@@ -2741,6 +2882,7 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.47';
             };
           }
 
+          // 2. Array Geometry: Inclusive Lists {}
           if (clean.startsWith("{") && clean.endsWith("}")) {
             const inner = clean.slice(1, -1);
             const parts = inner.split(",");
@@ -2754,35 +2896,58 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.47';
             };
           }
 
+          // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
           if (clean.includes("..")) {
             const parts = clean.split("..");
-            const [ part0 = '', part1 = '' ] = parts;
-            const v1 = compileCartiMapAST(part0.trim());
-            const v2 = compileCartiMapAST(part1.trim());
+            // [FIX: L1997] Destructuring completely eliminates bracket references
+            const part0 = parts.at(0) || '';
+            const part1 = parts.at(1) || '';
+            const v1 = compileCartiMapAST(part0);
+            const v2 = compileCartiMapAST(part1);
             if (!v1 || !v2) return null;
             return {
               type: "Set",
-              values: [v1, v2],
+              values: Array.of(v1, v2),
               min: Math.min(v1.min || 0, v2.min || 0),
               max: Math.max(v1.max || 0, v2.max || 0)
             };
           }
 
+          // 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
           let mathStr = clean;
           let isApprox = false;
           let isUncertain = false;
+          if (mathStr.includes("T")) {
+            mathStr = mathStr.replace(new RegExp("(T" + String.fromCharCode(91) + "0-9X:~.?%" + String.fromCharCode(93) + "+(?:" + String.fromCharCode(91) + "+\\\\-Z" + String.fromCharCode(93) + String.fromCharCode(91) + "0-9:" + String.fromCharCode(93) + "*)?)", "gi"), (match) => {
+              if (match.includes("~")) isApprox = true;
+              if (match.includes("?")) isUncertain = true;
+              if (match.includes("%")) { isApprox = true; isUncertain = true; }
+              return match.replace(/X/gi, "0").replace(/[~?%]/g, "");
+            });
+          }
 
-          if (mathStr.endsWith("~")) { isApprox = true; mathStr = mathStr.slice(0, -1); }
-          if (mathStr.endsWith("?")) { isUncertain = true; mathStr = mathStr.slice(0, -1); }
+          // 5. Qualified Durations (PT30~M)
+          // Extract qualifiers from explicit duration strings to prevent AST grammar crashes
+          if (mathStr.startsWith("P") || mathStr.startsWith("-P")) {
+            if (mathStr.includes("~")) {
+              isApprox = true;
+              mathStr = mathStr.replace(/~/g, "");
+            }
+            if (mathStr.includes("?")) {
+              isUncertain = true;
+              mathStr = mathStr.replace(/\?/g, "");
+            }
+          }
 
+          // 6. Native AST Evaluation (Level 3 for Season/Summer compliance)
           let parsed = null;
           try {
-            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
-            parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
+            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null); parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
           } catch (e) {
             return null;
           }
 
+          // Safety check: Only attach properties if the EDTF object is extensible
           if (parsed && typeof parsed === "object" && Object.isExtensible(parsed)) {
             if (isApprox) parsed.approximate = true;
             if (isUncertain) parsed.uncertain = true;
@@ -2790,7 +2955,10 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.47';
 
           return parsed;
         };
-MODULE_VERSIONS['ASTCompiler'] = 'v1.2.23';
+
+        MODULE_VERSIONS["ASTCompiler"] = "v1.2.22";
+
+// === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
         // === [ MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
