@@ -1483,9 +1483,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.67-b149 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.13.67-b149 ] ===
-
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b150 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.13.68-b150 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           // --- [ MapViewer State & Refs Initialization ] ---
           const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -1570,12 +1569,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           };
 
           const parseGeometryCollection = (wktStr) => {
-            const cleanStr = wktStr.trim().replace(/^GEOMETRYCOLLECTION\s*\(/i, '').replace(/\)\s*$/, '');
-            const m = [...cleanStr.matchAll(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g)];
-            const extractedLayers = [];
-            const upper = wktStr.toUpperCase();
-            if (m.length > 0) extractedLayers.push(upper.startsWith('POLY') ? L.polygon(m.map(([ , x1, x2 ]) => new L.LatLng(parseFloat(x1), parseFloat(x2)))) : L.polyline(m.map(([ , x1, x2 ]) => new L.LatLng(parseFloat(x1), parseFloat(x2)))));
-            return extractedLayers;
+            const ogcRegex = /(?:POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON)\s*\(\s*\(.*\)\s*\)|\b(?:POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON)\s*\([^)]+\)/gi;
+            const subWkts = wktStr.match(ogcRegex);
+            if (!subWkts || subWkts.length === 0) return [wktStr];
+            return subWkts;
           };
 
           useEffect(() => {
@@ -1702,7 +1699,16 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               const isVip = item.priority && item.priority.toLowerCase() === 'vip';
               let featureLayers = [];
               try {
-                if (locStr.match(/^GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(locStr);
+                if (locStr.match(/^GEOMETRYCOLLECTION/i)) {
+                  const subs = parseGeometryCollection(locStr);
+                  subs.forEach(sub => {
+                    try {
+                      const wkt = new window.Wkt.Wkt();
+                      wkt.read(sub);
+                      featureLayers = featureLayers.concat(extractLayers(wkt.toObject()));
+                    } catch (err) {}
+                  });
+                }
                 else if (locStr.match(/^[A-Za-z]+\s*\(/i)) {
                   const wkt = new window.Wkt.Wkt();
                   wkt.read(locStr);
@@ -1934,13 +1940,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           `;
         };
 
-MODULE_VERSIONS['MapViewer'] = 'v6.4.49-b149';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.50-b150';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.67-b149 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.13.67-b149 ] ===
-
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b150 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b150 ] ===
 const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
@@ -2430,83 +2435,20 @@ const App = () => {
 
           const executeSearch = (query) => {
             if (!query || !query.trim()) return [];
-            const q = stripAndNormalize(query);
+            const normalized = stripAndNormalize(query);
+            const terms = normalized.split(/\s+/).filter(Boolean);
+            if (terms.length === 0) return [];
+
             return data.filter(d => {
-              if (d._searchIndex && d._searchIndex.includes(q)) return true;
-              if (d.id && String(d.id) === q.replace(/\.$/, '')) return true;
-              const title = d.title ? stripAndNormalize(d.title) : '';
-              const desc = d.description ? stripAndNormalize(d.description) : '';
-              const place = d.place ? stripAndNormalize(d.place) : '';
-              const tagsStr = Array.isArray(d.tags) ? d.tags.map(stripAndNormalize).join(' ') : (d.tags ? stripAndNormalize(d.tags) : '');
-              return title.includes(q) || desc.includes(q) || place.includes(q) || tagsStr.includes(q);
+              if (terms.length === 1 && d.id && String(d.id) === terms[0].replace(/\.$/, '')) return true;
+              const titleNorm = d.title ? stripAndNormalize(d.title) : '';
+              const descNorm = d.description ? stripAndNormalize(d.description) : '';
+              const placeNorm = d.place ? stripAndNormalize(d.place) : '';
+              const tagsNorm = Array.isArray(d.tags) ? d.tags.map(t => stripAndNormalize(t)).join(' ') : (d.tags ? stripAndNormalize(d.tags) : '');
+              const idNorm = d.id ? String(d.id) : '';
+              const composite = `${idNorm} ${titleNorm} ${descNorm} ${placeNorm} ${tagsNorm}`;
+              return terms.every(term => composite.includes(term));
             });
-          };
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 7: VIEWPORT BOUNDS TRACKING ] ===
-          // =========================================================================
-          useEffect(() => {
-            if (data.length === 0) return;
-            const minTimes = data.map(d => d.startDate?.min).filter(Boolean);
-            const maxTimes = data.map(d => d.endDate?.max || d.startDate?.max).filter(Boolean);
-            if (minTimes.length > 0) {
-              const globalMin = Math.min(...minTimes);
-              const globalMax = maxTimes.length > 0 ? Math.max(...maxTimes) : globalMin;
-              setVisibleTimeBounds([globalMin, globalMax]);
-            }
-          }, [data]);
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 8: TIMED AUTOFOCUS FOCUS GATES ] ===
-          // =========================================================================
-          useEffect(() => {
-            const handleKeyDown = (e) => {
-              if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
-              if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
-              else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
-            };
-            window.addEventListener('keydown', handleKeyDown);
-            return () => window.removeEventListener('keydown', handleKeyDown);
-          }, [activeIndex, data.length]);
-
-          useEffect(() => {
-            if (isSearchOpen) {
-              setTimeout(() => {
-                const inputNode = document.querySelector('.search-input');
-                if (inputNode) inputNode.focus();
-              }, 150);
-            }
-          }, [isSearchOpen]);
-
-          useEffect(() => {
-            const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-            updateAppHeight();
-            let wasDesktop = window.innerWidth >= 1024;
-            const handleResize = () => {
-              updateAppHeight();
-              const isDesktop = window.innerWidth >= 1024;
-              if (isDesktop !== wasDesktop) {
-                window.dispatchEvent(new Event('resize'));
-              }
-              wasDesktop = isDesktop;
-            };
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
-          }, []);
-
-          const jumpToSlide = (newIdx, isSequential = false) => {
-            if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
-              if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
-              setActiveIndex(newIdx);
-            }
-          };
-
-          const goBack = () => {
-            if (slideHistory.length > 0) {
-              const prev = slideHistory[slideHistory.length - 1];
-              setSlideHistory(h => h.slice(0, -1));
-              setActiveIndex(prev);
-            }
           };
 
           const searchResults = executeSearch(debouncedSearchQuery);
@@ -2864,18 +2806,21 @@ const App = () => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.60-b149';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.61-b150';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.67-b149 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.67-b149 ] ===
-
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b150 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b150 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
-          let clean = String(str).trim().replace(/\s*\/\s*/g, '/').replace(/\s*,\s*/g, ',');
+          let clean = String(str).trim()
+            .replace(/[\r\n]+/g, ',')
+            .replace(/\s*\/\s*/g, '/')
+            .replace(/\s*,\s*/g, ',')
+            .replace(/,,+/g, ',');
 
           // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
           if (clean.startsWith(String.fromCharCode(91)) && clean.endsWith(String.fromCharCode(93))) {
@@ -2883,11 +2828,13 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.60-b149';
             const parts = inner.split(",");
             const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
             if (values.length === 0) return null;
+            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
+            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
             return {
               type: "Set",
               values: values,
-              min: Math.min(...values.map(v => v.min || 0)),
-              max: Math.max(...values.map(v => v.max || 0))
+              min: minVals.length > 0 ? Math.min(...minVals) : 0,
+              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
             };
           }
 
@@ -2897,28 +2844,33 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.60-b149';
             const parts = inner.split(",");
             const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
             if (values.length === 0) return null;
+            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
+            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
             return {
               type: "List",
               values: values,
-              min: Math.min(...values.map(v => v.min || 0)),
-              max: Math.max(...values.map(v => v.max || 0))
+              min: minVals.length > 0 ? Math.min(...minVals) : 0,
+              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
             };
           }
 
           // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
           if (clean.includes("..")) {
             const parts = clean.split("..");
-            // [FIX: L1997] Destructuring completely eliminates bracket references
             const part0 = parts.at(0) || '';
             const part1 = parts.at(1) || '';
             const v1 = compileCartiMapAST(part0);
             const v2 = compileCartiMapAST(part1);
             if (!v1 || !v2) return null;
+            const min1 = typeof v1.min === 'number' ? v1.min : Number(v1.min?.valueOf() || 0);
+            const min2 = typeof v2.min === 'number' ? v2.min : Number(v2.min?.valueOf() || 0);
+            const max1 = typeof v1.max === 'number' ? v1.max : Number(v1.max?.valueOf() || 0);
+            const max2 = typeof v2.max === 'number' ? v2.max : Number(v2.max?.valueOf() || 0);
             return {
               type: "Set",
               values: Array.of(v1, v2),
-              min: Math.min(v1.min || 0, v2.min || 0),
-              max: Math.max(v1.max || 0, v2.max || 0)
+              min: Math.min(min1, min2),
+              max: Math.max(max1, max2)
             };
           }
 
@@ -2926,8 +2878,12 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.60-b149';
           let mathStr = clean;
           let isApprox = false;
           let isUncertain = false;
+
+          // Normalize short timezone offset: +02 or -05 -> +02:00 or -05:00
+          mathStr = mathStr.replace(/([+-]\d{2})(?!\:\d{2})(?=\s*|$)/g, '$1:00');
+
           if (mathStr.includes("T")) {
-            mathStr = mathStr.replace(new RegExp("(T" + String.fromCharCode(91) + "0-9X:~.?%" + String.fromCharCode(93) + "+(?:" + String.fromCharCode(91) + "+\\\\-Z" + String.fromCharCode(93) + String.fromCharCode(91) + "0-9:" + String.fromCharCode(93) + "*)?)", "gi"), (match) => {
+            mathStr = mathStr.replace(new RegExp("(T" + String.fromCharCode(91) + "0-9X:~.?%" + String.fromCharCode(93) + "+(?:" + String.fromCharCode(91) + "+\\-Z" + String.fromCharCode(93) + String.fromCharCode(91) + "0-9:" + String.fromCharCode(93) + "*)?)", "gi"), (match) => {
               if (match.includes("~")) isApprox = true;
               if (match.includes("?")) isUncertain = true;
               if (match.includes("%")) { isApprox = true; isUncertain = true; }
@@ -2936,36 +2892,46 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.60-b149';
           }
 
           // 5. Qualified Durations (PT30~M)
-          // Extract qualifiers from explicit duration strings to prevent AST grammar crashes
           if (mathStr.startsWith("P") || mathStr.startsWith("-P")) {
-            if (mathStr.includes("~")) {
-              isApprox = true;
-              mathStr = mathStr.replace(/~/g, "");
-            }
-            if (mathStr.includes("?")) {
-              isUncertain = true;
-              mathStr = mathStr.replace(/\?/g, "");
-            }
+            if (mathStr.includes("~")) { isApprox = true; mathStr = mathStr.replace(/~/g, ""); }
+            if (mathStr.includes("?")) { isUncertain = true; mathStr = mathStr.replace(/\?/g, ""); }
           }
 
-          // 6. Native AST Evaluation (Level 3 for Season/Summer compliance)
+          // 6. Native AST Evaluation
           let parsed = null;
           try {
-            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null); parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
+            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
+            parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
           } catch (e) {
             return null;
           }
 
-          // Safety check: Only attach properties if the EDTF object is extensible
-          if (parsed && typeof parsed === "object" && Object.isExtensible(parsed)) {
-            if (isApprox) parsed.approximate = true;
-            if (isUncertain) parsed.uncertain = true;
+          if (parsed && typeof parsed === "object") {
+            let minMs = 0;
+            let maxMs = 0;
+            try {
+              if (typeof parsed.min === 'number') minMs = parsed.min;
+              else if (parsed.min && typeof parsed.min.valueOf === 'function') minMs = Number(parsed.min.valueOf());
+
+              if (typeof parsed.max === 'number') maxMs = parsed.max;
+              else if (parsed.max && typeof parsed.max.valueOf === 'function') maxMs = Number(parsed.max.valueOf());
+            } catch(e) {}
+
+            return {
+              type: parsed.type || "Date",
+              values: parsed.values,
+              min: minMs,
+              max: maxMs,
+              approximate: isApprox || !!parsed.approximate,
+              uncertain: isUncertain || !!parsed.uncertain,
+              raw: str
+            };
           }
 
-          return parsed;
+          return null;
         };
 
-MODULE_VERSIONS['ASTCompiler'] = 'v1.2.24-b149';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.25-b150';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
