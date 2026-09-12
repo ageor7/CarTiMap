@@ -1483,10 +1483,10 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v6.4.48 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.67-b149 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.13.67-b149 ] ===
 
-        const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
+const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           // --- [ MapViewer State & Refs Initialization ] ---
           const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
           const mapInstance = useRef(null); const miniMapInstance = useRef(null);
@@ -1665,8 +1665,25 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               if (o) {
                 const z = idx + 10;
                 const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
-                const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
-                overlayLayersRef.current[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
+                const isWms = (o.format && o.format.toLowerCase() === 'wms') || !!o.wmsLayer || String(o.url).toLowerCase().includes('wms');
+                if (isWms) {
+                  overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, {
+                    layers: o.wmsLayer || 'default',
+                    format: 'image/png',
+                    transparent: true,
+                    opacity: dynamicOpacity,
+                    maxNativeZoom: o.maxZoom || 19,
+                    maxZoom: maxGlobalZoom,
+                    attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`,
+                    zIndex: z,
+                    keepBuffer: 4,
+                    updateWhenZooming: false,
+                    updateWhenIdle: true
+                  }).addTo(map);
+                } else {
+                  const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
+                  overlayLayersRef.current[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
+                }
               }
             });
           }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
@@ -1685,31 +1702,24 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
               const isVip = item.priority && item.priority.toLowerCase() === 'vip';
               let featureLayers = [];
               try {
-                if (locStr.match(/^GEOMETRYCOLLECTION/i)) {
-                const wkt = new window.Wkt.Wkt();
-                wkt.read(locStr);
-                featureLayers = extractLayers(wkt.toObject());
-              } else if (locStr.match(/^[A-Za-z]+\s*\(/i)) {
-                const wkt = new window.Wkt.Wkt();
-                wkt.read(locStr);
-                featureLayers = extractLayers(wkt.toObject());
-              } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
-                try {
+                if (locStr.match(/^GEOMETRYCOLLECTION/i)) featureLayers = parseGeometryCollection(locStr);
+                else if (locStr.match(/^[A-Za-z]+\s*\(/i)) {
+                  const wkt = new window.Wkt.Wkt();
+                  wkt.read(locStr);
+                  featureLayers = extractLayers(wkt.toObject());
+                } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
                   featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
-                } catch (jsonErr) {
-                  if (typeof addLog === 'function') addLog(`[MapViewer] Corrupted GeoJSON in row ${idx + 2} ("${item.title || 'Untitled'}"): ${jsonErr.message}`, 'warning');
+                } else {
+                  const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
+                  if (coordMatch) {
+                    const [ , latStr, lngStr ] = coordMatch;
+                    const lat = parseFloat(latStr);
+                    const lng = parseFloat(lngStr);
+                    featureLayers.push(L.marker(new L.LatLng(lat, lng)));
+                  }
                 }
-              } else {
-                const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
-                if (coordMatch) {
-                  const [ , latStr, lngStr ] = coordMatch;
-                  const lat = parseFloat(latStr);
-                  const lng = parseFloat(lngStr);
-                  featureLayers.push(L.marker(new L.LatLng(lat, lng)));
-                }
-              }
-              const subLabels = item.subLabels ? item.subLabels.split(/[|·;·\n\-]/).map(s => s.trim()).filter(Boolean) : [];
-              featureLayers.forEach((layer, layerIdx) => {
+                const subLabels = item.subLabels ? item.subLabels.split(/(?:\||·|;|·|\n|\-)/).map(s => s.trim()).filter(Boolean) : [];
+                featureLayers.forEach((layer, layerIdx) => {
                   if (!layer) return;
                   let sig = null;
                   if (layer.getLatLng) {
@@ -1924,17 +1934,14 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
 
-        
-
-
-        MODULE_VERSIONS['MapViewer'] = 'v6.4.48';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.49-b149';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v3.7.59 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.67-b149 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.13.67-b149 ] ===
 
-        const App = () => {
+const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
           // =========================================================================
@@ -2239,7 +2246,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                     attrText: exactGet(norm, 'attribution text'),
                     attrLink: exactGet(norm, 'attribution link'),
                     wmsLayer: exactGet(norm, 'wms layer'),
-                    defaultOpacity: exactGet(norm, 'default opacity') !== '' ? parseFloat(exactGet(norm, 'default opacity')) : 1.0
+                    defaultOpacity: (exactGet(norm, 'default opacity') !== '' && !isNaN(parseFloat(exactGet(norm, 'default opacity')))) ? parseFloat(exactGet(norm, 'default opacity')) : 0.3
                   };
                 }).filter(b => b.id && b.url);
                 setBasemapsRegistry(basemaps);
@@ -2422,14 +2429,17 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           };
 
           const executeSearch = (query) => {
-            if (!query.trim()) return [];
+            if (!query || !query.trim()) return [];
             const q = stripAndNormalize(query);
-            return data.filter(d => 
-              (d.title && stripAndNormalize(d.title).includes(q)) ||
-              (d.description && stripAndNormalize(d.description).includes(q)) ||
-              (d.place && stripAndNormalize(d.place).includes(q)) ||
-              (d.tags && d.tags.some(t => stripAndNormalize(t).includes(q)))
-            );
+            return data.filter(d => {
+              if (d._searchIndex && d._searchIndex.includes(q)) return true;
+              if (d.id && String(d.id) === q.replace(/\.$/, '')) return true;
+              const title = d.title ? stripAndNormalize(d.title) : '';
+              const desc = d.description ? stripAndNormalize(d.description) : '';
+              const place = d.place ? stripAndNormalize(d.place) : '';
+              const tagsStr = Array.isArray(d.tags) ? d.tags.map(stripAndNormalize).join(' ') : (d.tags ? stripAndNormalize(d.tags) : '');
+              return title.includes(q) || desc.includes(q) || place.includes(q) || tagsStr.includes(q);
+            });
           };
 
           // =========================================================================
@@ -2716,7 +2726,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
                       -moz-appearance: textfield;
                     }
                   </style>
-                  <div class="status-left" style="display: flex; align-items: center; gap: 8px; padding-left: 8px; box-sizing: border-box;">
+                  <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
                     ${aboutBtn}
                     ${resetLayoutBtn}
                     ${settingsBtn}
@@ -2854,16 +2864,15 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           `;
         };
 
-        MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.59';
-
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.60-b149';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v1.2.24 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.67-b149 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.67-b149 ] ===
 
-        // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
+// [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
           let clean = String(str).trim().replace(/\s*\/\s*/g, '/').replace(/\s*,\s*/g, ',');
@@ -2956,8 +2965,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
           return parsed;
         };
 
-        MODULE_VERSIONS["ASTCompiler"] = "v1.2.22";
-
+MODULE_VERSIONS['ASTCompiler'] = 'v1.2.24-b149';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
