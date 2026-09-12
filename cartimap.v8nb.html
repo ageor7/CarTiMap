@@ -1483,8 +1483,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
         MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b150 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.13.68-b150 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b151 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.13.68-b151 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           // --- [ MapViewer State & Refs Initialization ] ---
           const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
@@ -1940,12 +1940,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           `;
         };
 
-MODULE_VERSIONS['MapViewer'] = 'v6.4.50-b150';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.50-b151';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b150 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b150 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b151 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b151 ] ===
 const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
@@ -2422,6 +2422,52 @@ const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 5: CHRONOLOGICALLY REALIGNED SEARCH ] ===
           // =========================================================================
+          
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 4.1: SLIDE NAVIGATION & VIEWPORT LISTENERS ] ===
+          // =========================================================================
+          const jumpToSlide = (newIdx, isSequential = false) => {
+            if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
+              if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
+              setActiveIndex(newIdx);
+            }
+          };
+
+          const goBack = () => {
+            if (slideHistory.length > 0) {
+              const prev = slideHistory[slideHistory.length - 1];
+              setSlideHistory(h => h.slice(0, -1));
+              setActiveIndex(prev);
+            }
+          };
+
+          const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+
+          useEffect(() => {
+            const handleKeyDown = (e) => {
+              if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+              if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
+              else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
+            };
+            window.addEventListener('keydown', handleKeyDown);
+            return () => window.removeEventListener('keydown', handleKeyDown);
+          }, [activeIndex, data.length]);
+
+          useEffect(() => {
+            updateAppHeight();
+            let wasDesktop = window.innerWidth >= 1024;
+            const handleResize = () => {
+              updateAppHeight();
+              const isDesktop = window.innerWidth >= 1024;
+              if (isDesktop !== wasDesktop) {
+                window.dispatchEvent(new Event('resize'));
+              }
+              wasDesktop = isDesktop;
+            };
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+          }, []);
+
           const handleResultClick = (id, qString) => {
             const sortedIdx = data.findIndex(d => d.id === id);
             if (sortedIdx >= 0) jumpToSlide(sortedIdx);
@@ -2806,13 +2852,13 @@ const App = () => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.61-b150';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.62-b151';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b150 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b150 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b151 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b151 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
@@ -2931,7 +2977,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.61-b150';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.25-b150';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.25-b151';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
