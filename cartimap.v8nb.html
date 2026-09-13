@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.13.69-b186</title>
+    <title>CarTiMap v8.13.69-b187</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -78,14 +78,14 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
 .visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
 .visual-pane.no-media .media-pane { display: none !important; }
-.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible; z-index: 30; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; }
+.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible !important; z-index: 100 !important; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; }
 .resizer-dyn-secondary { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
 .media-pane { background: #111; overflow: hidden; position: relative; min-height: 0; min-width: 0; z-index: 30; flex: 1 1 auto; height: auto; width: 100%; }
 .media-carousel { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
 .media-item-container { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 .status-bar, .global-status-bar { height: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative; }
-.status-left, .status-right { display: flex; align-items: center; gap: 8px; flex: 1; }
-.status-left { padding-left: 12px !important; flex-shrink: 0 !important; }
+.status-left, .status-right { display: flex; align-items: center; gap: 8px; flex: 1; padding-right: 0 !important; }
+.status-left { padding-left: 0 !important; flex-shrink: 0 !important; }
 .status-center { display: flex; align-items: center; gap: 12px; justify-content: center; flex: 0 0 auto; }
 .timeline-pane { background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; z-index: 5; width: 100%; max-width: 100%; box-sizing: border-box; }
 
@@ -192,7 +192,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b186';
+const APP_VERSION = 'v8.13.69-b187';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -669,7 +669,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.8.0-b164';
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.10 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
-const TimelineScrubber = ({ data, activeIndex, setActiveIndex, addLog, activeTags, isTimelineExpanded, setIsTimelineExpanded, maxPane, setMaxPane, showButtonText, visibleTimeBounds, setVisibleTimeBounds, visibleTimeSpan, setVisibleTimeSpan, zoomLock, setZoomLock, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight }) => {
+const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
   const wrapperRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0, hasDragged: false });
@@ -959,7 +959,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, addLog, activeTag
       .event-group:hover .event-block { transform: translateY(-50%) scale(1.08) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; border-color: #007acc !important; z-index: 99999 !important; width: max-content !important; min-width: var(--calc-w) !important; }
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
-<!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
+      <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
       <div class="timeline-window-toolbar" style="position: absolute; top: 8px; right: 12px; z-index: 1000; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.95); padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
         <button class="status-btn" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -1241,7 +1241,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               const config = basemapsRegistry.find(b => b.id === activeBasemap);
               if (config) {
                 const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
-                baseLayerRef.current = L.tileLayer(config.url, layerOpts).addTo(map);
+                baseLayerRef.current = L.tileLayer(config.url, { ...layerOpts, zIndex: 0 }).addTo(map);
                 miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
               }
             };
@@ -2016,7 +2016,7 @@ const App = () => {
 
             window.addEventListener('mousemove', doDrag);
             window.addEventListener('mouseup', stopDrag);
-            window.addEventListener('touchmove', doDrag);
+            window.addEventListener('touchmove', doDrag, { passive: true });
             window.addEventListener('touchend', stopDrag);
           };
 
@@ -2048,7 +2048,7 @@ const App = () => {
 
             window.addEventListener('mousemove', doDrag);
             window.addEventListener('mouseup', stopDrag);
-            window.addEventListener('touchmove', doDrag);
+            window.addEventListener('touchmove', doDrag, { passive: true });
             window.addEventListener('touchend', stopDrag);
           };
 
@@ -2188,7 +2188,7 @@ const App = () => {
           const CarTiMapperLogo = ({ context, appVersion }) => {
             const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
-            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 700; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span><span style="font-size: 0.68rem; font-family: monospace; color: #007acc; font-weight: 600; line-height: 1;">${appVersion}</span></div></div>`;
+            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 400; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span><span style="font-size: 0.68rem; font-family: monospace; color: #007acc; font-weight: 600; line-height: 1;">${appVersion}</span></div></div>`;
             return html`
               <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
                 <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
@@ -2216,9 +2216,11 @@ const App = () => {
           const searchBtnText = showButtonText ? html`<span>Search</span>` : '';
           const filterBtnText = showButtonText ? html`<span>Filters</span>` : '';
 
-          const backBtn = (slideHistory && slideHistory.length > 0)
-            ? html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`
-            : '';
+          const canGoBack = slideHistory && slideHistory.length > 0;
+          const backBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} disabled=${!canGoBack} style="opacity: ${canGoBack ? '1' : '0.38'}; cursor: ${canGoBack ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoBack ? 'auto' : 'none'};" title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`;
+
+          const canGoForward = forwardHistory && forwardHistory.length > 0;
+          const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward to Next Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg></button>`;
 
           const resetLayoutBtn = html`
             <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(140); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
@@ -2351,7 +2353,7 @@ const App = () => {
                   <div class="visual-pane ${!activeSlide.media || activeSlide.media.length === 0 ? 'no-media' : ''}" style="flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; z-index: 20; height: 100%;">
 
                     <!-- Map Viewer Container -->
-                    <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}" style="flex: 0 0 var(--secondary-split, 50%); height: var(--secondary-split, 50%); position: relative; z-index: 100; overflow: visible;">
+                    <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}" style="flex: 0 0 var(--secondary-split, 50%); height: var(--secondary-split, 50%); position: relative; z-index: 100 !important; overflow: visible !important;">
                       <${MapViewer}
                         data=${data}
                         activeIndex=${activeIndex}
@@ -2422,7 +2424,7 @@ const App = () => {
                         onKeyDown=${(e) => {
                           e.stopPropagation();
                         }}
-                        style="width: 26px; background: rgba(0, 0, 0, 0.04); border: 1px solid #ccc; border-radius: 3px; text-align: center; font-family: monospace; font-size: 0.9rem; font-weight: 700; padding: 1px 2px; color: #222; outline: none;"
+                        style="width: 26px; background: rgba(0, 0, 0, 0.04); border: none; border-radius: 3px; text-align: center; font-family: monospace; font-size: 0.9rem; font-weight: 700; padding: 1px 2px; color: #222; outline: none;"
                         title="Jump to Record Index (Editable)"
                       />
                       <span style="user-select: none; opacity: 0.85; white-space: nowrap;">${data.length < unfilteredData.length ? ` / ${data.length} / ${unfilteredData.length}` : ` / ${data.length}`}</span>
