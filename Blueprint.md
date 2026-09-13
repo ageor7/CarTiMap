@@ -1,4 +1,4 @@
-# CarTiMap Engine Master Blueprint (v8.12.24)
+# CarTiMap Engine Master Blueprint (v8.13.23)
 ### The Living Technical, Spatial-Temporal & Historiographical Specification
 
 This living document contains the rigid engineering, mathematical, cartographic, and methodological specifications for **CarTiMap** and the **HGBB extracts database**. Standardized using the semantic anchor system `[REF: TAG-NAME]`, these rules are bidirectionally deep-linked between the active Preact/Leaflet codebase, the spreadsheet database schemas, and the physical postgraduate thesis (*Forensic Visualisation and Triangulation of Historical Narratives*, Georgiadis 2026) [REF: DOC-01].
@@ -8,7 +8,7 @@ This living document contains the rigid engineering, mathematical, cartographic,
 ## 1. Engineering Protocols & Coding Rules <a name="category-1"></a>
 
 ### [REF: DOC-01] Two-Tier Documentation (REF-TAGS) [UPDATED]
-To prevent technical debt and ensure absolute cross-session consistency, the project documentation is bifurcated. The master repository `README.md` serves as the primary epistemic portal and developer-facing guide, detailing standard API behaviors, URL queries, and database schemas. The companion file `BLUEPRINT.md` houses the rigid architectural, physical, and mathematical parameters of the system. These tiers are permanently interlinked with the physical LaTeX/Word manuscript using the `[REF: TAG-NAME]` semantic taxonomy. Every blueprint entry must carry its specific chapter and section coordinates (e.g., Chapter 5.4, Section 5.4.1), ensuring complete referential traceability between the running code, the database paradata, and the academic defense text. Zero duplication.
+To prevent technical debt and ensure absolute cross-session consistency, the project documentation is bifurcated. The master repository `README.md` serves as the primary epistemic portal and developer-facing guide, detailing standard API behaviors, URL queries, and database schemas. The companion file `BLUEPRINT.md` houses the rigid architectural, physical, and mathematical parameters of the system. These tiers are permanently interlinked with the physical LaTeX/Word manuscript using the `[REF: TAG-NAME]` semantic taxonomy. Every blueprint entry must carry its specific chapter and section coordinates (e.g., Chapter 5.4, Page 51), ensuring complete referential traceability between the running code, the database paradata, and the academic defense text. Zero duplication.
 
 ### [REF: ARCH-01] Two-Stage Data Pipeline
 To support dynamic on-the-fly re-rendering without network latency, the engine strictly separates raw data ingestion (`rawCsvRows`) from the compiled data state (`data`).
@@ -66,50 +66,6 @@ The CarTiMap application utilizes custom terminology to describe its unique math
 ### [REF: PROT-13] The Anti-Bloat CDN Mandate
 The engine strictly forbids hosting compiled 3rd-party dependencies or massive JavaScript binaries (e.g., >500KB AST parsers) directly within the GitHub repository. Serving raw executable code from version-control endpoints destroys Time-to-Interactive (TTI) metrics by inducing severe V8 Main Thread Blocking. Whenever 3rd-party dependencies exhibit grammatical or functional limitations, the architecture council must engineer lightweight (< 50 lines), native ECMAScript Decorator/Interceptor patterns (e.g., compileCartiMapAST) to mathematically correct the inputs/outputs, strictly maintaining the project's single-file, Zero-Build footprint and utilizing optimized esm.sh distribution.
 
-### [REF: BOOT-CRASH-03] Regular Expression Literal Compilation [NEW]
-Regular expression literals parsed natively by the browser must strictly utilize standard single-escaped backslash formatting —such as `\s`, `\d`, or `\(`. Double-escaping backslashes inside a regular expression literal compiles the first backslash as a literal character, leaving trailing formatting operators unescaped. This instantly violates browser-level abstract syntax tree validation, triggering a critical system syntax error that halts script tokenisation.
-
-**[REF: PROT-15] The Regression Audit Gate:** Prior to compiling any client-side JavaScript or CSS alterations, the developer AI must execute a systematic, line-by-line audit comparing the proposed module state against the previous conformed version in /workspace/artifacts/. Any modification that drops previously validated features (such as CSS legend tables, scroll containment, or specific bibliographic details) must be halted immediately. No blind code simplification is permitted without an explicit Socratic explanation in the chat and explicit approval.
-
-**[REF: PROT-16] Unified Delimiter Symmetries:** Semicolons (;) and Greek ano teleias (·) must be conformed as first-class delimiters across all multi-value string splitters (places, sublabels, tags, media) in both the Map and Timeline modules to ensure identical spatial-temporal tracking.
-
-### ## 1. Engineering Protocols & Coding Rules / 2. Interface Geometry
-
-*   **[REF: UI-164c] Symmetrical Status Cockpit [NEW]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers (Previous and Next) directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
-
-[REF: BOOT-CRASH-04] Regular Expression Literal Boundary Escaping [NEW — 2026-08-27]:
-Inside native JavaScript regular expression literals (/.../), the forward slash / acts as the absolute delimiter boundary. Even when nested within character classes [...] —where standard punctuation operators are evaluated as literal strings— a forward slash must be explicitly escaped with a leading backslash (\/). Omission of this escape causes the browser's lexical parser to evaluate the unescaped slash as the closing boundary of the regular expression, exposing the remaining character class characters as executable code and triggering an instant SyntaxError that aborts script tokenization on boot.
-
-#### [REF: DOC-02] Architectural SubBlock Taxonomy [UPDATED - 2026-09-02]
-To eliminate cascading errors, prevent attention mask decay, and enable risk-free surgical patching, all major component Blocks (AppOrchestrator, MapViewer, TimelineScrubber) are strictly partitioned into distinct topological boundaries. Symmetrically, as development progresses and logical density scales, the developer AI must introduce progressively smaller, highly granular Subblocks (each rigidly capped at a maximum of 80 lines). Each subblock must be bounded by explicit alphanumeric comment anchors:
-- `// --- [ START_SUBBLOCK: LogicDescription ] ---`
-- `// --- [ END_SUBBLOCK: LogicDescription ] ---`
-This isolation guarantees that Virtual DOM transitions, kinetic camera calculations, and state handling are physically decoupled, preventing adjacent logic from being mutated or dropped during token serialization.
-
-#### [REF: PROT-16] Whole-Block Delivery Mandate [NEW - 2026-09-02]
-To prevent compiler crashes due to truncated state declarations, unresolved dependencies, or orphaned variable scope, the developer AI is strictly prohibited from delivering fragmented code line suggestions. All updates must be delivered purely in the form of 100% intact, complete component Blocks, or fully compiled, self-contained Subblocks. Every delivered block must contain all required state declarations, React hooks, and render streams intact, guaranteeing browser-native compilation on a single copy-paste transaction.
-
-#### [REF: BOOT-CRASH-05c] Monolithic Script Literal Protection [NEW - 2026-09-07]
-To preserve absolute execution fluidity of the single-file Preact runtime, all component return statements utilizing the tagged template literal `html`` must remain entirely un-escaped on outer boundaries. Symmetrically, escaping template backticks (e.g. `html\``) is strictly prohibited as it triggers catastrophic parser crashes across modern browser engines.
-
-#### [REF: BOOT-CRASH-05d] Escape Protection & Component Hygiene [NEW - 2026-09-07]
-To preserve absolute execution fluidity of the single-file Preact runtime, all component return statements and dynamic mapping loops utilizing the tagged template literal `html`` must remain entirely un-escaped on outer boundaries. Escaping template backticks or interpolation variables (e.g. `\${}`, `\\${`) is strictly prohibited. Symmetrically, a compiler-gate audit must be run before every release to prevent double-escaping syntax errors from corrupting runtime Virtual DOM properties.
-
-#### [REF: STATE-04] Dynamic Tile Registry State Hook Binding [NEW - 2026-09-10]
-All state hooks referenced in asynchronous CSV ingestion pipelines (e.g., `setBasemapsRegistry`) must be explicitly declared at the root level of `AppOrchestrator` SubBlock 1 during state initialization. Omitting state setter definitions while invoking them in asynchronous `.then()` promises creates an unhandled `ReferenceError` that trips top-level error boundaries, resulting in a simulated CMS Connection Failure.
-
-#### [REF: CLOSURE-08] Deep-Link URL Parameter Extraction Helper [NEW - 2026-09-10]
-Helper functions invoked during dataset initialization (such as `getOmniParam`) must be explicitly declared within the scope of the `useEffect` hook prior to execution. To handle both unescaped and HTML-entity-encoded URL search strings from iframe or CMS embeds, `getOmniParam` falls back to `urlParams.get('amp;' + key)` when `urlParams.get(key)` returns null.
-
-#### [REF: CLOSURE-08b] Component-Scoped Utility Binding Standard [UPDATED - 2026-09-10]
-When injecting utility closures into monolithic multi-component distributions, patch compilers must scope-check target anchor occurrences against specific major block headers (`AppOrchestrator` vs `MapViewer`) rather than performing global string replacements. Utilities invoked within asynchronous hooks (such as `getOmniParam` in SubBlock 2) must reside in the exact function scope of the calling `useEffect`.
-
-#### [REF: STATE-05] Subcomponent Prop Mirroring & State Declaration Standard [NEW - 2026-09-10]
-Every state variable passed down to subcomponents in JSX/htm template literals (such as `zoomLock` and `setZoomLock` for `TimelineScrubber`) must be explicitly declared in the parent component's top-level state block. Subcomponent prop assignments referencing undeclared local variables trigger immediate compile/render-time `ReferenceError` crashes before component mounting completes.
-
-#### [REF: MAP-06] Pre-Coded Basemap Registry Standard [UPDATED - 2026-09-10]
-To guarantee immediate tile service availability across air-gapped or asynchronous network conditions, `AppOrchestrator` state must initialize with the complete 8-item basemap array (including WMS and `none` Blank Canvas). Secondary spreadsheet ingestion (`LayersT` / `bgid`) merges onto this pre-coded baseline without overriding default offline fallbacks.
-
 ---
 
 ## 2. Data Schema & The Upstream ETL Pipeline <a name="category-2"></a>
@@ -132,8 +88,14 @@ The engine strictly abandons external CDNs for spatial-temporal processing of br
 ### [REF: ETL-09] AST Hierarchical Evaluation
 The `compileCartiMapAST` decorator strictly enforces mathematical order of operations to prevent array geometry collapse. It must always evaluate Sets `[]` and Lists `{}` via comma delimiter splitting *before* analyzing elements for Range Expansions. Attempting to split ranges before arrays mathematically orphans the array commas, feeding illegal string fragments into the native Nearley AST tree and causing catastrophic `SyntaxError` crashes. Furthermore, the decorator actively intercepts and strips uncertainty qualifiers (`~`, `?`) from explicit durations (`PT30~M`) prior to native evaluation, coercing the approximate boolean flag onto the final object to bypass `edtf.js` Level 2 duration limitations.
 
+### [REF: ETL-10] MS Word XML Bibliography Generator & Zip Mapping Engine [UPDATED]
+The multi-author zip-mapping subroutine must reside as a localized closure inside the primary XML `MAP` loop without altering adjacent metadata evaluation chains. Specifically, it must split newline-delimited (`CHAR(10)`) name strings, map their index sequences via `SEQUENCE`, and return a concatenated list of individual `<b:Person>` objects to the main XML string, preserving the upstream URL string checkers and ampersand sanitization logic natively.
+
 ### [REF: ETL-12] Parallel Media, Caption, and Credit Sync [UPDATED]
 To prevent index de-synchronization across multi-value media carousels in the presentation layer, all grouped timeline media columns must be sorted in perfect parallel with the description snippets. The upstream ETL compiler (`MAKEARRAY`) is strictly prohibited from running flat deduplication on Media (Col 6), Media Caption (Col 7), and Media Credit (Col 8). The compiler must construct an in-memory `HSTACK` table binding each column's vector to the parallel sort_data (Col IQ), execute a descending sort on the priority weight, extract the sorted values, filter out empty fields, and finally apply a stable `UNIQUE` deduplication before compiling the final cell string via `TEXTJOIN`. This mathematically guarantees that `mediaItems[i]` always maps to its true historical `captions[i]` and `credits[i]` on the Hero Stage. This protocol strictly respects all manual overrides defined in `v6.1.2b` (specifically target sheet `ExtractsT` and `first_record_cols, {5,39}`).
+
+### [REF: ETL-14] Relational ERD & Normalization Mapping
+To preserve absolute database integrity and prevent visual coordinate collisions, the HGBB Extracts database must strictly reject flat-file data-entry patterns. The schema operates on a normalized relational network mapped explicitly in Figure 7 (ERD). Primary bibliography data (`SourcesT`) must be isolated from the spatial-temporal event ledger (`ExtractsT`) and joined dynamically via URL string keys. All unstructured geographic coordinates must be extracted from description records, georeferenced and geocoded inside QGIS, and returned to the centralized `GeoLU` lookup table under a shared, immutable `Shape_ID` key. This minimizes coordinate redundancy in the spreadsheet and prevents Leaflet rendering crashes due to loose, un-geocoded spatial variables.
 
 ### [REF: DATA-02] The Cartographer's Dilemma
 Humans use `[Lat, Lon]`. GIS standards (GeoJSON, WKT) demand Cartesian `[Lon, Lat]`. The spreadsheet translates this natively, ensuring export interoperability with QGIS/PostGIS.
@@ -167,57 +129,6 @@ The engine utilizes a mathematically precise delimiter interceptor (`/[\r\n]+|\\
 
 ### [REF: TL-17] Timeline Omni-Splitter
 Intercepts incoming `item.tags` via `getParsedTags()`. Ensures horizontal swimlanes split properly during background generation, scaling vertical boundaries appropriately.
-
-### [REF: DATA-15] String Storage Optimization [NEW]:
-To prevent index fragmentation and optimize client-side data transfer, the HGBB database enforces strict string typing. Unbounded narrative fields and complex, multi-point WKT or GeoJSON strings must be typed as TEXT to trigger out-of-line database storage, keeping primary tables compact. Conversely, all relational join keys, standard URI links, and short metadata tags must be typed as bounded VARCHAR variables (e.g., VARCHAR(64) or VARCHAR(2048)) to allow standard B-Tree indexing and prevent hash collision slowdowns during data compilation.
-
-### [REF: ETL-08b] AST Range Extraction Bounds [NEW]
-During recursive chronological range expansions —such as those mapping `Date1..Date2` intervals— the compiler must explicitly target isolated string indices rather than passing raw parsed arrays to down-level parser iterations. Passing an array container into string-coercive loops triggers array-to-string serializations that produce illegible, comma-separated streams. This process violates standard Extended Date/Time Format parameters and breaks chronological timeline sorting.
-
-[REF: ETL-14b] Symmetric Tag Ingestion Protocol [UPDATED - 2026-08-27]:
-To prevent runtime data loss inside browser-side state-filtering loops, the Data Ingestion Phase must maintain absolute delimiter symmetry with the Tag Map Extraction Phase. The primary tags column parser must not rely on simple comma splitting (split(',')). It is strictly mandated to parse tags utilizing a conformed regex /[,\r\n|;·]+/ on initial load. This guarantees that any multi-value arrays compiled upstream via TEXTJOIN are instantly flattened into primitive strings prior to Virtual DOM diffing, completely neutralizing the activeTags intersection failure that previously culled un-split composite strings on boot. Semicolons (;) and Greek ano teleias (·) must be evaluated as primary splitting boundaries.
-
-[REF: ETL-01] Upstream Horizontal Ingestion Compiler (v6.1.7) [UPDATED]
-The horizontal consolidation formula (ExtractsCombinedV) must resolve spatial coordinate cell boundaries before running WKT keyword validation blocks. If a grouped coordinate cell contains multi-row inputs or inline HTML line breaks ((?i)<br\s*/?>), the formula splits them by clean newlines (CHAR(10)) and processes them as a vertical vector utilizing TOCOL(..., 1). To prevent Google Sheets from stripping leading zeroes or truncating coordinate decimals during splitting, the formula must wrap each element in temporary @-armor, stripping the character only after the transposition is complete. Furthermore, nested quotation marks inside compiled GeoJSON strings must be escaped using doubled double quotes ("") to satisfy the Sheets formula compiler.
-
-### [REF: ETL-01b] Google Sheets Ingestion (gviz/tq vs export) [UPDATED - 2026-08-29]
-To prevent client-side "Database Sync Failure" exceptions, the CarTiMap client rendering layer must exclusively fetch raw Google Sheet data utilizing Google's Visualization Query API endpoint (`/gviz/tq?tqx=out:csv&gid=...`). Developers are strictly prohibited from utilizing Google's raw file export endpoint (`/export?format=csv`). While both endpoints conceptually return CSV payloads, the `/export` endpoint does not support cross-origin queries and refuses to transmit Access-Control-Allow-Origin headers to anonymous user-agents. Reverting to `/gviz/tq` guarantees 100% CORS-compliance, permitting secure, serverless database synchronization directly inside the browser across all domains (including GitHub Pages, local files, and resource-constrained tablets).
-
-#### [REF: ARCH-01b] Decoupled Data Pipeline (Ingestion vs. Parsing Telemetry) [NEW - 2026-08-30]
-To secure robust client-side diagnostic transparency, the data synchronization lifecycle must be split into two isolated, sequential execution bounds:
-- **Ingestion Zone:** Contains only the asynchronous promise network chains. Rejection here strictly indicates origin blocking (CORS), unreachability, or transport-layer timeouts, setting the UI state directly to `"Connection Timeout"`.
-- **Compilation Zone:** Contains CSV parsing (`Papa.parse`), chronological normalization, and index mapping. Handled inside a local `try-catch` scope, any runtime or structural mapping exceptions caught here designate localized formatting or variable typing failures, setting the UI state directly to `"Dataset Parse Error"`.
-
-#### [REF: ARCH-01b] Decoupled Data Pipeline (CORS vs Parse Boundaries) [NEW - 2026-08-30]
-The synchronization lifecycle must execute within two isolated boundaries to provide accurate telemetry:
-1. **The Ingestion Zone:** Raw asychronous fetch operations. Any failure here sets the UI state directly to "Connection Timeout".
-2. **The Data Compilation Zone:** Dynamic mappings and array manipulations. Handled inside an isolated local try-catch block, any failure sets the UI state directly to "Dataset Parse Error".
-
-#### [REF: MED-11] Local Splitting Closures [UPDATED - 2026-08-30]
-Multi-valued fields (media URLs, credits, captions, and tags) must be split on the fly inside the local parsing scope. Symmetrically, the `/\||\r?\n/` regex (`omniSplitRegex`) must be anchored within the core parsing context to avoid hoisting reference errors during rapid client-side compiles.
-
-#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
-The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
-
-#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
-The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
-
-#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
-The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
-#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
-The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
-
-#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
-The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
-
-#### [REF: ETL-08c] Non-Array Recursive Coercion for ISO 8601-2 Ranges [NEW - 2026-09-08]
-When evaluating duration range expansions (..) within the zero-build compileCartiMapAST parser, the compiler must strictly bypass passing the raw split array (parts) into the recursive evaluator. Doing so forces array-to-string coercion, resulting in comma-separated strings that fail Nearley Level 3 evaluation and return a fatal null. The parser is strictly required to target isolated string indices (v1 = parts and v2 = parts[1]) prior to execution, guaranteeing that primitive date strings are cleanly computed.
-
-#### [REF: ARCH-09b] CSV Ingestion Architecture Retention [NEW - 2026-09-08]
-The CarTiMap engine strictly mandates client-side CSV fetching (via Google Sheets 'gviz/tq?tqx=out:csv' endpoints) to act as its primary database transport layer. The architecture explicitly rejects transition paths to Google Sheets API v4 or Visualization JSONP blocks to prevent credential leakage (API keys) and protect standalone, zero-build offline performance across mobile and tablet viewports.
-
-#### [REF: ETL-09] Delimiter Isolation for Multi-Word Metadata Tokens [NEW - 2026-09-10]
-When tokenizing structured spreadsheet fields (such as `tags` or `extractType`), split regexes must explicitly exclude ASCII space characters (`' '`) to prevent fracturing multi-word category labels (e.g. `"Side Story"` -> `"Side"` + `"Story"`). Fractured tokens fail exact string inclusion checks against active filter arrays, resulting in silent record drops and broken timeline swimlanes.
 
 ---
 
@@ -313,90 +224,6 @@ Map initialization forces a strict execution latency. The generic `fitBounds` pa
 
 ### [REF: BOOT-CRASH-02b] Hardcoded Pin Dimensions [UPDATED]
 Custom HTML CSS markers physically measure `24px` by `34px`. To insulate the geometry against documentation/markdown parsers inadvertently swallowing bracketed arrays, the engine mathematically enforces these pixel boundaries by declaring strict Leaflet constructor objects (`iconSize: new L.Point(24, 34)`, `iconAnchor: new L.Point(12, 34)`) instead of shorthand arrays.
-
-*   **[REF: DOC-02] Sub-Block Surgical Landmarks [UPDATED]:** Logical sub-blocks within major components are strictly isolated using physical comment boundaries (START_SUBBLOCK and END_SUBBLOCK). Patching scripts must target these boundaries exclusively to preserve bracket parity.
-*   **[REF: MAP-03b] Decoupled Kinetic Camera Flight [NEW]:** To eliminate camera jitter during timeline scrubs, marker opacities (Temporal Ghosting) are calculated within a lightweight effect, while heavy flyToBounds transitions are bound to an isolated effect triggered strictly when activeIndex mutates.
-*   **[REF: BOOT-CRASH-03] Character Class Range Bounds [NEW]:** RegExp character classes containing literal dashes or backslashes must explicitly escape these tokens to prevent the compiler from evaluating ASCII ranges and throwing fatal SyntaxError halts on boot.
-
-Update [REF: UI-164c] (Symmetrical Status Cockpit): We must codify the strict physics of the new tripartite status bar. This records the exact spatial layout bounds: .status-left locked to system utilities, .status-center containing the center-grouped Navigation Cockpit [Prev] [ 1 / 87 ] [Next] and dynamic timeline span telemetry, and .status-right housing context utilities (Filters, Search, Undo).
-Update [REF: UI-164d] (Proportional Logo Constraints): Document the mathematical rules of the logo component. It must be strictly bounded to 24px height with automatic width scaling (width: auto;) inside the 32px status line wrapper, leaving a symmetrical 4px top/bottom padding buffer to protect its polygonal SVG aspect ratio from distortion.
-Update [REF: ETL-08] (AST Compiler Recursion): Record the structural correction inside compileCartiMapAST. Specifically, document how the range expansion split (..) was stabilized by passing isolated string elements (parts[0] / parts[1]) into the recursive loop, resolving the array-passing compiler crash.
-
-[REF: MAP-04] Type-Agnostic Sequential Index Coupling [UPDATED]
-To prevent coordinate-label desynchronization across multi-geometry slides, the visualizer must decouple layer-label mapping from Leaflet's internal, auto-incremented object IDs (_leaflet_id). During the initial WKT tokenization loop inside parseGeometryCollection, each extracted sub-layer must be stamped with its original, raw WKT string index (_geometryIndex) and nested sub-coordinate sequence index (_childIndex) at the exact millisecond of creation. Symmetrically, the tooltip rendering engine evaluates the place labels by splitting strings by newlines first to isolate the parent block (_geometryIndex), and then by semicolons to retrieve the precise descriptor matching the active _childIndex position.
-[REF: MAP-05] Fallback Axis Inversion Physics [UPDATED]
-When a Well-Known Text (WKT) string fails to compile through Wicket and triggers a regex catch block fallback, the manual extractor must enforce standard WKT axis inversion. Because OGC standards dictate Cartesian POINT(Lon Lat) formatting while Leaflet expects L.LatLng(Lat, Lon), the fallback regular expression must explicitly swap the captured coordinate groups (parseFloat(m.at(2)) for Latitude, parseFloat(m.at(1)) for Longitude). Plain, non-WKT coordinate cells parsed from the database must bypass this inversion loop, ingesting raw Lat, Lon arrays directly.
-
-#### [REF: MAP-01c] Multi-Line WKT Array Splitting [NEW - 2026-08-29]
-When the horizontal LET() compiler aggregates deconstructed event rows, it frequently produces line-break separated lists of geographic shapes within a single cell. Attempting to parse these strings directly via the Wicket library triggers a fatal syntax crash. The `MapViewer` engine implements a pre-parser string interceptor: it splits the incoming `location` string by `<br>` tags and newlines (`\n`) into a flat array, processing each geometry node independently. This ensures that composite, multi-vocal coordinate matrices render perfectly as distinct, interactive spatial nodes without breaking the Leaflet cycle.
-
-[REF: MAP-01c] Multi-Line WKT Array Splitting [NEW - 2026-08-29]
-When the horizontal LET() compiler aggregates deconstructed event rows, it frequently produces line-break separated lists of geographic shapes within a single cell (e.g., POINT(...)<br>POINT(...)). Attempting to parse these strings directly via the Wicket library triggers a fatal syntax crash inside the rendering loop. The MapViewer engine implements a pre-parser string interceptor: it splits the incoming location string by <br> tags and newlines (\n) into a flat array, processing each geometry node independently. This ensures that composite, multi-vocal coordinate matrices render perfectly as distinct, interactive spatial nodes without breaking the Leaflet cycle.
-[REF: MAP-02b] Identical Coordinate Stacking [UPDATED - 2026-08-29]
-When multiple historical actions share mathematically identical coordinates, standard mapping libraries overlap and eclipse markers. To communicate chronological volume without visual bloat, the engine intercepts overlapping coordinates and groups them into a custom “Stacked Pin” featuring a numeric depth badge. For complex geometries, the tooltip rendering engine evaluates the place labels by splitting strings by newlines first to isolate the parent block, and then by semicolons to retrieve the precise descriptor matching the active sub-coordinate sequence.
-
-#### [REF: MAP-01c] Multi-Line WKT Array Splitting [NEW - 2026-08-29]
-When the horizontal LET() compiler aggregates deconstructed event rows, it frequently produces line-break separated lists of geographic shapes within a single cell (e.g., `POINT(...)<br>POINT(...)`). Attempting to parse these strings directly via the Wicket library triggers a fatal syntax crash inside the rendering loop. The `MapViewer` engine implements a pre-parser string interceptor: it splits the incoming `location` string by `<br>` tags and then flattens them by string-based newlines (`\n`) into a flat array, processing each geometry node independently. This string-based fallback bypasses regular expression escaping anomalies entirely, ensuring that composite, multi-vocal coordinate matrices render perfectly as distinct, interactive spatial nodes without breaking the Leaflet cycle.
-
-#### [REF: MAP-01d] Fallback Coordinate Axis Realignment [NEW - 2026-08-29]
-When the Leaflet MapViewer's primary WKT engine encounters nested geometries that trigger parser catch-blocks, it utilizes regular expression fallback mapping to capture decimal primitives. To prevent JavaScript array-to-string type coercion (where `parseFloat(match_array)` evaluates both Lat and Lon to the identical first index), coordinate extraction must explicitly target indexed group sequences: `parseFloat(match_array[2])` for Latitude, and `parseFloat(match_array[1])` for Longitude. Symmetrically, this maintains consistency with WKT’s Cartesian axis layout (`POINT(Lng Lat)`) and prevents collapsed flat diagonal geometries, ensuring 100% visual rendering accuracy.
-
-#### [REF: UI-71b] Basemap Opacity Attenuation [NEW - 2026-08-29]
-To allow qualitative researchers to visually attenuate high-contrast raster background details, the Layers dropdown incorporates inline `<input type="range">` opacity sliders dynamically nestled below active basemap radio buttons. Adjusting the slider binds the value directly to a reactive `basemapOpacity` state variable. Symmetrically, a React `useEffect` hook intercepts opacity mutations and directly executes `setOpacity()` on the active base and mini-base Leaflet tile-layers in constant time, avoiding expensive canvas re-creations.
-
-#### [REF: MAP-01d] Fallback Coordinate Axis Realignment [NEW - 2026-08-29]
-When the Leaflet MapViewer's primary WKT engine encounters nested geometries that trigger parser catch-blocks, it utilizes regular expression fallback mapping to capture decimal primitives. To prevent JavaScript array-to-string type coercion (where `parseFloat(match_array)` evaluates both Lat and Lon to the identical first index), coordinate extraction must explicitly target indexed group sequences: `parseFloat(match_array.at(2))` for Latitude, and `parseFloat(match_array.at(1))` for Longitude. Symmetrically, this maintains consistency with WKT’s Cartesian axis layout (`POINT(Lng Lat)`) and prevents collapsed flat diagonal geometries, ensuring 100% visual rendering accuracy.
-
-#### [REF: UI-71b] Basemap Opacity Attenuation [NEW - 2026-08-29]
-To allow qualitative researchers to visually attenuate high-contrast raster background details, the Layers dropdown incorporates inline `<input type="range">` opacity sliders dynamically nestled below active basemap radio buttons. Adjusting the slider binds the value directly to a reactive `basemapOpacity` state variable. Symmetrically, a React `useEffect` hook intercepts opacity mutations and directly executes `setOpacity()` on the active base and mini-base Leaflet tile-layers in constant time, avoiding expensive canvas re-creations.
-
-#### [REF: MAP-05] Complete Separation of WKT and Standard Coordinate Parsers [UPDATED - 2026-08-29]
-To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and secure epistemic data accuracy, the spatial engine must strictly separate Well-Known Text (WKT) from explicit Lat/Lon coordinate notation:
-1. **WKT Integrity:** If a WKT string (e.g. POINT(...), LINESTRING(...), POLYGON(...)) is syntactically malformed and fails during Wicket compilation, the MapViewer must fail gracefully. It is strictly prohibited to execute manual regular expression extractions inside catch blocks to "rescue" or guess the coordinate parameters, as this masks upstream data-entry errors and generates invalid cartographic layers.
-2. **Explicit Lat/Lon Support:** Symmetrically, standard geographic coordinates are fully supported but must be formatted explicitly matching /^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/. Standard coordinate parsing operates purely on its own conditional branch and must never serve as a catch-block fallback for failed WKT inputs.
-
-#### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-08-29]
-To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate coordinates strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
-
-### [REF: MAP-02c] The Anti-Swallow Indexing Pattern [UPDATED - 2026-08-30]
-During both Leaflet marker clustering and AppOrchestrator date parsing, the JavaScript engine dynamically accesses indices of array structures. To insulate the codebase from compiler filters, markdown engines, or Git tools that accidentally swallow or strip square brackets (e.g., mistaking `parts[0]` for a markdown footnote indicator), all array index mapping must explicitly use the safe ES6 `.at()` accessor prototype (e.g., `parts.at(0)`). This prevents syntax and runtime exceptions while guaranteeing strict data format alignment across all compiler channels.
-
-#### [REF: MAP-01b] Basemaps Registry Fallback & Dynamic Fetching [UPDATED - 2026-08-30]
-The MapViewer requires a conformed `basemapsRegistry` array to mount. To prevent runtime failures when loading offline or with isolated parameters, the AppOrchestrator must maintain a conformed static `DEFAULT_BASEMAPS` catalog hook within State Subblock 1. If an external `bgid` is active, the parser must merge those sheets-defined layers dynamically over the fallback basemaps, updating Leaflet tile definitions without physical DOM restarts.
-
-#### [REF: CHRONO-08] Absolute Unbounded/Interval Check Optimization [UPDATED - 2026-08-30]
-The ingestion pipeline must identify open-ended ranges and unbounded intervals (such as ISO 8601-2 Level 2 Choice Sets with undefined endings) to guarantee structural parity in long-term data preservation. 
-
-To maintain execution fluidity, the engine must avoid structural depth-traversals of nested Abstract Syntax Trees (AST) or array-matching loops during real-time rendering. Because the native `compileCartiMapAST` decorator recursively propagates infinity limits up to the root boundaries of the parsed date node, checking the absolute limits of the computed timestamps resolves unboundedness in mathematical \\(O(1)\\) complexity:
-
-`isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY)`
-
-This evaluation bypasses the need for object type-checking and functions seamlessly across simple dates, Sets, Lists, and Interval trees.
-
-#### [REF: CHRONO-08] Absolute Unbounded/Interval Check Optimization [UPDATED - 2026-08-30]
-The ingestion pipeline identifies open-ended ranges and unbounded intervals to guarantee visual structural integrity on long-term project data. To maintain high-velocity execution, the compiler checks the root boundary coordinates of parsed dates in constant \\(O(1)\\) time:
-
-`isOpen: (parsed.min === Number.NEGATIVE_INFINITY || parsed.max === Number.POSITIVE_INFINITY)`
-
-This bypasses costly array looping and functions smoothly across single dates, Sets, Lists, and Interval nodes.
-
-#### [REF: MAP-01b] Case-Insensitive WKT Compilation & Parenthetical Depth Validation [UPDATED - 2026-08-31]
-To preserve coordinate rendering integrity across multi-line spatial datasets, the mapping pipeline rejects standard linear string splitting. Location data fields are processed using a parenthetical-depth ingestion tokenizer. The tokenizer scans the string character-by-character, incrementing a depth counter on open parenthesis “(” and decrementing on closed parenthesis “)”. It executes newline divisions strictly when the unclosed parenthetical depth is exactly zero. Further, the WKT validation regex executes case-insensitively (`/i`) to support mixed-case coordinates (e.g., “Polygon”, “LineString”, “Point”) natively, preventing coordinate fracturing and subsequent Leaflet rendering crashes.
-
-#### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-09-02]
-To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate arrays strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
-
-#### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-09-02]
-To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate arrays strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
-
-#### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-09-02]
-To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate arrays strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
-
-#### [REF: GIS-04] Transmission-Immune WKT Geometry Regex [NEW - 2026-09-10]
-WKT character-matching regular expressions must avoid literal bracket tokens `[A-Za-z]` to prevent intermediate markdown processors from stripping them. Constructing regex objects via `new RegExp('^' + String.fromCharCode(91) + 'A-Za-z' + String.fromCharCode(93) + '+\\s*\\(')` guarantees full execution safety for all spatial features (`POLYGON`, `LINESTRING`, `POINT`).
-
-#### [REF: UI-184] Map Control Cluster Legend HUD & Spatial Keys [NEW - 2026-09-10]
-The `.map-control-cluster` action bar must include a dedicated Map Legend control (`showLegendMenu`) alongside Zoom, Grid, and Layers tools. The Legend HUD provides visual key references for active story pins (green), VIP features (gold), standard markers (blue), and spatial vector polylines/polygons.
 
 ---
 
@@ -515,82 +342,6 @@ Interactive media iframes (e.g., YouTube, PDFs, embedded WebGL maps) fundamental
 ### [REF: SEARCH-02] Advanced Normalization & Agnosticism (Search Engine)
 To ensure a frictionless retrieval experience—especially critical for Polytonic Greek historical archives—the search indexer is explicitly decoupled from raw data strings. The AppOrchestrator utilizes a specialized `stripAndNormalize` regex closure. This engine sequentially: 1) Purges invisible HTML tags to prevent users from accidentally matching CSS classes or href attributes hidden in the dataset. 2) Executes NFD Unicode decomposition to mathematically separate base characters from their diacritics. 3) Strips the tonal markers (`/[̀-ͯ]/g`), enforcing a perfect case-and-accent-agnostic search matrix.
 
-### [REF: UI-201c] Centered Click-Window Pattern [NEW - 2026-08-25] 
-To bypass browser CORS/Clickjacking constraints when embedding third-party interactive media (such as YouTube iframes or PDF players), the media viewport swipe overlay must utilize a physical pass-through coordinate. Rather than using complex hover toggles, the system must deploy an absolute-centered window measuring 160px by 120px (top: 50%; left: 50%; transform: translate(-50%, -50%)) configured with pointer-events: none and carved out using a CSS clip-path polygon. This allows natural center clicks to fall through directly to the underlying media player, while the surrounding outer canvas boundaries retain pointer-events: auto to process swipe navigation gestures cleanly. Symmetrically, to prevent layout collisions, all media navigation chevrons are relocated to the bottom-left corner of the container (left: 16px; bottom: 12px;), and if a caption exists, a padding-left: 110px; is dynamically applied to the caption wrapper to prevent any visual overlapping.
-
-**[REF: UI-164c] Symmetrical Status Cockpit [NEW]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers —Previous and Next— directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
-
-### [REF: UI-46] Symmetrical Left Action Cluster & Standalone Taskbar Actions [UPDATED]
-Secondary utility tools —Settings and Telemetry— are completely decoupled from popover navigation containers. Standalone action triggers reside directly within the left-hand status bar vector alongside the About logo. This flat visual layout optimizes Fitts’s Law on touch devices by eliminating nested click targets, securing rapid, zero-friction interface configuration.
-
-### [REF: UI-164c] Symmetrical Status Cockpit [NEW]
-To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive “Chronological Cockpit” at the absolute center of the viewport's status line. Grouping the incremental navigation triggers —Previous and Next— directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
-
-### [REF: UI-164d] Proportional Logo Constraints [NEW]
-To preserve brand geometry across variable screen sizes, inline logo assets are strictly scaled using proportional height boundaries. Inside the 32px global status bar wrapper, the compass icon is locked to a physical height of 24px with the width calculated automatically. This structural layout choice establishes a symmetrical 4px top and bottom margin, keeping the logo nested cleanly within the taskbar while preventing geometric aspect ratio distortion.
-
-**[REF: UI-164c] Symmetrical Status Cockpit [UPDATED]:**
-To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers —Previous and Next— directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
-
-**[REF: UI-164d] Proportional Logo Constraints [NEW]:**
-To preserve brand geometry across variable screen sizes, inline logo assets are strictly scaled using proportional height boundaries. Inside the 32px global status bar wrapper, the compass icon is locked to a physical height of 24px with the width calculated automatically. This structural layout choice establishes a symmetrical 4px top and bottom margin, keeping the logo nested cleanly within the taskbar while preventing geometric aspect ratio distortion.
-
-**[REF: UI-164c] Symmetrical Status Cockpit [UPDATED]:** To maintain visual containment and support intuitive chronological scraping, all navigation controls must be clustered into a single, cohesive "Chronological Cockpit" at the absolute center of the viewport's status line. Grouping the incremental navigation triggers —Previous and Next— directly around the numeric record selector/counter prevents mouse-travel fatigue and locks the user's gaze to the active slide index. Telemetry and qualitative time span text must reside strictly to the right of the cockpit to prevent layout overlap on narrower mobile viewports.
-
-**[REF: UI-164d] Proportional Logo Constraints [NEW]:** To preserve brand geometry across variable screen sizes, inline logo assets are strictly scaled using proportional height boundaries. Inside the 32px global status bar wrapper, the compass icon is locked to a physical height of 24px with the width calculated automatically. This structural layout choice establishes a symmetrical 4px top and bottom margin, keeping the logo nested cleanly within the taskbar while preventing geometric aspect ratio distortion.
-
-    [REF: DATE-12] Strict Serial date containment: Prevents string dates with leading digits from being parsed as serial float numbers, protecting Gregorian fallbacks.
-    [REF: UI-199c] Center Cockpit Navigation: Centers Prev, Input, and Next buttons, locking pagination coordinates.
-    [REF: UI-201b] Minimap Gutter Scale Clearance: Sets minimap coordinates to bottom: 55px, freeing up the Leaflet bottom-left scale bar vertical clearance.
-
-#### [REF: MAP-01b] Strict WKT Parser Isolation [UPDATED - 2026-09-02]
-To maintain GIS database standards, the fallback regex marker generation is entirely deprecated. If Wicket fails to compile a coordinate cell, the feature is caught, an error warning is dispatched to the Telemetry monitor, and the rendering loop skips the element. Under no circumstances is a fallback pin plotted, preventing out-of-bounds rendering anomalies.
-
-#### [REF: MAP-01c] Parenthetical-Depth Tokenizer [NEW - 2026-09-02]
-Multiline cells containing raw WKT geometry definitions are protected from newline-splitting bugs using a parenthetical identifier scanner. If a cell matches WKT signatures (POINT, LINESTRING, POLYGON, etc.), the parser bypasses string splitting, cleans whitespace, and passes the WKT block cleanly to the compilation engine.
-
-#### [REF: SEARCH-02] Advanced Normalization & Agnosticism (Search Engine) [UPDATED - 2026-09-02]
-To ensure a frictionless retrieval experience —especially critical for Polytonic Greek historical archives— the search indexer is explicitly decoupled from raw data strings. The search indexer utilizes contains-matching over raw fields to preserve indexing properties of diacritics and HTML-formatted slides like the Help card. Symmetrically, the AppOrchestrator utilizes a specialized `stripAndNormalize` regex closure. This engine sequentially: 1) Executes NFD Unicode decomposition to mathematically separate base characters from their diacritics. 2) Strips the tonal markers, enforcing a perfect case-and-accent-agnostic search matrix.
-
-#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
-Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
-
-#### [REF: SEARCH-02] Advanced Normalization & Agnosticism (Search Engine) [UPDATED - 2026-09-02]
-To ensure a frictionless retrieval experience —especially critical for Polytonic Greek historical archives— the search indexer is explicitly decoupled from raw data strings. The search indexer utilizes contains-matching over raw fields to preserve indexing properties of diacritics and HTML-formatted slides like the Help card. Symmetrically, the AppOrchestrator utilizes a specialized `stripAndNormalize` regex closure. This engine sequentially: 1) Executes NFD Unicode decomposition to mathematically separate base characters from their diacritics. 2) Strips the tonal markers, enforcing a perfect case-and-accent-agnostic search matrix.
-
-#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
-Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
-
-#### [REF: UI-156b] Double-Sized Brand Touch Target [NEW - 2026-09-02]
-To resolve mobile accessibility bottlenecks and conform to Fitts's Law, the primary brand About button is scaled to a horizontal 48px footprint. This distinguishes the primary brand entry target from adjacent 22px utility toggles.
-
-#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
-Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
-
-#### [REF: UI-176c] Perfect Modal X-Axis Alignment [NEW - 2026-09-02]
-Vector brand logos nested inside vertical modular overlays are isolated inside horizontal flex alignment wrappers (`display: flex; justify-content: center; width: 100%;`). This prohibits structural text nodes from inducing asymmetrical margins, centering assets regardless of viewport dimension.
-
-#### [REF: UI-156b] Double-Sized Brand Touch Target [NEW - 2026-08-30]
-To resolve mobile accessibility bottlenecks and conform to Fitts's Law, the primary brand About button is scaled to a horizontal 48px footprint. This distinguishes the primary brand entry target from adjacent 22px utility toggles.
-
-#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-08-30]
-Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
-
-#### [REF: UI-176c] Perfect Modal X-Axis Alignment [NEW - 2026-08-30]
-Vector brand logos nested inside vertical modular overlays are isolated inside horizontal flex alignment wrappers (`display: flex; justify-content: center; width: 100%;`). This prohibits structural text nodes from inducing asymmetrical margins, centering assets regardless of viewport dimension.
-
-#### [REF: UI-156b] Double-Sized Brand Touch Target [NEW - 2026-08-30]
-To resolve mobile accessibility bottlenecks and conform to Fitts's Law, the primary brand About button is scaled to a horizontal 48px footprint. This distinguishes the primary brand entry target from adjacent 22px utility toggles.
-
-#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-08-30]
-Modal elements (`#about-modal`, `#search-modal`) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (`overflow-y: auto;`). This isolates interactive closures from scrolling shifts.
-
-#### [REF: UI-176c] Perfect Modal X-Axis Alignment [NEW - 2026-08-30]
-Vector brand logos nested inside vertical modular overlays are isolated inside horizontal flex alignment wrappers (`display: flex; justify-content: center; width: 100%;`). This prohibits structural text nodes from inducing asymmetrical margins, centering assets regardless of viewport dimension.
-
-#### [REF: UI-156c] Sub-Pixel Logo Compass Completeness [NEW - 2026-09-07]
-The scaleless logo vector asset `CarTiMapperLogo` is strictly protected against code generation truncations. Its layout properties, bounding box filters, and path vectors must remain unified in a single file block to preserve rendering stability.
-
 ---
 
 ## 5. Timeline Physics & Chronological Mathematics <a name="category-5"></a>
@@ -687,95 +438,6 @@ To circumvent the CPU cost of mathematically recalculating long-string widths du
 ### [REF: UI-188] Asymmetrical Hit-Boxes [NEW]
 To protect Fitts's Law on touch devices, the CSS `clip-path` bounding the Ghost Calipers is decoupled from interactive listeners. An invisible sibling node (`.hover-bridge-hitbox`) handles the `onMouseEnter` logic. This node is uniquely biased downwards (`bottom: -15px`), pushing the interaction target safely past the `.event-block` typography and directly into the dead-space of the 28px X-Axis timeline track.
 
-### [REF: TL-18b] Viewport-Center HUD Button Fallback [NEW - 2026-08-25]: 
-To prevent vertical axis and layout scroll-snapping errors during timeline scaling shifts, the timeline scroll system must distinguish between slide-initiated autofocus events and manual scale modifications. Manual zoom triggers (mouse wheel, touchpad pinches, or HUD zoom buttons) must explicitly reject snapping to the active slide index. For cursor wheel zooms (onWheel), the exact timeline time under the cursor (eventX) must be captured and centered in the viewport post-zoom. For manual HUD buttons (center zooms), the current visual midpoint of the screen (containerW / 2) serves as the mathematical anchor, applying the scale transform, and adjusting scrollLeft to snap the identical time coordinate back to the center of the viewport, preserving the user's focus.
-
-### [REF: MAP-12b] Granular Wave-Date Dimming (Quantum Sets) [NEW - 2026-08-25]: 
-To support micro-chronological geographic modeling—such as military or diplomatic forces arriving in distinct waves inside an inclusive EDTF Set or List {}—the mapping engine must decouple coordinate highlights from slide-level states. During data ingestion, the engine maps the individual elements of a Set/List of dates 1:1 to the individual features in the coordinate geometry, caching the specific date limit onto each Leaflet layer object as layerDate. During active timeline scrubbing, the temporal filter loops through each layer of the active slide. Any layer whose cached layerDate intersects the scrubber viewport bounds receives 100% opacity, while layers representing future or past dates are attenuated to 20% opacity (Temporal Ghosting), allowing the map to physically animate strategic spatial expansions on the fly.
-
-**[REF: BOOT-CRASH-03b] Character Class Escaping and Hyphen Bounds:**
-To isolate the regular expression engine from unexpected system encodings or polytonic Greek character overlaps, all hyphens (-) utilized inside active split arrays (places, sublabels, dates) must be explicitly escaped as \- or anchored to the absolute far-right boundary of the bracket. Ingesting unescaped hyphens in the middle of character classes (e.g., [\\/\\\\-.]) forces the browser to evaluate character ranges based on ASCII codes. If the character preceding the hyphen holds a higher decimal value than the trailing character, the JS compiler immediately throws a fatal "invalid range in character class" SyntaxError, blocking the Preact boot sequence.
-
-#### [REF: CRASH-05b] Nested Template Literal Syntax Guard [UPDATED - 2026-08-30]
-Dynamic rendering variables passed to hoisted Preact layouts (`appLayout`) must strictly avoid nested backtick structures (e.g., `` `\${height}px` `` inside `html` tag literals). Lexical parsers in standard browser V8 engines interpret inner backticks as template closures, prematurely terminating the parent literal and triggering fatal syntax errors. All variable property calculations must utilize standard JavaScript string concatenation (e.g., `height + 'px'`) to maintain single-file compilation integrity.
-
-#### [REF: CRASH-05b] Dynamic Layout Dimensions [UPDATED - 2026-08-30]
-Avoid nesting backtick strings inside dynamic HTM template layouts (e.g., style="height: `${variable}px`" inside a parent html`...` tag). This forces parser collisions on downstream elements, triggering syntax errors (e.g., Error L2420). All dynamic inline styles must use standard string concatenation wrapped in single quotes (e.g., style="height: ${variable + 'px'}").
-
-#### [REF: CRASH-05b] Dynamic Viewport Bounds [UPDATED - 2026-08-30]
-Dynamic sizing on structural divs must bypass nested template literals (e.g., style="height: `${val}px`" inside parent html`...`). All layouts must use flat single-quoted string concatenation (`+ 'px'`) to maintain 100% V8 runtime parser stability.
-
-#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
-To avoid component-level scope leaks, the active zoom parameters and computed semantic time spans must be managed by the parent AppOrchestrator. `<TimelineScrubber>` must remain a conformed presentation and event-capture layer, receiving state mutators (`setVisibleTimeSpan`, `setZoomLock`) and boundary properties (`timelineRequiredHeight`, `dateLocale`) as explicit React props. Any alteration to state-hoisting that separates these mutators from the parent render tree will crash the V8 runtime upon timeline scroll or drag interactions.
-
-#### [REF: UI-244] Multi-Axis Dynamic Resizing [UPDATED - 2026-08-30]
-The application layout relies on mathematical partitioning between visual media components and raw text sliders. To maintain dynamic responsive rendering without CSS repaint lag, the parent AppOrchestrator must bind structural drag-resizers to the window's mouse/touch interaction threads.
-1. Primary splitter resizes visual panels against content slides on the X-axis (bound strictly between 15% and 85% width).
-2. Secondary splitter divides map views from media views on the Y-axis (bound strictly between 10% and 90% height).
-All drag delta offsets must write straight to CSS variables (`--primary-split` and `--secondary-split`) on the `#app-layout` element, triggering smooth layout recalculations on Leaflet and SVG render paths without hard state-level re-draws.
-
-#### [REF: UI-245] Structural Collapse Shields [UPDATED - 2026-08-30]
-Any drag action that drives a partition width or height to 0% will completely drop active component event listeners, causing standard scrolling and zoom mechanisms to lock. The drag handlers must execute strict clamp checks prior to setting properties, enforcing hard minimum sizes of 15% for the primary panel and 10% for secondary structures.
-
-#### [REF: UI-164c] Timeline Scrubber Component Interface Stability [UPDATED - 2026-08-30]
-Presentation-layer visual controllers, such as the SVG ruler timeline and zoom clusters, must never independently mutate global canvas scales. The parent AppOrchestrator retains absolute state ownership over variables tracking physical layout parameters (e.g., active swimlane dimensions, temporal spans, and zoom-lock flags). 
-
-Components (specifically <TimelineScrubber> and <MapViewer>) must remain pure, reactively rendering coordinates from incoming props and reporting physical telemetry changes via verified state callback mutators. Severing this interface bridge or leaving state setters unpassed during instantiation instantly breaks V8 compilation upon rendering loops.
-
-#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
-The parent AppOrchestrator state tree and the child <TimelineScrubber> communicate scale computations strictly via the `setVisibleTimeSpan` callback prop. 
-
-To maintain the architectural boundary between state calculation and DOM representation:
-1. The raw state variable `visibleTimeSpan` is held in parent scope.
-2. The interactive calculation is processed at 60fps in the child scrubber.
-3. The resulting string **must** be explicitly consumed and rendered within a dedicated `.semantic-time-span` element inside the left-aligned status bar (`status-left`). 
-4. This placement isolates high-frequency text-node repaints away from the interactive center record navigation cockpit, preserving structural performance.
-
-#### [REF: UI-164b] Status Bar Integrated Timeline Zoom Metric [UPDATED - 2026-08-30]
-The parent AppOrchestrator state tree and the child <TimelineScrubber> communicate scale computations and temporal measurements strictly via the `setVisibleTimeSpan` callback prop. 
-
-To maintain the strict architectural boundary between performance-intensive calculations and visual representation:
-1. The raw state variable `visibleTimeSpan` must reside in parent scope.
-2. The active scale-delta is calculated inside the child scrubber's execution thread.
-3. The resulting string must be rendered within a dedicated `.semantic-time-span-left` node inside the left-aligned status bar (`status-left`).
-4. This specific placement isolates frequent layout reflows away from the center record navigation cockpit (`record-select-input`), preserving keyboard focus and ensuring 60fps responsiveness on tablet-class viewports.
-
-#### [REF: UI-164c] Integrated Navigation and Telemetry Cockpit [UPDATED - 2026-08-30]
-To maximize real estate for high-density historical mapping, the Status/Toolbar height is strictly capped at 38px, restricting layout rendering to a single line. Interactive buttons and text inputs within this container must be scaled up by one click (e.g., font-size: 0.95rem; button padding: 4px 10px;) to maintain tactile accessibility. 
-
-Timeline scale measurements and dynamic zoom spans (`visibleTimeSpan`) must be rendered within a dedicated text node in the center cockpit, positioned immediately to the right of the Next control button. This alignment minimizes eye tracking fatigue during chronological scrubbing.
-
-#### [REF: MAP-01f] Non-Destructive Ingestion & Telemetry Diagnostics [UPDATED - 2026-08-30]
-The MapViewer GIS pipeline strictly rejects native regex fallback approximations for malformed Well-Known Text (WKT). The presentation engine is a renderer, not a correction tool. Location coordinate cells must be parsed by splitting on HTML breaks (`<br>`) and platform-native newlines (`\r\n`, `\n`, `\r`) recursively. 
-
-When geometry compilation encounters an un-geocodable entry or coordinate syntax failure:
-1. The engine must cleanly drop the specific features to avoid DOM halting.
-2. The pipeline must calculate the physical spreadsheet row index (`item.id + 2`).
-3. An active error marker must be dispatched straight to the Telemetry panel to alert the dataset compiler of database syntax errors.
-
-#### [REF: UI-164c] Integrated Navigation and Telemetry Cockpit [UPDATED - 2026-08-30]
-To maximize vertical workspace, the Status/Toolbar height is locked to 38px (single-line layout). Interactive buttons and input indicators must scale up by one click (e.g., font-size: 0.95rem; button padding: 4px 10px;). Timeline scale measurements (`visibleTimeSpan`) must be rendered inside the center cockpit immediately to the right of the Next control button to minimize eye tracking fatigue.
-
-#### [REF: UI-175] Strict Flex-Column Flow & Stacking Hierarchy [UPDATED - 2026-09-02]
-To prevent absolute-position layout calculations from colliding across fluid resize boundaries, the master application shell is locked into an active CSS Flexbox layout. 
-
-`#app-layout { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }`
-
-Within this matrix:
-1. `.core-viewports` is configured as a flexible item (`flex: 1; min-height: 0;`), absorbing all available vertical pixels.
-2. The 38px `.status-bar` and the 4px `.resizer-dyn-timeline` act as static vertical blocks.
-3. Minimizing the `.timeline-pane` to `0px` forces the parent layout to automatically stretch the core mapping and media viewports to the bottom, preventing layout voids.
-4. Symmetrically, global modal overlay frames (`.tm-modal` and `.tm-backdrop`) are anchored with dominant z-indexes (`z-index: 100000` and `99999`), isolating them from lower resizer handlers.
-
-#### [REF: ETL-14c] Extract Type Data Streams [NEW - 2026-09-02]
-The engine ingests the "Extract Type" column mapping (Column 18) directly from the unified database paradata. Symmetrically, four stream streams (Storyline, Context, Related history, Presentation) are registered in the global state machine, allowing users to toggle entire narrative classes from the Filter cockpit.
-
-#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
-To prevent key interface controls from scrolling out of viewport bounds, modal dialogs are configured with structured flex layers. The close button is locked in a static top-right position inside the non-scrolling parent block, while content scrolling is delegated entirely to a nested child container.
-
-#### [REF: CRASH-09c] Leaflet Coordinate Array-to-Point Coercion [NEW - 2026-09-08]
-To prevent in-transit regex sanitizers or footnote-strippers from eating raw coordinate arrays inside Javascript modules, all Leaflet configurations utilizing static numeric arrays (e.g. tooltip offsets) must declare strict Leaflet constructors (e.g. L.point(x, y)) instead of bracketed arrays. This preserves 100% lexical parsing immunity while natively conforming to Leaflet's coordinate schemas.
-
 ---
 
 ## 6. Algorithms, Analytics & Methodologies <a name="category-6"></a>
@@ -838,34 +500,6 @@ When intercepting mobile hardware telemetry (touch events), the engine must neve
 ### [REF: CRASH-07] Bracket Stripping Immunity [NEW]
 During string parsing and extraction loops inside the Virtual DOM, the engine must actively avoid utilizing static numeric bracket accessors (like `[0]`) to retrieve first-elements from arrays or DOM nodes. To guarantee the code physically survives text-stripping transmission pipelines (where `[0]` may be mistaken for a citation or markdown tag), the engine must utilize native traversal methods: `.shift()` for extracting the first string from an Array, and `.item(0)` for extracting the primary Cartesian object from a DOM `TouchList`.
 
-[REF: PROT-15] Semantic Version Gating & Compiler Escape Armor [NEW]
-The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Furthermore, to prevent unescaped regular expressions or backslashes nested within the Javascript codeblocks from crashing the compiler, all string substitutions inside the Python regex engine must run through a callable replacement function to be parsed as raw text.
-
-[REF: PROT-15] Semantic Version Gating & Compiler Escape Armor (v1.1.4) [UPDATED]
-The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Symmetrically, to prevent unescaped regular expressions or backslashes nested within the Javascript codeblocks from crashing the compiler, all string substitutions inside the Python regex engine must run through a callable replacement function to be parsed as raw text. To ensure complete immunity against carriage returns, variable spaces, or custom alpha/beta version tags (e.g. v6.4.5_live or v11α5) inside the monolithic HTML template, the compiler searches for component boundaries using a space-and-bracket-insensitive wildcard block (([^\s\]]+)), mapping the files symmetrically regardless of typographical drift.
-
-[REF: PROT-15] Semantic Version Gating & Compiler Escape Armor (v1.1.5) [UPDATED]
-The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Symmetrically, the script replaces component payloads using a callable replacement callback that preserves the closing END_INJECT comment via the fourth matched group (m_match.group(4)), preventing duplicate blocks or orphaned characters. To ensure complete immunity against carriage returns, variable spaces, or custom alpha/beta version tags (e.g. v6.4.5_live or v11α5) inside the monolithic HTML template, the compiler searches for component boundaries using a space-and-bracket-insensitive wildcard block (([^\s\]]+)), mapping the files symmetrically regardless of typographical drift.
-
-[REF: PROT-15] Boundary Self-Healing & Compiler Escape Armor (v1.1.7) [UPDATED]
-The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Symmetrically, the script replaces component payloads using a callable replacement callback that preserves the closing END_INJECT comment via the fourth matched group (m_match.group(4)), preventing duplicate blocks or orphaned characters. To recover from corrupt target files, the compiler runs a pre-flight self-healing routine: if a component possesses a start anchor but is missing a closing anchor, the script scans forward, locates the next component's starting boundary or closing </script> tag, and reconstructs the missing END_INJECT comment block in-place on the user's filesystem prior to compilation.
-
-[REF: PROT-15] Boundary Self-Healing & Compiler Escape Armor (v1.1.7) [UPDATED]
-The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Symmetrically, the script replaces component payloads using a callable replacement callback that preserves the closing END_INJECT comment via the fourth matched group (m_match.group(4)), preventing duplicate blocks or orphaned characters. To recover from corrupt target files, the compiler runs a pre-flight self-healing routine: if a component possesses a start anchor but is missing a closing anchor, the script scans forward, locates the next component's starting boundary or closing </script> tag, and reconstructs the missing END_INJECT comment block in-place on the user's filesystem prior to compilation.
-
-[REF: PROT-15] Boundary Self-Healing & Compiler Escape Armor [UPDATED - 2026-08-29]
-The local Dev/Ops compilation script (compile_cartimap.py) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (START_INJECT) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Symmetrically, the script replaces component payloads using a callable replacement callback that preserves the closing END_INJECT comment via the fourth matched group (m_match.group(4)), preventing duplicate blocks or orphaned characters. To recover from corrupt target files, the compiler runs a pre-flight self-healing routine: if a component possesses a start anchor but is missing a closing anchor, the script scans forward, locates the next component's starting boundary or closing </script> tag, and reconstructs the missing END_INJECT comment block in-place on the user's filesystem prior to compilation.
-
-#### [REF: CHRONO-09] White-Label Theme Runway Isolation [NEW - 2026-08-31]
-The timeline xAxisMarker duration ribbons are isolated against a solid white background runway (`background: #ffffff;`) inside the track container. This architectural styling choice decouples the bottom runway from the alternating tag-lane grey stripes on the swimlanes above, guaranteeing maximum visual contrast for overlapping translucent trapezoids and hatched approximate qualifiers.
-
-#### [REF: CRASH-02] Cross-Origin (CORS) Ingestion Armor [UPDATED - 2026-09-02]
-Google Sheets direct `/export?format=csv` downloads lack explicit wildcard `Access-Control-Allow-Origin: *` headers, throwing silent, catastrophic network violations ('TypeError: Failed to fetch') when requested by client-side browser runtimes executing from remote staging domains or local filesystems (`file://`). To protect system connectivity, the data pipeline strictly routes data parsing endpoints through the Google Visualization query API (`/gviz/tq?tqx=out:csv`), which natively guarantees CORS compliance for unauthenticated single-page architectures.
-
-
-#### [REF: CRASH-02] Cross-Origin (CORS) Ingestion Armor [UPDATED - 2026-09-02]
-Google Sheets direct `/export?format=csv` downloads lack explicit wildcard `Access-Control-Allow-Origin: *` headers, throwing silent, catastrophic network violations ('TypeError: Failed to fetch') when requested by client-side browser runtimes executing from remote staging domains or local filesystems (`file://`). To protect system connectivity, the data pipeline strictly routes data parsing endpoints through the Google Visualization query API (`/gviz/tq?tqx=out:csv`), which natively guarantees CORS compliance for unauthenticated single-page architectures.
-
 ---
 
 ## 8. Grid Topology & Stacking Domination <a name="category-8"></a>
@@ -873,148 +507,116 @@ Google Sheets direct `/export?format=csv` downloads lack explicit wildcard `Acce
 ### [REF: UI-175] Global Beam Architecture
 Extracted the Nav/Status UI (`.unified-status-bar`) from the nested narrative pane. Re-engineered it as a static 32px horizontal structural beam (`#app-layout > .global-status-bar`) separating the Core Viewports from the Timeline Scrubber. This guarantees the UI floor permanently survives visual pane maximizations.
 
-*   **[REF: UI-83] Absolute Utility Margin Offsets [UPDATED]:** The floating control toolbar (`Maximize` and `Open Source File [↗]`) inside the Media Viewer is absolute-positioned at `top: 60px; right: 60px`. This horizontal translation provides a strict 60px safe margin that isolates our UI elements from native browser scrollbars and inline iframe toolbars.
-*   **[REF: UI-84] Bottom-Center Navigation HUD [NEW]:** To eliminate vertical side-edge clutter over maps and images, multiple-media slides display a consolidated, central navigation bubble absolute-positioned at `bottom: 65px; left: 50%; transform: translateX(-50%)`. This groups chevrons and counter indicators into a compact tap zone while clearing bottom-aligned iframe menu overlays.
+---
 
+## 9. Historiographical Methodology & Source Physics <a name="category-9"></a>
+
+### [REF: METH-01] The Triangulation and Reliability Matrix [NEW]
+The HGBB Database resolves all spatial, temporal, and narrative conflicts through strict multi-modal triangulation (Data, Investigator, and Methodological), integrating archival text with topographical and video evidence. The engine resolves contradictory data by applying a rigid reliability hierarchy: Government Archives and Peer-Reviewed History Books dictate the baseline truth, overriding Biographies, Diaries, and Archival News Media. Interviews, Oral Histories, and Partisan Documents are treated strictly as subjective or ideological perspectives requiring independent triangulation.
+
+### [REF: METH-02] Spatial-Temporal Coercion Standards [NEW]
+Ambiguous temporal data is mathematically coerced using standardized historical assumptions: morning print media is anchored to 06:00, second editions to 12:00, and broad publication dates to the exact limits of their month/year bounds. Spatially, aerial movements are plotted as straight-line vectors, while terrestrial movements utilize present-day route approximations.
+
+
+---
+
+### Category: 3. Cartographic & Spatial Physics (Additions)
+
+#### [REF: MAP-01c] Multi-Line WKT Array Splitting [NEW - 2026-08-29]
+When the horizontal LET() compiler aggregates deconstructed event rows, it frequently produces line-break separated lists of geographic shapes within a single cell (e.g., `POINT(...)<br>POINT(...)`). Attempting to parse these strings directly via the Wicket library triggers a fatal syntax crash inside the rendering loop. The `MapViewer` engine implements a pre-parser string interceptor: it splits the incoming `location` string by `<br>` tags and newlines (`\n`) into a flat array, processing each geometry node independently. This ensures that composite, multi-vocal coordinate matrices render perfectly as distinct, interactive spatial nodes without breaking the Leaflet cycle.
+
+#### [REF: MAP-02b] Identical Coordinate Stacking [UPDATED - 2026-08-29]
+When multiple historical actions share mathematically identical coordinates, standard mapping libraries overlap and eclipse markers. To communicate chronological volume without visual bloat, the engine intercepts overlapping coordinates and groups them into a custom "Stacked Pin" featuring a numeric depth badge. For complex geometries, the tooltip rendering engine evaluates the place labels by splitting strings by newlines first to isolate the parent block, and then by semicolons to retrieve the precise descriptor matching the active sub-coordinate sequence.
+
+#### [REF: MAP-05] Complete Separation of WKT and Standard Coordinate Parsers [UPDATED - 2026-08-29]
+To satisfy the Zero-Frontend-Cleaning Mandate `[REF: ETL-04]` and secure epistemic data accuracy, the spatial engine must strictly separate Well-Known Text (WKT) from explicit Lat/Lon coordinate notation:
+1. **WKT Integrity:** If a WKT string (e.g. `POINT(...)`, `LINESTRING(...)`, `POLYGON(...)`) is syntactically malformed and fails during Wicket compilation, the MapViewer must fail gracefully. It is strictly prohibited to execute manual regular expression extractions inside `catch` blocks to "rescue" or guess the coordinate parameters, as this masks upstream data-entry errors and generates invalid cartographic layers.
+2. **Explicit Lat/Lon Support:** Symmetrically, standard geographic coordinates are fully supported but must be formatted explicitly matching `/^\s*(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)\s*$/`. Standard coordinate parsing operates purely on its own conditional branch and must never serve as a catch-block fallback for failed WKT inputs.
+
+---
+
+### Category: 7. System Stability & Error Boundaries (Additions)
+
+#### [REF: PROT-15] Semantic Version Gating & Compiler Escape Armor [UPDATED - 2026-08-29]
+The local Dev/Ops compilation script (`compile_cartimap.py`) must protect git repository history by executing minimal delta-only updates. The compiler extracts semantic version strings from component injection headers (`START_INJECT`) and converts them to integer tuples. Overwriting a target component is strictly prohibited unless the patch's version is mathematically greater than the version inside the target HTML. Symmetrically, the script replaces component payloads using a callable replacement callback that preserves the closing `END_INJECT` comment via the fourth matched group (`m_match.group(4)`), preventing duplicate blocks or orphaned characters. To recover from corrupt target files, the compiler runs a pre-flight self-healing routine: if a component possesses a start anchor but is missing a closing anchor, the script scans forward, locates the next component's starting boundary or closing `</script>` tag, and reconstructs the missing `END_INJECT` comment block in-place on the user's filesystem prior to compilation.
+
+
+### Category: 3. Cartographic & Spatial Physics (Additions)
+#### [REF: MAP-01e] Multi-Line Geometry Preservation & Decoupling [NEW - 2026-08-29]
+To satisfy the Zero-Frontend-Cleaning Mandate [REF: ETL-04] and prevent pre-parser geometry corruption, the location parser must split coordinate arrays strictly by HTML break tags (`<br>`) and never by physical newline `\n` characters. Standard OGC WKT structures natively utilize internal carriage returns to span multiple lines. Splitting by physical newlines chops these structures into invalid grammatical fragments, triggering fatal catch-blocks inside Wicket. By preserving whole multi-line arrays and decoupling the parser, Wicket evaluates complex polygons, sewers, and polylines cleanly while point coordinate arrays remain isolated on their own numeric matching branches.
+
+### Category: 8. Grid Topology & Stacking Domination (Additions)
 #### [REF: UI-340] Sorted Search State Inversion [NEW - 2026-08-29]
 When the user queries the database index via the Search Modal, the action list returns matching records based on original row indexes (`res.id`). Symmetrically, because the active viewport stage presents a chronologically sorted and tag-filtered subset of records, directly jumping to an absolute index `id` creates an index-drift regression. To eliminate this drift, the modal click handler must execute a mathematical state inversion inside the active state registry: `data.findIndex(d => d.id === id)`. This retrieves the correct sorted target position, guaranteeing that the Stage, Map, and Scrubber focus on the exact intended historical node.
 
+### Category: 9. System Stability & Error Boundaries (Additions)
 #### [REF: CRASH-05b] Template Literal Decoupling & Isolation [NEW - 2026-08-29]
 To prevent fatal browser-level parsing errors (SyntaxError: unexpected token: identifier), any complex conditional HTML element containing template strings must be decoupled from the core JSX template rendering stream. Tagged template expressions (e.g., `html\`...\``) nested deeply within larger template interpolation blocks (`\${...}`) can trigger lexical collisions in browser engines when interpreted in a single-file environment. By compiling the sub-component into an independent state variable (such as `downloadBtn`) before the core JSX return declaration, the parsing contexts are strictly separated, securing 100% engine stability and cross-viewport compatibility.
 
-#### [REF: CRASH-05b] Hoisted Variable Isolation & Escaping [UPDATED - 2026-08-29]
-To completely insulate the Preact Virtual DOM from browser-level lexer crashes (e.g., SyntaxError: unexpected token: identifier), nesting conditional template strings (such as html`...`) inside the main return block's JSX placeholders is strictly deprecated. Deep-nesting triggers catastrophic compiler collisions when parsed client-side in a monolithic file. All conditional or complex HTML elements must be extracted and declared as independent JS constants (e.g., downloadBtn, backBtn, prevBtn) *above* the core JSX render stream. This physical decoupling isolates the string parsing contexts, securing 100% engine stability and maintaining a deterministic constant-time render frame.
+### Category: 1. Engineering Protocols & Coding Rules (Additions)
 
----
+#### [REF: COMP-01] Ten-Subblock Modular Architecture & Code Scoping [NEW - 2026-08-29]
+To prevent code drift and protect the monolithic `cartimap.v8py.html` against downstream compile collisions, the core `AppOrchestrator` is structured into ten heavily commented, isolated subblocks. Each subblock is strictly demarcated with start and end subblock comment nodes (`// --- [ START_SUBBLOCK: ... ] ---` and `// --- [ END_SUBBLOCK: ... ] ---`). This modularization isolates different reactive concerns, such as state tracking, temporal calculations, kinetic navigation, and viewport UI rendering. Symmetrically, developers must restrict surgical modifications to these isolated subblocks, preventing accidental modifications to adjacent state hooks.
 
-### ## 9. System Stability & Error Boundaries ↓↓
+### Category: 9. System Stability & Error Boundaries (Additions)
 
-*   **[REF: BOOT-CRASH-03] Character Class Range Bounds & Escaping [NEW]:** All regular expression character classes ([...]) containing literal dashes (-) or backslashes (\) must strictly escape these tokens to isolate them from range operators. Slashes (/) inside RegExp literals must be escaped as \/. Literal dashes must be positioned at the absolute end of the class (e.g., /[\/\\.-]/) or escaped as \- to prevent the JavaScript engine from evaluating ASCII character ranges and throwing fatal SyntaxError exceptions on boot.
-
-*   **[REF: BOOT-CRASH-03] Character Class Escape Parity [NEW]:** To maintain strict-mode execution compliance inside ES module runtimes, all literal string-splitting regular expressions containing forward slashes (/) or backslashes (\) must explicitly escape these characters (e.g., `[\/\\.-]`). Failure to escape forward slashes inside bracket classes causes the lexical engine to interpret the token as a closing delimiter, dumping naked escape sequences into the global execution thread and triggering fatal compiler-level halts.
-
-**[REF: BOOT-CRASH-03] State Initializer Syntax Isolation:**
-To prevent fatal compilation exceptions —(κατάρρευση μεταγλώττισης)— during 
-automated code serialization, pipeline template merges, or human code styling, 
-all JavaScript state initialization code sitting outside string or template 
-literals must pass a strict lexical validation gate. Developers and generator 
-scripts are strictly prohibited from utilizing raw backslashes or unquoted 
-escape sequences —such as literal "\n" characters— in active execution lanes. 
-All physical carriage returns must rely on native, hardware-level line breaks 
-to preserve absolute cross-browser portability and ensure offline Preact 
-reconciliation stability.
-
-#### [REF: CRASH-05b] Zero-Nesting Decoupled Architecture [UPDATED - 2026-08-29]
-To permanently insulate the Preact Virtual DOM from browser-level lexer crashes (such as `unexpected token: identifier`), deep-nesting conditional template strings (`html`...`) inside the main return block's JSX placeholders is strictly prohibited. Low-spec browser engines frequently fail to balance backticks nested within placeholders. Symmetrically, all conditional blocks, modals, loops, and button text segments must be hoisted and resolved into independent JavaScript constants *prior* to the main return statement. The final JSX stream must only interpolate flat variables (e.g., `${loadingScreen}`, `${appLayout}`), securing 100% engine stability and ensuring clean execution across restricted mobile devices and field tablets.
-
-#### [REF: CRASH-05b] Nested Template Literal Escaping [NEW - 2026-08-29]
-To prevent fatal browser compilation crashes (SyntaxError: unexpected token: identifier), any secondary Preact html template string nested inside the main App component's return literal must explicitly escape its backticks using backslashes (\`). If unescaped, the browser's parser interprets the first nested backtick as the termination of the outer template literal, forcing the following HTML markup to parse as raw JavaScript execution code. This instantly breaks the document thread, preventing the Virtual DOM from mounting. Escaping nested backticks isolates the inner arrays, securing 100% rendering stability.
-
-#### [REF: BOOT-CRASH-07c] Manual Character Verification Standard [NEW - 2026-09-07]
-To preserve absolute baseline reliability when build scripts are bypassed, manual quality control checks must verify the zero-escape state of virtual DOM properties in both MapViewer and AppOrchestrator templates. The architecture mandates that any patch release must be inspected to ensure that occurrences of escaped variable syntax or unclosed template brackets are mathematically equal to zero before pushing code to github production baselines.
-
-#### [REF: BOOT-CRASH-08d] Active State Preservation & Version Alignment [NEW - 2026-09-07]
-To prevent technical and architectural regression, the development pipeline must never treat the static uploaded source file (cartimap.v8nb.html) as the primary index of active progress when a sequence of conformed patches is actively logged in the workspace artifacts. Symmetrically, the active version chain (v8.13.x) represents the definitive baseline of the project. Any subsequent release must mathematically build on top of this active layer, preventing the silent culling of previously validated features during code updates.
-
-#### [REF: BOOT-CRASH-09] Multi-Layered Defensive VDOM Gates [NEW - 2026-09-07]
-To guarantee absolute execution resilience under the zero-build Single-File Preact paradigm, the runtime must never bind un-sanitized external database values directly to VDOM strings. Symmetrically, the architecture mandates:
-1. Strict Null-Coalescing array checks on all data filtration loops.
-2. Mandatory mathematical validation of extracted coordinates before triggering Leaflet bounding transformations.
-3. Explicit double-tag closure on all nested SVG elements to prevent htm compile-time parser crashes.
-
-#### [REF: BOOT-CRASH-09d] Cumulative Version Promotion Protocols [NEW - 2026-09-08]
-When a sequence of conformed patches experiences local-to-remote collision or cache contamination, the SCM protocol mandates skipping the contaminated range entirely on the main trunk. Symmetrically, the clean baseline must be promoted to a fresh coordinate (v8.13.32) carrying all intervening feature layers (e.g., multi-stream tags, parenthetical coordinate tokenizers) alongside the predictive defensive gates (NaN range checks, null-coalescers, explicit SVG tag closures). This maintains absolute cryptographic uniqueness of the release logs and keeps client-side telemetry deterministic.
-
-#### [REF: BOOT-CRASH-11] Dynamic State Safety & VDOM Key Locking [NEW - 2026-09-08]
-To prevent Preact reconciliation collapses during active stream-filtering, all dynamically generated slide and coordinate nodes must carry strict, immutable key parameters mapped to their primary database ID. Furthermore, the GIS engine must reject out-of-bounds coordinates (Lat outside [-90, 90], Lon outside [-180, 180]) and NaNs at the ingestion boundary, cleanly logging invalid nodes to Telemetry to prevent Leaflet from dropping the UI camera thread.
-
-#### [REF: CRASH-07b] Interface-Layer Whitespace Bracket Escaping [NEW - 2026-09-08]
-When compiling static index references within active template loaders, the code parser is vulnerable to regex-based citation or footnote-stripping utilities operating in transit. To insulate JavaScript array accessors against being flattened or emptied, all bracket index structures must utilize defensive inner padding spaces (e.g., parts[ 0 ] instead of parts). Standard browser V8 engines ignore this whitespace, maintaining native high-performance compile times while guaranteeing that file deliveries remain structurally intact.
-
-#### [REF: CRASH-07b] Spaced-Bracket Array Indexing [UPDATED - 2026-09-08]
-To insulate native JavaScript array lookups from aggressive markdown citation filters operating during workspace payload transmissions, all bracket-enclosed integers must implement inner padding spaces (e.g., parts[ 0 ]). Browser-native JS engines ignore this whitespace, while intermediate parsers fail to match the standard citation signature, preserving 100% compilation and rendering accuracy.
-
-#### [REF: CRASH-08b] Lenient Bracket Parsing Heuristics [NEW - 2026-09-08]
-Compilation scripts executing regex replacements on monolithic single-file distributions must strictly support lenient escaping parameters for brackets on starting and ending anchors. The parser pattern must support optional backslashes (\\?[\s*START_INJECT) to prevent pipeline execution halts when processing payloads that have transitioned across markdown rendering environments.
-
-#### [REF: CRASH-07c] Systematic Spaced-Bracket Array Indexing [UPDATED - 2026-09-08]
-To secure our single-file standalone distribution against in-transit text processors operating on network layers, all bracket-enclosed integers inside Javascript source files must utilize double-sided inner space padding (e.g., match[ 1 ]). This blocks regex academic footnote filters from matching the array lookups, ensuring uncorrupted float assignment and preventing runtime NaN collapses.
-
-#### [REF: COD-02] Mandatory ES6 Array Destructuring Standard [NEW - 2026-09-08]
-The use of sequential index-bracket properties (e.g. coordMatch[ 1 ]) on matching or split arrays is strictly deprecated. To protect monolithic source code files traveling through intermediate conversational, Git, or text-processing pipelines, all array variables must utilize native ES6 array destructuring structures (e.g. const [ , latStr, lngStr ] = coordMatch). This removes numerical bracket patterns from active strings, securing browser V8 compilation from fatal syntactical collapses.
-
-#### [REF: COD-02] Mandatory ES6 Array Destructuring Standard [UPDATED - 2026-09-08]
-To ensure absolute transmission immunity across modern cloud workspace platforms and intermediate conversational parsers, the use of naked numeric bracket lookups (e.g., match) on matching or split arrays is strictly deprecated. SCM guidelines mandate ES6 array destructuring (e.g., const [ , val1, val2 ] = match) for all string-splitting, regex lookups, and spreadsheet row parsing. This eliminates numeric bracket patterns from active strings, securing browser V8 compilation from fatal syntactical collapses.
-
-#### [REF: COD-02] Mandatory ES6 Array Destructuring Standard [UPDATED - 2026-09-08]
-To ensure absolute transmission immunity across modern cloud workspace platforms and intermediate conversational parsers, the use of naked numeric bracket lookups (e.g., match[1]) on matching or split arrays is strictly deprecated. SCM guidelines mandate ES6 array destructuring (e.g., const [ , val1, val2 ] = match) for all string-splitting, regex lookups, and spreadsheet row parsing. This eliminates numeric bracket patterns from active strings, securing browser V8 compilation from fatal syntactical collapses.
-
-#### [REF: COD-02] Mandatory ES6 Array Destructuring Standard [UPDATED - 2026-09-08]
-To ensure absolute transmission immunity across modern cloud workspace platforms and intermediate conversational parsers, the use of naked numeric bracket lookups (e.g., match) on matching or split arrays is strictly deprecated. SCM guidelines mandate ES6 array destructuring (e.g., const [ , val1, val2 ] = match) for all string-splitting, regex lookups, and spreadsheet row parsing. This eliminates numeric bracket patterns from active strings, securing browser V8 compilation from fatal syntactical collapses.
-
-#### [REF: COD-02] Comprehensive ES6 Array Destructuring Standard [UPDATED - 2026-09-08]
-To ensure absolute transmission immunity across modern cloud workspace platforms and intermediate conversational parsers, the use of naked numeric bracket lookups (e.g., match[i] or array[i]) on matching or split arrays is strictly deprecated. SCM guidelines mandate ES6 array destructuring (e.g., const [ , val1, val2 ] = match) for static indices, and native .at(index) array traversal for dynamic index lookups. This physically eliminates bracket patterns from active strings, securing browser V8 compilation from fatal syntactical collapses.
-
-#### [REF: COD-03] Absolute Bracket-Free Character Classes [NEW - 2026-09-08]
-To preserve compilation stability across modern cloud workspace environments, the use of literal RegExp character class square brackets (/[...]/) is strictly deprecated. All delimiter parsers and token splitters must utilize non-capturing alternation groups (/(?:a|b|c)/) or construct RegExp classes dynamically using hexadecimal escape sequences (\x5b and \x5d) or standard character codes (String.fromCharCode(91) and String.fromCharCode(93)). This prevents intermediate parsing engines from corrupting regular expressions during code distribution.
-
-#### [REF: CRASH-11] Monolithic Injection Boundary Isolation Standard [NEW - 2026-09-10]
-Patch compiler self-healing heuristics must distinguish between major component boundaries (`START_INJECT` / `END_INJECT` / `MODULE_VERSIONS`) and internal subblock section headers (`// === [ SUBBLOCK N ... ] ===`). Including subblock headers in boundary detection regexes causes premature termination of injection windows, creating duplicated component bodies and fatal const redeclaration errors inside browser V8 engines.
-
-#### [REF: CRASH-12] Component Truncation Prevention Standard [NEW - 2026-09-10]
-Patch generation scripts must execute an automated line-count assertion on exported component blocks prior to publishing. A `MapViewer` payload falling below 400 lines indicates buffer truncation, which strips the JSX return template and causes runtime `ReferenceError` crashes during manual or script-based HTML injection.
-
-#### [REF: UNBOUND-HOOK-SCOPE] Functional Scope Encapsulation for Reactive Hooks [NEW - 2026-09-10]
-All React/Preact state hooks (`useState`, `useRef`, `useEffect`) must sit strictly inside the function component closure prior to the `return` statement. Placing hooks outside the component body causes V8 to evaluate state variables against the global `window` object, throwing `Uncaught ReferenceError`.
-
-#### [REF: JS-TDZ-CRASH] ES6 Lexical Scope Hoisting & TDZ Prevention [NEW - 2026-09-11]
-All derived dataset projections (e.g., `availableExtractTypes`) and sub-component JSX templates (e.g., `aboutBtn`) must be declared at top-level component scope prior to evaluating dependent UI booleans (`isExtractFiltered`) or rendering parent JSX nodes (`filterBtn`, `${aboutBtn}`). Accessing `const` identifiers above their initialization line triggers immediate ES6 Temporal Dead Zone (TDZ) `ReferenceError` crashes in V8 during initial Preact render ticks.
-
-#### [REF: ETL-12] Pure Relational Projection for Data Streams [NEW - 2026-09-11]
-Data Stream filter menus must derive options strictly through unique attribute projection (`unfilteredData.map(d => d.extractType)`). Attribute domain isolation prevents cross-contamination between categorical swimlane tags (`d.tags`) and structural stream types (`d.extractType`) without relying on imperative string-exclusion blacklists [3, 5].
-
-#### [REF: JS-SYNTAX-ESCAPE] Template Literal Escaping & RegExp Literal Rule [NEW - 2026-09-11]
-Tagged template literal parsers (`htm`) require un-corrupted string literals and unescaped `${...}` boundaries to construct the Virtual DOM. String-based `new RegExp("...")` constructors containing backslashes must be completely eliminated in favor of clean JavaScript RegExp literals (e.g., `/^\s*\\[.*?\\]\s*/`) or `String.fromCharCode()` constants to prevent backslash exponential expansion collisions during Python build transformations.
-
-#### [REF: COMPILER-v1.3.3] Single-Version Anchor Placement & Slice Infiltration [NEW - 2026-09-11]
-Infiltration compilers must enforce single-version anchor placement: version strings reside exclusively inside opening tags (`START_INJECT: Component vX.Y.Z`). Closing tags (`END_INJECT: Component`) contain titles only. Patch infiltration must execute via exact string slice replacement (`content[:start] + payload + content[end:]`) to guarantee zero regex backslash backreference corruption during single-file compilation.
-
-### ## 9. System Stability & Error Boundaries / 2. Initialization Safety
-
-*   **[REF: CRASH-08b] Structural Tag Alignment [NEW]:** To guarantee the integrity of zero-build Virtual DOM engines executing in standalone HTML viewports, any global component renaming (e.g., VibeMonitor to TelemetryMonitor) must be applied synchronously across all layout constructor tags. Discrepancies between element definitions and Virtual DOM rendering templates bypass the standard Preact ErrorBoundary and trigger fatal, unhandled ReferenceError interrupts during the initial DOM paint cycle, trapping the client's progress bar at the 10% boot-strap step.
-
-#### ## 9. Core System Stability / 2. Parser Error Boundaries ↓↓
-
-*   **[REF: BOOT-CRASH-03] Character Class Escape Parity [UPDATED]:** Regular expression literals inside utility components must open with an unescaped forward slash (/) and escape any literal slashes within bracket classes (e.g., `[\/\\.-]`). If a leading slash is escaped or an inner slash is left unescaped, compile-time syntax errors cascade down the DOM tree.
-*   **[REF: CRASH-07] Bracket Stripping Immunity [ENFORCED]:** Accessing first-elements inside array split loops must utilize `.at(0)` or `.shift()`. Standard bracket accessors (like ``) are banned within the core ingestion hooks to insulate strings against automatic bracket-stripping in markdown-based translation pipelines.
-
-*   **[REF: BOOT-CRASH-03] Character Class Escape Parity [DEPRECATED]:** The string-splitting regex validation sequence in `parseChronoNode` is officially deprecated in favor of strict-schema float parsing.
-*   **[REF: DATA-16] Native Float-to-Epoch Ingestion [NEW]:** To maintain low boot latency and eliminate strict-mode lexical parser collisions, the chronological engine reads legacy dates strictly as native Double-Precision Floats (`FLOAT8`). The parser casts the incoming PapaParse CSV tokens directly via `parseFloat` and converts the Google Sheets epoch offset (`25569`) to UNIX millisecond timestamps in a single constant-time \\(O(1)\\) computational step, safely discarding all string allocation overhead.
-
-## ## 9. Core System Stability / Failsafes ↓↓
-
-*   **[REF: BOOT-CRASH-03] Character Class Escape Parity [UPDATED]:** Regular expression literals inside utility components must open with an unescaped forward slash (/) and escape any literal slashes within bracket classes (e.g., `[\/\\.-]`). If a leading slash is escaped or an inner slash is left unescaped, compile-time syntax errors cascade down the DOM tree.
-*   **[REF: CRASH-07] Bracket Stripping Immunity [ENFORCED]:** Accessing first-elements inside array split loops must utilize `.at(0)` or `.shift()`. Standard bracket accessors (like ``) are banned within the core ingestion hooks to insulate strings against automatic bracket-stripping in markdown-based translation pipelines.
-
-## Category: 10. Grid Topology & Stacking Domination
-
-#### [REF: UI-175] Coupled Resizer & Separator Architecture [UPDATED - 2026-08-31]
-To eliminate duplicate visual dividers, static border properties are purged from the `.timeline-pane` and `.status-bar` structures. Symmetrically, the interactive timeline resizer handle (`.resizer-dyn-timeline`) is styled as the primary divider line (`border-top: 1px solid #ddd`), anchored precisely above the 38px status bar wrapper at `bottom: timelineRequiredHeight + 38px` (or `38px` if minimized), serving as a single-pixel tactile boundary between viewports.
-
-#### [REF: BOOT-CRASH-04b] Native ES6/htm Template Literal Escape Standards [NEW - 2026-09-07]
-The client-side rendering engine operates strictly inside standard browser-based ECMAScript module scopes [6]. Symmetrically, nested tagged templates (`html` literals) inside components must never carry backslash overrides on interpolation tokens (like `\\${` or `\\\\({`) [5, 6]. Placeholders must remain native `${variable}` expressions to secure correct Preact rendering and prevent fatal browser-side compilation SyntaxErrors.
+#### [REF: CRASH-05b] Template Literal Decoupling & Isolation [UPDATED - 2026-08-29]
+To completely insulate the Preact Virtual DOM from browser-level lexer crashes (e.g., `SyntaxError: unexpected token: identifier`), nesting conditional template strings (such as `html`...``) inside the main return block's JSX placeholders is strictly deprecated. Deep-nesting triggers catastrophic compiler collisions when parsed client-side in a monolithic file. All conditional or complex HTML elements must be extracted and declared as independent JS constants (e.g., `downloadBtn`, `backBtn`, `prevBtn`) *above* the core JSX render stream. This physical decoupling isolates the string parsing contexts, ensuring 100% syntactical safety and maintaining a deterministic constant-time render frame.
 
 
 ---
 
-#### [REF: UI-164c] Condensed Micro-Typography & Cockpit Layout [UPDATED - 2026-08-31]
-To prevent layout overflows under narrow aspect ratios, the dynamic `visibleTimeSpan` readout is stripped of all bold properties. Static key text nodes (“Span:”, “Zoom:”) are styled using a narrow condensed sans-serif font family (`font-family: 'Arial Narrow', sans-serif; font-stretch: condensed;`), while dynamic values retain monospaced alignments. The telemetry block is left-aligned and placed directly adjacent to the centered previous/next navigation buttons, optimizing horizontal viewport space.
+### Category: 2. Data Schema & The Upstream ETL Pipeline (Additions v8.13.23)
+
+#### [REF: ETL-14c] Ingestion & Filtering of "Extract Type" [NEW - 2026-09-02]
+The engine ingests the exact database header "Extract Type" from the unified database schema (Column 18). Ingested items are classified into four streams: "Storyline", "Context", "Related history", or "Presentation", falling back to "Storyline" if empty. The client-side status cockpit hosts selector checkboxes to let users intersect these streams with active horizontal tag swimlanes.
+
+---
+
+### Category: 3. Cartographic & Spatial Physics (Additions v8.13.23)
+
+#### [REF: MAP-01b] Strict WKT Ingestion Integrity [UPDATED - 2026-09-02]
+To prevent coordinate collision and visual anomalies, the engine strictly rejects fallback coordinates parsing when a Well-Known Text (WKT) string fails to compile. The `catch (e)` point fallback block is completely deprecated. If Wicket fails to parse a coordinate string, the error is written to the Telemetry panel (Vibe-Monitor), and the rendering loop skips the record. Symmetrically, no "ghost" markers are drawn at oceanic or default coordinates.
+
+#### [REF: MAP-01c] Parenthetical-Depth Cell Tokenizer [UPDATED - 2026-09-02]
+Database cells containing multiline spatial layouts (WKT formats containing line breaks) are protected from fracture during parsing. The engine checks if a coordinate string starts with an OGC WKT identifier (e.g., POINT, LINESTRING, POLYGON, GEOMETRYCOLLECTION) case-insensitively. If matched, standard newline splits are bypassed, whitespace and line breaks are sanitized, and the cell is processed as a single contiguous spatial block.
+
+---
+
+### Category: 4. UI/UX Elements & Design Solutions (Additions v8.13.23)
+
+#### [REF: UI-176b] Flex Sticky Modal Geometry [NEW - 2026-09-02]
+Modal elements (.tm-modal and .search-modal) are locked into flex layout boxes with non-scrolling parent nodes. Stationary header blocks secure the close [X] buttons at a fixed top-right anchor, while narrative body text is nested inside scrollable child containers (overflow-y: auto;). This isolates interactive closures from scrolling shifts.
 
 
+---
 
-## 11. Media Playback & Camera Focus Controls ↓↓
+## 10. Conformed Baseline Expansion Addenda (v8.13.62 to v8.13.68-b173) <a name="category-10"></a>
 
-*   **[REF: MED-11] Asynchronous video pausing [UPDATED]:** Rather than destroying iframe contexts on carousel sliding, inactive `<iframe>` elements configured with `?enablejsapi=1` are sent an asynchronous postMessage post with "pauseVideo" command. Native video targets execute a synchronous `.pause()` to ensure background audio is terminated without resetting buffering pipelines.
-*   **[REF: UI-221] Color Synchronicity [NEW]:** Action states representing rigid binary locks (Map Grid and Timeline Zoom Lock) utilize synchronized color markers. Engaging Timeline Zoom Lock forces its SVG path and border to transition to Sapphire Blue (#007acc).
+### Category 1: System Architecture & AST Integrity
+* **[REF: ARCH-01d] Mandatory Sub-Component Topological Order Contract:** All monolithic single-file HTML builds MUST declare sub-components in strict topological dependency order inside `<script type="module">`:
+  1) `Imports & Globals`, 2) `ErrorBoundary`, 3) `TelemetryMonitor`, 4) `MediaViewer`, 5) `ContentSlider`, 6) `TimelineScrubber`, 7) `MapViewer`, 8) `compileCartiMapAST`, 9) `AppOrchestrator` (`App`), 10) `IgnitionSwitch` (`render()`).
+* **[REF: CRASH-08] ErrorBoundary Class Declaration & Ignition Order Contract:** All monolithic HTML builds MUST declare `class ErrorBoundary extends Component` directly following `Imports & Globals`. The terminal application mount (`render()`) MUST execute at the absolute bottom of `<script type="module">` inside a DOM ready listener, wrapping `<${App} />` safely inside `<${ErrorBoundary}>`.
+* **[REF: SYNTAX-02] Array Elision Parameter Prohibition:** Function argument lists and variable destructuring assignments MUST NOT use leading array elision syntax (`const [ , x, y ] = arr` or `([ , x, y ]) =>`). Developers MUST use explicit array index access (`arr[0]`, `arr[1]`).
+* **[REF: SYNTAX-03b] Conditional Feature Block Closure Protocol:** All conditional initialization blocks inside Preact hooks MUST provide an explicit `else` fallback clause and close with a terminal `}` brace before subsequent layer registrations execute.
+* **[REF: SYNTAX-04] Single-Line Regular Expression Literal Mandate:** All JavaScript regular expression literals (`/.../`) generated by automated compiler scripts MUST reside on a single, continuous text line. Raw line breaks (`\n` or `\r`) MUST NOT be injected between regex delimiter slashes.
+* **[REF: SYNTAX-05] Block-Scoped Variable Identifier Uniqueness Mandate:** Build pipelines MUST verify that `const` and `let` variable identifiers are declared exactly once per lexical block scope before emitting candidate HTML artifacts.
 
+### Category 2: Data Schema & Search Precision
+* **[REF: UI-01f] 1-Based Record Serial Number Protocol:** All raw dataset ingestion loops (`results.data.map`) MUST assign database IDs as 1-based integers (`id: index + 1`, spanning `1` to `N`), matching the 1-based database row keys in Google Sheets (`ExtractsCombinedV`).
+* **[REF: SEARCH-01c] Live Search Direct Execution Protocol:** The search engine MUST execute queries directly against active `searchQuery` state over `unfilteredData` (all 95 records) to guarantee real-time filtering without debounce delay or state disconnects.
+* **[REF: ETL-01g] Multi-Column Spatial Header Invariance Protocol:** CSV dataset ingestion loops MUST NOT rely on a single literal field key for spatial coordinates. The location extractor MUST evaluate `exactGet(norm, 'location') || exactGet(norm, 'location (wkt)') || exactGet(norm, 'location wkt') || exactGet(norm, 'wkt') || exactGet(norm, 'coordinates') || exactGet(norm, 'geo')`. All spatial parsing operations MUST log results directly to `VibeMonitor` Telemetry (`addLog`).
 
+### Category 3: Cartographic & Map HUD Topology
+* **[REF: MAP-01c2] Pre-Parser Multi-Geometry Interceptor & Fail-Safe Contract:** Multi-geometry spatial fields containing line breaks or `<br>` tags MUST be pre-split into flat string arrays (`rawLocStr.split(/<br\s*\/?>|\n|\|/i)`) before passing nodes to `window.Wkt.Wkt().read()`. `MapViewer` MUST wrap `L.markerClusterGroup` in a fail-safe fallback (`L.featureGroup()`) to guarantee map rendering continues if the cluster library fails.
+* **[REF: MAP-01g] Per-Record WKT Layer Signature Scoping:** Spatial deduplication sets (`uniqueSignatures`) inside `MapViewer` MUST be instantiated **per-record** inside the dataset iteration loop (`data.forEach`). Scoping `uniqueSignatures` per-record guarantees that every historical event receives its own interactive map layers, active style highlighting, tooltips, and fly-to bounds.
+* **[REF: MAP-HUD-01d] Top-Right Map Controls Topology Contract:** The Map control cluster (`.map-control-cluster`) MUST be anchored to the top-right corner of the `.map-pane` (`position: absolute; top: 12px; right: 12px; z-index: 2000`). Buttons MUST render in uniform 30x30px card boxes with centered SVG icons, including the Maximize/Restore Map Pane toggle.
+
+### Category 6: Timeline Scrubber & Swimlane Physics
+* **[REF: TL-02d2] Pixel-Exact Swimlane Alignment Contract:** Event marker groups (`.event-group`) inside `TimelineScrubber` MUST calculate vertical placement using `topPos = laneIdx * laneHeight` and height using `blockHeight = ((maxTagIdx - minTagIdx) + 1) * laneHeight`. Adding arbitrary pixel offsets disrupts vertical symmetry and causes event blocks to drift off-center relative to swimlane background stripes (`.tag-lane`).
+* **[REF: TL-05b] Timeline Control Cluster Specification:** The `TimelineScrubber` component MUST mount a horizontal control cluster (`.timeline-control-cluster`) in the top-right corner exposing 7 controls: 1) Zoom In (`+`), 2) Zoom Scale Factor, 3) Zoom Out (`-`), 4) Center Active Event (`🎯`), 5) Reset View (`↺`), 6) Fullscreen Expand (`↕`), and 7) Minimize (`-`).
+
+### Category 8: Typography & Keyboard Navigation
+* **[REF: PERF-01c] Dual-Axis Keyboard Navigation Contract:** Global keyboard listeners MUST bifurcate directional arrow keys:
+  1) `ArrowLeft` / `ArrowRight`: Triggers `jumpToSlide()` array index changes.
+  2) `ArrowUp` / `ArrowDown`: Triggers vertical `scrollBy({ top: ±120 })` viewport scrolling on `.content-slider-pane`.
