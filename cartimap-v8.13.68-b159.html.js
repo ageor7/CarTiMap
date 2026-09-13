@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CarTiMap v8.13.68-b159</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
+    <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="">
+        // --- APP MOUNT ENGINE ---
+        if (typeof render !== 'undefined' && typeof html !== 'undefined' && typeof App !== 'undefined') {
+          const rootEl = document.getElementById('root') || document.getElementById('app-root');
+          if (rootEl) {
+            render(html`<${App} />`, rootEl);
+          }
+        }
+
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket-leaflet.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://unpkg.com/preact@10.19.3/dist/preact.umd.js"></script>
+    <script src="https://unpkg.com/preact@10.19.3/hooks/dist/hooks.umd.js"></script>
+    <script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+    
+<style id="global-styles">
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* --- [ SubBlock: Root & Base ] --- */
+:root { --bg: #fcfcfc; --paneBg: #fcfcfc; --border: #ccc; --text: #222; --accent: #007acc; }
+
+body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw; max-height: 100vh; font-family: 'Noto Sans', system-ui, sans-serif; font-weight: 400; overflow: hidden; background: var(--bg); color: var(--text); box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
+/* Absolute hardware lock + rigid width/height limits to kill bleed */
+#tm-root { position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%; max-width: 100%; max-height: 100%; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; }
+
+/* Native Scrollbar Management */
+.timeline-scroll-wrapper::-webkit-scrollbar, .media-carousel::-webkit-scrollbar { display: none !important; width: 0px; height: 0px; }
+.timeline-scroll-wrapper, .media-carousel { scrollbar-width: none; -ms-overflow-style: none; }
+.tm-modal::-webkit-scrollbar, .content-scroll-area::-webkit-scrollbar { width: 8px; }
+.tm-modal::-webkit-scrollbar-thumb, .content-scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+/* --- [ SubBlock: VibeMonitor & Universal Modals ] --- */
+#vibe-monitor { position: fixed; z-index: 9999; background: #1a1a1a; color: #eee; border: 1px solid #444; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; font-family: monospace; resize: both; min-width: 280px; min-height: 200px; width: 320px; height: auto; max-width: 95vw; max-height: 90vh; }
+#vibe-header { background: #333; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #444; user-select: none; font-weight: 600; flex-shrink: 0; }
+.vibe-close-btn { background: transparent; color: #aaa; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.2s; }
+.vibe-close-btn:hover { color: #ff5555; }
+#vibe-logs { flex-grow: 1; overflow-y: auto; padding: 10px; font-size: 0.75rem; background: #111; display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 50px; }
+.log-time { color: #888; margin-right: 6px; }
+.tm-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 99999 !important; backdrop-filter: blur(2px); display: none; }
+.tm-backdrop.open { display: block; }
+
+/* --- [ SubBlock: CSS Button Reset v6.3.0 ] --- */
+.status-btn { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; padding: 0; margin: 0; background: transparent; border: 1px solid transparent; border-radius: 4px; color: #444; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; box-sizing: border-box; flex-shrink: 0; outline: none; line-height: 0; }
+.status-btn svg { margin: 0; display: block; }
+.status-btn:hover { background: #eee; border-color: #ccc; }
+.status-btn.active { background: #007acc; color: #fff; border-color: #005a99; }
+.status-btn::after { content: ''; position: absolute; top: -6px; bottom: -6px; left: -6px; right: -6px; z-index: 10; }
+.status-btn-text { -webkit-appearance: none; appearance: none; height: 24px; padding: 0 8px; margin: 0; background: #fcfcfc; border: 1px solid #ccc; border-radius: 4px; color: #444; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; position: relative; transition: all 0.2s; box-sizing: border-box; font-family: inherit; font-size: 0.75rem; font-weight: 500; line-height: 0; }
+.status-btn-text:hover:not(:disabled) { background: #eee; }
+.status-btn-text:disabled { opacity: 0.4; cursor: not-allowed; }
+.fab-btn:hover { background: #005a99; transform: scale(1.05); }
+
+/* --- [ SubBlock: Splash & Loading ] --- */
+.loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--paneBg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; opacity: 1; }
+.loading-screen.fade-out { opacity: 0; pointer-events: none; }
+.logo-stack-splash { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; }
+.splash-icon-wrapper { width: 500px; max-width: 80vw; height: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15)); }
+.splash-text { font-size: 2.2rem; color: #333; letter-spacing: -1px; line-height: 1.2; margin: 20px 0 0 0; text-align: center; max-width: 90vw; padding: 0 20px; box-sizing: border-box;}
+.splash-version { font-size: 1rem; color: #888; font-family: monospace; margin-top: 8px; letter-spacing: 1px; text-align: center;}
+.loading-bar-container { width: 250px; height: 4px; background: #ddd; border-radius: 2px; overflow: hidden; margin-top: 20px;}
+.loading-bar-fill { height: 100%; background: #007acc; transition: width 0.4s ease; }
+
+/* --- [ SubBlock: Layout & Resizers ] --- */
+#app-layout { --primary-split: 50%; --secondary-split: 50%; --timeline-height: 10%; display: flex; flex-direction: column; flex: 1; width: 100%; max-width: 100%; height: 100%; overflow: hidden; position: relative; }
+.core-viewports { display: flex; flex-direction: row; flex-grow: 1; height: calc(100% - var(--timeline-height) - 4px); width: 100%; max-width: 100%; overflow: visible; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; min-width: 0; position: relative; z-index: 10; }
+.content-slider-pane { background: var(--paneBg); overflow: hidden; display: flex; flex-direction: column; min-height: 0; min-width: 0; flex-shrink: 0; z-index: 15; order: 1; width: var(--primary-split); height: 100%; max-width: 95ch; }
+.resizer-dyn-primary { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; order: 2; width: 4px; height: 100%; cursor: col-resize; }
+.visual-pane { display: flex; flex-direction: column; overflow: visible; min-height: 0; min-width: 0; flex-shrink: 0; position: relative; z-index: 20; order: 3; flex: 1 1 0; width: auto; height: 100%; }
+.visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
+.visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
+.visual-pane.no-media .media-pane { display: none !important; }
+.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible; z-index: 30; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; }
+.resizer-dyn-secondary { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
+.media-pane { background: #111; overflow: hidden; position: relative; min-height: 0; min-width: 0; z-index: 30; flex: 1 1 auto; height: auto; width: 100%; }
+.media-carousel { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+.media-item-container { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.global-status-bar { display: flex; justify-content: space-between; align-items: center; height: 32px; padding: 0 12px; box-sizing: border-box; }
+.status-left, .status-right { display: flex; align-items: center; gap: 8px; flex: 1; }
+.status-left { padding-left: 12px !important; flex-shrink: 0 !important; }
+.status-center { display: flex; align-items: center; gap: 12px; justify-content: center; flex: 0 0 auto; }
+.timeline-pane { background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; z-index: 5; width: 100%; max-width: 100%; box-sizing: border-box; }
+
+/* Maximize Panes Matrix */
+.core-viewports.max-text .visual-pane { display: none !important; }
+.core-viewports.max-text .content-slider-pane { width: 100% !important; height: 100% !important; flex: 1 !important; max-width: none !important; }
+.core-viewports.max-text .resizer-dyn-primary { display: none !important; }
+.core-viewports.max-map .content-slider-pane { display: none !important; }
+.core-viewports.max-map .media-pane { display: none !important; }
+.core-viewports.max-map .visual-pane { width: 100% !important; height: 100% !important; flex: 1 !important; flex-direction: row !important; }
+.core-viewports.max-map .map-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; }
+.core-viewports.max-map .resizer-dyn-primary, .core-viewports.max-map .resizer-dyn-secondary { display: none !important; }
+.core-viewports.max-media .content-slider-pane { display: none !important; }
+.core-viewports.max-media .map-pane { display: none !important; }
+.core-viewports.max-media .visual-pane { width: 100% !important; height: 100% !important; flex: 1 !important; flex-direction: row !important; }
+.core-viewports.max-media .media-pane { width: 100% !important; height: 100% !important; flex: 1 1 100% !important; max-width: 100% !important; max-height: 100% !important; display: block !important; }
+.core-viewports.max-media .resizer-dyn-primary, .core-viewports.max-media .resizer-dyn-secondary { display: none !important; }
+.resizer-dyn-primary:hover, .resizer-dyn-secondary:hover, .resizer-dyn-timeline:hover { background: var(--accent); }
+.resizer-dyn-timeline { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
+
+@media (max-width: 1023px) {
+#app-layout { --primary-split: 55%; }
+.core-viewports { flex-direction: column; }
+.visual-pane { width: 100%; height: calc(100% - var(--primary-split) - 4px); flex-direction: row; order: 1; flex: none; }
+.resizer-dyn-primary { width: 100%; height: 4px; cursor: row-resize; order: 2; }
+.content-slider-pane { width: 100%; height: var(--primary-split); order: 3; max-width: none; }
+.map-pane { flex: 0 0 var(--secondary-split); height: 100%; width: var(--secondary-split); }
+.resizer-dyn-secondary { width: 4px; height: 100%; cursor: col-resize; }
+.media-pane { flex: 1 1 auto; width: 100%; height: 100%; }
+}
+
+/* --- [ SubBlock: Leaflet Map & Spatial HUD ] --- */
+.leaflet-tooltip { white-space: normal !important; word-wrap: break-word !important; width: max-content !important; max-width: 300px !important; text-align: left !important; font-size: 0.85rem; line-height: 1.4; padding: 6px 10px !important; }
+.custom-map-pin { display: flex; align-items: flex-end; justify-content: center; width: 24px; height: 34px; position: relative; transition: transform 0.2s, opacity 0.3s ease;}
+.pin-head { width: 14px; height: 14px; border-radius: 50%; background: #d32f2f; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.4); position: absolute; top: 0; }
+.pin-stem { width: 2px; height: 20px; background: #333; position: absolute; bottom: 0; }
+.custom-div-icon { background: transparent !important; border: none !important; }
+.centered-tooltip { text-align: center; }
+.layer-attribution-link a { color: #888; text-decoration: underline; text-decoration-color: #ccc; transition: all 0.2s; }
+.layer-attribution-link a:hover { color: #007acc; text-decoration-color: #007acc; }
+.tm-opacity-slider { -webkit-appearance: none; width: 100px; height: 4px; background: #ddd; border-radius: 2px; outline: none; }
+.tm-opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; }
+.tm-opacity-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; border: none; }
+.minimap-container { position: absolute; bottom: 55px !important; left: 20px; width: 150px; height: 150px; background: #fff; border: 2px solid #ccc; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; overflow: hidden; resize: both; min-width: 100px; min-height: 100px; max-width: 150px !important; max-height: 40vh; flex-shrink: 0 !important; }
+.minimap-container.hide { display: none; }
+.marker-cluster-small { background-color: rgba(240, 140, 40, 0.6) !important; }
+.marker-cluster-small div { background-color: rgba(255, 180, 80, 0.7) !important; color: white !important; }
+.marker-cluster-medium { background-color: rgba(240, 80, 80, 0.6) !important; }
+.marker-cluster-medium div { background-color: rgba(255, 100, 100, 0.7) !important; color: white !important; }
+.marker-cluster-large { background-color: rgba(180, 100, 180, 0.6) !important; }
+.marker-cluster-large div { background-color: rgba(150, 60, 150, 0.7) !important; color: white !important; }
+
+/* --- [ SubBlock: Narrative Content Slider ] --- */
+.content-scroll-area { flex: 1; overflow-y: auto; display: flex; flex-direction: column; z-index: 5; scroll-behavior: smooth; width: 100%; }
+.title-header-container { max-width: 90ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+.slide-desc { line-height: 1.6; font-size: 1.15rem; color: #333; width: 100%; max-width: 75ch; margin: 0 auto; }
+.click-zone { position: absolute; top: 0; bottom: 0; width: 15%; z-index: 10; cursor: pointer; }
+.click-zone-left { left: 0; }
+.click-zone-right { right: 0; }
+.metadata-ribbon { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 0.4rem; width: 100%; }
+.metadata-date { font-weight: 600; color: #007acc; font-size: 0.9rem; flex-shrink: 0; white-space: nowrap; margin-top: 4px; }
+.metadata-pills-wrapper { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end; }
+.place-pill, .tag-pill { display: inline-flex; align-items: center; background: rgba(128,128,128,0.06); color: #444; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; border: 1px solid rgba(128,128,128,0.15); word-break: break-word; line-height: 1.2; text-align: left; }
+
+/* --- [ SubBlock: Status Bar & Modals ] --- */
+.status-right { justify-content: flex-end; }
+.semantic-time-span { font-size: 0.75rem; color: #007acc; padding: 0; margin: 0 5px; display: flex; align-items: center; height: 20px; font-weight: 600;}
+.tm-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 700px; max-height: 85vh; background: #fff; z-index: 100000 !important; border-radius: 12px; padding: 30px; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; color: #222; font-size: 1.1rem; }
+.modal-close { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #999; outline: none; }
+.modal-close:hover { color: #d32f2f; }
+.search-input { width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box; }
+.search-result-item { padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
+.search-result-item:hover { background: #f0f8ff; }
+.search-result-title { font-weight: 600; color: #222; font-size: 1rem; }
+.search-result-meta { font-size: 0.8rem; color: #666; margin-top: 4px; }
+
+/* --- [ SubBlock: Timeline UI & Leaflet Controls ] --- */
+.timeline-scroll-wrapper { width: 100%; height: 100%; overflow-y: hidden; overflow-x: auto; position: relative; display: block; cursor: grab; user-select: none; -webkit-user-select: none; }
+.timeline-scroll-wrapper:active { cursor: grabbing; }
+.timeline-track-container { position: relative; min-width: 100%; display: block; min-height: 100%; }
+.tag-lane { border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; box-sizing: border-box; width: 100%; position: absolute; left: 0; right: 0; }
+.tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
+.event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
+.event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
+.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon( 0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px) ); }
+.event-block:hover { filter: brightness(1.05); z-index: 40 !important; width: max-content !important; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.25)); }
+.timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
+.timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
+.timeline-control-cluster { position: absolute; right: 15px; z-index: 1000; display: flex; flex-direction: column; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; }
+.timeline-control-cluster .zoom-factor { display: flex; align-items: center; justify-content: center; }
+.media-swipe-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: auto; background: transparent; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, calc(50% - 80px) calc(50% - 60px), calc(50% + 80px) calc(50% - 60px), calc(50% + 80px) calc(50% + 60px), calc(50% - 80px) calc(50% + 60px), calc(50% - 80px) calc(50% - 60px)); }
+.semantic-time-span-left { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module">
+// === [ MAJOR BLOCK: Imports & Globals v2.0.6 ] ===
+import { h, render, Component } from 'https://esm.sh/preact';
+import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
+import htm from 'https://esm.sh/htm';
+import Papa from 'https://esm.sh/papaparse';
+import edtf from 'https://esm.sh/edtf@4.11.0';
+
+const html = htm.bind(h);
+const APP_VERSION = 'v8.13.68-b159';
+document.title = 'CarTiMap Core - ' + APP_VERSION;
+const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
+const TM_CONFIG = { paneBackground: '#fcfcfc' };
+// === [ END MAJOR BLOCK ] ===
+
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b159 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.13.68-b159 ] ===
+const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
+          // --- [ MapViewer State & Refs Initialization ] ---
+          const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
+          const mapInstance = useRef(null); const miniMapInstance = useRef(null);
+          const rectBoundsRef = useRef(null); const markerLayer = useRef(null);
+          const clusterLayer = useRef(null); const gridLayerRef = useRef(null);
+          const markersRef = useRef([]); const hasFitBounds = useRef(false);
+          const [mapZoom, setMapZoom] = useState(2); const [showGrid, setShowGrid] = useState(false);
+          const [showLayersMenu, setShowLayersMenu] = useState(false);
+          const [activeBasemap, setActiveBasemap] = useState(null);
+          const [activeOverlays, setActiveOverlays] = useState([]);
+          const [showLegendMenu, setShowLegendMenu] = useState(false);
+          const [overlayOpacities, setOverlayOpacities] = useState({});
+          const [basemapOpacity, setBasemapOpacity] = useState(1.0);
+          const initialLoadRef = useRef(false); const baseLayerRef = useRef(null);
+          const miniBaseLayerRef = useRef(null); const overlayLayersRef = useRef({});
+          const minimapOffsetRef = useRef(minimapOffset || -4);
+          const isSyncingRef = useRef(false);
+          
+          // --- [ Inline Comment: Helper to parse names and coordinates from polyline place strings ] ---
+          const parsePolylineLabels = (placeStr) => {
+            if (!placeStr) return null;
+            const match = placeStr.match(/^\s*\x5b(.*?)\x5d.*$/);
+            if (match) {
+              const [ , lineNameRaw ] = match; const lineName = lineNameRaw.trim();
+              const details = placeStr.replace(/^\s*\x5b.*?\x5d\s*/, '').split(/(?:,|\||·|;)/).map(s => s.trim()).filter(Boolean);
+              const [ startLabelRaw = '', endLabelRaw = '' ] = details; return { lineName, startLabel: startLabelRaw, endLabel: endLabelRaw };
+            }
+            return null;
+          };
+
+          // --- [ Inline Comment: Securely strips HTML elements from spatial label strings ] ---
+          const safeStripHTML = (str) => {
+            if (!str) return '';
+            const withDashes = String(str).replace(new RegExp("<p\\x5b^>\\x5d*>", "gi"), ' - ');
+            return withDashes.replace(new RegExp("<\\x5b^>\\x5d*>?", "gm"), '').trim();
+          };
+
+          const loadScript = (src) => new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${src}"]`)) return resolve();
+            const script = document.createElement('script'); script.src = src; script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
+          });
+
+          const loadStyle = (href) => {
+            if (document.querySelector(`link[href="${href}"]`)) return;
+            const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = href; document.head.appendChild(link);
+          };
+
+          const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
+
+          useEffect(() => {
+            if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
+              const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
+              if (defaultBase) setActiveBasemap(defaultBase.id);
+              const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
+              setActiveOverlays(defaultOverlays);
+              const initOpac = {}; basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => { initOpac[o.id] = o.defaultOpacity ?? 0.3; });
+              setOverlayOpacities(initOpac); initialLoadRef.current = true;
+            }
+          }, [basemapsRegistry]);
+
+          useEffect(() => {
+            minimapOffsetRef.current = minimapOffset;
+            if (mapInstance.current && miniMapInstance.current) {
+              let targetMiniZoom = mapInstance.current.getZoom() + minimapOffset;
+              if (targetMiniZoom < 0) targetMiniZoom = 0;
+              miniMapInstance.current.setView(mapInstance.current.getCenter(), targetMiniZoom, { animate: true });
+            }
+          }, [minimapOffset]);
+
+          const createPinHtml = (isActive, isVip) => {
+            const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
+            return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'}"><div class="pin-head" style="background: ${color}"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'}"></div></div>`;
+          };
+
+          const extractLayers = (layerObj) => {
+            let layers = [];
+            if (Array.isArray(layerObj)) layerObj.forEach(l => layers = layers.concat(extractLayers(l)));
+            else if (layerObj && layerObj.eachLayer) layerObj.eachLayer(l => layers = layers.concat(extractLayers(l)));
+            else if (layerObj) layers.push(layerObj);
+            return layers;
+          };
+
+          const parseGeometryCollection = (wktStr) => {
+            if (!wktStr) return [];
+            let str = wktStr.trim();
+            const match = str.match(/^GEOMETRYCOLLECTION\s*\((.*)\)$/i);
+            if (!match) return [str];
+            const inner = match[1];
+            const subs = [];
+            let current = [];
+            let depth = 0;
+            for (let i = 0; i < inner.length; i++) {
+              const char = inner[i];
+              if (char === '(') depth++;
+              if (char === ')') depth--;
+              if (char === ',' && depth === 0) {
+                const s = current.join('').trim();
+                if (s) subs.push(s);
+                current = [];
+              } else {
+                current.push(char);
+              }
+            }
+            if (current.length > 0) {
+              const s = current.join('').trim();
+              if (s) subs.push(s);
+            }
+            return subs.length > 0 ? subs : [str];
+          };
+
+          useEffect(() => {
+            if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const initialZoom = urlParams.get('mapzoom') ? parseInt(urlParams.get('mapzoom')) : 2;
+              setMapZoom(initialZoom);
+              const container = mapDomRef.current;
+              const map = L.map(container, { zoomControl: false, attributionControl: false, minZoom: 1, maxZoom: maxGlobalZoom }).setView(new L.LatLng(37.9838, 23.7275), 13);
+              L.control.scale({ position: 'bottomright', imperial: true, metric: true }).addTo(map);
+              map.on('zoomend', () => setMapZoom(map.getZoom()));
+              mapInstance.current = map;
+              const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false }).setView(new L.LatLng(37.9838, 23.7275), 0);
+              miniMapInstance.current = miniMap;
+              const updateMinimap = () => {
+                if (isSyncingRef.current) return;
+                isSyncingRef.current = true;
+                let targetMiniZoom = map.getZoom() + minimapOffsetRef.current;
+                if (targetMiniZoom < 0) targetMiniZoom = 0;
+                miniMap.setView(map.getCenter(), targetMiniZoom, { animate: false });
+                isSyncingRef.current = false;
+              };
+              map.on('move', updateMinimap);
+              map.on('zoom', updateMinimap);
+              markerLayer.current = L.featureGroup().addTo(map);
+              clusterLayer.current = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true, iconCreateFunction: (cluster) => {
+                const markers = cluster.getAllChildMarkers();
+                const count = markers.length;
+                const [ firstMarker ] = markers; const isAllSameCoords = markers.every(m => m.getLatLng().equals(firstMarker.getLatLng()));
+                if (isAllSameCoords) {
+                  const html = `<div class="custom-map-pin active-glow" style="transform: scale(1.15);"><div class="pin-head" style="background: #28a745; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 800; font-family: sans-serif;">${count}</div><div class="pin-stem" style="background: #28a745; width: 3px;"></div></div>`;
+                  return L.divIcon({ html, className: 'custom-div-icon', iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
+                }
+                return L.divIcon({ html: `<div class="custom-cluster"><span>${count}</span></div>`, className: 'custom-cluster-wrapper', iconSize: new L.Point(40, 40) });
+              }}).addTo(map);
+              const customLayers = basemapsRegistry.filter(b => b.type === 'overlay');
+              const renderGrid = () => {
+                if (gridLayerRef.current) map.removeLayer(gridLayerRef.current);
+                gridLayerRef.current = L.layerGroup();
+                if (showGrid) {
+                  const bounds = map.getBounds();
+                  const snap = (val, step) => Math.floor(val / step) * step;
+                  const step = map.getZoom() > 15 ? 0.01 : map.getZoom() > 13 ? 0.05 : map.getZoom() > 11 ? 0.1 : map.getZoom() > 9 ? 0.5 : map.getZoom() > 7 ? 1 : map.getZoom() > 5 ? 5 : 10;
+                  for (let lat = snap(bounds.getSouth(), step); lat <= bounds.getNorth(); lat += step) {
+                    L.polyline([[lat, bounds.getWest()], [lat, bounds.getEast()]], { color: '#ccc', weight: 0.5, dashArray: '5, 5' }).addTo(gridLayerRef.current);
+                  }
+                  for (let lon = snap(bounds.getWest(), step); lon <= bounds.getEast(); lon += step) {
+                    L.polyline([[bounds.getSouth(), lon], [bounds.getNorth(), lon]], { color: '#ccc', weight: 0.5, dashArray: '5, 5' }).addTo(gridLayerRef.current);
+                  }
+                  gridLayerRef.current.addTo(map);
+                }
+              };
+              map.on('moveend', renderGrid);
+              map.on('zoomend', renderGrid);
+              const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
+              const [ firstBase ] = bases; const defaultBase = bases.find(b => b.active) || firstBase;
+              if (defaultBase) {
+                baseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: defaultBase.attrText, zIndex: 0 }).addTo(map);
+                miniBaseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: '', zIndex: 0 }).addTo(miniMap);
+              }
+            }
+          }, [basemapsRegistry, maxGlobalZoom]);
+
+          useEffect(() => {
+            const map = mapInstance.current; const miniMap = miniMapInstance.current;
+            if (!map || !miniMap || !basemapsRegistry) return;
+            const renderBasemap = () => {
+              if (baseLayerRef.current) { map.removeLayer(baseLayerRef.current); miniMap.removeLayer(miniBaseLayerRef.current); }
+              const config = basemapsRegistry.find(b => b.id === activeBasemap);
+              if (config) {
+                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
+                baseLayerRef.current = L.tileLayer(config.url, layerOpts).addTo(map);
+                miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
+              }
+            };
+            renderBasemap();
+          }, [activeBasemap, basemapsRegistry, maxGlobalZoom, basemapOpacity]);
+
+          useEffect(() => {
+            const map = mapInstance.current; const miniMap = miniMapInstance.current;
+            if (!map || !miniMap || !basemapsRegistry) return;
+            basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
+              if (overlayLayersRef.current[o.id]) { map.removeLayer(overlayLayersRef.current[o.id]); delete overlayLayersRef.current[o.id]; }
+            });
+            activeOverlays.forEach((id, idx) => {
+              const o = basemapsRegistry.find(b => b.id === id);
+              if (o) {
+                const z = idx + 10;
+                const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
+                const isWms = (o.format && o.format.toLowerCase() === 'wms') || !!o.wmsLayer || String(o.url).toLowerCase().includes('wms');
+                if (isWms) {
+                  overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, { version: '1.1.1', srs: 'EPSG:3857',
+                    layers: o.wmsLayer || 'default',
+                    format: 'image/png',
+                    transparent: true,
+                    opacity: dynamicOpacity,
+                    maxNativeZoom: o.maxZoom || 19,
+                    maxZoom: maxGlobalZoom,
+                    attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`,
+                    zIndex: z,
+                    keepBuffer: 4,
+                    updateWhenZooming: false,
+                    updateWhenIdle: true
+                  }).addTo(map);
+                } else {
+                  const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
+                  overlayLayersRef.current[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
+                }
+              }
+            });
+          }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
+
+          useEffect(() => {
+            const map = mapInstance.current;
+            if (!map || !markerLayer.current || !clusterLayer.current) return;
+            markersRef.current = [];
+            markerLayer.current.clearLayers();
+            clusterLayer.current.clearLayers();
+            const uniqueSignatures = new Set();
+            let validMarkers = 0;
+            data.forEach((item, idx) => {
+              const locStr = item.location ? item.location.trim() : '';
+              if (!locStr) { markersRef.current.push([]); return; }
+              const isVip = item.priority && item.priority.toLowerCase() === 'vip';
+              let featureLayers = [];
+              try {
+                if (locStr.match(/^GEOMETRYCOLLECTION/i)) {
+                  const subs = parseGeometryCollection(locStr);
+                  subs.forEach(sub => {
+                    try {
+                      const wkt = new window.Wkt.Wkt();
+                      wkt.read(sub);
+                      featureLayers = featureLayers.concat(extractLayers(wkt.toObject()));
+                    } catch (err) {
+                      if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): WKT Parse Failure on "${sub}": ${err.message}`, 'warning');
+                    }
+                  });
+                }
+                else if (locStr.match(/^[A-Za-z]+\s*\(/i)) {
+                  try {
+                    const wkt = new window.Wkt.Wkt();
+                    wkt.read(locStr);
+                    featureLayers = extractLayers(wkt.toObject());
+                  } catch (err) {
+                    if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): WKT Parse Failure on "${locStr}": ${err.message}`, 'warning');
+                  }
+                } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
+                  featureLayers = extractLayers(L.geoJSON(JSON.parse(locStr)));
+                } else {
+                  const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
+                  if (coordMatch) {
+                    const [ , latStr, lngStr ] = coordMatch;
+                    const lat = parseFloat(latStr);
+                    const lng = parseFloat(lngStr);
+                    featureLayers.push(L.marker(new L.LatLng(lat, lng)));
+                  }
+                }
+                const subLabels = item.subLabels ? item.subLabels.split(/(?:\||·|;|·|\n|\-)/).map(s => s.trim()).filter(Boolean) : [];
+                featureLayers.forEach((layer, layerIdx) => {
+                  if (!layer) return;
+                  let sig = null;
+                  if (layer.getLatLng) {
+                    const ll = layer.getLatLng();
+                    if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
+                    sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
+                  } else if (layer.getBounds) {
+                    const b = layer.getBounds();
+                    if (!b || !b.isValid()) return;
+                    sig = `B_${b.toBBoxString()}`;
+                  }
+                  if (sig) {
+                    if (uniqueSignatures.has(sig)) return;
+                    uniqueSignatures.add(sig);
+                  }
+                  const isActive = idx === activeIndex;
+                  if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
+                    layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
+                  } else if (layer.setStyle) {
+                    layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
+                  }
+                  if (layer instanceof L.Marker) {
+                    layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(isActive, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
+                  }
+                  const rawLabel = subLabels.at(layerIdx) || (item.place ? formatPlaces(item.place) : item.title);
+                  layer.bindTooltip(safeStripHTML(rawLabel), { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
+                  if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer);
+                  else markerLayer.current.addLayer(layer);
+                  validMarkers++;
+                });
+                markersRef.current.push(featureLayers);
+              } catch(e) {
+                markersRef.current.push([]);
+              }
+            });
+          }, [activeIndex, data, maxAutoZoom, polygonOpacity]);
+
+          useEffect(() => {
+            const map = mapInstance.current;
+            const markers = markersRef.current;
+            if (!map || markers.length === 0) return;
+            const activeLayers = markers.at(activeIndex);
+            if (activeLayers && activeLayers.length > 0) {
+              const activeFeatureGroup = L.featureGroup(activeLayers);
+              setTimeout(() => {
+                try {
+                  const bounds = activeFeatureGroup.getBounds();
+                  if (bounds.isValid()) {
+                    map.stop();
+                    map.flyToBounds(bounds, { animate: true, duration: 2.5, maxZoom: maxAutoZoom });
+                    hasFitBounds.current = true;
+                  }
+                  activeLayers.forEach(l => { if (l.openTooltip) l.openTooltip(); });
+                } catch(err) {}
+              }, 250);
+            }
+          }, [activeIndex, maxAutoZoom]);
+
+          const bases = basemapsRegistry ? basemapsRegistry.filter(b => b.type !== 'overlay') : [];
+          const overlays = basemapsRegistry ? basemapsRegistry.filter(b => b.type === 'overlay') : [];
+
+          // Decouple nested templates to variables to insulate against compile errors [REF: CRASH-05]
+          const renderOverlayRow = (o) => {
+            const isChecked = activeOverlays.includes(o.id);
+            const op = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
+            return html`
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;">
+                <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
+                  <input type="checkbox" id="over_${o.id}" checked=${isChecked} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <div style="display: inline; margin: 0;">
+                    <label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
+                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
+                  </div>
+                </div>
+                ${isChecked ? html`
+                  <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 0.65rem; color: #888;">Opacity</span>
+                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${op} onChange=${(e) => setOverlayOpacities(prev => ({...prev, [o.id]: parseFloat(e.target.value)}))} title="Adjust Overlay Opacity" />
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          };
+
+          const renderBaseRow = (b) => {
+            const isChecked = activeBasemap === b.id;
+            return html`
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;">
+                <div style="display: flex; align-items: flex-start; gap: 8px; line-height: 1.3;">
+                  <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${isChecked} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
+                  <div style="display: inline; margin: 0;">
+                    <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
+                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
+                  </div>
+                </div>
+                ${isChecked ? html`
+                  <div style="margin-left: 21px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 0.65rem; color: #888;">Opacity</span>
+                    <input type="range" class="tm-opacity-slider" min="0" max="1" step="0.05" value=${basemapOpacity} onChange=${(e) => setBasemapOpacity(parseFloat(e.target.value))} title="Adjust Basemap Opacity" />
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          };
+
+          
+                    useEffect(() => {
+            const map = mapInstance.current;
+            if (!map) return;
+            if (gridLayerRef.current) {
+              map.removeLayer(gridLayerRef.current);
+              gridLayerRef.current = null;
+            }
+            if (showGrid) {
+              const gridGroup = L.layerGroup();
+              const bounds = map.getBounds();
+              if (bounds && bounds.isValid()) {
+                const snap = (val, step) => Math.floor(val / step) * step;
+                const zoom = map.getZoom();
+                const step = zoom > 15 ? 0.01 : zoom > 13 ? 0.05 : zoom > 11 ? 0.1 : zoom > 9 ? 0.5 : zoom > 7 ? 1 : zoom > 5 ? 5 : 10;
+                for (let lat = snap(bounds.getSouth(), step); lat <= bounds.getNorth(); lat += step) {
+                  L.polyline([[lat, bounds.getWest()], [lat, bounds.getEast()]], { color: '#666', weight: 0.8, opacity: 0.6, dashArray: '4, 4' }).addTo(gridGroup);
+                }
+                for (let lon = snap(bounds.getWest(), step); lon <= bounds.getNorth(); lon += step) {
+                  L.polyline([[bounds.getSouth(), lon], [bounds.getNorth(), lon]], { color: '#666', weight: 0.8, opacity: 0.6, dashArray: '4, 4' }).addTo(gridGroup);
+                }
+                gridGroup.addTo(map);
+                gridLayerRef.current = gridGroup;
+              }
+            }
+          }, [showGrid, mapZoom]);
+
+          const legendMenuNode = showLegendMenu ? html`
+            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 280px; font-size: 0.82rem; color: #333; position: absolute; left: 44px; top: 12px; z-index: 2000;">
+              <div style="font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Map Legend</span>
+                <button onClick=${() => setShowLegendMenu(false)} style="border: none; background: none; cursor: pointer; font-size: 0.9rem; color: #888;">&times;</button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #28a745; display: inline-block;"></span>
+                  <span>Active Story Event</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffb300; display: inline-block;"></span>
+                  <span>VIP Feature</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #007acc; display: inline-block;"></span>
+                  <span>Standard Marker</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 18px; height: 3px; background: #007acc; display: inline-block;"></span>
+                  <span>Spatial Polyline / Polygon</span>
+                </div>
+              </div>
+            </div>
+          ` : '';
+
+          const layersMenuNode = showLayersMenu ? html`
+            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 40px; top: 130px; z-index: 20000;">
+              <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Basemaps</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                ${bases.map(renderBaseRow)}
+              </div>
+              <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Overlays</div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${overlays.length > 0 ? overlays.map(renderOverlayRow) : html`<div style="color: #888; font-style: italic;">No overlays available.</div>`}
+              </div>
+            </div>
+          ` : '';
+
+          return html`
+            <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
+              <div ref=${mapDomRef} style="flex: 1; min-height: 0; width: 100%;"></div>
+              <div class="minimap-container" ref=${miniMapDomRef} style="position: absolute; bottom: 24px; right: 12px; z-index: 1000;"></div>
+
+              <div class="map-control-cluster" style="position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2000;">
+                <div class="map-control-btn-group" style="display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border: 1px solid #ccc; background: #fff; width: 24px; box-sizing: border-box;">
+                  <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} title="Zoom In" style="border: none; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                  <div title="Current Zoom Level" style="height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: 'Arial Narrow', sans-serif, monospace; letter-spacing: -0.5px;">${mapZoom}</div>
+                  <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} title="Zoom Out" style="border: none; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                </div>
+
+                <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; border: 1px solid #ccc; box-sizing: border-box;">
+                  <button class="status-btn ${showGrid ? 'active' : ''}" onClick=${() => setShowGrid(!showGrid)} title="Toggle Coordinates Grid" style="border: none; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  </button>
+                </div>
+
+                <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; border: 1px solid #ccc; box-sizing: border-box; position: relative;">
+                  
+                <div style="display: flex; width: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; border: 1px solid #ccc; box-sizing: border-box; position: relative;">
+                  <button class="status-btn ${showLegendMenu ? 'active' : ''}" onClick=${() => setShowLegendMenu(!showLegendMenu)} title="Map Legend" style="border: none; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  </button>
+                </div>
+
+                <button class="status-btn ${showLayersMenu ? 'active' : ''}" onClick=${() => setShowLayersMenu(!showLayersMenu)} title="Map Layers" style="border: none; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                  </button>
+                </div>
+              </div>
+
+              ${legendMenuNode}
+              ${layersMenuNode}
+            </div>
+          `;
+        };
+
+MODULE_VERSIONS['MapViewer'] = 'v6.4.53-b155';
+// === [ END MAJOR BLOCK ] ===
+// 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
+
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b159 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b159 ] ===
+const App = () => {
+          // APP_VERSION bound to top-level HTML header per Directive I.3.c
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
+          // =========================================================================
+          const [logs, setLogs] = useState([]);
+          const [rawCsvRows, setRawCsvRows] = useState([]);
+          const [unfilteredData, setUnfilteredData] = useState([]);
+          const [data, setData] = useState([]);
+          const [aboutData, setAboutData] = useState(null);
+          const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
+          const [activeIndex, setActiveIndex] = useState(0);
+          const [slideHistory, setSlideHistory] = useState([]);
+          const [isMonitorOpen, setIsMonitorOpen] = useState(false);
+          const [isAboutOpen, setIsAboutOpen] = useState(false);
+          const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+          const [isMenuOpen, setIsMenuOpen] = useState(false);
+          const [isFilterOpen, setIsFilterOpen] = useState(false);
+          const [isSearchOpen, setIsSearchOpen] = useState(false);
+          const [searchQuery, setSearchQuery] = useState('');
+          useEffect(() => { if (isSearchOpen) { setTimeout(() => { const el = document.querySelector('.search-input'); if (el) el.focus(); }, 50); } }, [isSearchOpen]);
+          const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+          const [searchHistory, setSearchHistory] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; }
+            catch (e) { return []; }
+          });
+          const [maxPane, setMaxPane] = useState(null);
+          const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
+          const [isTimelineMinimized, setIsTimelineMinimized] = useState(false);
+          const [timelineRequiredHeight, setTimelineRequiredHeight] = useState(140);
+          const [zoomLevel, setZoomLevel] = useState(1.0);
+          const [visibleTimeSpan, setVisibleTimeSpan] = useState('');
+          const [visibleTimeBounds, setVisibleTimeBounds] = useState([0, Infinity]);
+          const [basemapOpacity, setBasemapOpacity] = useState(1.0);
+          const [polygonOpacity, setPolygonOpacity] = useState(() => {
+            try { return parseFloat(localStorage.getItem('tm_polygon_opacity')) || 0.4; }
+            catch (e) { return 0.4; }
+          });
+          const [showButtonText, setShowButtonText] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('tm_show_button_text')) ?? false; }
+            catch (e) { return false; }
+          });
+          const [dateLocale, setDateLocale] = useState(() => {
+            try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
+            catch (e) { return 'en-GB'; }
+          });
+          const [dateEngineMode, setDateEngineMode] = useState(() => {
+            try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
+            catch (e) { return 'auto'; }
+          });
+          const [allTags, setAllTags] = useState([]);
+          const [activeTags, setActiveTags] = useState([]);
+          const [activeExtractTypes, setActiveExtractTypes] = useState([]);
+          const [minimapOffset, setMinimapOffset] = useState(-4);
+          const [basemapsRegistry, setBasemapsRegistry] = useState([
+            { id: 'carto-light', label: 'CartoDB Positron (Light)', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: true, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
+            { id: 'carto-dark', label: 'CartoDB Dark Matter', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: false, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
+            { id: 'osm', label: 'OpenStreetMap Standard', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: false, attrText: 'OpenStreetMap contributors', attrLink: 'https://openstreetmap.org' },
+            { id: 'esri-sat', label: 'Esri World Imagery', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', format: 'png', maxZoom: 19, active: false, attrText: 'Esri', attrLink: 'https://www.esri.com' },
+            { id: 'opentopo', label: 'OpenTopoMap', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 17, active: false, attrText: 'OpenTopoMap', attrLink: 'https://opentopomap.org' },
+            { id: 'protomaps-light', label: 'Protomaps Vector Light', type: 'base', url: 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt', format: 'vector', maxZoom: 18, active: false, attrText: 'Protomaps / OSM', attrLink: 'https://protomaps.com' },
+            { id: 'wms-academic', label: 'Academic WMS Service', type: 'base', url: 'https://geodata.harvard.edu/geoserver/wms', format: 'wms', maxZoom: 19, active: false, attrText: 'Harvard Geospatial', attrLink: 'https://geodata.harvard.edu' },
+            { id: 'none', label: 'No Basemap (Blank Canvas)', type: 'base', url: '', format: 'none', maxZoom: 22, active: false, attrText: 'Blank Canvas', attrLink: '' }
+          ]);
+          const [zoomLock, setZoomLock] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('tm_zoom_lock')) ?? false; }
+            catch (e) { return false; }
+          });
+          const appRef = useRef(null);
+          const hasInitializedRef = useRef(false);
+
+          const addLog = (msg, type = 'info') => {
+            const timeStr = new Date().toTimeString().split(' ').at(0);
+            setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
+          };
+
+          const stripAndNormalize = (str) => {
+            if (!str) return '';
+            return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim();
+          };
+
+          const formatSmartDate = (startObj, endObj, locale) => {
+            if (!startObj) return 'Undated';
+            if (startObj.isEDTF) return startObj.text;
+            const d = startObj.date; if (!d || isNaN(d.getTime())) return 'Invalid Date';
+            if (endObj && endObj.date && !isNaN(endObj.date.getTime())) {
+              const dEnd = endObj.date;
+              if (dEnd.getTime() === d.getTime()) return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+              return `${d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })} — ${dEnd.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}`;
+            }
+            return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+          };
+
+          const formatPlaces = (placeStr) => {
+            if (!placeStr) return '';
+            const stripped = placeStr.replace(new RegExp("^\\s*\\\\x5b.*?\\\\x5d\\s*", ""), '');
+            return stripped.split(/(?:\||·|;|·|\n|\-)/).map(s => s.trim()).filter(Boolean).join(' · ');
+          };
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 2: CHRONO ENGINE - DATAFRAME PARSING ] ===
+          // =========================================================================
+          useEffect(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
+            let source = urlParams.get('source') || urlParams.get('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+            const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
+            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid');
+
+            setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
+            addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
+
+            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+            const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
+
+            Promise.all([
+              fetch(fetchUrlPrimary).then(res => {
+                if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
+                return res.text();
+              }),
+              fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
+                if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status ${res.status})`);
+                return res.text();
+              }) : Promise.resolve(null)
+            ]).then(([primaryCsv, basemapsCsv]) => {
+              setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
+
+              const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
+              if (results.errors.length > 0) {
+                results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
+              }
+
+              const exactGet = (normObj, key) => {
+                const val = normObj[key];
+                return val !== undefined && val !== null ? String(val).trim() : "";
+              };
+
+              const firstRowNorm = {};
+              if (results.data.length > 0) {
+                const [ firstRow ] = results.data; for (let k in firstRow) firstRowNorm[k.toLowerCase().trim()] = firstRow[k];
+              }
+
+              const aboutDataObj = {
+                title: exactGet(firstRowNorm, 'title') || 'Dataset Overview',
+                description: exactGet(firstRowNorm, 'description') || 'No project description provided.',
+                rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source,
+                downloadUrl: fetchUrlPrimary
+              };
+              setAboutData(aboutDataObj);
+
+              let activeMode = dateEngineMode;
+              if (activeMode === 'auto') {
+                const hasEDTF = results.data.some(row => {
+                  const norm = {};
+                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                  return exactGet(norm, 'start edtf') !== '';
+                });
+                activeMode = hasEDTF ? 'edtf' : 'legacy';
+              }
+              const isUS = dateLocale === 'en-US';
+              const omniSplitRegex = /\||\r?\n/;
+              const rows = results.data;
+
+              const parseChronoNode = (legacyStr, edtfStr, index, rowTitle) => {
+                const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
+                const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
+                if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
+                  try {
+                    if (cleanEdtf) {
+                      const parsed = compileCartiMapAST(cleanEdtf);
+                      if (parsed) {
+                        return {
+                          isEDTF: true,
+                          min: parsed.min,
+                          max: parsed.max,
+                          obj: parsed,
+                          isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
+                          text: cleanEdtf
+                        };
+                      }
+                    }
+                  } catch (e) {
+                    addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
+                  }
+                }
+
+                if (!cleanLegacy) {
+                  if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
+                  return null;
+                }
+
+                if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
+                  const serialVal = parseFloat(cleanLegacy);
+                  const ts = (serialVal - 25569) * 86400 * 1000;
+                  return { 
+                    isEDTF: false, 
+                    min: ts, 
+                    max: ts, 
+                    date: new Date(ts), 
+                    text: cleanLegacy 
+                  };
+                }
+
+                const parts = cleanLegacy.split(' ');
+                if (parts.length >= 1) {
+                  const [ dateStr = '', timeStr = '' ] = parts;
+                  const dParts = dateStr.split(/(?:\/|\.|\-)/);
+                  if (dParts.length >= 3) {
+                    const [ dp0 = '', dp1 = '', dp2 = '' ] = dParts;
+                    const [ tHourStr = '0', tMinStr = '0', tSecFullStr = '0' ] = timeStr ? timeStr.split(':') : [];
+                    const [ tSecStr = '0', tMsStr = '0' ] = tSecFullStr.split('.');
+                    const dYear = parseInt(dp2, 10);
+                    const dMonth = parseInt(isUS ? dp0 : dp1, 10) - 1;
+                    const dDay = parseInt(isUS ? dp1 : dp0, 10);
+                    const tHour = parseInt(tHourStr, 10);
+                    const tMin = parseInt(tMinStr, 10);
+                    const tSec = parseInt(tSecStr, 10);
+                    const tMs = parseInt(tMsStr, 10);
+                    const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
+                    const ts = dateObj.getTime();
+                    if (!isNaN(ts)) {
+                      return { 
+                        isEDTF: false, 
+                        min: ts, 
+                        max: ts, 
+                        date: dateObj, 
+                        text: cleanLegacy 
+                      };
+                    }
+                  }
+                }
+
+                if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Failed to parse. Rendering as Undated.`, 'warning');
+                return null;
+              };
+
+              const cleaned = rows.map((row, index) => {
+                const norm = {};
+                for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
+
+                return {
+                  id: index,
+                  title: rowTitle,
+                  startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf'), index, rowTitle),
+                  endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf'), index, rowTitle),
+                  description: exactGet(norm, 'description'),
+                  place: exactGet(norm, 'place'),
+                  location: exactGet(norm, 'location'),
+                  subLabels: exactGet(norm, 'sublabels') || exactGet(norm, 'sub-labels') || exactGet(norm, 'sub labels') || '',
+                  priority: exactGet(norm, 'priority'),
+                  media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
+                  mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
+                  mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
+                  tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/(?:,|\r|\n|\||;|·)+/).map(t => t.trim()).filter(Boolean) : [],
+                  extractType: exactGet(norm, 'extract type') || 'Storyline'
+                };
+              });
+
+              const valid = cleaned.sort((a, b) => {
+                const aMin = a.startDate ? a.startDate.min : 0;
+                const bMin = b.startDate ? b.startDate.min : 0;
+                if (aMin !== bMin) return aMin - bMin;
+                return a.id - b.id;
+              });
+
+              // =========================================================================
+              // === [ APP_ORCHESTRATOR SUBBLOCK 3: VECTOR SEARCH INDEXING ] ===
+              // =========================================================================
+              const indexedData = valid.map(d => ({
+                ...d,
+                _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
+              }));
+              setUnfilteredData(indexedData);
+              const discoveredTypes = Array.from(new Set(indexedData.map(d => d.extractType).filter(Boolean)));
+              if (activeExtractTypes.length === 0) {
+                setActiveExtractTypes(discoveredTypes);
+              }
+
+              const tagsMap = new Set();
+              indexedData.forEach(d => {
+                let rawTags = d.tags || [];
+                let arr = [];
+                (Array.isArray(rawTags) ? rawTags : [rawTags]).forEach(t => {
+                  if (typeof t === 'string') arr.push(...t.split(omniSplitRegex));
+                  else arr.push(t);
+                });
+                arr.map(s => String(s).trim()).filter(Boolean).forEach(t => tagsMap.add(t));
+              });
+
+              const uniqueTagsList = Array.from(tagsMap).sort();
+              setAllTags(uniqueTagsList);
+              setActiveTags(uniqueTagsList);
+
+              if (basemapsCsv) {
+                const baseResult = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
+                const basemaps = baseResult.data.map(row => {
+                  const norm = {};
+                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                  return {
+                    id: exactGet(norm, 'id'),
+                    label: exactGet(norm, 'label'),
+                    type: exactGet(norm, 'type'),
+                    url: exactGet(norm, 'url'),
+                    format: exactGet(norm, 'format'),
+                    maxZoom: parseInt(exactGet(norm, 'maxzoom') || 19, 10),
+                    active: exactGet(norm, 'active').toLowerCase() === 'true',
+                    attrText: exactGet(norm, 'attribution text'),
+                    attrLink: exactGet(norm, 'attribution link'),
+                    wmsLayer: exactGet(norm, 'wms layer'),
+                    defaultOpacity: (exactGet(norm, 'default opacity') !== '' && !isNaN(parseFloat(exactGet(norm, 'default opacity')))) ? parseFloat(exactGet(norm, 'default opacity')) : 0.3
+                  };
+                }).filter(b => b.id && b.url);
+                setBasemapsRegistry(basemaps);
+                addLog(`Basemaps registry parsed. Found ${basemaps.length} configured tile services.`, 'info');
+              } else {
+                setBasemapsRegistry([{ id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: true, attrText: 'OpenStreetMap', attrLink: 'https://openstreetmap.org' }]);
+              }
+
+              if (!hasInitializedRef.current) {
+                const paramSlide = getOmniParam('slide');
+                const paramDate = getOmniParam('date');
+                let initialIdx = 0;
+                if (paramSlide) {
+                  const sVal = parseInt(paramSlide, 10);
+                  if (!isNaN(sVal) && sVal >= 0 && sVal < indexedData.length) initialIdx = sVal;
+                } else if (paramDate) {
+                  const targetTime = new Date(paramDate).getTime();
+                  if (!isNaN(targetTime)) {
+                    let closestIdx = 0; let minDiff = Infinity;
+                    indexedData.forEach((d, i) => {
+                      if (d.startDate) {
+                        const diff = Math.abs(d.startDate.min - targetTime);
+                        if (diff < minDiff) { minDiff = diff; closestIdx = i; }
+                      }
+                    });
+                    initialIdx = closestIdx;
+                  }
+                }
+                setActiveIndex(initialIdx);
+                hasInitializedRef.current = true;
+              }
+              setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
+              setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
+            }).catch(err => {
+              console.error("Fatal CMS Connection Failure:", err);
+              setStatus({ text: 'Database Sync Failure', progress: 100, isFading: false, active: false });
+              addLog(`Database Sync Error: ${err.message}`, 'error');
+            });
+          }, [rawCsvRows, dateEngineMode, dateLocale]);
+
+          // --- [ Active filtering of datasets by swimlanes and streams ] ---
+          useEffect(() => {
+            if (unfilteredData.length === 0) return;
+            const filtered = unfilteredData.filter(d => 
+              ((d.tags || []).length === 0 || d.tags.some(t => (activeTags || []).includes(t))) &&
+              (activeExtractTypes || []).includes(d.extractType)
+            );
+            setData(filtered);
+
+            if (activeIndex >= filtered.length) {
+              setActiveIndex(Math.max(0, filtered.length - 1));
+            }
+
+            const tagsMap = new Set();
+            filtered.forEach(d => {
+              (d.tags || []).forEach(t => tagsMap.add(t));
+            });
+            const laneCount = tagsMap.size > 0 ? tagsMap.size : 1;
+            setTimelineRequiredHeight((laneCount * 24) + 40);
+          }, [unfilteredData, activeTags, activeExtractTypes]);
+
+          const handleToggleTag = (tag) => {
+            if (activeTags.includes(tag)) {
+              if (activeTags.length > 1) {
+                setActiveTags(activeTags.filter(t => t !== tag));
+              } else {
+                addLog('Cannot deselect all swimlanes. At least one must remain active.', 'warning');
+              }
+            } else {
+              setActiveTags([...activeTags, tag]);
+            }
+          };
+
+          const handleToggleExtractType = (type) => {
+            if (activeExtractTypes.includes(type)) {
+              if (activeExtractTypes.length > 1) {
+                setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
+              } else {
+                addLog('At least one data stream must remain active.', 'warning');
+              }
+            } else {
+              setActiveExtractTypes([...activeExtractTypes, type]);
+            }
+          };
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 4: RESIZER EVENT LISTENERS ] ===
+          // =========================================================================
+          const startPrimaryResize = (e) => {
+            e.preventDefault();
+            const [ touchX0 ] = e.touches || []; const startX = e.clientX || (touchX0 && touchX0.clientX);
+            const startSplit = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--primary-split')) || 50;
+            const docW = window.innerWidth;
+
+            const doDrag = (moveEvent) => {
+              const [ mTouchX0 ] = moveEvent.touches || []; const currentX = moveEvent.clientX || (mTouchX0 && mTouchX0.clientX);
+              const diffX = currentX - startX;
+              const pctDiff = (diffX / docW) * 100;
+              const newSplit = Math.max(20, Math.min(80, startSplit + pctDiff));
+              document.documentElement.style.setProperty('--primary-split', `${newSplit}%`);
+            };
+
+            const stopDrag = () => {
+              window.removeEventListener('mousemove', doDrag);
+              window.removeEventListener('mouseup', stopDrag);
+              window.removeEventListener('touchmove', doDrag);
+              window.removeEventListener('touchend', stopDrag);
+            };
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('touchmove', doDrag, { passive: true });
+            window.addEventListener('touchend', stopDrag);
+          };
+
+          const startSecondaryResize = (e) => {
+            e.preventDefault();
+            const [ touchY0 ] = e.touches || []; const startY = e.clientY || (touchY0 && touchY0.clientY);
+            const startSplit = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--secondary-split')) || 50;
+            const docH = window.innerHeight;
+
+            const doDrag = (moveEvent) => {
+              const [ mTouchY0 ] = moveEvent.touches || []; const currentY = moveEvent.clientY || (mTouchY0 && mTouchY0.clientY);
+              const diffY = currentY - startY;
+              const pctDiff = (diffY / docH) * 100;
+              const newSplit = Math.max(20, Math.min(80, startSplit + pctDiff));
+              document.documentElement.style.setProperty('--secondary-split', `${newSplit}%`);
+            };
+
+            const stopDrag = () => {
+              window.removeEventListener('mousemove', doDrag);
+              window.removeEventListener('mouseup', stopDrag);
+              window.removeEventListener('touchmove', doDrag);
+              window.removeEventListener('touchend', stopDrag);
+            };
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('touchmove', doDrag, { passive: true });
+            window.addEventListener('touchend', stopDrag);
+          };
+
+          const startTimelineResize = (e) => {
+            e.preventDefault();
+            const [ touchY0 ] = e.touches || []; const startY = e.clientY || (touchY0 && touchY0.clientY);
+            const startHeight = timelineRequiredHeight;
+
+            const doDrag = (moveEvent) => {
+              const [ mTouchY0 ] = moveEvent.touches || []; const currentY = moveEvent.clientY || (mTouchY0 && mTouchY0.clientY);
+              const diffY = startY - currentY;
+              const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
+              setTimelineRequiredHeight(newHeight);
+            };
+
+            const stopDrag = () => {
+              window.removeEventListener('mousemove', doDrag);
+              window.removeEventListener('mouseup', stopDrag);
+              window.removeEventListener('touchmove', doDrag);
+              window.removeEventListener('touchend', stopDrag);
+            };
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('touchmove', doDrag, { passive: true });
+            window.addEventListener('touchend', stopDrag);
+          };
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 5: CHRONOLOGICALLY REALIGNED SEARCH ] ===
+          // =========================================================================
+          
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 4.1: SLIDE NAVIGATION & VIEWPORT LISTENERS ] ===
+          // =========================================================================
+          const jumpToSlide = (newIdx, isSequential = false) => {
+            if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
+              if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
+              setActiveIndex(newIdx);
+            }
+          };
+
+          const goBack = () => {
+            if (slideHistory.length > 0) {
+              const prev = slideHistory[slideHistory.length - 1];
+              setSlideHistory(h => h.slice(0, -1));
+              setActiveIndex(prev);
+            }
+          };
+
+          const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+
+          useEffect(() => {
+            const handleKeyDown = (e) => {
+              if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+              if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
+              else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
+            };
+            window.addEventListener('keydown', handleKeyDown);
+            return () => window.removeEventListener('keydown', handleKeyDown);
+          }, [activeIndex, data.length]);
+
+          useEffect(() => {
+            updateAppHeight();
+            let wasDesktop = window.innerWidth >= 1024;
+            const handleResize = () => {
+              updateAppHeight();
+              const isDesktop = window.innerWidth >= 1024;
+              if (isDesktop !== wasDesktop) {
+                window.dispatchEvent(new Event('resize'));
+              }
+              wasDesktop = isDesktop;
+            };
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+          }, []);
+
+          const handleResultClick = (id, qString) => {
+            const sortedIdx = data.findIndex(d => d.id === id);
+            if (sortedIdx >= 0) jumpToSlide(sortedIdx);
+            setIsSearchOpen(false);
+            if (qString && !searchHistory.includes(qString)) {
+              const newH = [qString, ...searchHistory].slice(0, 8);
+              setSearchHistory(newH);
+              localStorage.setItem('tm_search_history', JSON.stringify(newH));
+            }
+          };
+
+          const executeSearch = (query) => {
+            if (!query || !query.trim()) return [];
+            const normalized = stripAndNormalize(query);
+            const terms = normalized.split(/\s+/).filter(Boolean);
+            if (terms.length === 0) return [];
+
+            return data.filter(d => {
+              if (terms.length === 1 && d.id && String(d.id) === terms[0].replace(/\.$/, '')) return true;
+              const titleNorm = d.title ? stripAndNormalize(d.title) : '';
+              const descNorm = d.description ? stripAndNormalize(d.description) : '';
+              const placeNorm = d.place ? stripAndNormalize(d.place) : '';
+              const tagsNorm = Array.isArray(d.tags) ? d.tags.map(t => stripAndNormalize(t)).join(' ') : (d.tags ? stripAndNormalize(d.tags) : '');
+              const idNorm = d.id ? String(d.id) : '';
+              const composite = `${idNorm} ${titleNorm} ${descNorm} ${placeNorm} ${tagsNorm}`;
+              return terms.every(term => composite.includes(term));
+            });
+          };
+
+          const searchResults = executeSearch(debouncedSearchQuery);
+          const activeSlide = data.at(activeIndex);
+          const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
+          // =========================================================================
+          const CarTiMapperLogo = ({ context, appVersion }) => {
+            const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
+            if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
+            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%;"><div style="height: 24px; width: auto; display: flex; align-items: center;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.85rem; color: #444; line-height: 1;">CarTiMap</span><span style="font-size: 0.65rem; color: #888; line-height: 1;">${appVersion}</span></div></div>`;
+            return html`
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
+                <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <h2 style="margin: 0; font-size: 2.4rem; color: #222; letter-spacing: -0.5px; line-height: 1.1;">CarTiMap Engine</h2>
+                  <div style="font-family: monospace; color: #007acc; font-size: 1.1rem; font-weight: 600; margin-top: 6px;">${appVersion}</div>
+                </div>
+              </div>
+            `;
+          };
+
+          // =========================================================================
+          // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
+          // =========================================================================
+          const downloadBtn = (aboutData && aboutData.downloadUrl) 
+            ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
+            : '';
+
+          const backBtnText = showButtonText ? html`<span>Back</span>` : '';
+          const resetLayoutBtnText = showButtonText ? html`<span>Reset Layout</span>` : '';
+          const settingsBtnText = showButtonText ? html`<span>Settings</span>` : '';
+          const telemetryBtnText = showButtonText ? html`<span>Telemetry</span>` : '';
+          const prevBtnText = showButtonText ? html`<span>Prev</span>` : '';
+          const nextBtnText = showButtonText ? html`<span>Next</span>` : '';
+          const searchBtnText = showButtonText ? html`<span>Search</span>` : '';
+          const filterBtnText = showButtonText ? html`<span>Filters</span>` : '';
+
+          const backBtn = (slideHistory && slideHistory.length > 0)
+            ? html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`
+            : '';
+
+          const resetLayoutBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(140); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><polyline points="16 3 21 8 16 13"></polyline><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><polyline points="8 21 3 16 8 11"></polyline></svg>
+              ${resetLayoutBtnText}
+            </button>
+          `;
+
+          const settingsBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(true)} title="Engine Configurations">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              ${settingsBtnText}
+            </button>
+          `;
+
+          const telemetryBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Logs">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              ${telemetryBtnText}
+            </button>
+          `;
+
+          const prevBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              ${prevBtnText}
+            </button>
+          `;
+
+          const nextBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next Node">
+              ${nextBtnText}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          `;
+
+          const searchBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSearchOpen(true)} title="Interactive Query Index">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              ${searchBtnText}
+            </button>
+          `;
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
+          // =========================================================================
+          const aboutBtn = aboutData 
+            ? html`<button class="status-btn" style="width: 48px; height: 28px; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;" onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs">
+                <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
+              </button>`
+            : '';
+
+          const masterExtractTypes = Array.from(new Set(unfilteredData.map(d => d.extractType).filter(Boolean)));
+          const isExtractFiltered = masterExtractTypes.some(t => !activeExtractTypes.includes(t));
+          const isTagFiltered = activeTags.length > 0 && activeTags.length < allTags.length;
+          const isFilteringActive = isExtractFiltered || isTagFiltered;
+
+          const filterBtn = html`
+            <button class="status-btn ${isFilteringActive || isFilterOpen ? 'active' : ''}" onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              ${filterBtnText}
+            </button>
+          `;
+
+          const filterPopup = isFilterOpen
+            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
+                <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
+                  <span>Active Swimlanes</span>
+                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.8rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; padding-right: 4px;">
+                  ${allTags.map(tag => html`
+                    <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+                      <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
+                      <span style="font-family: monospace; color: #555;">${tag}</span>
+                    </label>
+                  `)}
+                </div>
+                <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 8px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
+                  <span>Data Streams</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  ${masterExtractTypes.map(type => html`
+                    <label key=${type} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+                      <input type="checkbox" checked=${activeExtractTypes.includes(type)} onChange=${() => handleToggleExtractType(type)} style="cursor: pointer;" />
+                      <span style="font-family: monospace; color: #555;">${type}</span>
+                    </label>
+                  `)}
+                </div>
+              </div>`
+            : '';
+
+          const searchHistoryLayout = (searchHistory.length > 0 && !searchQuery)
+            ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>`
+            : '';
+
+          const searchResultsList = searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">${res.title}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`);
+
+          const loadingScreen = (!status.active)
+            ? html`<div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
+                <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
+                <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%"></div></div>
+                <div class="status-text" style="font-family: monospace; font-size: 0.95rem;">${status.text}</div>
+              </div>`
+            : '';
+
+          const appLayout = (data.length > 0 && status.active)
+            ? html`<div id="app-layout" ref=${appRef} style="display: flex; flex-direction: column; height: 100%; width: 100%; overflow: hidden;">
+
+                <!-- Core Viewports Container wrapping ContentSlider and VisualPane [REF: UI-175] -->
+                <div class="core-viewports ${maxPane === 'text' ? 'max-text' : ''} ${maxPane === 'map' ? 'max-map' : ''} ${maxPane === 'media' ? 'max-media' : ''}" style="display: flex; flex-direction: row; flex-grow: 1; width: 100%; min-height: 0; overflow: hidden; position: relative; z-index: 10;">
+
+                  <!-- Conformed Text Pane containing ContentSlider -->
+                  <div class="content-slider-pane" style="width: var(--primary-split, 50%); height: 100%; flex-shrink: 0; display: flex; flex-direction: column; overflow: hidden; z-index: 15; background: #fcfcfc;">
+                    <${ContentSlider}
+                      data=${data}
+                      activeIndex=${activeIndex}
+                      setActiveIndex=${jumpToSlide}
+                      maxPane=${maxPane}
+                      setMaxPane=${setMaxPane}
+                      dateLocale=${dateLocale}
+                      formatSmartDate=${formatSmartDate}
+                    />
+                  </div>
+
+                  <!-- Primary Vertical Column Resizer Splitter -->
+                  <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize} style="width: 4px; background: #eee; cursor: col-resize; z-index: 50; flex-shrink: 0;"></div>
+
+                  <!-- Visual Pane containing MapViewer and MediaViewer -->
+                  <div class="visual-pane ${!activeSlide.media || activeSlide.media.length === 0 ? 'no-media' : ''}" style="flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; z-index: 20; height: 100%;">
+
+                    <!-- Map Viewer Container -->
+                    <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}" style="flex: 0 0 var(--secondary-split, 50%); height: var(--secondary-split, 50%); position: relative; z-index: 30;">
+                      <${MapViewer}
+                        data=${data}
+                        activeIndex=${activeIndex}
+                        setActiveIndex=${jumpToSlide}
+                        addLog=${addLog}
+                        basemapsRegistry=${basemapsRegistry}
+                        maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
+                        minimapOffset=${minimapOffset}
+                        setMinimapOffset=${setMinimapOffset}
+                        maxPane=${maxPane}
+                        setMaxPane=${setMaxPane}
+                        polygonOpacity=${polygonOpacity}
+                        showButtonText=${showButtonText}
+                        visibleTimeBounds=${visibleTimeBounds}
+                      />
+                    </div>
+
+                    <!-- Secondary Horizontal Row Resizer Splitter -->
+                    <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize} style="height: 4px; background: #eee; cursor: row-resize; z-index: 50; flex-shrink: 0;"></div>
+
+                    <!-- Media Viewer Container -->
+                    <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}" style="flex: 1; position: relative; min-height: 0; z-index: 30; background: #111;">
+                      <${MediaViewer}
+                        activeSlide=${activeSlide}
+                        maxPane=${maxPane}
+                        setMaxPane=${setMaxPane}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Conformed 38px Status Cockpit sitting clean in the vertical column flow -->
+                <div class="status-bar" style="height: 38px; flex-shrink: 0; display: flex; align-items: center; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative;">
+                  <style>
+                    .record-select-input::-webkit-outer-spin-button,
+                    .record-select-input::-webkit-inner-spin-button {
+                      -webkit-appearance: none;
+                      margin: 0;
+                    }
+                    .record-select-input[type=number] {
+                      -moz-appearance: textfield;
+                    }
+                  </style>
+                  <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
+                    ${aboutBtn}
+                    ${resetLayoutBtn}
+                    ${settingsBtn}
+                    ${telemetryBtn}
+                  </div>
+
+                  <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
+                  <div class="status-center" style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; z-index: 101; font-size: 0.95rem;">
+                    ${prevBtn}
+
+                    <div style="display: flex; align-items: center; gap: 4px; font-family: monospace; font-size: 0.95rem;">
+                      <input
+                        type="number"
+                        class="record-select-input"
+                        min="1"
+                        max=${data.length}
+                        value=${activeIndex + 1}
+                        onChange=${(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          if (!isNaN(val) && val >= 1 && val <= data.length) {
+                            jumpToSlide(val - 1);
+                          }
+                        }}
+                        onKeyDown=${(e) => {
+                          e.stopPropagation();
+                        }}
+                        style="width: 50px; background: rgba(0, 0, 0, 0.05); border: 1px solid #999; border-radius: 4px; text-align: center; font-family: monospace; font-size: 0.95rem; padding: 3px 0; color: inherit; outline: none;"
+                      />
+                      <span style="user-select: none; opacity: 0.8;">/ ${data.length}</span>
+                    </div>
+
+                    ${nextBtn}
+
+                    <!-- Non-bold left-aligned dynamic scale metrics directly adjacent to Next navigation control [REF: UI-164c] -->
+                    ${visibleTimeSpan ? (() => {
+                      const parts = visibleTimeSpan.split(' (');
+                      const [ spanStrPart = '', zoomStrPart = '' ] = parts;
+                      const spanStr = spanStrPart.replace('Span: ', '');
+                      const zoomStr = zoomStrPart.replace('Zoom: ', '').replace(')', '');
+                      return html`
+                        <div class="telemetry-span-zoom" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin-left: 12px; font-size: 0.8rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none;">
+                          <div style="display: flex; align-items: center; gap: 4px;">
+                            <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>
+                            <span style="font-family: monospace; color: #333;">${spanStr}</span>
+                          </div>
+                          ${zoomStr ? html`
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                              <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>
+                              <span style="font-family: monospace; color: #333;">${zoomStr}</span>
+                            </div>
+                          ` : ''}
+                        </div>
+                      `;
+                    })() : ''}
+                  </div>
+
+                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
+                    ${filterBtn}
+                    ${filterPopup}
+                    ${searchBtn}
+                    ${backBtn}
+                  </div>
+                </div>
+
+                <!-- Resizer divider sits clean above the timeline pane [REF: UI-175] -->
+                <div class="resizer-dyn-timeline" onMouseDown=${startTimelineResize} onTouchStart=${startTimelineResize} style="height: 4px; background: #eee; cursor: ns-resize; z-index: 90; flex-shrink: 0; border-top: 1px solid #ddd; position: relative;"></div>
+
+                <!-- Dedicated static-flow Timeline Pane (border-top duplicate removed) -->
+                <div class="timeline-pane" style="height: ${isTimelineMinimized ? '0px' : `${timelineRequiredHeight}px`}; min-height: ${isTimelineMinimized ? '0px' : '45px'}; flex-shrink: 0; border-top: none; overflow: hidden; position: relative; z-index: 5;">
+                  <${TimelineScrubber}
+                    data=${data}
+                    activeIndex=${activeIndex}
+                    setActiveIndex=${jumpToSlide}
+                    addLog=${addLog}
+                    activeTags=${activeTags}
+                    isTimelineExpanded=${isTimelineExpanded}
+                    setIsTimelineExpanded=${setIsTimelineExpanded}
+                    maxPane=${maxPane}
+                    setMaxPane=${setMaxPane}
+                    showButtonText=${showButtonText}
+                    visibleTimeBounds=${visibleTimeBounds}
+                    setVisibleTimeBounds=${setVisibleTimeBounds}
+                    visibleTimeSpan=${visibleTimeSpan}
+                    setVisibleTimeSpan=${setVisibleTimeSpan}
+                    zoomLock=${zoomLock}
+                    setZoomLock=${setZoomLock}
+                    isTimelineMinimized=${isTimelineMinimized}
+                    setIsTimelineMinimized=${setIsTimelineMinimized}
+                    dateLocale=${dateLocale}
+                    timelineRequiredHeight=${timelineRequiredHeight}
+                  />
+                </div>
+
+                ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline" style="z-index: 2000;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
+
+                <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
+                <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
+                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 30px;">
+                  <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;">&times;</button>
+                  <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
+                    <div style="display: flex; justify-content: center; width: 100%; margin-bottom: 20px;">
+                      <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
+                    </div>
+                    <h3>${aboutData ? aboutData.title : 'Dataset Specs'}</h3>
+                    <p style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #444;">${aboutData ? aboutData.description : 'No project description provided.'}</p>
+                    <div style="border-top: 1px solid #eee; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
+                      <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
+                      <strong>Active Modules:</strong><br/>
+                      ${Object.entries(MODULE_VERSIONS).map(([k, v]) => `• ${k}: ${v}`).join('\n        ')}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 99999 !important;"></div>
+                <div id="search-modal" class="tm-modal" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; height: 80vh; padding: 30px;">
+                  <button class="modal-close" onClick=${() => setIsSearchOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;">&times;</button>
+                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} style="flex-shrink: 0; width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
+                  <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
+                    ${searchHistoryLayout}
+                    ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
+                    ${searchResultsList}
+                  </div>
+                </div>
+
+              </div>`
+            : '';
+
+          return html`
+            <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
+              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
+
+              ${loadingScreen}
+              ${appLayout}
+            </div>
+          `;
+        };
+
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.65-b155';
+// === [ END MAJOR BLOCK ] ===
+// 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
+
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b159 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b159 ] ===
+// [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
+        const compileCartiMapAST = (str) => {
+          if (!str) return null;
+          let clean = String(str).trim()
+            .replace(/[\r\n]+/g, ',')
+            .replace(/\s*\/\s*/g, '/')
+            .replace(/\s*,\s*/g, ',')
+            .replace(/,,+/g, ',');
+
+          // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
+          if (clean.startsWith(String.fromCharCode(91)) && clean.endsWith(String.fromCharCode(93))) {
+            const inner = clean.slice(1, -1);
+            const parts = inner.split(",");
+            const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
+            if (values.length === 0) return null;
+            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
+            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
+            return {
+              type: "Set",
+              values: values,
+              min: minVals.length > 0 ? Math.min(...minVals) : 0,
+              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
+            };
+          }
+
+          // 2. Array Geometry: Inclusive Lists {}
+          if (clean.startsWith("{") && clean.endsWith("}")) {
+            const inner = clean.slice(1, -1);
+            const parts = inner.split(",");
+            const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
+            if (values.length === 0) return null;
+            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
+            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
+            return {
+              type: "List",
+              values: values,
+              min: minVals.length > 0 ? Math.min(...minVals) : 0,
+              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
+            };
+          }
+
+          // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
+          if (clean.includes("..")) {
+            const parts = clean.split("..");
+            const part0 = parts.at(0) || '';
+            const part1 = parts.at(1) || '';
+            const v1 = compileCartiMapAST(part0);
+            const v2 = compileCartiMapAST(part1);
+            if (!v1 || !v2) return null;
+            const min1 = typeof v1.min === 'number' ? v1.min : Number(v1.min?.valueOf() || 0);
+            const min2 = typeof v2.min === 'number' ? v2.min : Number(v2.min?.valueOf() || 0);
+            const max1 = typeof v1.max === 'number' ? v1.max : Number(v1.max?.valueOf() || 0);
+            const max2 = typeof v2.max === 'number' ? v2.max : Number(v2.max?.valueOf() || 0);
+            return {
+              type: "Set",
+              values: Array.of(v1, v2),
+              min: Math.min(min1, min2),
+              max: Math.max(max1, max2)
+            };
+          }
+
+          // 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
+          let mathStr = clean;
+          let isApprox = false;
+          let isUncertain = false;
+
+          // Normalize short timezone offset: +02 or -05 -> +02:00 or -05:00
+          mathStr = mathStr.replace(/([+-]\d{2})(?!\:\d{2})(?=\s*|$)/g, '$1:00');
+
+          if (mathStr.includes("T")) {
+            mathStr = mathStr.replace(new RegExp("(T" + String.fromCharCode(91) + "0-9X:~.?%" + String.fromCharCode(93) + "+(?:" + String.fromCharCode(91) + "+\\-Z" + String.fromCharCode(93) + String.fromCharCode(91) + "0-9:" + String.fromCharCode(93) + "*)?)", "gi"), (match) => {
+              if (match.includes("~")) isApprox = true;
+              if (match.includes("?")) isUncertain = true;
+              if (match.includes("%")) { isApprox = true; isUncertain = true; }
+              return match.replace(/X/gi, "0").replace(/[~?%]/g, "");
+            });
+          }
+
+          // 5. Qualified Durations (PT30~M)
+          if (mathStr.startsWith("P") || mathStr.startsWith("-P")) {
+            if (mathStr.includes("~")) { isApprox = true; mathStr = mathStr.replace(/~/g, ""); }
+            if (mathStr.includes("?")) { isUncertain = true; mathStr = mathStr.replace(/\?/g, ""); }
+          }
+
+          // 6. Native AST Evaluation
+          let parsed = null;
+          try {
+            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
+            parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
+          } catch (e) {
+            return null;
+          }
+
+          if (parsed && typeof parsed === "object") {
+            let minMs = 0;
+            let maxMs = 0;
+            try {
+              if (typeof parsed.min === 'number') minMs = parsed.min;
+              else if (parsed.min && typeof parsed.min.valueOf === 'function') minMs = Number(parsed.min.valueOf());
+
+              if (typeof parsed.max === 'number') maxMs = parsed.max;
+              else if (parsed.max && typeof parsed.max.valueOf === 'function') maxMs = Number(parsed.max.valueOf());
+            } catch(e) {}
+
+            return {
+              type: parsed.type || "Date",
+              values: parsed.values,
+              min: minMs,
+              max: maxMs,
+              approximate: isApprox || !!parsed.approximate,
+              uncertain: isUncertain || !!parsed.uncertain,
+              raw: str
+            };
+          }
+
+          return null;
+        };
+
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.27-b155';
+// === [ END MAJOR BLOCK ] ===
+// 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
+
+    </script>
+</body>
+</html>
