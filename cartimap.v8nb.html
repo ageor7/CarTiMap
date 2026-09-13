@@ -191,7 +191,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.68-b160';
+const APP_VERSION = 'v8.13.68-b161';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -207,6 +207,127 @@ class ErrorBoundary extends Component {
   }
 }
 // === [ END MAJOR BLOCK ] ===
+
+// === [ MAJOR BLOCK: TelemetryMonitor v2.1.16 ] ===
+const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVersion, moduleVersions, isTimelineExpanded, timelineRequiredHeight}) => {
+  const logsEndRef = useRef(null);
+  const monitorRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [pos, setPos] = useState({"x": -1000, "y": -1000});
+  const [size, setSize] = useState({"w": "320px", "h": "auto"});
+  const dragStart = useRef({"x": 0, "y": 0});
+  const hasInitPos = useRef(false);
+  const [isConfigMode, setIsConfigMode] = useState(false);
+  const [trackedFields, setTrackedFields] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('tm_telemetry_fields')) || ['id', 'location', 'priority']; }
+    catch (e) { return ['id', 'location', 'priority']; }
+  });
+
+  useEffect(() => {
+    if (!hasInitPos.current) {
+      const activeTimelineH = isTimelineExpanded ? timelineRequiredHeight : (window.innerHeight * 0.10);
+      const yPos = window.innerHeight - activeTimelineH - 32 - 10 - 250;
+      setPos({"x": 15, "y": Math.max(10, yPos)});
+      hasInitPos.current = true;
+    }
+  }, [isTimelineExpanded, timelineRequiredHeight]);
+
+  useEffect(() => {
+    if (logsEndRef.current && isOpen && !isConfigMode) {
+      logsEndRef.current.scrollIntoView({"behavior": "smooth"});
+    }
+  }, [logs, isOpen, isConfigMode]);
+
+  const onMouseDown = (e) => {
+    if (e.target.closest('.vibe-close-btn') || e.target.closest('.vibe-config-btn') || e.target.closest('.log-time')) return;
+    setIsDragging(true);
+    const currentRect = monitorRef.current.getBoundingClientRect();
+    setSize({"w": currentRect.width + 'px', "h": currentRect.height + 'px'});
+    dragStart.current = {"x": e.clientX - pos.x, "y": e.clientY - pos.y};
+  };
+
+  const onMouseMove = (e) => {
+    if (!isDragging) return;
+    setPos({"x": e.clientX - dragStart.current.x, "y": e.clientY - dragStart.current.y});
+  };
+
+  const onMouseUp = () => setIsDragging(false);
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    } else {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDragging]);
+
+  const handleToggleField = (field) => {
+    const newFields = trackedFields.includes(field) ? trackedFields.filter(f => f !== field) : [...trackedFields, field];
+    setTrackedFields(newFields);
+    localStorage.setItem('tm_telemetry_fields', JSON.stringify(newFields));
+  };
+
+  const availableFields = activeSlide ? Object.keys(activeSlide) : ['id', 'title', 'startDate', 'endDate', 'place', 'location', 'priority', 'tags'];
+
+  if (!isOpen) return null;
+
+  return html`
+    <div id="vibe-monitor" ref=${monitorRef} style="left: ${pos.x}px; top: ${pos.y}px; width: ${size.w}; height: ${size.h}; z-index: 9999; resize: both; overflow: hidden; position: fixed; background: #1a1a1a; color: #eee; border: 1px solid #444; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; font-family: monospace; min-width: 280px; min-height: 200px; max-width: 95vw; max-height: 90vh;">
+      <div id="vibe-header" onMouseDown=${onMouseDown} style="background: #333; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #444; user-select: none; font-weight: 600; flex-shrink: 0;">
+        <span>SYSTEM TELEMETRY</span>
+        <div style="display: flex; gap: 8px;">
+          <button class="vibe-config-btn" onClick=${() => setIsConfigMode(!isConfigMode)} style="background: transparent; border: none; color: ${isConfigMode ? '#007acc' : '#aaa'}; cursor: pointer; outline: none;" title="Configure Telemetry">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </button>
+          <button class="vibe-close-btn" onClick=${() => setIsOpen(false)} title="Close Monitor" style="background: transparent; color: #aaa; border: none; padding: 4px; cursor: pointer; outline: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+      ${isConfigMode ? html`
+        <div style="background: #111; padding: 12px; flex-shrink: 0; border-bottom: 1px solid #333; font-size: 0.8rem;">
+          <div style="color: #aaa; margin-bottom: 8px;">Select variables to track:</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 150px; overflow-y: auto;">
+            ${availableFields.map(field => html`
+              <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.75rem;">
+                <input type="checkbox" checked=${trackedFields.includes(field)} onChange=${() => handleToggleField(field)} />
+                ${field}
+              </label>
+            `)}
+          </div>
+        </div>
+      ` : html`
+        <div style="background: #222; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.75rem; color: #8be9fd; display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; align-items: center;">
+          <div style="background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;">ENGINE: ${appVersion}</div>
+          <div style="color: #ffb86c; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;">LAYOUT: ${window.innerWidth >= 1024 ? 'Desktop' : 'Mobile'}</div>
+          ${trackedFields.map(f => {
+            let val = activeSlide ? activeSlide[f] : 'N/A';
+            if (val instanceof Date) val = val.toISOString();
+            if (Array.isArray(val)) val = val.length > 0 ? `[${val.join(', ')}]` : '[]';
+            return html`<div style="color: #50fa7b; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;" title="${val}">
+              <span style="color: #aaa;">${f.toUpperCase()}:</span> ${val || 'NULL'}
+            </div>`;
+          })}
+        </div>
+      `}
+      <div id="vibe-logs" style="flex-grow: 1; overflow-y: auto; padding: 10px; font-size: 0.75rem; background: #111; display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 50px;">
+        ${logs.map((log, i) => html`<div key=${i} class="log-${log.type}"><span class="log-time" style="color: #888; margin-right: 6px;">[${log.time}]</span> ${log.msg}</div>`)}
+        <div ref=${logsEndRef} />
+      </div>
+    </div>
+  `;
+};
+
+MODULE_VERSIONS["VibeMonitor"] = 'v2.1.16';
+// === [ END MAJOR BLOCK ] ===
+
+
 
 
 // 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b159 ] 🔽🔽🔽
