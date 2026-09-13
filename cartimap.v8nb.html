@@ -72,13 +72,13 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 /* --- [ SubBlock: Layout & Resizers ] --- */
 #app-layout { --primary-split: 50%; --secondary-split: 50%; --timeline-height: 10%; display: flex; flex-direction: column; flex: 1; width: 100%; max-width: 100%; height: 100%; overflow: hidden; position: relative; }
 .core-viewports { display: flex; flex-direction: row; flex-grow: 1; height: calc(100% - var(--timeline-height) - 4px); width: 100%; max-width: 100%; overflow: visible; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; min-width: 0; position: relative; z-index: 10; }
-.content-slider-pane { background: var(--paneBg); overflow: hidden; display: flex; flex-direction: column; min-height: 0; min-width: 0; flex-shrink: 0; z-index: 15; order: 1; width: var(--primary-split); height: 100%; max-width: 95ch; }
+.content-slider-pane { background: var(--paneBg); overflow: hidden; display: flex; flex-direction: column; min-height: 0; min-width: 0; flex-shrink: 0; z-index: 15; order: 1; width: var(--primary-split); height: 100%; }
 .resizer-dyn-primary { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; order: 2; width: 4px; height: 100%; cursor: col-resize; }
 .visual-pane { display: flex; flex-direction: column; overflow: visible; min-height: 0; min-width: 0; flex-shrink: 0; position: relative; z-index: 20; order: 3; flex: 1 1 0; width: auto; height: 100%; }
 .visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
 .visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
 .visual-pane.no-media .media-pane { display: none !important; }
-.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible; z-index: 30; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; }
+.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible; z-index: 60; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; }
 .resizer-dyn-secondary { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
 .media-pane { background: #111; overflow: hidden; position: relative; min-height: 0; min-width: 0; z-index: 30; flex: 1 1 auto; height: auto; width: 100%; }
 .media-carousel { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
@@ -193,7 +193,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b181';
+const APP_VERSION = 'v8.13.69-b182';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -807,6 +807,25 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   useEffect(() => {
     const activeDataIndex = validData.findIndex((d, idx) => d.id === (activeIndex + 1) || idx === activeIndex);
     if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
+      const activeNode = validData[activeDataIndex];
+      if (activeNode && activeNode.startDate && zoomLock === 'auto') {
+        const activeMs = activeNode.startDate.min;
+        const nearby = validData.filter(d => Math.abs(d.startDate.min - activeMs) <= 30 * 86400000);
+        if (nearby.length > 1) {
+          let minGap = Infinity;
+          nearby.forEach(d => {
+            const gap = Math.abs(d.startDate.min - activeMs);
+            if (gap > 0 && gap < minGap) minGap = gap;
+          });
+          if (minGap < Infinity) {
+            const targetSpanMs = Math.max(86400000, minGap * 12);
+            const calculatedZoom = Math.max(1, Math.min(200, renderTimeRange / targetSpanMs));
+            setZoomLevel(calculatedZoom);
+          }
+        } else {
+          setZoomLevel(2.5);
+        }
+      }
       const containerW = wrapperRef.current.clientWidth || 1000;
       const targetTrackW = Math.max(containerW, containerW * zoomLevel);
       const scrollPos = getExactNodeScrollPos(activeIndex, targetTrackW, containerW);
@@ -941,15 +960,31 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       .event-group:hover .event-block { transform: translateY(-50%) scale(1.08) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; border-color: #007acc !important; z-index: 99999 !important; width: max-content !important; min-width: var(--calc-w) !important; }
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
-      <div class="timeline-control-cluster" style="position: absolute; top: 8px; right: 12px; z-index: 1000; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.92); padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-        <button class="status-btn" onClick=${() => handleManualZoom(Math.max(1, zoomLevel / 1.5))} title="Zoom Out (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
+      <!-- 1. Window Controls Toolbar (Top-Right) -->
+      <div class="timeline-window-toolbar" style="position: absolute; top: 8px; right: 12px; z-index: 1000; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.95); padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+        <button class="status-btn ${isTimelineExpanded ? 'active' : ''}" onClick=${() => setIsTimelineExpanded(!isTimelineExpanded)} title="Expand / Restore Fullscreen Timeline (⛶)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+        </button>
+        <button class="status-btn" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
-        <span style="font-size: 0.75rem; font-weight: 700; color: #444; font-family: monospace; padding: 0 4px; min-width: 32px; text-align: center;">${zoomLevel.toFixed(1)}x</span>
+      </div>
+
+      <!-- 2. Temporal Controls Cluster (Vertical Stack Below Window Toolbar) -->
+      <div class="timeline-temporal-cluster" style="position: absolute; top: 42px; right: 12px; z-index: 1000; display: flex; flex-direction: column; align-items: center; gap: 4px; background: rgba(255,255,255,0.95); padding: 4px 2px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); width: 28px;">
         <button class="status-btn" onClick=${() => handleManualZoom(Math.min(2000, zoomLevel * 1.5))} title="Zoom In (+)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
-        <div style="width: 1px; height: 16px; background: #ccc; margin: 0 2px;"></div>
+        <span style="font-size: 0.68rem; font-weight: 800; color: #333; font-family: monospace; letter-spacing: -0.5px; padding: 2px 0;">${zoomLevel.toFixed(1)}x</span>
+        <button class="status-btn" onClick=${() => handleManualZoom(Math.max(1, zoomLevel / 1.5))} title="Zoom Out (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button class="status-btn ${zoomLock === 'hard' ? 'active' : ''}" onClick=${() => setZoomLock(p => p === 'hard' ? 'auto' : 'hard')} title="Toggle Auto-Zoom Lock" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
+          ${zoomLock === 'hard'
+            ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
+            : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`
+          }
+        </button>
         <button class="status-btn" onClick=${() => {
           const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
           const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
@@ -957,16 +992,6 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           if (wrapperRef.current) wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
         }} title="Center Active Event (🎯)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
-        </button>
-        <button class="status-btn" onClick=${() => { setZoomLevel(1); if (wrapperRef.current) wrapperRef.current.scrollTo({ left: 0, behavior: 'smooth' }); }} title="Reset View (↺)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-        </button>
-        <div style="width: 1px; height: 16px; background: #ccc; margin: 0 2px;"></div>
-        <button class="status-btn ${isTimelineExpanded ? 'active' : ''}" onClick=${() => setIsTimelineExpanded(!isTimelineExpanded)} title="Expand Fullscreen Timeline (↕)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-        </button>
-        <button class="status-btn" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
       </div>
 
@@ -1026,20 +1051,28 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const [overlayOpacities, setOverlayOpacities] = useState({});
 
           useEffect(() => {
-            if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
-              const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
-              const defaultBase = bases.find(b => b.active) || bases.at(0);
-              if (defaultBase) {
-                setActiveBasemap(defaultBase.id);
+            if (basemapsRegistry && basemapsRegistry.length > 0) {
+              if (!initialLoadRef.current) {
+                const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
+                const defaultBase = bases.find(b => b.active) || bases.at(0);
+                if (defaultBase) {
+                  setActiveBasemap(defaultBase.id);
+                }
+                initialLoadRef.current = true;
               }
               const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
-              setActiveOverlays(defaultOverlays);
+              if (activeOverlays.length === 0 && defaultOverlays.length > 0) {
+                setActiveOverlays(defaultOverlays);
+              }
               const initOpac = {};
               basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
-                initOpac[o.id] = o.defaultOpacity !== undefined ? o.defaultOpacity : 0.3;
+                if (overlayOpacities[o.id] === undefined) {
+                  initOpac[o.id] = o.defaultOpacity !== undefined ? o.defaultOpacity : (o.defaultopacity !== undefined ? parseFloat(o.defaultopacity) : 0.3);
+                }
               });
-              setOverlayOpacities(initOpac);
-              initialLoadRef.current = true;
+              if (Object.keys(initOpac).length > 0) {
+                setOverlayOpacities(prev => ({ ...prev, ...initOpac }));
+              }
             }
           }, [basemapsRegistry]);
           const [basemapOpacity, setBasemapOpacity] = useState(1.0);
@@ -2005,7 +2038,8 @@ const App = () => {
             e.preventDefault();
             const [ touchY0 ] = e.touches || []; const startY = e.clientY || (touchY0 && touchY0.clientY);
             const startSplit = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--secondary-split')) || 50;
-            const docH = window.innerHeight;
+            const containerNode = appRef.current ? appRef.current.querySelector('.visual-pane') : null;
+            const docH = containerNode ? containerNode.offsetHeight : (window.innerHeight * 0.5);
 
             const doDrag = (moveEvent) => {
               const [ mTouchY0 ] = moveEvent.touches || []; const currentY = moveEvent.clientY || (mTouchY0 && mTouchY0.clientY);
