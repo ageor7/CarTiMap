@@ -193,8 +193,8 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.68-b179';
-document.title = 'CarTiMap Core - ' + APP_VERSION;
+const APP_VERSION = 'v8.13.69-b180';
+document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -805,7 +805,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   };
 
   useEffect(() => {
-    const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+    const activeDataIndex = validData.findIndex((d, idx) => d.id === (activeIndex + 1) || idx === activeIndex);
     if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
       const containerW = wrapperRef.current.clientWidth || 1000;
       const targetTrackW = Math.max(containerW, containerW * zoomLevel);
@@ -1019,14 +1019,14 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const markerLayer = useRef(null);
           const clusterLayer = useRef(null);
           const markersRef = useRef([]);
-          const hasFitBounds = useRef(false);
+          const hasFitBounds = useRef(false); const initialLoadRef = useRef(false);
           const [mapZoom, setMapZoom] = useState(2);
           const [activeBasemap, setActiveBasemap] = useState('carto-light');
           const [activeOverlays, setActiveOverlays] = useState([]);
           const [overlayOpacities, setOverlayOpacities] = useState({});
 
           useEffect(() => {
-            if (basemapsRegistry && basemapsRegistry.length > 0) {
+            if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
               const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
               const defaultBase = bases.find(b => b.active) || bases.at(0);
               if (defaultBase) {
@@ -1039,6 +1039,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 initOpac[o.id] = o.defaultOpacity !== undefined ? o.defaultOpacity : 0.3;
               });
               setOverlayOpacities(initOpac);
+              initialLoadRef.current = true;
             }
           }, [basemapsRegistry]);
           const [basemapOpacity, setBasemapOpacity] = useState(1.0);
@@ -1216,34 +1217,34 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           useEffect(() => {
             const map = mapInstance.current;
             if (!map || !basemapsRegistry) return;
-            basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
-              if (overlayLayersRef.current[o.id]) { map.removeLayer(overlayLayersRef.current[o.id]); delete overlayLayersRef.current[o.id]; }
+            Object.keys(overlayLayersRef.current).forEach(id => {
+              if (!activeOverlays.includes(id)) {
+                map.removeLayer(overlayLayersRef.current[id]);
+                delete overlayLayersRef.current[id];
+              }
             });
             activeOverlays.forEach((id, idx) => {
-              const o = basemapsRegistry.find(b => b.id === id);
-              if (o) {
-                const z = idx + 10;
-                const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
-                const isWms = (o.format && o.format.toLowerCase() === 'wms') || !!o.wmsLayer || String(o.url).toLowerCase().includes('wms');
-                if (isWms) {
-                  overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, {
-                    version: '1.1.1',
-                    srs: 'EPSG:3857',
-                    layers: o.wmsLayer || 'default',
-                    format: 'image/png',
-                    transparent: true,
-                    opacity: dynamicOpacity,
-                    maxNativeZoom: o.maxZoom || 19,
-                    maxZoom: maxGlobalZoom,
-                    attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`,
-                    zIndex: z,
-                    keepBuffer: 4,
-                    updateWhenZooming: false,
-                    updateWhenIdle: true
-                  }).addTo(map);
-                } else {
-                  const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
-                  overlayLayersRef.current[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
+              if (!overlayLayersRef.current[id]) {
+                const o = basemapsRegistry.find(b => b.id === id);
+                if (o) {
+                  const z = idx + 10;
+                  const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
+                  const isWms = (o.format && o.format.toLowerCase() === 'wms') || !!o.wmsLayer || String(o.url).toLowerCase().includes('wms');
+                  if (isWms) {
+                    overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, {
+                      maxNativeZoom: o.maxZoom || 19,
+                      maxZoom: maxGlobalZoom,
+                      layers: o.wmsLayer || 'default',
+                      format: 'image/png',
+                      transparent: true,
+                      opacity: dynamicOpacity,
+                      attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`,
+                      zIndex: z
+                    }).addTo(map);
+                  } else {
+                    const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
+                    overlayLayersRef.current[o.id] = L.tileLayer(o.url, layerOpts).addTo(map);
+                  }
                 }
               }
             });
@@ -1571,6 +1572,7 @@ const App = () => {
           const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
           const [activeIndex, setActiveIndex] = useState(0);
           const [slideHistory, setSlideHistory] = useState([]);
+          const [forwardHistory, setForwardHistory] = useState([]);
           const [isMonitorOpen, setIsMonitorOpen] = useState(false);
           const [isAboutOpen, setIsAboutOpen] = useState(false);
           const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -1878,7 +1880,15 @@ const App = () => {
                     defaultOpacity: (exactGet(norm, 'default opacity') !== '' && !isNaN(parseFloat(exactGet(norm, 'default opacity')))) ? parseFloat(exactGet(norm, 'default opacity')) : 0.3
                   };
                 }).filter(b => b.id && b.url);
-                setBasemapsRegistry(basemaps);
+                setBasemapsRegistry(prev => {
+                  const merged = [...prev];
+                  basemaps.forEach(bm => {
+                    const existIdx = merged.findIndex(m => m.id === bm.id);
+                    if (existIdx >= 0) merged[existIdx] = bm;
+                    else merged.push(bm);
+                  });
+                  return merged;
+                });
                 addLog(`Basemaps registry parsed. Found ${basemaps.length} configured tile services.`, 'info');
               } else {
                 setBasemapsRegistry([{ id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: true, attrText: 'OpenStreetMap', attrLink: 'https://openstreetmap.org' }]);
@@ -2052,7 +2062,10 @@ const App = () => {
           // =========================================================================
           const jumpToSlide = (newIdx, isSequential = false) => {
             if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
-              if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
+              if (!isSequential) {
+                setSlideHistory(prev => [...prev, activeIndex]);
+                setForwardHistory([]);
+              }
               setActiveIndex(newIdx);
             }
           };
@@ -2061,7 +2074,17 @@ const App = () => {
             if (slideHistory.length > 0) {
               const prev = slideHistory[slideHistory.length - 1];
               setSlideHistory(h => h.slice(0, -1));
+              setForwardHistory(f => [...f, activeIndex]);
               setActiveIndex(prev);
+            }
+          };
+
+          const goForward = () => {
+            if (forwardHistory.length > 0) {
+              const next = forwardHistory[forwardHistory.length - 1];
+              setForwardHistory(f => f.slice(0, -1));
+              setSlideHistory(h => [...h, activeIndex]);
+              setActiveIndex(next);
             }
           };
 
@@ -2171,6 +2194,9 @@ const App = () => {
 
           const canGoBack = slideHistory && slideHistory.length > 0;
           const backBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} disabled=${!canGoBack} style="opacity: ${canGoBack ? '1' : '0.38'}; cursor: ${canGoBack ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoBack ? 'auto' : 'none'};" title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`;
+
+          const canGoForward = forwardHistory && forwardHistory.length > 0;
+          const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward to Next Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg></button>`;
 
           const resetLayoutBtn = html`
             <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(140); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
@@ -2410,6 +2436,7 @@ const App = () => {
                     ${filterPopup}
                     ${searchBtn}
                     ${backBtn}
+                    ${forwardBtn}
                   </div>
                 </div>
 
