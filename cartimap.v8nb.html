@@ -191,7 +191,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.68-b163';
+const APP_VERSION = 'v8.13.68-b164';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -645,7 +645,11 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
               </div>
             </div>
             <div class="title-header-container" style="width: 100%; padding: 0; box-sizing: border-box;">
-              <h2 style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease; color: #222;" dangerouslySetInnerHTML=${{"__html": slide.title}}></h2>
+              <h2 style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease; color: #222;">
+              ${slide.webPage && (slide.webPage.startsWith('http://') || slide.webPage.startsWith('https://'))
+                ? html`<a href="${slide.webPage}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 122, 204, 0.4); text-underline-offset: 4px; pointer-events: auto;" dangerouslySetInnerHTML=${{"__html": slide.title}}></a>`
+                : html`<span dangerouslySetInnerHTML=${{"__html": slide.title}}></span>`}
+            </h2>
             </div>
           </div>
         </div>
@@ -657,7 +661,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.7.0';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.0-b164';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1485,6 +1489,13 @@ const App = () => {
           const [isFilterOpen, setIsFilterOpen] = useState(false);
           const [isSearchOpen, setIsSearchOpen] = useState(false);
           const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      setTimeout(() => searchInputRef.current && searchInputRef.current.focus(), 50);
+    }
+  }, [isSearchOpen]);
           useEffect(() => { if (isSearchOpen) { setTimeout(() => { const el = document.querySelector('.search-input'); if (el) el.focus(); }, 50); } }, [isSearchOpen]);
           const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
           const [searchHistory, setSearchHistory] = useState(() => {
@@ -1707,7 +1718,7 @@ const App = () => {
                 const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
 
                 return {
-                  id: index,
+                  id: index + 1,
                   title: rowTitle,
                   startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf'), index, rowTitle),
                   endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf'), index, rowTitle),
@@ -1972,6 +1983,14 @@ const App = () => {
               if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
               if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
               else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
+              else if (e.key === 'ArrowDown') {
+                const textPane = document.querySelector('.content-slider-pane');
+                if (textPane) textPane.scrollBy({ top: 120, behavior: 'smooth' });
+              }
+              else if (e.key === 'ArrowUp') {
+                const textPane = document.querySelector('.content-slider-pane');
+                if (textPane) textPane.scrollBy({ top: -120, behavior: 'smooth' });
+              }
             };
             window.addEventListener('keydown', handleKeyDown);
             return () => window.removeEventListener('keydown', handleKeyDown);
