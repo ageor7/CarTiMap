@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.13.68-b170</title>
+    <title>CarTiMap v8.13.68-b171</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -174,7 +174,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .event-block:hover { filter: brightness(1.05); z-index: 40 !important; width: max-content !important; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.25)); }
 .timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
 .timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
-.timeline-control-cluster { position: absolute; right: 15px; z-index: 1000; display: flex; flex-direction: row; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; }
+.timeline-control-cluster { position: absolute; right: 15px; z-index: 1000; display: flex; flex-direction: column; box-shadow: 0 2px 6px rgba(0,0,0,0.25); border-radius: 4px; overflow: hidden; background: #fff; }
 .timeline-control-cluster .zoom-factor { display: flex; align-items: center; justify-content: center; }
 .media-swipe-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: auto; background: transparent; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, calc(50% - 80px) calc(50% - 60px), calc(50% + 80px) calc(50% - 60px), calc(50% + 80px) calc(50% + 60px), calc(50% - 80px) calc(50% + 60px), calc(50% - 80px) calc(50% - 60px)); }
 .semantic-time-span-left { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -191,7 +191,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.68-b170';
+const APP_VERSION = 'v8.13.68-b171';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1002,82 +1002,32 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 
 
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b170 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.13.68-b170 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b171 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.13.68-b171 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
-          // --- [ MapViewer State & Refs Initialization ] ---
-          const mapDomRef = useRef(null); const miniMapDomRef = useRef(null);
-          const mapInstance = useRef(null); const miniMapInstance = useRef(null);
-          const rectBoundsRef = useRef(null); const markerLayer = useRef(null);
-          const clusterLayer = useRef(null); const gridLayerRef = useRef(null);
-          const markersRef = useRef([]); const hasFitBounds = useRef(false);
-          const [mapZoom, setMapZoom] = useState(2); const [showGrid, setShowGrid] = useState(false);
-          const [showLayersMenu, setShowLayersMenu] = useState(false);
-          const [activeBasemap, setActiveBasemap] = useState(null);
+          const mapDomRef = useRef(null);
+          const miniMapDomRef = useRef(null);
+          const mapInstance = useRef(null);
+          const miniMapInstance = useRef(null);
+          const baseLayerRef = useRef(null);
+          const miniBaseLayerRef = useRef(null);
+          const overlayLayersRef = useRef({});
+          const gridLayerRef = useRef(null);
+          const markerLayer = useRef(null);
+          const clusterLayer = useRef(null);
+          const markersRef = useRef([]);
+          const hasFitBounds = useRef(false);
+          const [mapZoom, setMapZoom] = useState(2);
+          const [activeBasemap, setActiveBasemap] = useState('carto-light');
           const [activeOverlays, setActiveOverlays] = useState([]);
-          const [showLegendMenu, setShowLegendMenu] = useState(false);
           const [overlayOpacities, setOverlayOpacities] = useState({});
           const [basemapOpacity, setBasemapOpacity] = useState(1.0);
-          const initialLoadRef = useRef(false); const baseLayerRef = useRef(null);
-          const miniBaseLayerRef = useRef(null); const overlayLayersRef = useRef({});
-          const minimapOffsetRef = useRef(minimapOffset || -4);
+          const [showGrid, setShowGrid] = useState(false);
+          const [showLegendMenu, setShowLegendMenu] = useState(false);
+          const [showLayersMenu, setShowLayersMenu] = useState(false);
           const isSyncingRef = useRef(false);
-          
-          // --- [ Inline Comment: Helper to parse names and coordinates from polyline place strings ] ---
-          const parsePolylineLabels = (placeStr) => {
-            if (!placeStr) return null;
-            const match = placeStr.match(/^\s*\x5b(.*?)\x5d.*$/);
-            if (match) {
-              const lineNameRaw = match[1]; const lineName = lineNameRaw.trim();
-              const details = placeStr.replace(/^\s*\x5b.*?\x5d\s*/, '').split(/(?:,|\||·|;)/).map(s => s.trim()).filter(Boolean);
-              const [ startLabelRaw = '', endLabelRaw = '' ] = details; return { lineName, startLabel: startLabelRaw, endLabel: endLabelRaw };
-            }
-            return null;
-          };
-
-          // --- [ Inline Comment: Securely strips HTML elements from spatial label strings ] ---
-          const safeStripHTML = (str) => {
-            if (!str) return '';
-            const withDashes = String(str).replace(new RegExp("<p\\x5b^>\\x5d*>", "gi"), ' - ');
-            return withDashes.replace(new RegExp("<\\x5b^>\\x5d*>?", "gm"), '').trim();
-          };
-
-          const loadScript = (src) => new Promise((resolve, reject) => {
-            if (document.querySelector(`script[src="${src}"]`)) return resolve();
-            const script = document.createElement('script'); script.src = src; script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
-          });
-
-          const loadStyle = (href) => {
-            if (document.querySelector(`link[href="${href}"]`)) return;
-            const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = href; document.head.appendChild(link);
-          };
-
-          const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
-
-          useEffect(() => {
-            if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
-              const defaultBase = basemapsRegistry.find(b => b.type === 'base' && b.active) || basemapsRegistry.find(b => b.type === 'base');
-              if (defaultBase) setActiveBasemap(defaultBase.id);
-              const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
-              setActiveOverlays(defaultOverlays);
-              const initOpac = {}; basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => { initOpac[o.id] = o.defaultOpacity ?? 0.3; });
-              setOverlayOpacities(initOpac); initialLoadRef.current = true;
-            }
-          }, [basemapsRegistry]);
-
-          useEffect(() => {
-            minimapOffsetRef.current = minimapOffset;
-            if (mapInstance.current && miniMapInstance.current) {
-              let targetMiniZoom = mapInstance.current.getZoom() + minimapOffset;
-              if (targetMiniZoom < 0) targetMiniZoom = 0;
-              miniMapInstance.current.setView(mapInstance.current.getCenter(), targetMiniZoom, { animate: true });
-            }
-          }, [minimapOffset]);
-
-          const createPinHtml = (isActive, isVip) => {
-            const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
-            return `<div class="custom-map-pin" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'}"><div class="pin-head" style="background: ${color}"></div><div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'}"></div></div>`;
-          };
+          const minimapOffsetRef = useRef(minimapOffset);
+          minimapOffsetRef.current = minimapOffset;
 
           const extractLayers = (layerObj) => {
             let layers = [];
@@ -1115,6 +1065,27 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             return subs.length > 0 ? subs : [str];
           };
 
+          const safeStripHTML = (str) => {
+            if (!str) return '';
+            return String(str).replace(/<[^>]*>/g, '').trim();
+          };
+
+          const formatPlaces = (placeStr) => {
+            if (!placeStr) return '';
+            return String(placeStr).replace(/[
+]+/g, ' · ').trim();
+          };
+
+          const createPinHtml = (isActive, isVip) => {
+            const color = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
+            return `<div class="custom-map-pin ${isActive ? 'active-glow' : ''}" style="transform: ${isActive ? 'scale(1.3)' : 'scale(1)'}; z-index: ${isActive ? '1000' : '0'}">
+              <div class="pin-head" style="background: ${color}"></div>
+              <div class="pin-stem" style="background: ${isActive ? '#28a745' : '#333'}; width: ${isActive ? '3px' : '2px'}"></div>
+            </div>`;
+          };
+
+          const maxGlobalZoom = basemapsRegistry && basemapsRegistry.length > 0 ? Math.max(...basemapsRegistry.map(b => b.maxZoom || 19)) : 22;
+
           useEffect(() => {
             if (mapDomRef.current && miniMapDomRef.current && !mapInstance.current && window.L && basemapsRegistry) {
               const urlParams = new URLSearchParams(window.location.search);
@@ -1125,8 +1096,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               L.control.scale({ position: 'bottomright', imperial: true, metric: true }).addTo(map);
               map.on('zoomend', () => setMapZoom(map.getZoom()));
               mapInstance.current = map;
+
               const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false }).setView(new L.LatLng(37.9838, 23.7275), 0);
               miniMapInstance.current = miniMap;
+
               const updateMinimap = () => {
                 if (isSyncingRef.current) return;
                 isSyncingRef.current = true;
@@ -1137,22 +1110,30 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               };
               map.on('move', updateMinimap);
               map.on('zoom', updateMinimap);
+
               markerLayer.current = L.featureGroup().addTo(map);
+
               if (window.L && window.L.markerClusterGroup) {
-                clusterLayer.current = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true, iconCreateFunction: (cluster) => {
-                  const markers = cluster.getAllChildMarkers();
-                  const count = markers.length;
-                  const [ firstMarker ] = markers; const isAllSameCoords = markers.every(m => m.getLatLng().equals(firstMarker.getLatLng()));
-                  if (isAllSameCoords) {
-                    const html = `<div class="custom-map-pin active-glow" style="transform: scale(1.15);"><div class="pin-head" style="background: #28a745; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 800; font-family: sans-serif;">${count}</div><div class="pin-stem" style="background: #28a745; width: 3px;"></div></div>`;
-                    return L.divIcon({ html, className: 'custom-div-icon', iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
+                clusterLayer.current = L.markerClusterGroup({
+                  spiderfyOnMaxZoom: true,
+                  showCoverageOnHover: false,
+                  zoomToBoundsOnClick: true,
+                  iconCreateFunction: (cluster) => {
+                    const markers = cluster.getAllChildMarkers();
+                    const count = markers.length;
+                    const [ firstMarker ] = markers;
+                    const isAllSameCoords = markers.every(m => m.getLatLng().equals(firstMarker.getLatLng()));
+                    if (isAllSameCoords) {
+                      const html = `<div class="custom-map-pin active-glow" style="transform: scale(1.15);"><div class="pin-head" style="background: #28a745; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 800; font-family: sans-serif;">${count}</div><div class="pin-stem" style="background: #28a745; width: 3px;"></div></div>`;
+                      return L.divIcon({ html, className: 'custom-div-icon', iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) });
+                    }
+                    return L.divIcon({ html: `<div class="custom-cluster"><span>${count}</span></div>`, className: 'custom-cluster-wrapper', iconSize: new L.Point(40, 40) });
                   }
-                  return L.divIcon({ html: `<div class="custom-cluster"><span>${count}</span></div>`, className: 'custom-cluster-wrapper', iconSize: new L.Point(40, 40) });
-                }}).addTo(map);
+                }).addTo(map);
               } else {
                 clusterLayer.current = L.featureGroup().addTo(map);
               }
-              const customLayers = basemapsRegistry.filter(b => b.type === 'overlay');
+
               const renderGrid = () => {
                 if (gridLayerRef.current) map.removeLayer(gridLayerRef.current);
                 gridLayerRef.current = L.layerGroup();
@@ -1163,7 +1144,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   for (let lat = snap(bounds.getSouth(), step); lat <= bounds.getNorth(); lat += step) {
                     L.polyline([[lat, bounds.getWest()], [lat, bounds.getEast()]], { color: '#ccc', weight: 0.5, dashArray: '5, 5' }).addTo(gridLayerRef.current);
                   }
-                  for (let lon = snap(bounds.getWest(), step); lon <= bounds.getEast(); lon += step) {
+                  for (let lon = snap(bounds.getWest(), step); lon <= bounds.getNorth(); lon += step) {
                     L.polyline([[bounds.getSouth(), lon], [bounds.getNorth(), lon]], { color: '#ccc', weight: 0.5, dashArray: '5, 5' }).addTo(gridLayerRef.current);
                   }
                   gridLayerRef.current.addTo(map);
@@ -1171,8 +1152,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               };
               map.on('moveend', renderGrid);
               map.on('zoomend', renderGrid);
+
               const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
-              const [ firstBase ] = bases; const defaultBase = bases.find(b => b.active) || firstBase;
+              const [ firstBase ] = bases;
+              const defaultBase = bases.find(b => b.active) || firstBase;
               if (defaultBase) {
                 baseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: defaultBase.attrText, zIndex: 0 }).addTo(map);
                 miniBaseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: '', zIndex: 0 }).addTo(miniMap);
@@ -1181,7 +1164,8 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [basemapsRegistry, maxGlobalZoom]);
 
           useEffect(() => {
-            const map = mapInstance.current; const miniMap = miniMapInstance.current;
+            const map = mapInstance.current;
+            const miniMap = miniMapInstance.current;
             if (!map || !miniMap || !basemapsRegistry) return;
             const renderBasemap = () => {
               if (baseLayerRef.current) { map.removeLayer(baseLayerRef.current); miniMap.removeLayer(miniBaseLayerRef.current); }
@@ -1196,8 +1180,8 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [activeBasemap, basemapsRegistry, maxGlobalZoom, basemapOpacity]);
 
           useEffect(() => {
-            const map = mapInstance.current; const miniMap = miniMapInstance.current;
-            if (!map || !miniMap || !basemapsRegistry) return;
+            const map = mapInstance.current;
+            if (!map || !basemapsRegistry) return;
             basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
               if (overlayLayersRef.current[o.id]) { map.removeLayer(overlayLayersRef.current[o.id]); delete overlayLayersRef.current[o.id]; }
             });
@@ -1208,7 +1192,9 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
                 const isWms = (o.format && o.format.toLowerCase() === 'wms') || !!o.wmsLayer || String(o.url).toLowerCase().includes('wms');
                 if (isWms) {
-                  overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, { version: '1.1.1', srs: 'EPSG:3857',
+                  overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, {
+                    version: '1.1.1',
+                    srs: 'EPSG:3857',
                     layers: o.wmsLayer || 'default',
                     format: 'image/png',
                     transparent: true,
@@ -1236,6 +1222,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             markerLayer.current.clearLayers();
             clusterLayer.current.clearLayers();
             let validMarkers = 0;
+
             data.forEach((item, idx) => {
               const uniqueSignatures = new Set();
               const rawLocStr = item.location ? String(item.location).trim() : '';
@@ -1270,14 +1257,14 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                         wkt.read(locStr);
                         const extracted = extractLayers(wkt.toObject());
                         featureLayers = featureLayers.concat(extracted);
-                        if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): Parsed WKT ("${locStr.substring(0, 40)}...") -> ${extracted.length} layers`, 'info');
+                        if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): Parsed WKT string ("${locStr.substring(0, 40)}...") -> ${extracted.length} layers`, 'info');
                       }
                     } catch (err) {
                       if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): WKT Parse Failure on "${locStr}": ${err.message}`, 'warning');
                       const m = [...locStr.matchAll(/(-?\d+\.\d+|-?\d+)[,\s]+(-?\d+\.\d+|-?\d+)/g)];
                       if (m.length > 0) {
-                        const pts = m.map(mItem => { const x = mItem[1]; const y = mItem[2];
-                          let p1 = parseFloat(x), p2 = parseFloat(y);
+                        const pts = m.map(mItem => {
+                          let p1 = parseFloat(mItem[1]), p2 = parseFloat(mItem[2]);
                           return (p1 < p2 && p1 >= 18.0 && p1 <= 30.0 && p2 >= 34.0 && p2 <= 42.0)
                             ? new L.LatLng(p2, p1)
                             : new L.LatLng(p1, p2);
@@ -1289,14 +1276,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                       }
                     }
                   } else if (locStr.startsWith('{') && locStr.includes('"type"')) {
-                    const extracted = extractLayers(L.geoJSON(JSON.parse(locStr)));
-                    featureLayers = featureLayers.concat(extracted);
+                    featureLayers = featureLayers.concat(extractLayers(L.geoJSON(JSON.parse(locStr))));
                   } else {
                     const coordMatch = locStr.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
                     if (coordMatch) {
-                      const p1Str = coordMatch[1]; const p2Str = coordMatch[2];
-                      let p1 = parseFloat(p1Str);
-                      let p2 = parseFloat(p2Str);
+                      let p1 = parseFloat(coordMatch[1]);
+                      let p2 = parseFloat(coordMatch[2]);
                       let lat = p1, lng = p2;
                       if (p1 < p2 && p1 >= 18.0 && p1 <= 30.0 && p2 >= 34.0 && p2 <= 42.0) {
                         lat = p2; lng = p1;
@@ -1307,45 +1292,44 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                     }
                   }
                 } catch(e) {
-                  if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} Exception processing "${locStr}": ${e.message}`, 'error');
+                  if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): Unhandled spatial parse exception: ${e.message}`, 'error');
                 }
               });
-              const subLabels = item.subLabels ? item.subLabels.split(/(?:\||·|;|·|\n|\-)/).map(s => s.trim()).filter(Boolean) : [];
-                featureLayers.forEach((layer, layerIdx) => {
-                  if (!layer) return;
-                  let sig = null;
-                  if (layer.getLatLng) {
-                    const ll = layer.getLatLng();
-                    if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
-                    sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
-                  } else if (layer.getBounds) {
-                    const b = layer.getBounds();
-                    if (!b || !b.isValid()) return;
-                    sig = `B_${b.toBBoxString()}`;
-                  }
-                  if (sig) {
-                    if (uniqueSignatures.has(sig)) return;
-                    uniqueSignatures.add(sig);
-                  }
-                  const isActive = idx === activeIndex;
-                  if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
-                    layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
-                  } else if (layer.setStyle) {
-                    layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
-                  }
-                  if (layer instanceof L.Marker) {
-                    layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(isActive, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
-                  }
-                  const rawLabel = subLabels.at(layerIdx) || (item.place ? formatPlaces(item.place) : item.title);
-                  layer.bindTooltip(safeStripHTML(rawLabel), { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
-                  if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer);
-                  else markerLayer.current.addLayer(layer);
-                  validMarkers++;
-                });
-                markersRef.current.push(featureLayers);
-              } catch(e) {
-                markersRef.current.push([]);
-              }
+
+              const subLabels = item.subLabels ? item.subLabels.split(/(?:\||·|;|·|
+|\-)/).map(s => s.trim()).filter(Boolean) : [];
+              featureLayers.forEach((layer, layerIdx) => {
+                if (!layer) return;
+                let sig = null;
+                if (layer.getLatLng) {
+                  const ll = layer.getLatLng();
+                  if (!ll || ll.lat == null || ll.lng == null || isNaN(ll.lat) || isNaN(ll.lng)) return;
+                  sig = `P_${ll.lat.toFixed(5)}_${ll.lng.toFixed(5)}`;
+                } else if (layer.getBounds) {
+                  const b = layer.getBounds();
+                  if (!b || !b.isValid()) return;
+                  sig = `B_${b.toBBoxString()}`;
+                }
+                if (sig) {
+                  if (uniqueSignatures.has(sig)) return;
+                  uniqueSignatures.add(sig);
+                }
+                const isActive = idx === activeIndex;
+                if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
+                  layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
+                } else if (layer.setStyle) {
+                  layer.setStyle({ color: isActive ? '#007acc' : '#555', weight: isActive ? 6 : 4, opacity: isActive ? 0.9 : 0.6, fillOpacity: isActive ? 0.4 : polygonOpacity });
+                }
+                if (layer instanceof L.Marker) {
+                  layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(isActive, isVip), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
+                }
+                const rawLabel = subLabels.at(layerIdx) || (item.place ? formatPlaces(item.place) : item.title);
+                layer.bindTooltip(safeStripHTML(rawLabel), { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
+                if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer);
+                else markerLayer.current.addLayer(layer);
+                validMarkers++;
+              });
+              markersRef.current.push(featureLayers);
             });
           }, [activeIndex, data, maxAutoZoom, polygonOpacity]);
 
@@ -1373,7 +1357,6 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const bases = basemapsRegistry ? basemapsRegistry.filter(b => b.type !== 'overlay') : [];
           const overlays = basemapsRegistry ? basemapsRegistry.filter(b => b.type === 'overlay') : [];
 
-          // Decouple nested templates to variables to insulate against compile errors [REF: CRASH-05]
           const renderOverlayRow = (o) => {
             const isChecked = activeOverlays.includes(o.id);
             const op = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
@@ -1417,8 +1400,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             `;
           };
 
-          
-                    useEffect(() => {
+          useEffect(() => {
             const map = mapInstance.current;
             if (!map) return;
             if (gridLayerRef.current) {
@@ -1445,10 +1427,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [showGrid, mapZoom]);
 
           const legendMenuNode = showLegendMenu ? html`
-            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 280px; font-size: 0.82rem; color: #333; position: absolute; left: 44px; top: 12px; z-index: 2000;">
+            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 280px; font-size: 0.82rem; color: #333; position: absolute; right: 44px; top: 12px; z-index: 20000;">
               <div style="font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
                 <span>Map Legend</span>
-                <button onClick=${() => setShowLegendMenu(false)} style="border: none; background: none; cursor: pointer; font-size: 0.9rem; color: #888;">×</button>
+                <button onClick=${() => setShowLegendMenu(false)} style="border: none; background: none; cursor: pointer; font-size: 0.9rem; color: #888;">&times;</button>
               </div>
               <div style="display: flex; flex-direction: column; gap: 6px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -1494,7 +1476,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   <button class="status-btn" onClick=${() => mapInstance.current?.zoomIn()} title="Zoom In" style="width: 30px; height: 30px; border: none; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: center; padding: 0;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
-                  <div title="Current Zoom Level" style="height: 24px; width: 30px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: monospace; letter-spacing: -0.5px;">${mapZoom}</div>
+                  <div title="Current Zoom Level" style="height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800; color: #222; border-bottom: 1px solid #e0e0e0; background: #fff; font-family: monospace; letter-spacing: -0.5px;">${mapZoom}</div>
                   <button class="status-btn" onClick=${() => mapInstance.current?.zoomOut()} title="Zoom Out" style="width: 30px; height: 30px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
@@ -1527,18 +1509,18 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   </button>
                 </div>
               </div>
+
               ${legendMenuNode}
               ${layersMenuNode}
             </div>
           `;
         };
-
-MODULE_VERSIONS['MapViewer'] = 'v6.4.53-b155';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.70-b171';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b170 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b170 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b171 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b171 ] ===
 const App = () => {
           // APP_VERSION bound to top-level HTML header per Directive I.3.c
           // =========================================================================
@@ -2474,8 +2456,8 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.65-b155';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b170 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b170 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b171 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b171 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
