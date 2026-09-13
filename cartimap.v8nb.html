@@ -191,7 +191,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.68-b162';
+const APP_VERSION = 'v8.13.68-b163';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -688,44 +688,108 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     if (wrapperRef.current) ro.observe(wrapperRef.current);
   }, []);
 
-  const SECOND = 1000;
-  const MINUTE = 60 * SECOND;
-  const HOUR = 60 * MINUTE;
-  const DAY = 24 * HOUR;
-  const MONTH = 30.4375 * DAY;
-  const YEAR = 365.25 * DAY;
+  const safeStripHTML = (str) => {
+    if (!str) return '';
+    return String(str).replace(/<[^>]*>/g, '').trim();
+  };
+
+  const formatLabelSmart = (titleStr, maxPx = 180) => {
+    if (!titleStr) return { lines: ['Untitled'], pxWidth: 60 };
+    const clean = safeStripHTML(titleStr);
+    const words = clean.split(/\s+/);
+    if (words.length <= 3) return { lines: [clean], pxWidth: Math.max(60, clean.length * 7 + 35) };
+    const mid = Math.ceil(words.length / 2);
+    const line1 = words.slice(0, mid).join(' ');
+    const line2 = words.slice(mid).join(' ');
+    return { lines: [line1, line2], pxWidth: Math.max(60, Math.max(line1.length, line2.length) * 7 + 35) };
+  };
+
+  const getParsedTags = (rawTagsArray) => {
+    if (!rawTagsArray || rawTagsArray.length === 0) return [];
+    const splitRegex = /(?:\||·|;|·|\n|\-)/;
+    const arr = [];
+    (Array.isArray(rawTagsArray) ? rawTagsArray : [rawTagsArray]).forEach(t => {
+      if (typeof t === 'string') arr.push(...t.split(splitRegex));
+      else arr.push(t);
+    });
+    return arr.map(s => String(s).trim()).filter(Boolean);
+  };
+
+  const uniqueStarts = [...new Set((data || []).map(d => d.startDate?.min).filter(Boolean))].sort((a,b) => a - b);
+
+  // Swimlane gravity extraction matrix
+  const allTags = [];
+  (data || []).forEach(d => {
+    if (d.tags) allTags.push(...getParsedTags(d.tags));
+  });
+  const orderedTags = [...new Set(allTags)].filter(Boolean);
+  const laneCount = Math.max(1, orderedTags.length);
+  const laneHeight = Math.max(24, (containerHeight - 55) / laneCount);
 
   const validData = (data || []).filter(d => d.startDate && !isNaN(d.startDate.min));
-  const timeExtents = validData.reduce((acc, d) => {
-    return {
-      min: Math.min(acc.min, d.startDate.min),
-      max: Math.max(acc.max, d.endDate ? d.endDate.max : d.startDate.max)
-    };
-  }, { min: Infinity, max: -Infinity });
+  const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
+  let maxTimeRaw = minTimeRaw;
 
-  let renderMinTime = timeExtents.min;
-  let renderMaxTime = timeExtents.max;
+  validData.forEach(d => {
+    if (d.endDate && !isNaN(d.endDate.max) && d.endDate.max > maxTimeRaw) maxTimeRaw = d.endDate.max;
+    else if (d.startDate.min > maxTimeRaw) maxTimeRaw = d.startDate.min;
+  });
 
-  if (!isFinite(renderMinTime) || !isFinite(renderMaxTime)) {
-    renderMinTime = Date.now() - YEAR;
-    renderMaxTime = Date.now();
-  }
-
-  if (renderMinTime === renderMaxTime) {
-    renderMinTime -= DAY;
-    renderMaxTime += DAY;
-  }
-
-  const rawRange = renderMaxTime - renderMinTime;
-  const paddingMs = rawRange * 0.05;
-  renderMinTime -= paddingMs;
-  renderMaxTime += paddingMs;
+  const rawTimeRange = Math.max(maxTimeRaw - minTimeRaw, 86400000);
+  const padMs = rawTimeRange * 0.05;
+  const renderMinTime = minTimeRaw - padMs;
+  const renderMaxTime = maxTimeRaw + padMs;
   const renderTimeRange = renderMaxTime - renderMinTime;
+
+  const SECOND = 1000; const MINUTE = 60 * SECOND; const HOUR = 60 * MINUTE; const DAY = 24 * HOUR; const MONTH = 30 * DAY; const YEAR = 365.25 * DAY;
+
+  const scaleConfigs = [
+    { ms: 100 * YEAR, type: 'year', step: 100, minorType: 'year', minorStep: 10, minorCount: 10 },
+    { ms: 10 * YEAR, type: 'year', step: 10, minorType: 'year', minorStep: 1, minorCount: 10 },
+    { ms: 2 * YEAR, type: 'year', step: 2, minorType: 'month', minorStep: 2, minorCount: 12 },
+    { ms: YEAR, type: 'year', step: 1, minorType: 'month', minorStep: 1, minorCount: 12 },
+    { ms: 6 * MONTH, type: 'month', step: 6, minorType: 'month', minorStep: 1, minorCount: 6 },
+    { ms: MONTH, type: 'month', step: 1, minorType: 'day', minorStep: 3, minorCount: 10 },
+    { ms: 15 * DAY, type: 'day', step: 15, minorType: 'day', minorStep: 1, minorCount: 15 },
+    { ms: 5 * DAY, type: 'day', step: 5, minorType: 'day', minorStep: 1, minorCount: 5 },
+    { ms: DAY, type: 'day', step: 1, minorType: 'hour', minorStep: 3, minorCount: 8 },
+    { ms: 12 * HOUR, type: 'hour', step: 12, minorType: 'hour', minorStep: 1, minorCount: 12 },
+    { ms: 6 * HOUR, type: 'hour', step: 6, minorType: 'hour', minorStep: 1, minorCount: 6 },
+    { ms: 2 * HOUR, type: 'hour', step: 2, minorType: 'minute', minorStep: 15, minorCount: 8 },
+    { ms: HOUR, type: 'hour', step: 1, minorType: 'minute', minorStep: 10, minorCount: 6 },
+    { ms: 30 * MINUTE, type: 'minute', step: 30, minorType: 'minute', minorStep: 5, minorCount: 6 },
+    { ms: 15 * MINUTE, type: 'minute', step: 15, minorType: 'minute', minorStep: 1, minorCount: 15 },
+    { ms: 10 * MINUTE, type: 'minute', step: 10, minorType: 'minute', minorStep: 1, minorCount: 10 },
+    { ms: 5 * MINUTE, type: 'minute', step: 5, minorType: 'minute', minorStep: 1, minorCount: 5 },
+    { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
+  ];
 
   if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
 
   const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
   const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+  const visibleTimeSpanMs = renderTimeRange / zoomLevel;
+
+  const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
+  const visibleRightMs = renderMinTime + ((viewLeftEdge + containerW) / trackWidthPx) * renderTimeRange;
+  const viewportCenterMs = visibleLeftMs + ((visibleRightMs - visibleLeftMs) / 2);
+
+  useEffect(() => {
+    if (setVisibleTimeBounds && !isNaN(visibleLeftMs) && !isNaN(visibleRightMs)) {
+      setVisibleTimeBounds([visibleLeftMs, visibleRightMs]);
+    }
+  }, [visibleLeftMs, visibleRightMs, setVisibleTimeBounds]);
+
+  useEffect(() => {
+    const visibleMs = renderTimeRange / zoomLevel;
+    const secs = visibleMs / 1000; const mins = secs / 60; const hrs = mins / 60; const days = hrs / 24; const mos = days / 30.44; const yrs = days / 365.25;
+    let str = `${Math.round(mins)} Minutes`;
+    if (yrs >= 1) str = `${Math.round(yrs)} Years`;
+    else if (mos >= 1) str = `${Math.round(mos)} Months`;
+    else if (days >= 1) str = `${Math.round(days)} Days`;
+    else if (hrs >= 1) str = `${Math.round(hrs)} Hours`;
+    setVisibleTimeSpan(`Span: ${str} (Zoom: ${Math.round(zoomLevel)}x)`);
+  }, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
 
   const getExactNodeScrollPos = (nodeGlobalIdx, trackW, containerW) => {
     const activeNode = data[nodeGlobalIdx];
@@ -744,22 +808,6 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
   }, [activeIndex]);
 
-  useLayoutEffect(() => {
-    if (scrollTargetPayloadRef.current !== null && wrapperRef.current) {
-      const containerW = wrapperRef.current.clientWidth;
-      const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
-      let targetScrollPos = 0;
-      const payload = scrollTargetPayloadRef.current;
-      if (payload.type === 'node') {
-        targetScrollPos = getExactNodeScrollPos(payload.value, trackWidthPx, containerW);
-      } else if (payload.type === 'raw') {
-        targetScrollPos = payload.value;
-      }
-      wrapperRef.current.scrollTo({ left: targetScrollPos, behavior: 'auto' });
-      scrollTargetPayloadRef.current = null;
-    }
-  }, [zoomLevel]);
-
   const handleManualZoom = (newZoom, centerType = 'center', eventX = 0) => {
     if (!wrapperRef.current) return;
     const containerW = wrapperRef.current.clientWidth;
@@ -767,11 +815,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const newTrackW = Math.max(containerW, containerW * newZoom);
 
     let focalPx = 0;
-    if (centerType === 'mouse') {
-      focalPx = wrapperRef.current.scrollLeft + eventX;
-    } else {
-      focalPx = wrapperRef.current.scrollLeft + (containerW / 2);
-    }
+    if (centerType === 'mouse') focalPx = wrapperRef.current.scrollLeft + eventX;
+    else focalPx = wrapperRef.current.scrollLeft + (containerW / 2);
 
     const focalPct = focalPx / currentTrackW;
     const newFocalPx = focalPct * newTrackW;
@@ -832,28 +877,63 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     scrollTimeout.current = setTimeout(() => { if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft); }, 100);
   };
 
-  const isSuspended = false;
+  const viewPadMs = visibleTimeSpanMs * 0.5;
+  const stackRegistry = {};
 
   const markers = validData.map((item) => {
-    const isActive = item.id === activeIndex;
-    const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
     const itemStartMs = item.startDate.min;
-    const itemEndMs = item.endDate ? item.endDate.max : itemStartMs;
-    const leftPct = ((itemStartMs - renderMinTime) / renderTimeRange) * 100;
-    const widthPct = Math.max(0.1, ((itemEndMs - itemStartMs) / renderTimeRange) * 100);
+    const itemEndMs = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : itemStartMs;
+    if (itemEndMs < (visibleLeftMs - viewPadMs) || itemStartMs > (visibleRightMs + viewPadMs)) return null;
+
+    const globalIndex = data.findIndex(d => d.id === item.id);
+    const startPct = Number((((itemStartMs - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+    const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
+    const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
+    const topPos = (laneIdx * laneHeight) + 5;
+    const blockHeight = Math.max(20, ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight);
+    const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
+    const hasMedia = item.media && item.media.length > 0;
+
+    const stackKey = `${itemStartMs}_${laneIdx}`;
+    if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
+    const stackDepth = stackRegistry[stackKey]++;
+    const xOffset = stackDepth * 6;
+    const yOffset = stackDepth * 4;
+
+    let endPct = startPct;
+    if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
+      endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+    }
+    const hasDuration = (endPct - startPct) > 0.001;
+    const isActive = globalIndex === activeIndex;
+    const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
     const colActive = isActive ? '#007acc' : (isVip ? '#ffb300' : '#444');
 
+    let dropLine = '';
+    if (isActive) {
+      dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: #007acc; z-index: 999;"></div>`;
+    } else if (!hasDuration) {
+      dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: rgba(204,0,0,0.6); z-index: 900;"></div>`;
+    }
+
     return html`
-      <div key=${item.id} onClick=${() => handleNodeClick(item.id)} style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 20px; bottom: 35px; cursor: pointer; z-index: ${isActive ? 1000 : 100}; display: flex; align-items: center;">
-        <div style="width: 12px; height: 12px; border-radius: 50%; background: ${colActive}; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: translate(-50%, -50%); position: absolute; left: 0; top: 50%;"></div>
-        <div style="margin-left: 10px; font-size: 0.75rem; font-weight: ${isActive ? 'bold' : 'normal'}; color: ${colActive}; white-space: nowrap; text-shadow: 0 1px 2px #fff;">
-          ${item.title || 'Untitled'}
+      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)}>
+        ${dropLine}
+        <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
+          ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>` : ''}
+          <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
+            ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
+          </div>
         </div>
       </div>
     `;
   });
 
   return html`
+    <style>
+      .event-group:hover { z-index: 99999 !important; }
+      .event-group:hover .event-block { transform: translateY(-50%) scale(1.08) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; border-color: #007acc !important; z-index: 99999 !important; width: max-content !important; min-width: var(--calc-w) !important; }
+    </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <div class="timeline-control-cluster" style="position: absolute; top: 10px; right: 12px; z-index: 1000; display: flex; gap: 4px;">
         <button class="status-btn" style="border: 1px solid #ccc; border-radius: 4px; background: rgba(255,255,255,0.85); width: 24px; height: 24px;" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline">
@@ -863,8 +943,23 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
       <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
         <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box; background: #ffffff;">
+          <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 50px; pointer-events: none; z-index: 0;">
+            ${orderedTags.map((tag, i) => html`
+              <div class="tag-lane" style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.04)' : 'transparent'}; border-bottom: 1px solid rgba(0,0,0,0.05);"></div>
+            `)}
+          </div>
+
           <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #f8f9fa; border-top: 2px solid #999; z-index: 5;"></div>
+
           ${markers}
+
+          <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 50px; pointer-events: none; z-index: 45;">
+            ${orderedTags.map((tag, i) => html`
+              <div style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; pointer-events: none;">
+                <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05); pointer-events: auto; position: sticky; left: 0; height: 100%; display: inline-flex; align-items: center; padding: 0 10px; font-size: 0.75rem; color: #555;">${tag}</div>
+              </div>
+            `)}
+          </div>
         </div>
       </div>
     </div>
