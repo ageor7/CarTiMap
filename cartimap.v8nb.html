@@ -1019,29 +1019,32 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const markerLayer = useRef(null);
           const clusterLayer = useRef(null);
           const markersRef = useRef([]);
-          const hasFitBounds = useRef(false); const initialLoadRef = useRef(false);
+          const hasFitBounds = useRef(false);
           const [mapZoom, setMapZoom] = useState(2);
           const [activeBasemap, setActiveBasemap] = useState('carto-light');
           const [activeOverlays, setActiveOverlays] = useState([]);
           const [overlayOpacities, setOverlayOpacities] = useState({});
 
           useEffect(() => {
-            if (basemapsRegistry && basemapsRegistry.length > 0 && !initialLoadRef.current) {
+            if (basemapsRegistry && basemapsRegistry.length > 0) {
               const bases = basemapsRegistry.filter(b => b.type !== 'overlay');
-              const defaultBase = bases.find(b => b.active) || bases.at(0);
-              if (defaultBase) {
-                setActiveBasemap(defaultBase.id);
+              const overlays = basemapsRegistry.filter(b => b.type === 'overlay');
+              if (!initialLoadRef.current) {
+                const defaultBase = bases.find(b => b.active) || bases.at(0);
+                if (defaultBase) setActiveBasemap(defaultBase.id);
+                initialLoadRef.current = true;
               }
-              const defaultOverlays = basemapsRegistry.filter(b => b.type === 'overlay' && b.active).map(b => b.id);
-              setActiveOverlays(defaultOverlays);
-              const initOpac = {};
-              basemapsRegistry.filter(b => b.type === 'overlay').forEach(o => {
-                initOpac[o.id] = o.defaultOpacity !== undefined ? o.defaultOpacity : 0.3;
-              });
-              setOverlayOpacities(initOpac);
-              initialLoadRef.current = true;
+              if (overlays.length > 0 && activeOverlays.length === 0) {
+                const defaultOverlays = overlays.filter(b => b.active).map(b => b.id);
+                setActiveOverlays(defaultOverlays);
+                const initOpac = {};
+                overlays.forEach(o => {
+                  initOpac[o.id] = o.defaultOpacity !== undefined ? o.defaultOpacity : 0.3;
+                });
+                setOverlayOpacities(initOpac);
+              }
             }
-          }, [basemapsRegistry]);
+          }, [basemapsRegistry, activeOverlays.length]);
           const [basemapOpacity, setBasemapOpacity] = useState(1.0);
           const [showGrid, setShowGrid] = useState(false);
           const [showLegendMenu, setShowLegendMenu] = useState(false);
@@ -1229,7 +1232,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 if (o) {
                   const z = idx + 10;
                   const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity ?? 0.3);
-                  const isWms = (o.format && o.format.toLowerCase() === 'wms') || !!o.wmsLayer || String(o.url).toLowerCase().includes('wms');
+                  const isWms = (o.format && o.format.toLowerCase() === 'wms') || (o.wmsLayer && o.wmsLayer.trim() !== '');
                   if (isWms) {
                     overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, {
                       maxNativeZoom: o.maxZoom || 19,
@@ -1248,7 +1251,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 }
               }
             });
-          }, [activeOverlays, basemapsRegistry, maxGlobalZoom, overlayOpacities]);
+          }, [activeOverlays, basemapsRegistry, maxGlobalZoom]);
 
           useEffect(() => {
             const map = mapInstance.current;
@@ -1572,7 +1575,6 @@ const App = () => {
           const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
           const [activeIndex, setActiveIndex] = useState(0);
           const [slideHistory, setSlideHistory] = useState([]);
-          const [forwardHistory, setForwardHistory] = useState([]);
           const [isMonitorOpen, setIsMonitorOpen] = useState(false);
           const [isAboutOpen, setIsAboutOpen] = useState(false);
           const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -1880,15 +1882,7 @@ const App = () => {
                     defaultOpacity: (exactGet(norm, 'default opacity') !== '' && !isNaN(parseFloat(exactGet(norm, 'default opacity')))) ? parseFloat(exactGet(norm, 'default opacity')) : 0.3
                   };
                 }).filter(b => b.id && b.url);
-                setBasemapsRegistry(prev => {
-                  const merged = [...prev];
-                  basemaps.forEach(bm => {
-                    const existIdx = merged.findIndex(m => m.id === bm.id);
-                    if (existIdx >= 0) merged[existIdx] = bm;
-                    else merged.push(bm);
-                  });
-                  return merged;
-                });
+                setBasemapsRegistry(basemaps);
                 addLog(`Basemaps registry parsed. Found ${basemaps.length} configured tile services.`, 'info');
               } else {
                 setBasemapsRegistry([{ id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: true, attrText: 'OpenStreetMap', attrLink: 'https://openstreetmap.org' }]);
@@ -2060,6 +2054,8 @@ const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 4.1: SLIDE NAVIGATION & VIEWPORT LISTENERS ] ===
           // =========================================================================
+          const [forwardHistory, setForwardHistory] = useState([]);
+
           const jumpToSlide = (newIdx, isSequential = false) => {
             if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
               if (!isSequential) {
@@ -2196,7 +2192,8 @@ const App = () => {
           const backBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} disabled=${!canGoBack} style="opacity: ${canGoBack ? '1' : '0.38'}; cursor: ${canGoBack ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoBack ? 'auto' : 'none'};" title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`;
 
           const canGoForward = forwardHistory && forwardHistory.length > 0;
-          const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward to Next Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg></button>`;
+          const forwardBtnText = showButtonText ? html`<span>Forward</span>` : '';
+          const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward in History"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg>${forwardBtnText}</button>`;
 
           const resetLayoutBtn = html`
             <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { setMinimapOffset(-4); setTimelineRequiredHeight(140); setIsTimelineExpanded(false); setIsTimelineMinimized(false); setMaxPane(null); }} title="Reset Layout Viewport">
