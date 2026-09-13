@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.13.68-b179</title>
+    <title>CarTiMap v8.13.68-b178</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -72,13 +72,13 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 /* --- [ SubBlock: Layout & Resizers ] --- */
 #app-layout { --primary-split: 50%; --secondary-split: 50%; --timeline-height: 10%; display: flex; flex-direction: column; flex: 1; width: 100%; max-width: 100%; height: 100%; overflow: hidden; position: relative; }
 .core-viewports { display: flex; flex-direction: row; flex-grow: 1; height: calc(100% - var(--timeline-height) - 4px); width: 100%; max-width: 100%; overflow: visible; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; min-width: 0; position: relative; z-index: 10; }
-.content-slider-pane { background: var(--paneBg); overflow: hidden; display: flex; flex-direction: column; min-height: 0; min-width: 0; flex-shrink: 0; z-index: 15; order: 1; width: var(--primary-split); height: 100%; }
+.content-slider-pane { background: var(--paneBg); overflow: hidden; display: flex; flex-direction: column; min-height: 0; min-width: 0; flex-shrink: 0; z-index: 15; order: 1; width: var(--primary-split); height: 100%; max-width: 95ch; }
 .resizer-dyn-primary { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; order: 2; width: 4px; height: 100%; cursor: col-resize; }
 .visual-pane { display: flex; flex-direction: column; overflow: visible; min-height: 0; min-width: 0; flex-shrink: 0; position: relative; z-index: 20; order: 3; flex: 1 1 0; width: auto; height: 100%; }
 .visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
 .visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
 .visual-pane.no-media .media-pane { display: none !important; }
-.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible !important; z-index: 100 !important; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; }
+.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible; z-index: 100 !important; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; }
 .resizer-dyn-secondary { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
 .media-pane { background: #111; overflow: hidden; position: relative; min-height: 0; min-width: 0; z-index: 30; flex: 1 1 auto; height: auto; width: 100%; }
 .media-carousel { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
@@ -86,7 +86,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .status-bar, .global-status-bar { height: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative; }
 .status-left, .status-right { display: flex; align-items: center; gap: 8px; flex: 1; }
 .status-left { padding-left: 0 !important; flex-shrink: 0 !important; }
-.status-right { padding-right: 0 !important; justify-content: flex-end; }
+.status-right { padding-right: 0 !important; }
 .status-center { display: flex; align-items: center; gap: 12px; justify-content: center; flex: 0 0 auto; }
 .timeline-pane { background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; z-index: 5; width: 100%; max-width: 100%; box-sizing: border-box; }
 
@@ -131,7 +131,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tm-opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; }
 .tm-opacity-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; border: none; }
 .minimap-container { position: absolute; bottom: 24px; left: 12px; width: 140px; height: 140px; background: #fff; border: 2px solid #ccc; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; overflow: hidden; resize: both; min-width: 50px; min-height: 50px; max-width: 250px !important; max-height: 250px !important; flex-shrink: 0 !important; }
-@media (max-width: 1023px), (min-width: 1024px) and (max-height: 800px) and (orientation: landscape) { .minimap-container { width: 75px !important; height: 75px !important; bottom: 12px !important; left: 12px !important; } }
+@media (max-width: 1023px) { .minimap-container { width: 75px !important; height: 75px !important; bottom: 12px !important; left: 12px !important; } }
 .minimap-container.hide { display: none; }
 .marker-cluster-small { background-color: rgba(240, 140, 40, 0.6) !important; }
 .marker-cluster-small div { background-color: rgba(255, 180, 80, 0.7) !important; color: white !important; }
@@ -180,7 +180,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .timeline-control-cluster .zoom-factor { display: flex; align-items: center; justify-content: center; }
 .media-swipe-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: auto; background: transparent; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, calc(50% - 80px) calc(50% - 60px), calc(50% + 80px) calc(50% - 60px), calc(50% + 80px) calc(50% + 60px), calc(50% - 80px) calc(50% + 60px), calc(50% - 80px) calc(50% - 60px)); }
 .semantic-time-span-left { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.content-scroll-area a, .slide-desc a, .title-header-container a { word-break: break-word !important; overflow-wrap: anywhere !important; }
 </style>
 </head>
 <body>
@@ -194,8 +193,8 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b184';
-document.title = 'CarTiMap - ' + APP_VERSION;
+const APP_VERSION = 'v8.13.69-b185';
+document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -621,7 +620,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
 
   return html`
     <div style="position: relative; height: 100%; width: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--paneBg, #ffffff);">
-      <div style="position: absolute; top: 12px; right: 18px; z-index: 1000; display: flex; gap: 8px;">
+      <div style="position: absolute; top: 12px; right: 32px; z-index: 1000; display: flex; gap: 8px;">
         <button class="status-btn" onClick=${() => setMaxPane(maxPane === 'text' ? null : 'text')} title=${maxPane === 'text' ? "Restore Layout" : "Maximize Text Pane"} style="width: 28px; height: 28px; background: rgba(0,0,0,0.05); border: 1px solid #ccc; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
           ${maxPane === 'text'
             ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`
@@ -984,7 +983,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         </button>
         <button class="status-btn ${zoomLock === 'hard' ? 'active' : ''}" onClick=${() => setZoomLock(p => p === 'hard' ? 'auto' : 'hard')} title="Toggle Auto-Zoom Lock" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           ${zoomLock === 'hard'
-            ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
+            ? html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
             : html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`
           }
         </button>
@@ -997,6 +996,24 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
         </button>
       </div>
+
+      <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
+        <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box; background: #ffffff;">
+          <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 50px; pointer-events: none; z-index: 0;">
+            ${orderedTags.map((tag, i) => html`
+              <div class="tag-lane" style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.04)' : 'transparent'}; border-bottom: 1px solid rgba(0,0,0,0.05);"></div>
+            `)}
+          </div>
+
+          <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #f8f9fa; border-top: 2px solid #999; z-index: 5;"></div>
+
+          ${markers}
+
+          <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 50px; pointer-events: none; z-index: 45;">
+            ${orderedTags.map((tag, i) => html`
+              <div style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; pointer-events: none;">
+                <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05); pointer-events: auto; position: sticky; left: 0; height: 100%; display: inline-flex; align-items: center; padding: 0 10px; font-size: 0.75rem; color: #555;">${tag}</div>
+              </div>
             `)}
           </div>
         </div>
@@ -1014,8 +1031,8 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 
 
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b179 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.13.68-b179 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           const mapDomRef = useRef(null);
           const miniMapDomRef = useRef(null);
@@ -1029,7 +1046,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const markerLayer = useRef(null);
           const clusterLayer = useRef(null);
           const markersRef = useRef([]);
-          const hasFitBounds = useRef(false); const initialLoadRef = useRef(false);
+          const hasFitBounds = useRef(false);
           const [mapZoom, setMapZoom] = useState(2);
           const [activeBasemap, setActiveBasemap] = useState('carto-light');
           const [activeOverlays, setActiveOverlays] = useState([]);
@@ -1037,13 +1054,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
           useEffect(() => {
             if (basemapsRegistry && basemapsRegistry.length > 0) {
-              if (!initialLoadRef.current) {
-                const bases = basemapsRegistry.filter(b => (b.type || 'base').toLowerCase() !== 'overlay');
-                const defaultBase = bases.find(b => b.active) || bases.at(0);
-                if (defaultBase && !activeBasemap) {
-                  setActiveBasemap(defaultBase.id);
-                }
-                initialLoadRef.current = true;
+              const bases = basemapsRegistry.filter(b => (b.type || 'base').toLowerCase() !== 'overlay');
+              const defaultBase = bases.find(b => b.active) || bases.at(0);
+              if (defaultBase && !activeBasemap) {
+                setActiveBasemap(defaultBase.id);
               }
               const defaultOverlays = basemapsRegistry.filter(b => String(b.type).toLowerCase() === 'overlay' && (b.active === true || String(b.active).toLowerCase() === 'true')).map(b => b.id);
               if (defaultOverlays.length > 0) {
@@ -1225,7 +1239,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               const config = basemapsRegistry.find(b => b.id === activeBasemap);
               if (config) {
                 const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
-                baseLayerRef.current = L.tileLayer(config.url, layerOpts).addTo(map);
+                baseLayerRef.current = L.tileLayer(config.url, { ...layerOpts, zIndex: 0 }).addTo(map);
                 miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
               }
             };
@@ -1564,8 +1578,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.70-b171';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b179 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b179 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b178 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b178 ] ===
 const App = () => {
           // APP_VERSION bound to top-level HTML header per Directive I.3.c
           // =========================================================================
@@ -1579,7 +1593,6 @@ const App = () => {
           const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
           const [activeIndex, setActiveIndex] = useState(0);
           const [slideHistory, setSlideHistory] = useState([]);
-          const [forwardHistory, setForwardHistory] = useState([]);
           const [isMonitorOpen, setIsMonitorOpen] = useState(false);
           const [isAboutOpen, setIsAboutOpen] = useState(false);
           const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -1887,15 +1900,7 @@ const App = () => {
                     defaultOpacity: (exactGet(norm, 'default opacity') !== '' && !isNaN(parseFloat(exactGet(norm, 'default opacity')))) ? parseFloat(exactGet(norm, 'default opacity')) : 0.3
                   };
                 }).filter(b => b.id && b.url);
-                setBasemapsRegistry(prev => {
-                  const merged = [...prev];
-                  basemaps.forEach(bm => {
-                    const existIdx = merged.findIndex(m => m.id === bm.id);
-                    if (existIdx >= 0) merged[existIdx] = bm;
-                    else merged.push(bm);
-                  });
-                  return merged;
-                });
+                setBasemapsRegistry(basemaps);
                 addLog(`Basemaps registry parsed. Found ${basemaps.length} configured tile services.`, 'info');
               } else {
                 setBasemapsRegistry([{ id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: true, attrText: 'OpenStreetMap', attrLink: 'https://openstreetmap.org' }]);
@@ -1981,7 +1986,7 @@ const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 4: RESIZER EVENT LISTENERS ] ===
           // =========================================================================
-                    const startPrimaryResize = (e) => {
+          const startPrimaryResize = (e) => {
             e.preventDefault();
             const startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
             const appNode = document.getElementById('app-layout') || document.documentElement;
@@ -2044,19 +2049,6 @@ const App = () => {
             window.addEventListener('touchend', stopDrag);
           };
 
-            const stopDrag = () => {
-              window.removeEventListener('mousemove', doDrag);
-              window.removeEventListener('mouseup', stopDrag);
-              window.removeEventListener('touchmove', doDrag);
-              window.removeEventListener('touchend', stopDrag);
-            };
-
-            window.addEventListener('mousemove', doDrag);
-            window.addEventListener('mouseup', stopDrag);
-            window.addEventListener('touchmove', doDrag, { passive: true });
-            window.addEventListener('touchend', stopDrag);
-          };
-
           const startTimelineResize = (e) => {
             e.preventDefault();
             const [ touchY0 ] = e.touches || []; const startY = e.clientY || (touchY0 && touchY0.clientY);
@@ -2089,12 +2081,12 @@ const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 4.1: SLIDE NAVIGATION & VIEWPORT LISTENERS ] ===
           // =========================================================================
+          const [forwardHistory, setForwardHistory] = useState([]);
+
           const jumpToSlide = (newIdx, isSequential = false) => {
             if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
-              if (!isSequential) {
-                setSlideHistory(prev => [...prev, activeIndex]);
-                setForwardHistory([]);
-              }
+              if (!isSequential) setSlideHistory(prev => [...prev, activeIndex]);
+              setForwardHistory([]);
               setActiveIndex(newIdx);
             }
           };
@@ -2193,7 +2185,7 @@ const App = () => {
           const CarTiMapperLogo = ({ context, appVersion }) => {
             const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
-            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 400; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span><span style="font-size: 0.68rem; font-family: monospace; color: #007acc; font-weight: 600; line-height: 1;">${appVersion}</span></div></div>`;
+            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 700; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span><span style="font-size: 0.68rem; font-family: monospace; color: #007acc; font-weight: 600; line-height: 1;">${appVersion}</span></div></div>`;
             return html`
               <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
                 <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
@@ -2358,7 +2350,7 @@ const App = () => {
                   <div class="visual-pane ${!activeSlide.media || activeSlide.media.length === 0 ? 'no-media' : ''}" style="flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; z-index: 20; height: 100%;">
 
                     <!-- Map Viewer Container -->
-                    <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}" style="flex: 0 0 var(--secondary-split, 50%); height: var(--secondary-split, 50%); position: relative; z-index: 60;">
+                    <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}" style="flex: 0 0 var(--secondary-split, 50%); height: var(--secondary-split, 50%); position: relative; z-index: 100; overflow: visible;">
                       <${MapViewer}
                         data=${data}
                         activeIndex=${activeIndex}
@@ -2429,7 +2421,7 @@ const App = () => {
                         onKeyDown=${(e) => {
                           e.stopPropagation();
                         }}
-                        style="width: 26px; background: rgba(0, 0, 0, 0.04); border: none; border-radius: 3px; text-align: center; font-family: monospace; font-size: 0.9rem; font-weight: 700; padding: 1px 2px; color: #222; outline: none;"
+                        style="width: 26px; background: rgba(0, 0, 0, 0.04); border: 1px solid #ccc; border-radius: 3px; text-align: center; font-family: monospace; font-size: 0.9rem; font-weight: 700; padding: 1px 2px; color: #222; outline: none;"
                         title="Jump to Record Index (Editable)"
                       />
                       <span style="user-select: none; opacity: 0.85; white-space: nowrap;">${data.length < unfilteredData.length ? ` / ${data.length} / ${unfilteredData.length}` : ` / ${data.length}`}</span>
@@ -2548,8 +2540,8 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.65-b155';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b179 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b179 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b178 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b178 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
