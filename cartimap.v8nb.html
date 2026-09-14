@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b229';
+const APP_VERSION = 'v8.13.69-b230';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -760,7 +760,40 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   (data || []).forEach(d => {
     if (d.tags) allTags.push(...getParsedTags(d.tags));
   });
-  const orderedTags = [...new Set(allTags)].filter(Boolean);
+  const uniqueTags = [...new Set(allTags)].filter(Boolean);
+    const tagFreq = {};
+    uniqueTags.forEach(t => tagFreq[t] = 0);
+    (data || []).forEach(d => {
+      if (d.tags) getParsedTags(d.tags).forEach(t => { if(t && tagFreq[t] !== undefined) tagFreq[t]++; });
+    });
+
+    const remaining = [...uniqueTags].sort((a, b) => tagFreq[b] - tagFreq[a]);
+    const orderedTags = [];
+    if (remaining.length > 0) orderedTags.push(remaining.shift());
+
+    while (remaining.length > 0) {
+      let bestMatchIdx = 0;
+      let maxIntersection = -1;
+      let insertPos = 'push';
+      for (let i = 0; i < remaining.length; i++) {
+        const cand = remaining[i];
+        let interLast = 0;
+        let interFirst = 0;
+        (data || []).forEach(d => {
+          if (d.tags) {
+            const tList = getParsedTags(d.tags);
+            if (tList.includes(cand)) {
+              if (tList.includes(orderedTags.at(-1))) interLast++;
+              if (tList.includes(orderedTags.at(0))) interFirst++;
+            }
+          }
+        });
+        if (interLast > maxIntersection) { maxIntersection = interLast; bestMatchIdx = i; insertPos = 'push'; }
+        if (interFirst > maxIntersection) { maxIntersection = interFirst; bestMatchIdx = i; insertPos = 'unshift'; }
+      }
+      if (insertPos === 'push') { orderedTags.push(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
+      else { orderedTags.unshift(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
+    }
   const laneCount = Math.max(1, orderedTags.length);
   const laneHeight = Math.max(24, (containerHeight - 55) / laneCount);
 
@@ -965,6 +998,74 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   };
 
   const viewPadMs = visibleTimeSpanMs * 0.5;
+
+    const SECOND = 1000; const MINUTE = 60 * SECOND; const HOUR = 60 * MINUTE; const DAY = 24 * HOUR; const MONTH = 30 * DAY; const YEAR = 365.25 * DAY;
+    const scaleConfigs = [
+      { ms: 100 * YEAR, type: 'year', step: 100, minorType: 'year', minorStep: 10, minorCount: 10 },
+      { ms: 10 * YEAR, type: 'year', step: 10, minorType: 'year', minorStep: 1, minorCount: 10 },
+      { ms: 2 * YEAR, type: 'year', step: 2, minorType: 'month', minorStep: 2, minorCount: 12 },
+      { ms: YEAR, type: 'year', step: 1, minorType: 'month', minorStep: 1, minorCount: 12 },
+      { ms: 6 * MONTH, type: 'month', step: 6, minorType: 'month', minorStep: 1, minorCount: 6 },
+      { ms: MONTH, type: 'month', step: 1, minorType: 'day', minorStep: 3, minorCount: 10 },
+      { ms: 15 * DAY, type: 'day', step: 15, minorType: 'day', minorStep: 1, minorCount: 15 },
+      { ms: 5 * DAY, type: 'day', step: 5, minorType: 'day', minorStep: 1, minorCount: 5 },
+      { ms: DAY, type: 'day', step: 1, minorType: 'hour', minorStep: 3, minorCount: 8 },
+      { ms: 12 * HOUR, type: 'hour', step: 12, minorType: 'hour', minorStep: 1, minorCount: 12 },
+      { ms: 6 * HOUR, type: 'hour', step: 6, minorType: 'hour', minorStep: 1, minorCount: 6 },
+      { ms: 2 * HOUR, type: 'hour', step: 2, minorType: 'minute', minorStep: 15, minorCount: 8 },
+      { ms: HOUR, type: 'hour', step: 1, minorType: 'minute', minorStep: 10, minorCount: 6 },
+      { ms: 30 * MINUTE, type: 'minute', step: 30, minorType: 'minute', minorStep: 5, minorCount: 6 },
+      { ms: 15 * MINUTE, type: 'minute', step: 15, minorType: 'minute', minorStep: 1, minorCount: 15 },
+      { ms: 10 * MINUTE, type: 'minute', step: 10, minorType: 'minute', minorStep: 1, minorCount: 10 },
+      { ms: 5 * MINUTE, type: 'minute', step: 5, minorType: 'minute', minorStep: 1, minorCount: 5 },
+      { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
+    ];
+
+    const targetMsPerMajorTick = Math.max((120 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
+    let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
+
+    let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
+    iterDate.setMilliseconds(0);
+    if (activeScale.type === 'year') { iterDate.setMonth(0, 1); iterDate.setHours(0, 0, 0, 0); iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step); }
+    else if (activeScale.type === 'month') { iterDate.setDate(1); iterDate.setHours(0,0,0,0); iterDate.setMonth(Math.floor(iterDate.getMonth() / activeScale.step) * activeScale.step); }
+    else if (activeScale.type === 'day') { iterDate.setHours(0,0,0,0); }
+    else if (activeScale.type === 'hour') { iterDate.setMinutes(0,0,0); iterDate.setHours(Math.floor(iterDate.getHours() / activeScale.step) * activeScale.step); }
+    else if (activeScale.type === 'minute') { iterDate.setSeconds(0,0); iterDate.setMinutes(Math.floor(iterDate.getMinutes() / activeScale.step) * activeScale.step); }
+
+    let safety = 0;
+    const stopTime = Math.min(renderMaxTime, visibleRightMs + (activeScale.ms * 2));
+    const majorTicksData = [];
+
+    while (iterDate.getTime() <= stopTime && safety < 1000) {
+      safety++; const t = iterDate.getTime();
+      if (t >= renderMinTime) majorTicksData.push({ t, pctLeft: ((t - renderMinTime) / renderTimeRange) * 100, date: new Date(iterDate) });
+      if (activeScale.type === 'year') iterDate.setFullYear(iterDate.getFullYear() + activeScale.step);
+      else if (activeScale.type === 'month') iterDate.setMonth(iterDate.getMonth() + activeScale.step);
+      else if (activeScale.type === 'day') iterDate.setDate(iterDate.getDate() + activeScale.step);
+      else if (activeScale.type === 'hour') iterDate.setHours(iterDate.getHours() + activeScale.step);
+      else if (activeScale.type === 'minute') iterDate.setMinutes(iterDate.getMinutes() + activeScale.step);
+    }
+
+    const viewportCenterMs = visibleLeftMs + (visibleTimeSpanMs / 2);
+    let minDist = Infinity;
+    let centerTickIndex = -1;
+    majorTicksData.forEach((d, i) => {
+      if (d.t >= visibleLeftMs && d.t <= visibleRightMs) {
+        const dist = Math.abs(d.t - viewportCenterMs);
+        if (dist < minDist) { minDist = dist; centerTickIndex = i; }
+      }
+    });
+
+    const rulerTicksHTML = majorTicksData.map((d, i) => {
+      const labelText = activeScale.type === 'year' ? d.date.getFullYear() : (activeScale.type === 'month' ? d.date.toLocaleDateString(dateLocale, { month: 'short', year: 'numeric' }) : d.date.toLocaleDateString(dateLocale, { month: 'numeric', day: 'numeric', year: 'numeric' }));
+      const isCenter = i === centerTickIndex;
+      return html`
+        <div class="timeline-ruler-tick" style="left: ${d.pctLeft}%;">
+          <div style="height: 10px; width: 1px; background: #666;"></div>
+          <span style="font-size: 0.7rem; font-family: monospace; color: ${isCenter ? '#007acc' : '#555'}; font-weight: ${isCenter ? '700' : '400'}; margin-top: 2px; white-space: nowrap;">${labelText}</span>
+        </div>
+      `;
+    });
   const stackRegistry = {};
 
   const markers = validData.map((item, index) => {
@@ -1120,7 +1221,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
           <!-- Solid White Duration Lane Background Band (for best pattern contrast) -->
               <div style="position: absolute; bottom: 28px; left: 0; right: 0; height: 10px; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1; pointer-events: none;"></div>
-              <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #f8f9fa; border-top: 2px solid #999; z-index: 5;"></div>
+              <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #f8f9fa; border-top: 2px solid #999; z-index: 5;">${rulerTicksHTML}</div>
 
           ${markers}
 
@@ -1136,7 +1237,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.39-b229';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.40-b230';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
