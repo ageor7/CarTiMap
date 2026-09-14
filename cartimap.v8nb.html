@@ -173,7 +173,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
 .event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
 .event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
-.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon( 0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px) ); }
+.event-block { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon(0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px)); }
 .event-block:hover { filter: brightness(1.05); z-index: 40 !important; width: max-content !important; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.25)); }
 .timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
 .timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
@@ -194,7 +194,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b204';
+const APP_VERSION = 'v8.13.69-b205';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -978,7 +978,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     return html`
       <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: ${topPos}px; height: ${laneHeight}px; width: ${hasDuration ? `calc(${endPct - startPct}% - ${xOffset}px)` : `${totalWidth}px`}; z-index: ${isActive ? 50 : 10};" onClick=${() => handleNodeClick(globalIndex)}>
         ${dropLine}
-        <div class="event-block" style="position: absolute; top: 0; left: 0; height: 100%; --diag-w: 10px; width: ${hasDuration ? '100%' : `${totalWidth}px`}; background: ${isActive ? '#007acc' : (isVip ? '#ffb300' : '#ffffff')}; color: ${isActive ? '#ffffff' : '#222222'}; border: 1px solid ${isActive ? '#005a99' : (isVip ? '#e69900' : '#cccccc')}; font-weight: ${isActive ? '700' : '500'}; clip-path: polygon(0 0, 10px 0, 100% 0, 100% 100%, 10px 100%, 0 100%); display: flex; align-items: center; padding: 2px 8px 2px 14px; box-sizing: border-box; font-size: 0.75rem; cursor: pointer;">
+        <div class="event-block" style="position: absolute; top: 0; left: 0; height: 100%; --diag-w: 10px; width: ${hasDuration ? '100%' : `${totalWidth}px`}; background: ${isActive ? '#007acc' : (isVip ? '#ffb300' : '#ffffff')}; color: ${isActive ? '#ffffff' : '#222222'}; border: 1px solid ${isActive ? '#005a99' : (isVip ? '#e69900' : '#cccccc')}; font-weight: ${isActive ? '700' : '500'}; clip-path: polygon(0 calc(50% - 12px), 10px 0, 100% 0, 100% 100%, 10px 100%, 0 calc(50% + 12px)); display: flex; align-items: center; padding: 2px 8px 2px 14px; box-sizing: border-box; font-size: 0.75rem; cursor: pointer;">
           ${hasMedia ? html`<svg style="margin-right: 6px; flex-shrink: 0; width: 12px; height: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>` : ''}
           <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.15; max-width: 100%; text-align: left;">
             ${lines.map(lineText => html`<span class="event-title-line" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${lineText}</span>`)}
@@ -991,7 +991,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   return html`
     <style>
       .event-group:hover { z-index: 99999 !important; }
-      .event-group:hover .event-block { transform: translateY(-50%) scale(1.08) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; border-color: #007acc !important; z-index: 99999 !important; width: max-content !important; min-width: var(--calc-w) !important; }
+      .event-group:hover .event-block { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon(0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px)); }
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
