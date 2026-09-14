@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b223';
+const APP_VERSION = 'v8.13.69-b224';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -964,8 +964,6 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const hasDuration = (endPct - startPct) > 0.001;
     const isActive = globalIndex === activeIndex;
     const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
-    const colActive = isActive ? '#007acc' : (isVip ? '#ffb300' : '#444');
-
     const colActive = 'var(--tm-active, #007acc)';
     const colInactive = 'rgba(var(--tm-inactive-rgb, 204, 0, 0), 0.6)';
     const colApprox = 'var(--tm-approx, #ffb300)';
@@ -1108,7 +1106,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.33-b223';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.34-b224';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
