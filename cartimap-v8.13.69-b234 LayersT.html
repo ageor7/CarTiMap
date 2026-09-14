@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b233';
+const APP_VERSION = 'v8.13.69-b234';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2176,58 +2176,49 @@ const App = () => {
               setAllTags(uniqueTagsList);
               setActiveTags(uniqueTagsList);
 
-              const rawLayersRows = (sheetsData && (sheetsData.LayersT || sheetsData.Layers)) ? (sheetsData.LayersT || sheetsData.Layers) : null;
-              if (rawLayersRows && Array.isArray(rawLayersRows) && rawLayersRows.length > 0) {
-                const basemaps = rawLayersRows.map((row, idx) => {
+              const parseLayersTRows = (rows) => {
+                return rows.map(row => {
                   const norm = {};
                   for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                  const rawType = exactGet(norm, 'type') || exactGet(norm, 'layertype') || 'base';
-                  const rawActive = exactGet(norm, 'active') || exactGet(norm, 'default') || exactGet(norm, 'isdefault');
-                  const isActive = String(rawActive).toLowerCase() === 'true' || String(rawActive).toLowerCase() === 'yes' || String(rawActive) === '1';
+                  const isActive = /^(true|yes)$/i.test(String(norm.active || norm.isdefault || norm.default || '').trim());
+                  const rawOpac = parseFloat(norm.defaultopacity || norm.opacity);
+                  const rawType = String(norm.type || norm.layertype || '').toLowerCase().trim();
                   return {
-                    id: exactGet(norm, 'id') || exactGet(norm, 'name') || `layer-${idx}`,
-                    label: exactGet(norm, 'label') || exactGet(norm, 'title') || exactGet(norm, 'name') || `Layer ${idx + 1}`,
-                    type: rawType.toLowerCase(),
-                    url: exactGet(norm, 'url') || exactGet(norm, 'tileurl') || exactGet(norm, 'link') || exactGet(norm, 'wmsurl') || exactGet(norm, 'templateurl') || exactGet(norm, 'source'),
-                    format: exactGet(norm, 'format') || exactGet(norm, 'tileformat') || 'png',
-                    maxZoom: parseInt(exactGet(norm, 'maxzoom') || exactGet(norm, 'maxzoomlevel') || '19', 10),
+                    id: norm.id || norm.name || '',
+                    label: norm.label || norm.title || norm.name || '',
+                    type: (rawType === 'overlay' || rawType === 'wms') ? 'overlay' : 'base',
+                    url: norm.url || norm.tileurl || norm.link || norm.wmsurl || norm.templateurl || norm.source || '',
+                    maxZoom: parseInt(norm.maxzoom || norm.maxzoomlevel, 10) || 19,
                     active: isActive,
-                    attrText: exactGet(norm, 'attribution text') || exactGet(norm, 'attribution') || exactGet(norm, 'attrtext') || exactGet(norm, 'credit'),
-                    attrLink: exactGet(norm, 'attribution link') || exactGet(norm, 'attributionlink') || exactGet(norm, 'attrlink'),
-                    wmsLayer: exactGet(norm, 'wms layer') || exactGet(norm, 'wmslayer') || exactGet(norm, 'layer'),
-                    defaultOpacity: (exactGet(norm, 'default opacity') !== '' && !isNaN(parseFloat(exactGet(norm, 'default opacity')))) ? parseFloat(exactGet(norm, 'default opacity')) : 0.3
+                    attrText: norm.attrtext || norm.attribution || norm.credit || norm['attribution text'] || '',
+                    attrLink: norm.attrlink || norm.attributionlink || norm['attribution link'] || '',
+                    defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac,
+                    format: norm.format || norm.tileformat || 'xyz',
+                    wmsLayer: norm.wmslayer ? decodeURIComponent(String(norm.wmslayer).trim()) : (norm['wms layer'] ? decodeURIComponent(String(norm['wms layer']).trim()) : 'default')
                   };
                 }).filter(b => b.id && b.url);
-                if (basemaps.length > 0) {
-                  setBasemapsRegistry(basemaps);
-                  addLog(`LayersT basemap registry parsed. Loaded ${basemaps.length} configured spatial services from Sheets.`, 'info');
-                }
+              };
+
+              const rawLayersRows = (sheetsData && (sheetsData.LayersT || sheetsData.Layers)) ? (sheetsData.LayersT || sheetsData.Layers) : null;
+              let parsedBMs = [];
+              if (rawLayersRows && Array.isArray(rawLayersRows) && rawLayersRows.length > 0) {
+                parsedBMs = parseLayersTRows(rawLayersRows);
               } else if (basemapsCsv) {
                 const baseResult = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
-                const basemaps = baseResult.data.map((row, idx) => {
-                  const norm = {};
-                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                  const rawType = exactGet(norm, 'type') || exactGet(norm, 'layertype') || 'base';
-                  const rawActive = exactGet(norm, 'active') || exactGet(norm, 'default') || exactGet(norm, 'isdefault');
-                  const isActive = String(rawActive).toLowerCase() === 'true' || String(rawActive).toLowerCase() === 'yes' || String(rawActive) === '1';
-                  return {
-                    id: exactGet(norm, 'id') || exactGet(norm, 'name') || `layer-${idx}`,
-                    label: exactGet(norm, 'label') || exactGet(norm, 'title') || exactGet(norm, 'name') || `Layer ${idx + 1}`,
-                    type: rawType.toLowerCase(),
-                    url: exactGet(norm, 'url') || exactGet(norm, 'tileurl') || exactGet(norm, 'link') || exactGet(norm, 'wmsurl') || exactGet(norm, 'templateurl') || exactGet(norm, 'source'),
-                    format: exactGet(norm, 'format') || exactGet(norm, 'tileformat') || 'png',
-                    maxZoom: parseInt(exactGet(norm, 'maxzoom') || exactGet(norm, 'maxzoomlevel') || '19', 10),
-                    active: isActive,
-                    attrText: exactGet(norm, 'attribution text') || exactGet(norm, 'attribution') || exactGet(norm, 'attrtext') || exactGet(norm, 'credit'),
-                    attrLink: exactGet(norm, 'attribution link') || exactGet(norm, 'attributionlink') || exactGet(norm, 'attrlink'),
-                    wmsLayer: exactGet(norm, 'wms layer') || exactGet(norm, 'wmslayer') || exactGet(norm, 'layer'),
-                    defaultOpacity: (exactGet(norm, 'default opacity') !== '' && !isNaN(parseFloat(exactGet(norm, 'default opacity')))) ? parseFloat(exactGet(norm, 'default opacity')) : 0.3
-                  };
-                }).filter(b => b.id && b.url);
-                if (basemaps.length > 0) {
-                  setBasemapsRegistry(basemaps);
-                  addLog(`Basemaps CSV registry parsed. Loaded ${basemaps.length} configured tile services.`, 'info');
-                }
+                parsedBMs = parseLayersTRows(baseResult.data);
+              }
+
+              if (parsedBMs.length > 0) {
+                setBasemapsRegistry(prev => {
+                  const merged = [...prev];
+                  parsedBMs.forEach(bm => {
+                    const existIdx = merged.findIndex(m => m.id === bm.id);
+                    if (existIdx >= 0) merged[existIdx] = bm;
+                    else merged.push(bm);
+                  });
+                  return merged;
+                });
+                addLog(`[v8.12.74 Ingestion] LayersT registry parsed. Merged ${parsedBMs.length} spatial services into basemapsRegistry.`, 'info');
               }
 
               if (!hasInitializedRef.current) {
