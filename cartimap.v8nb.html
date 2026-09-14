@@ -194,7 +194,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b207';
+const APP_VERSION = 'v8.13.69-b208';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1305,6 +1305,15 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               }
             }
           }, [basemapsRegistry, maxGlobalZoom]);
+
+          useEffect(() => {
+            if (baseLayerRef.current && typeof baseLayerRef.current.setOpacity === 'function') {
+              baseLayerRef.current.setOpacity(basemapOpacity);
+            }
+            if (miniBaseLayerRef.current && typeof miniBaseLayerRef.current.setOpacity === 'function') {
+              miniBaseLayerRef.current.setOpacity(basemapOpacity);
+            }
+          }, [basemapOpacity]);
 
           useEffect(() => {
             const map = mapInstance.current;
