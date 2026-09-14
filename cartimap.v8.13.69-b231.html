@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b232';
+const APP_VERSION = 'v8.13.69-b231';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1809,12 +1809,8 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           ` : '';
 
           return html`
-            <style id="layers-menu-zindex-fix">
-        .map-pane { z-index: 110 !important; overflow: visible !important; }
-        .media-pane { z-index: 10 !important; }
-      </style>
-      <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: visible !important;">
-              <div ref=${mapDomRef} style="flex: 1; min-height: 0; width: 100%; overflow: hidden;"></div>
+            <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;">
+              <div ref=${mapDomRef} style="flex: 1; min-height: 0; width: 100%;"></div>
               <div class="minimap-container" ref=${miniMapDomRef} style="position: absolute; bottom: 24px; right: 12px; z-index: 1000;"></div>
 
               <div class="map-control-cluster" style="position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2000;">
@@ -1866,7 +1862,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.4.103-b232';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.102-b223';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2819,43 +2815,54 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
                 <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
                 <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto; position: fixed; z-index: 100000 !important; padding: 30px; background: #fff; border-radius: 12px; border: 1px solid #ccc; box-shadow: 0 20px 50px rgba(0,0,0,0.4); font-family: monospace; box-sizing: border-box;">
-                  <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #888; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">✕</button>
-                  <div style="margin-bottom: 25px;">
-                    <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
-                    <h2 style="margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50; font-family: monospace;" dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.title : 'Dataset Specifications' }}></h2>
-                    <div style="font-size: 1.05rem; line-height: 1.5; color: #333; margin-bottom: 15px; font-family: monospace;" dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.description : 'No project description provided.' }}></div>
-                  </div>
-
-                  <!-- Section: Map & Temporal Symbology Legend -->
-                  <div style="border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 12px 0; color: #007acc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-family: monospace;">🗺️ Cartographic & Temporal Symbology Legend</h4>
-                    <${SymbologyLegend} />
-                  </div>
-
-                  <!-- Section: Analytical System Accordion Details -->
-                  <details style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px;">
-                    <summary style="font-weight: 600; cursor: pointer; color: #444; font-family: monospace; font-size: 0.95rem;">⚙️ Analytical System Specifications & URL Parameters</summary>
-                    <div style="margin-top: 12px; font-size: 0.88rem; color: #555; line-height: 1.6; font-family: monospace; text-align: left;">
-                      <p style="margin-top: 0;">The <b>CarTiMap Engine</b> is a high-performance, single-file spatial-temporal processing suite. It dynamically parses raw Google Sheet datasets directly in the browser via zero-build Vanilla JS and Preact, executing R-Tree spatial indexing and ISO 8601-2 EDTF chronologies on the fly.</p>
-                      <div style="margin-top: 10px; margin-bottom: 10px; padding: 10px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px;">
-                        <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
-                        <strong>Active Modules:</strong><br/>
-                        ${Object.entries(MODULE_VERSIONS).map(([k, v]) => `• ${k}: ${v}`).join('<br/>')}
+                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 0; border-radius: 12px; background: #fff;">
+                  <!-- Locked Fixed Header Bar -->
+                  <div style="position: sticky; top: 0; background: #ffffff; border-bottom: 1px solid #eee; padding: 15px 20px; z-index: 101000; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <div style="width: 120px; height: 32px; flex-shrink: 0;">
+                        <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
                       </div>
-                      <h5 style="margin: 15px 0 5px 0; color: #222;">Analytical URL Parameters</h5>
-                      <ul style="margin: 0; padding-left: 20px; font-family: monospace; color: #007acc; line-height: 1.6;">
-                        <li><span style="color:#555">?source=ID</span> (Google Sheet Base ID)</li>
-                        <li><span style="color:#555">&gid=ID</span> (Primary Data Tab ID)</li>
-                        <li><span style="color:#555">&bgid=ID</span> (Basemaps/Overlays Tab ID)</li>
-                        <li><span style="color:#555">&slide=X</span> (Target integer slide index bypass)</li>
-                        <li><span style="color:#555">&date=YYYY-MM-DD</span> (Temporal anchor bypass)</li>
-                        <li><span style="color:#555">&mapzoom=Z</span> (Initial geographic zoom override)</li>
-                        <li><span style="color:#555">&theme=dark</span> (System dark mode override)</li>
-                      </ul>
-                      ${aboutData && aboutData.downloadUrl ? html`<div style="margin-top: 15px;"><a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; font-family: monospace;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a></div>` : ''}
+                      <h3 dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.title : 'Dataset Specs & About' }} style="margin: 0; font-size: 1.25rem; color: #222; font-weight: 700; line-height: 1.2;"></h3>
                     </div>
-                  </details>
+                    <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #444; display: flex; align-items: center; justify-content: center; padding: 0; outline: none; transition: background 0.2s;" title="Close Modal (Esc)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                    </button>
+                  </div>
+                  <!-- Independent Scrollable Body -->
+                  <div style="overflow-y: auto; flex-grow: 1; padding: 20px 25px; box-sizing: border-box; text-align: left;">
+                    <div class="slide-desc" dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.description : 'No project description provided.' }} style="font-size: 0.95rem; line-height: 1.6; color: #444; margin-bottom: 20px;"></div>
+                    <div style="border-top: 1px solid #eee; margin-top: 20px; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
+                      <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
+                      <strong>Active Modules:</strong><br/>
+                      ${Object.entries(MODULE_VERSIONS).map(([k, v]) => `• ${k}: ${v}`).join('\n        ')}
+                    </div>
+
+                    <!-- Section 3: URL Parameter Specifications Matrix -->
+                    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; margin-bottom: 24px;">
+                      <h4 style="margin: 0 0 12px 0; font-size: 1rem; color: #007acc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚙️ URL Configuration Parameters</h4>
+                      <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; color: #444; font-family: monospace;">
+                        <thead>
+                          <tr style="background: #f1f3f5; text-align: left;">
+                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Parameter</th>
+                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Description</th>
+                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Example</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>source</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Google Sheets Database ID</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?source=1BxiMVs...</td></tr>
+                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>gid</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Sheet Tab GID</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?gid=0</td></tr>
+                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>slide</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Initial Slide Index (1-based)</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?slide=5</td></tr>
+                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>mapzoom</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Initial Map Zoom Level</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?mapzoom=14</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Section 4: Cartographic Symbology Legend -->
+                    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 12px;">
+                      <h4 style="margin: 0 0 12px 0; font-size: 1rem; color: #007acc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🗺️ Cartographic Symbology Legend</h4>
+                      <${SymbologyLegend} />
+                    </div>
+                  </div>
                 </div>
 
                 <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 99999 !important;"></div>
