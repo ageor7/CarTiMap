@@ -194,7 +194,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b202';
+const APP_VERSION = 'v8.13.69-b204';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -725,15 +725,20 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     return String(str).replace(/<[^>]*>/g, '').trim();
   };
 
-  const formatLabelSmart = (titleStr, maxPx = 180) => {
-    if (!titleStr) return { lines: ['Untitled'], pxWidth: 60 };
-    const clean = safeStripHTML(titleStr);
-    const words = clean.split(/\s+/);
-    if (words.length <= 3) return { lines: [clean], pxWidth: Math.max(60, clean.length * 7 + 35) };
+  const formatLabelSmart = (text) => {
+    if (!text) return { lines: ['Untitled'], pxWidth: 70 };
+    const clean = safeStripHTML(text);
+    const words = clean.split(/\s+/).filter(Boolean);
+    if (words.length <= 3) {
+      const w = Math.max(70, clean.length * 7.2 + 28);
+      return { lines: [clean], pxWidth: w };
+    }
     const mid = Math.ceil(words.length / 2);
-    const line1 = words.slice(0, mid).join(' ');
-    const line2 = words.slice(mid).join(' ');
-    return { lines: [line1, line2], pxWidth: Math.max(60, Math.max(line1.length, line2.length) * 7 + 35) };
+    const l1 = words.slice(0, mid).join(' ');
+    const l2 = words.slice(mid).join(' ');
+    const maxLen = Math.max(l1.length, l2.length);
+    const w = Math.max(70, maxLen * 7.2 + 28);
+    return { lines: [l1, l2], pxWidth: w };
   };
 
   const getParsedTags = (rawTagsArray) => {
@@ -967,14 +972,13 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
 
     const hasMedia = !!(item.media || item.mediaUrl || item.embedUrl || item.youtube || item.image || item.photo);
-    const rawTitle = item.title ? safeStripHTML(item.title) : 'Untitled';
-    const lines = rawTitle.split(/(?:\r?\n|<br\s*\/?>)/i).map(s => s.trim()).filter(Boolean);
-    if (lines.length === 0) lines.push('Untitled');
+    const { lines, pxWidth } = formatLabelSmart(item.title);
+    const totalWidth = pxWidth + (hasMedia ? 18 : 0);
 
     return html`
-      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: ${topPos}px; height: ${laneHeight}px; width: ${hasDuration ? `calc(${endPct - startPct}% - ${xOffset}px)` : 'max-content'}; z-index: ${isActive ? 50 : 10};" onClick=${() => handleNodeClick(globalIndex)}>
+      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: ${topPos}px; height: ${laneHeight}px; width: ${hasDuration ? `calc(${endPct - startPct}% - ${xOffset}px)` : `${totalWidth}px`}; z-index: ${isActive ? 50 : 10};" onClick=${() => handleNodeClick(globalIndex)}>
         ${dropLine}
-        <div class="event-block" style="position: absolute; top: 50%; transform: translateY(-50%); left: 0; height: ${laneHeight - 2}px; --diag-w: 10px; width: ${hasDuration ? '100%' : 'max-content'}; min-width: ${hasDuration ? '20px' : 'auto'}; max-width: ${hasDuration ? 'none' : '280px'}; background: ${isActive ? '#007acc' : (isVip ? '#ffb300' : '#ffffff')}; color: ${isActive ? '#ffffff' : '#222222'}; border: 1px solid ${isActive ? '#005a99' : (isVip ? '#e69900' : '#cccccc')}; font-weight: ${isActive ? '700' : '500'}; clip-path: polygon(0 50%, 10px 0, 100% 0, 100% 100%, 10px 100%); display: flex; align-items: center; padding: 2px 10px 2px calc(10px + 6px); box-sizing: border-box; font-size: 0.75rem; cursor: pointer;">
+        <div class="event-block" style="position: absolute; top: 0; left: 0; height: 100%; --diag-w: 10px; width: ${hasDuration ? '100%' : `${totalWidth}px`}; background: ${isActive ? '#007acc' : (isVip ? '#ffb300' : '#ffffff')}; color: ${isActive ? '#ffffff' : '#222222'}; border: 1px solid ${isActive ? '#005a99' : (isVip ? '#e69900' : '#cccccc')}; font-weight: ${isActive ? '700' : '500'}; clip-path: polygon(0 0, 10px 0, 100% 0, 100% 100%, 10px 100%, 0 100%); display: flex; align-items: center; padding: 2px 8px 2px 14px; box-sizing: border-box; font-size: 0.75rem; cursor: pointer;">
           ${hasMedia ? html`<svg style="margin-right: 6px; flex-shrink: 0; width: 12px; height: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>` : ''}
           <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.15; max-width: 100%; text-align: left;">
             ${lines.map(lineText => html`<span class="event-title-line" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${lineText}</span>`)}
@@ -1063,6 +1067,19 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 
 // 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
+
+const SymbologyLegend = () => html`
+  <div class="symbology-legend-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; font-size: 0.82rem; color: #333; line-height: 1.3;">
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #28a745; display: inline-block; flex-shrink: 0;"></span> Active Story Feature</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #ffb300; display: inline-block; flex-shrink: 0;"></span> VIP Priority Feature</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #007acc; display: inline-block; flex-shrink: 0;"></span> Standard Marker</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 18px; height: 2px; border-top: 2px dashed #007acc; display: inline-block; flex-shrink: 0;"></span> Directional Route (80px >)</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 10px; background: rgba(40,167,69,0.35); border: 1px solid #28a745; display: inline-block; flex-shrink: 0;"></span> Spatial Polygon Area</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 10px; background: #007acc; clip-path: polygon(0 0, 3px 0, 100% 0, 100% 100%, 3px 100%, 0 100%); display: inline-block; flex-shrink: 0;"></span> Timeline Hexagon Node</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; color: #007acc; flex-shrink: 0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span> Media-Linked Record</div>
+  </div>
+`;
+
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           const mapDomRef = useRef(null);
           const miniMapDomRef = useRef(null);
@@ -1113,6 +1130,28 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [basemapsRegistry]);
           const [basemapOpacity, setBasemapOpacity] = useState(1.0);
           const [showGrid, setShowGrid] = useState(false);
+
+          useEffect(() => {
+            const container = mapDomRef.current;
+            if (!container) return;
+            const ro = new ResizeObserver(() => {
+              if (mapInstance.current) {
+                try { mapInstance.current.invalidateSize({ animate: false }); } catch(e){}
+              }
+            });
+            ro.observe(container);
+            return () => ro.disconnect();
+          }, []);
+
+          useEffect(() => {
+            const map = mapInstance.current;
+            if (!map) return;
+            const timer = setTimeout(() => {
+              try { map.invalidateSize({ animate: false }); } catch(e){}
+            }, 120);
+            return () => clearTimeout(timer);
+          }, [maxPane, activeIndex, data]);
+
           const [showLegendMenu, setShowLegendMenu] = useState(false);
           const [showLayersMenu, setShowLayersMenu] = useState(false);
 
@@ -1622,31 +1661,11 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [showGrid, mapZoom]);
 
           const legendMenuNode = showLegendMenu ? html`
-            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 280px; font-size: 0.82rem; color: #333; position: absolute; right: 44px; top: 12px; z-index: 20000;">
-              <div style="font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Map Legend</span>
-                <button onClick=${() => setShowLegendMenu(false)} style="border: none; background: none; cursor: pointer; font-size: 0.9rem; color: #888;">&times;</button>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #28a745; display: inline-block;"></span>
-                  <span>Active Story Event</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffb300; display: inline-block;"></span>
-                  <span>VIP Feature</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #007acc; display: inline-block;"></span>
-                  <span>Standard Marker</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 18px; height: 3px; background: #007acc; display: inline-block;"></span>
-                  <span>Spatial Polyline / Polygon</span>
-                </div>
-              </div>
-            </div>
-          ` : '';
+  <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 300px; font-size: 0.82rem; color: #333; position: absolute; left: 44px; top: 12px; z-index: 2000;">
+    <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Cartographic Symbology Legend</div>
+    <${SymbologyLegend} />
+  </div>
+` : '';
 
           const layersMenuNode = showLayersMenu ? html`
             <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 44px; top: 12px; z-index: 20000;">
@@ -2648,29 +2667,33 @@ const App = () => {
 
                 <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
                 <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000 !important; width: 90%; max-width: 820px; max-height: 85vh; padding: 0; border-radius: 12px; background: #ffffff; box-shadow: 0 12px 48px rgba(0,0,0,0.3); border: 1px solid #ddd;">
-                  <!-- Locked Header Bar -->
-                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #eee; background: #fafafa; flex-shrink: 0;">
+                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 0; border-radius: 12px; background: #fff;">
+                  <!-- Locked Fixed Header Bar -->
+                  <div style="position: sticky; top: 0; background: #ffffff; border-bottom: 1px solid #eee; padding: 15px 20px; z-index: 101000; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                      <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} style="height: 28px; width: auto;" />
-                      <h3 style="margin: 0; font-size: 1.25rem; color: #111; font-weight: 700;" dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.title : 'Dataset Specs & About' }}></h3>
-                    </div>
-                    <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="border: 1px solid #ccc; background: #fff; cursor: pointer; color: #555; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; transition: all 0.2s;" title="Close (Esc)">×</button>
-                  </div>
-                  <!-- Scrollable Modal Body -->
-                  <div style="overflow-y: auto; flex-grow: 1; padding: 24px; box-sizing: border-box; text-align: left; font-family: 'Noto Sans', sans-serif;">
-                    <!-- Section 1: HTML Description -->
-                    <div class="slide-desc" style="font-size: 1.05rem; line-height: 1.6; color: #333; margin-bottom: 24px;" dangerouslySetInnerHTML=${{ __html: aboutData && aboutData.description ? aboutData.description : 'No project description provided.' }}></div>
-                    
-                    <!-- Section 2: User Help & Navigation Guide -->
-                    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 24px;">
-                      <h4 style="margin: 0 0 12px 0; font-size: 1rem; color: #007acc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📖 User Controls & Interaction Guide</h4>
-                      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; font-size: 0.85rem; color: #444;">
-                        <div style="background: #f8f9fa; padding: 10px 14px; border-radius: 6px; border: 1px solid #e9ecef;"><strong>← / → Arrow Keys:</strong> Navigate slides</div>
-                        <div style="background: #f8f9fa; padding: 10px 14px; border-radius: 6px; border: 1px solid #e9ecef;"><strong>Timeline Drag:</strong> Scrub chronological time</div>
-                        <div style="background: #f8f9fa; padding: 10px 14px; border-radius: 6px; border: 1px solid #e9ecef;"><strong>Map Feature Click:</strong> Jump directly to slide</div>
-                        <div style="background: #f8f9fa; padding: 10px 14px; border-radius: 6px; border: 1px solid #e9ecef;"><strong>Pane Resizers:</strong> Drag split bars to adjust layout</div>
+                      <div style="width: 120px; height: 32px; flex-shrink: 0;">
+                        <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
                       </div>
+                      <h3 dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.title : 'Dataset Specs & About' }} style="margin: 0; font-size: 1.25rem; color: #222; font-weight: 700; line-height: 1.2;"></h3>
+                    </div>
+                    <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #444; display: flex; align-items: center; justify-content: center; padding: 0; outline: none; transition: background 0.2s;" title="Close Modal (Esc)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
+                  <!-- Independent Scrollable Body -->
+                  <div style="overflow-y: auto; flex-grow: 1; padding: 20px 25px; box-sizing: border-box; text-align: left;">
+                    <div class="slide-desc" dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.description : 'No project description provided.' }}></div>
+                    <div style="border-top: 1px solid #eee; margin-top: 20px; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
+                      <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
+                      <strong>Active Modules:</strong><br/>
+                      ${Object.entries(MODULE_VERSIONS).map(([k, v]) => `• ${k}: ${v}`).join('\n        ')}
+                    </div>
+                    <div style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px;">
+                      <h4 style="margin: 0 0 10px 0; color: #333; font-size: 0.95rem; font-weight: 700;">Cartographic Symbology Legend</h4>
+                      <${SymbologyLegend} />
+                    </div>
+                  </div>
+                </div>
                     </div>
 
                     <!-- Section 3: URL Parameter Specifications Matrix -->
