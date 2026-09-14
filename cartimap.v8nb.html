@@ -194,7 +194,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b209';
+const APP_VERSION = 'v8.13.69-b210';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -895,31 +895,41 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const onDown = (e) => {
     if (zoomLock !== 'hard') setZoomLock('soft');
     if (e.touches && e.touches.length === 2) {
-      const touchA = Array.from(e.touches).at(0); const touchB = Array.from(e.touches).at(1);
-      touchZoomRef.current = { initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY), initialZoom: zoomLevel };
+      const t1 = Array.from(e.touches).at(0);
+      const t2 = Array.from(e.touches).at(1);
+      if (t1 && t2) {
+        touchZoomRef.current = { initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY), initialZoom: zoomLevel };
+      }
       return;
     }
-    const touchEvt = e.touches ? Array.from(e.touches).at(0) : e;
-    dragRef.current = { isDragging: true, startX: t1.clientX, scrollLeft: wrapperRef.current.scrollLeft, hasDragged: false };
-    wrapperRef.current.classList.add('is-dragging');
+    const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+    if (t1 && wrapperRef.current) {
+      dragRef.current = { isDragging: true, startX: t1.clientX, scrollLeft: wrapperRef.current.scrollLeft, hasDragged: false };
+      wrapperRef.current.classList.add('is-dragging');
+    }
     if (caliperTooltip) setCaliperTooltip(null);
   };
 
-  const onUp = () => { dragRef.current.isDragging = false; wrapperRef.current?.classList.remove('is-dragging'); };
+  const onUp = () => { dragRef.current.isDragging = false; if (wrapperRef.current) wrapperRef.current.classList.remove('is-dragging'); };
 
   const onMove = (e) => {
     if (e.touches && e.touches.length === 2 && touchZoomRef.current.initialDist > 0) {
-      const moveTouchA = Array.from(e.touches).at(0); const moveTouchB = Array.from(e.touches).at(1);
-      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
-      const factor = dist / touchZoomRef.current.initialDist;
-      handleManualZoom(Math.max(1, Math.min(2000, touchZoomRef.current.initialZoom * factor)), 'center');
+      const t1 = Array.from(e.touches).at(0);
+      const t2 = Array.from(e.touches).at(1);
+      if (t1 && t2) {
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const factor = dist / touchZoomRef.current.initialDist;
+        handleManualZoom(Math.max(1, Math.min(2000, touchZoomRef.current.initialZoom * factor)), 'center');
+      }
       return;
     }
     if (!dragRef.current.isDragging) return;
-    const moveTouchEvt = e.touches ? Array.from(e.touches).at(0) : e;
-    const dx = dragRef.current.startX - t1.clientX;
-    if (Math.abs(dx) > 3) dragRef.current.hasDragged = true;
-    wrapperRef.current.scrollLeft = dragRef.current.scrollLeft + dx;
+    const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+    if (t1 && wrapperRef.current) {
+      const dx = dragRef.current.startX - t1.clientX;
+      if (Math.abs(dx) > 3) dragRef.current.hasDragged = true;
+      wrapperRef.current.scrollLeft = dragRef.current.scrollLeft + dx;
+    }
   };
 
   const onWheel = (e) => {
