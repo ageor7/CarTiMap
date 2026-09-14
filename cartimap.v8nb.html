@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b225';
+const APP_VERSION = 'v8.13.69-b226';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -837,33 +837,60 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   };
 
   useEffect(() => {
-    const activeDataIndex = validData.findIndex((d, idx) => d.id === (activeIndex + 1) || idx === activeIndex);
+    const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
     if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
-      const activeNode = validData[activeDataIndex];
-      if (activeNode && activeNode.startDate && zoomLock === 'auto') {
-        const activeMs = activeNode.startDate.min;
-        const nearby = validData.filter(d => Math.abs(d.startDate.min - activeMs) <= 30 * 86400000);
-        if (nearby.length > 1) {
-          let minGap = Infinity;
-          nearby.forEach(d => {
-            const gap = Math.abs(d.startDate.min - activeMs);
-            if (gap > 0 && gap < minGap) minGap = gap;
-          });
-          if (minGap < Infinity) {
-            const targetSpanMs = Math.max(86400000, minGap * 12);
-            const calculatedZoom = Math.max(1, Math.min(200, renderTimeRange / targetSpanMs));
-            setZoomLevel(calculatedZoom);
-          }
-        } else {
-          setZoomLevel(2.5);
-        }
-      }
       const containerW = wrapperRef.current.clientWidth || 1000;
       const targetTrackW = Math.max(containerW, containerW * zoomLevel);
       const scrollPos = getExactNodeScrollPos(activeIndex, targetTrackW, containerW);
       wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
     }
   }, [activeIndex]);
+
+  useEffect(() => {
+    if (validData.length > 1 && wrapperRef.current && !dragRef.current.isDragging && activeIndex !== prevActiveIndexRef.current) {
+      prevActiveIndexRef.current = activeIndex;
+      if (zoomLock === 'hard') return;
+      const timeoutId = setTimeout(() => {
+        const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+        if (activeDataIndex >= 0) {
+          if (zoomLock === 'auto') {
+            let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
+            let clusterMax = validData.at(activeDataIndex).endDate && !isNaN(validData.at(activeDataIndex).endDate.max) ? validData.at(activeDataIndex).endDate.max : validData.at(activeDataIndex).startDate.min;
+            for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
+              const node = validData.at(i);
+              clusterMax = Math.max(clusterMax, node.startDate.min);
+              clusterMin = Math.min(clusterMin, node.startDate.min);
+            }
+            const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
+            const clampedZoom = Math.min(Math.max(1, idealZoom), 2000);
+            scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
+            setZoomLevel(clampedZoom);
+          } else {
+            if (zoomLock === 'soft') setZoomLock('auto');
+            scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
+            setZoomLevel(z => z + 0.000001);
+          }
+        }
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [activeIndex, data, zoomLock, setZoomLock]);
+
+  useLayoutEffect(() => {
+    if (scrollTargetPayloadRef.current !== null && wrapperRef.current) {
+      const containerW = wrapperRef.current.clientWidth;
+      const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+      let targetScrollPos = 0;
+      const payload = scrollTargetPayloadRef.current;
+      if (payload.type === 'node') {
+        targetScrollPos = getExactNodeScrollPos(payload.value, trackWidthPx, containerW);
+      } else if (payload.type === 'raw') {
+        targetScrollPos = payload.value;
+      }
+      wrapperRef.current.scrollTo({ left: targetScrollPos, behavior: 'auto' });
+      scrollTargetPayloadRef.current = null;
+    }
+  }, [zoomLevel]);
 
   const handleManualZoom = (newZoom, centerType = 'center', eventX = 0) => {
     if (!wrapperRef.current) return;
@@ -1106,7 +1133,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.35-b225';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.36-b226';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
