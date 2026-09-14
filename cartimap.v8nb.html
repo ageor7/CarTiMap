@@ -181,7 +181,13 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .timeline-control-cluster .zoom-factor { display: flex; align-items: center; justify-content: center; }
 .media-swipe-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: auto; background: transparent; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, calc(50% - 80px) calc(50% - 60px), calc(50% + 80px) calc(50% - 60px), calc(50% + 80px) calc(50% + 60px), calc(50% - 80px) calc(50% + 60px), calc(50% - 80px) calc(50% - 60px)); }
 .semantic-time-span-left { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-</style>
+
+      .leaflet-bottom.leaflet-right .leaflet-control-scale {
+        margin-bottom: 155px !important;
+        margin-right: 12px !important;
+      }
+
+    </style>
 </head>
 <body>
     <div id="root"></div>
@@ -194,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b216';
+const APP_VERSION = 'v8.13.69-b217';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -570,7 +576,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
               ${(itemCaption || itemCredit) ? html`
                 <div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px; pointer-events: auto;">
                   ${itemCaption ? html`<div style="color: #ddd; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href=${cUrl} target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
-                  ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: <a href=${isCreditUrl ? itemCredit : cUrl} target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: underline; text-underline-offset: 2px;" title="Open credit attribution">${itemCredit}</a></div>` : ''}
+                  ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: ${isCreditUrl ? html`<a href=${itemCredit} target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
                 </div>
               ` : ''}
             </div>
@@ -989,6 +995,12 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     <style>
       .event-group:hover { z-index: 99999 !important; }
       .event-group:hover .event-block { transform: translateY(-50%) scale(1.08) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; border-color: #007acc !important; z-index: 99999 !important; width: max-content !important; min-width: var(--calc-w) !important; }
+    
+      .leaflet-bottom.leaflet-right .leaflet-control-scale {
+        margin-bottom: 155px !important;
+        margin-right: 12px !important;
+      }
+
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
@@ -1182,7 +1194,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               setMapZoom(initialZoom);
               const container = mapDomRef.current;
               const map = L.map(container, { zoomControl: false, attributionControl: false, minZoom: 1, maxZoom: maxGlobalZoom, renderer: L.svg({ padding: 1.0 }) }).setView(new L.LatLng(37.9838, 23.7275), 13);
-              L.control.scale({ position: 'bottomleft', imperial: true, metric: true }).addTo(map);
+              L.control.scale({ position: 'bottomright', imperial: true, metric: true }).addTo(map);
               map.on('zoomend', () => setMapZoom(map.getZoom()));
               mapInstance.current = map;
 
@@ -1469,14 +1481,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
             let rafId = null;
             const renderChevrons = () => {
-              if (rafId) cancelAnimationFrame(rafId);
-              rafId = requestAnimationFrame(() => {
-                if (!map || !chevronLayerRef.current) return;
-                chevronLayerRef.current.clearLayers();
-
-                // Scope chevrons to active slide polylines and cap at 20 max per path
-                const activeLayers = markersRef.current[activeIndex] || [];
-                activeLayers.forEach(layer => {
+              const map = mapInstance.current;
+              if (!map || !chevronLayerRef.current) return;
+              chevronLayerRef.current.clearLayers();
+              markersRef.current.forEach((layers, slideIdx) => {
+                const isActive = slideIdx === activeIndex;
+                layers.forEach(layer => {
                   if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
                     try {
                       const latlngs = layer.getLatLngs ? layer.getLatLngs() : [];
@@ -1487,33 +1497,36 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                           const containerPts = flatPts.map(ll => map.latLngToContainerPoint(ll));
                           let accumulatedPx = 0;
                           let nextTargetPx = 40;
-                          let count = 0;
                           for (let i = 0; i < containerPts.length - 1; i++) {
                             const p1 = containerPts[i];
                             const p2 = containerPts[i + 1];
                             const segLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
                             if (segLen <= 0) continue;
                             while (accumulatedPx + segLen >= nextTargetPx) {
-                              if (++count > 20) break;
                               const ratio = (nextTargetPx - accumulatedPx) / segLen;
                               const cx = p1.x + ratio * (p2.x - p1.x);
                               const cy = p1.y + ratio * (p2.y - p1.y);
                               const latLng = map.containerPointToLatLng(L.point(cx, cy));
                               const angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI);
-                              const arrowSvg = `<svg width="12" height="12" viewBox="0 0 24 24" style="transform: rotate(${angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="#28a745" stroke="#ffffff" stroke-width="1.5"/></svg>`;
+                              const strokeCol = isActive ? '#28a745' : '#007acc';
+                              const arrowSvg = `<svg width="12" height="12" viewBox="0 0 24 24" style="transform: rotate(${angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="${strokeCol}" stroke="#ffffff" stroke-width="1.5"/></svg>`;
                               const arrowMarker = L.marker(latLng, {
-                                icon: L.divIcon({ className: 'polyline-chevron-icon', html: arrowSvg, iconSize: [12, 12], iconAnchor: [6, 6] }),
+                                icon: L.divIcon({
+                                  html: arrowSvg,
+                                  className: 'chevron-icon',
+                                  iconSize: [12, 12],
+                                  iconAnchor: [6, 6]
+                                }),
                                 interactive: false
                               });
                               chevronLayerRef.current.addLayer(arrowMarker);
-                              nextTargetPx += 80;
+                              nextTargetPx += 60;
                             }
-                            if (count > 20) break;
                             accumulatedPx += segLen;
                           }
                         }
                       });
-                    } catch (e) {}
+                    } catch(e) {}
                   }
                 });
               });
@@ -2325,7 +2338,18 @@ const App = () => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
           // =========================================================================
-          const CarTiMapperLogo = ({ context, appVersion }) => {
+          
+const SymbologyLegend = () => html`
+  <div class="symbology-legend-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; font-size: 0.82rem; color: #333;">
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #28a745; border-radius: 50%; display: inline-block;"></span> Active Feature</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #ffb300; border-radius: 50%; display: inline-block;"></span> VIP Priority</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #007acc; border-radius: 50%; display: inline-block;"></span> Standard Feature</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: bold; color: #007acc; font-size: 1rem;">›››</span> Directional Polyline</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: rgba(0,122,204,0.35); border: 1px solid #007acc; display: inline-block;"></span> Spatial Polygon</div>
+  </div>
+`;
+
+const CarTiMapperLogo = ({ context, appVersion }) => {
             const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
             if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 400; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span><span style="font-size: 0.68rem; font-family: monospace; color: #007acc; font-weight: 600; line-height: 1;">${appVersion}</span></div></div>`;
@@ -2469,7 +2493,7 @@ const App = () => {
             ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>`
             : '';
 
-          const searchResultsList = searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">${res.title}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${formatPlaces(res.place)}` : ''}</div></div>`);
+          const searchResultsList = searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">${safeStripHTML(res.title)}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${safeStripHTML(formatPlaces(res.place))}` : ''}</div></div>`);
 
           const loadingScreen = (!status.active)
             ? html`<div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
@@ -2548,7 +2572,13 @@ const App = () => {
                     .record-select-input[type=number] {
                       -moz-appearance: textfield;
                     }
-                  </style>
+                  
+      .leaflet-bottom.leaflet-right .leaflet-control-scale {
+        margin-bottom: 155px !important;
+        margin-right: 12px !important;
+      }
+
+    </style>
                   <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
                     ${aboutBtn}
                     ${resetLayoutBtn}
@@ -2648,75 +2678,54 @@ const App = () => {
                 ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline" style="z-index: 2000;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
 
                 <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
-                
-                <!-- Settings Modal Overlay -->
-                <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="settings-modal" class="tm-modal" style="display: ${isSettingsOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 500px; max-height: 85vh; padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
-                  <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;" title="Close Settings">×</button>
-                  <h3 style="margin: 0 0 15px 0; color: #007acc; font-family: monospace; font-size: 1.2rem;">⚙️ Engine Preferences & Settings</h3>
-                  <div style="overflow-y: auto; flex-grow: 1; padding-right: 5px; font-family: monospace; font-size: 0.85rem; color: #333; display: flex; flex-direction: column; gap: 15px;">
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                      <span>Show Toolbar Text Labels:</span>
-                      <input type="checkbox" checked=${showButtonText} onChange=${(e) => {
-                        setShowButtonText(e.target.checked);
-                        localStorage.setItem('tm_show_button_text', JSON.stringify(e.target.checked));
-                      }} style="cursor: pointer;" />
-                    </label>
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                      <span>Date Formatting Locale:</span>
-                      <select value=${dateLocale} onChange=${(e) => {
-                        setDateLocale(e.target.value);
-                        localStorage.setItem('tm_date_locale', e.target.value);
-                      }} style="padding: 3px 6px; border-radius: 4px; border: 1px solid #ccc; font-family: monospace;">
-                        <option value="en-GB">en-GB (DD/MM/YYYY)</option>
-                        <option value="en-US">en-US (MM/DD/YYYY)</option>
-                      </select>
-                    </label>
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                      <span>Polygon Layer Opacity:</span>
-                      <input type="range" min="0.1" max="1.0" step="0.05" value=${polygonOpacity} onChange=${(e) => {
-                        const val = parseFloat(e.target.value);
-                        setPolygonOpacity(val);
-                        localStorage.setItem('tm_polygon_opacity', val.toString());
-                      }} style="width: 120px;" />
-                    </label>
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                      <span>Minimap Zoom Offset:</span>
-                      <input type="number" min="-8" max="-1" value=${minimapOffset} onChange=${(e) => {
-                        const val = parseInt(e.target.value, 10) || -4;
-                        setMinimapOffset(val);
-                        localStorage.setItem('tm_minimap_offset', val.toString());
-                      }} style="width: 60px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px;" />
-                    </label>
-                    <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
-                      <button class="status-btn-text" onClick=${() => {
-                        localStorage.removeItem('tm_show_button_text');
-                        localStorage.removeItem('tm_date_locale');
-                        localStorage.removeItem('tm_max_auto_zoom');
-                        localStorage.removeItem('tm_minimap_offset');
-                        localStorage.removeItem('tm_polygon_opacity');
-                        localStorage.removeItem('tm_zoom_lock');
-                        window.location.reload();
-                      }} style="background: #dc3545; color: #ffffff; border: none; padding: 8px 14px; border-radius: 4px; font-weight: 600; cursor: pointer; font-family: monospace;" title="Restore all default settings">
-                        Reset Settings to Defaults
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
                 <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 30px;">
-                  <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;">×</button>
-                  <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
-                    <div style="display: flex; justify-content: center; width: 100%; margin-bottom: 20px;">
-                      <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
+                <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
+                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 0; border-radius: 12px; background: #fff;">
+                  <!-- Locked Fixed Header Bar -->
+                  <div style="position: sticky; top: 0; background: #ffffff; border-bottom: 1px solid #eee; padding: 15px 20px; z-index: 101000; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <div style="width: 120px; height: 32px; flex-shrink: 0;">
+                        <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
+                      </div>
+                      <h3 dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.title : 'Dataset Specs & About' }} style="margin: 0; font-size: 1.25rem; color: #222; font-weight: 700; line-height: 1.2;"></h3>
                     </div>
-                    <h3>${aboutData ? aboutData.title : 'Dataset Specs'}</h3>
-                    <p style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #444;">${aboutData ? aboutData.description : 'No project description provided.'}</p>
-                    <div style="border-top: 1px solid #eee; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
+                    <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #444; display: flex; align-items: center; justify-content: center; padding: 0; outline: none; transition: background 0.2s;" title="Close Modal (Esc)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                    </button>
+                  </div>
+                  <!-- Independent Scrollable Body -->
+                  <div style="overflow-y: auto; flex-grow: 1; padding: 20px 25px; box-sizing: border-box; text-align: left;">
+                    <div class="slide-desc" dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.description : 'No project description provided.' }} style="font-size: 0.95rem; line-height: 1.6; color: #444; margin-bottom: 20px;"></div>
+                    <div style="border-top: 1px solid #eee; margin-top: 20px; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
                       <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
                       <strong>Active Modules:</strong><br/>
                       ${Object.entries(MODULE_VERSIONS).map(([k, v]) => `• ${k}: ${v}`).join('\n        ')}
+                    </div>
+
+                    <!-- Section 3: URL Parameter Specifications Matrix -->
+                    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; margin-bottom: 24px;">
+                      <h4 style="margin: 0 0 12px 0; font-size: 1rem; color: #007acc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚙️ URL Configuration Parameters</h4>
+                      <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; color: #444; font-family: monospace;">
+                        <thead>
+                          <tr style="background: #f1f3f5; text-align: left;">
+                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Parameter</th>
+                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Description</th>
+                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Example</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>source</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Google Sheets Database ID</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?source=1BxiMVs...</td></tr>
+                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>gid</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Sheet Tab GID</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?gid=0</td></tr>
+                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>slide</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Initial Slide Index (1-based)</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?slide=5</td></tr>
+                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>mapzoom</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Initial Map Zoom Level</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?mapzoom=14</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Section 4: Cartographic Symbology Legend -->
+                    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 12px;">
+                      <h4 style="margin: 0 0 12px 0; font-size: 1rem; color: #007acc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🗺️ Cartographic Symbology Legend</h4>
+                      <${SymbologyLegend} />
                     </div>
                   </div>
                 </div>
