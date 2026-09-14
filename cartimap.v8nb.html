@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b222';
+const APP_VERSION = 'v8.13.69-b223';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -966,21 +966,63 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
     const colActive = isActive ? '#007acc' : (isVip ? '#ffb300' : '#444');
 
-    let dropLine = '';
-    if (isActive) {
-      dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: #007acc; z-index: 999;"></div>`;
-    } else if (!hasDuration) {
-      dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: rgba(204,0,0,0.6); z-index: 900;"></div>`;
+    const colActive = 'var(--tm-active, #007acc)';
+    const colInactive = 'rgba(var(--tm-inactive-rgb, 204, 0, 0), 0.6)';
+    const colApprox = 'var(--tm-approx, #ffb300)';
+
+    const isApproxStart = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.approximate;
+    const isApproxEnd = item.endDate && item.endDate.isEDTF && item.endDate.obj && item.endDate.obj.approximate;
+
+    let xAxisMarker = '';
+    if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
+      const obj = item.startDate.obj;
+      if (obj.type === 'Set') {
+        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 10px; background: rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.1); border: 1px dashed ${colApprox}; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
+      } else if (obj.type === 'List') {
+        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        const subDots = (obj.values || []).map(v => {
+          const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
+          return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: ${colInactive}; transform: translateX(-2px);"></div>`;
+        });
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 1px; background: rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.4); z-index: 900;">${subDots}</div>`;
+      }
     }
 
-    const durationRibbon = hasDuration ? html`
-      <div class="duration-ribbon" style="position: absolute; left: 0; right: 0; top: ${blockHeight / 2}px; transform: translateY(-50%); height: 8px; background: ${isActive ? 'rgba(0, 122, 204, 0.45)' : 'rgba(0, 122, 204, 0.25)'}; border: 1px solid ${isActive ? '#007acc' : '#66b2ff'}; border-radius: 4px; z-index: 15; pointer-events: none;"></div>
-    ` : '';
+    if (!xAxisMarker && hasDuration) {
+      if (isActive) {
+        const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
+        const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
+        const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+      } else {
+        const styleIdx = index % 4;
+        const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
+        const borderL = isApproxStart ? `3px solid rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.6)` : `2px solid rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.6)`;
+        const borderR = isApproxEnd ? `3px solid rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.6)` : `2px solid rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.6)`;
+        const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
+        const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
+        xAxisMarker = html`
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply;">
+            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}"></div>
+          </div>
+        `;
+      }
+    }
+
+    let dropLine = '';
+    if (isActive) {
+      if (isApproxStart) dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colApprox}; z-index: 999;"></div>`;
+      else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colActive}; z-index: 999;"></div>`;
+    } else if (!hasDuration) {
+      if (isApproxStart) dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colApprox}; z-index: 900; cursor: zoom-in;" title="Approximate Date"></div>`;
+      else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colInactive}; z-index: 900;"></div>`;
+    }
 
     return html`
       <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)}>
         ${dropLine}
-        ${durationRibbon}
+        ${xAxisMarker}
         <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
           ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>` : ''}
           <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
@@ -1048,7 +1090,9 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
             `)}
           </div>
 
-          <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #f8f9fa; border-top: 2px solid #999; z-index: 5;"></div>
+          <!-- Solid White Duration Lane Background Band (for best pattern contrast) -->
+              <div style="position: absolute; bottom: 28px; left: 0; right: 0; height: 10px; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1; pointer-events: none;"></div>
+              <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #f8f9fa; border-top: 2px solid #999; z-index: 5;"></div>
 
           ${markers}
 
@@ -1064,7 +1108,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.33-b223';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1633,29 +1677,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [showGrid, mapZoom]);
 
           const legendMenuNode = showLegendMenu ? html`
-            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 280px; font-size: 0.82rem; color: #333; position: absolute; right: 44px; top: 12px; z-index: 20000;">
+            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; font-size: 0.82rem; color: #333; position: absolute; right: 44px; top: 12px; z-index: 20000;">
               <div style="font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Map Legend</span>
+                <span>Map Symbology Legend</span>
                 <button onClick=${() => setShowLegendMenu(false)} style="border: none; background: none; cursor: pointer; font-size: 0.9rem; color: #888;">&times;</button>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #28a745; display: inline-block;"></span>
-                  <span>Active Story Event</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffb300; display: inline-block;"></span>
-                  <span>VIP Feature</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #007acc; display: inline-block;"></span>
-                  <span>Standard Marker</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 18px; height: 3px; background: #007acc; display: inline-block;"></span>
-                  <span>Spatial Polyline / Polygon</span>
-                </div>
-              </div>
+              <${SymbologyLegend} />
             </div>
           ` : '';
 
@@ -1726,7 +1753,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.4.70-b171';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.102-b223';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2755,7 +2782,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.65-b155';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.120-b223';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
