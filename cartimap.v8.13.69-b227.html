@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b229';
+const APP_VERSION = 'v8.13.69-b227';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -832,10 +832,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const getExactNodeScrollPos = (nodeGlobalIdx, trackW, containerW) => {
     const activeNode = data[nodeGlobalIdx];
     if (!activeNode || !activeNode.startDate) return 0;
-    const startMs = activeNode.startDate.min;
-    const endMs = (activeNode.endDate && !isNaN(activeNode.endDate.max)) ? activeNode.endDate.max : startMs;
-    const centerMs = (startMs + endMs) / 2;
-    const basePx = ((centerMs - renderMinTime) / renderTimeRange) * trackW;
+    const basePx = ((activeNode.startDate.min - renderMinTime) / renderTimeRange) * trackW;
     return basePx - (containerW / 2);
   };
 
@@ -1136,7 +1133,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.39-b229';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.37-b227';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
