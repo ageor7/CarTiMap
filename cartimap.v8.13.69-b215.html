@@ -194,7 +194,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b216';
+const APP_VERSION = 'v8.13.69-b215';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -313,7 +313,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
             let val = activeSlide ? activeSlide[f] : 'N/A';
             if (val instanceof Date) val = val.toISOString();
             if (Array.isArray(val)) val = val.length > 0 ? `[${val.join(', ')}]` : '[]';
-            return html`<div style="color: #50fa7b; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;" title=${val}>
+            return html`<div style="color: #50fa7b; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;" title="${val}">
               <span style="color: #aaa;">${f.toUpperCase()}:</span> ${val || 'NULL'}
             </div>`;
           })}
@@ -501,23 +501,23 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
         }
         embedUrl += `&start=${seconds}`;
       }
-      return html`<iframe src=${embedUrl} loading="lazy" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+      return html`<iframe src="${embedUrl}" loading="lazy" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
     }
 
     const isHttpBlocked = lowUrl.startsWith('http://') && window.location.protocol === 'https:';
     if (evalUrl.endsWith('.pdf') || isHttpBlocked) {
       return html`
         <div style="position: relative; width: 100%; height: 100%; background: #222; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
-          <iframe src=${url} loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
+          <iframe src="${url}" loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
         </div>
       `;
     }
 
     if (evalUrl.match(/\.(jpeg|jpg|gif|png|svg|webp)$/) || url.startsWith('data:image')) {
-      return html`<img src=${url} style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
+      return html`<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
     }
 
-    return html`<iframe src=${url} loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
+    return html`<iframe src="${url}" loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
   };
 
   const currentMediaItem = mediaItems[activeMediaIdx] || '';
@@ -569,8 +569,8 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
               </div>
               ${(itemCaption || itemCredit) ? html`
                 <div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px; pointer-events: auto;">
-                  ${itemCaption ? html`<div style="color: #ddd; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href=${cUrl} target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
-                  ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: <a href=${isCreditUrl ? itemCredit : cUrl} target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: underline; text-underline-offset: 2px;" title="Open credit attribution">${itemCredit}</a></div>` : ''}
+                  ${itemCaption ? html`<div style="color: #ddd; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
+                  ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
                 </div>
               ` : ''}
             </div>
@@ -675,7 +675,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
             <div class="title-header-container" style="width: 100%; padding: 0; box-sizing: border-box;">
               <h2 style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease; color: #222;">
               ${slide.webPage && (slide.webPage.startsWith('http://') || slide.webPage.startsWith('https://'))
-                ? html`<a href=${slide.webPage} target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 122, 204, 0.4); text-underline-offset: 4px; pointer-events: auto;" dangerouslySetInnerHTML=${{"__html": slide.title}}></a>`
+                ? html`<a href="${slide.webPage}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 122, 204, 0.4); text-underline-offset: 4px; pointer-events: auto;" dangerouslySetInnerHTML=${{"__html": slide.title}}></a>`
                 : html`<span dangerouslySetInnerHTML=${{"__html": slide.title}}></span>`}
             </h2>
             </div>
@@ -1182,7 +1182,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               setMapZoom(initialZoom);
               const container = mapDomRef.current;
               const map = L.map(container, { zoomControl: false, attributionControl: false, minZoom: 1, maxZoom: maxGlobalZoom, renderer: L.svg({ padding: 1.0 }) }).setView(new L.LatLng(37.9838, 23.7275), 13);
-              L.control.scale({ position: 'bottomleft', imperial: true, metric: true }).addTo(map);
+              L.control.scale({ position: 'bottomright', imperial: true, metric: true }).addTo(map);
               map.on('zoomend', () => setMapZoom(map.getZoom()));
               mapInstance.current = map;
 
@@ -1279,7 +1279,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               const config = basemapsRegistry.find(b => b.id === activeBasemap);
               if (config) {
                 const tileUrl = config.url || '';
-                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href=${config.attrLink || '#'} target="_blank">${config.attrText || ''}</a>` };
+                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
                 baseLayerRef.current = L.tileLayer(tileUrl, { ...layerOpts, zIndex: 0 }).addTo(map);
                 miniBaseLayerRef.current = L.tileLayer(tileUrl, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
               }
@@ -1302,7 +1302,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 const z = idx + 10;
                 const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity !== undefined ? o.defaultOpacity : (o.defaultopacity !== undefined ? parseFloat(o.defaultopacity) : 0.3));
                 const isWms = (o.format && String(o.format).toLowerCase() === 'wms') || !!o.wmsLayer || String(o.url).toLowerCase().includes('wms');
-                const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href=${o.attrLink || '#'} target="_blank">${o.attrText || ''}</a>`, zIndex: z };
+                const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
                 if (isWms) {
                   overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, { ...layerOpts, layers: o.wmsLayer || 'default', format: 'image/png', transparent: true }).addTo(map);
                 } else {
@@ -1562,7 +1562,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   <input type="checkbox" id="over_${o.id}" checked=${isChecked} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
                     <label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
-                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href=${o.attrLink || '#'} target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
+                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
                   </div>
                 </div>
                 ${isChecked ? html`
@@ -1583,7 +1583,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${isChecked} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
                     <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
-                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href=${b.attrLink || '#'} target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
+                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
                   </div>
                 </div>
                 ${isChecked ? html`
@@ -2648,62 +2648,6 @@ const App = () => {
                 ${isTimelineMinimized ? html`<button class="fab-btn" onClick=${() => setIsTimelineMinimized(false)} title="Restore Timeline" style="z-index: 2000;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>` : ''}
 
                 <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
-                
-                <!-- Settings Modal Overlay -->
-                <div class="tm-backdrop ${isSettingsOpen ? 'open' : ''}" onClick=${() => setIsSettingsOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="settings-modal" class="tm-modal" style="display: ${isSettingsOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 500px; max-height: 85vh; padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
-                  <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;" title="Close Settings">×</button>
-                  <h3 style="margin: 0 0 15px 0; color: #007acc; font-family: monospace; font-size: 1.2rem;">⚙️ Engine Preferences & Settings</h3>
-                  <div style="overflow-y: auto; flex-grow: 1; padding-right: 5px; font-family: monospace; font-size: 0.85rem; color: #333; display: flex; flex-direction: column; gap: 15px;">
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                      <span>Show Toolbar Text Labels:</span>
-                      <input type="checkbox" checked=${showButtonText} onChange=${(e) => {
-                        setShowButtonText(e.target.checked);
-                        localStorage.setItem('tm_show_button_text', JSON.stringify(e.target.checked));
-                      }} style="cursor: pointer;" />
-                    </label>
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                      <span>Date Formatting Locale:</span>
-                      <select value=${dateLocale} onChange=${(e) => {
-                        setDateLocale(e.target.value);
-                        localStorage.setItem('tm_date_locale', e.target.value);
-                      }} style="padding: 3px 6px; border-radius: 4px; border: 1px solid #ccc; font-family: monospace;">
-                        <option value="en-GB">en-GB (DD/MM/YYYY)</option>
-                        <option value="en-US">en-US (MM/DD/YYYY)</option>
-                      </select>
-                    </label>
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                      <span>Polygon Layer Opacity:</span>
-                      <input type="range" min="0.1" max="1.0" step="0.05" value=${polygonOpacity} onChange=${(e) => {
-                        const val = parseFloat(e.target.value);
-                        setPolygonOpacity(val);
-                        localStorage.setItem('tm_polygon_opacity', val.toString());
-                      }} style="width: 120px;" />
-                    </label>
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                      <span>Minimap Zoom Offset:</span>
-                      <input type="number" min="-8" max="-1" value=${minimapOffset} onChange=${(e) => {
-                        const val = parseInt(e.target.value, 10) || -4;
-                        setMinimapOffset(val);
-                        localStorage.setItem('tm_minimap_offset', val.toString());
-                      }} style="width: 60px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px;" />
-                    </label>
-                    <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
-                      <button class="status-btn-text" onClick=${() => {
-                        localStorage.removeItem('tm_show_button_text');
-                        localStorage.removeItem('tm_date_locale');
-                        localStorage.removeItem('tm_max_auto_zoom');
-                        localStorage.removeItem('tm_minimap_offset');
-                        localStorage.removeItem('tm_polygon_opacity');
-                        localStorage.removeItem('tm_zoom_lock');
-                        window.location.reload();
-                      }} style="background: #dc3545; color: #ffffff; border: none; padding: 8px 14px; border-radius: 4px; font-weight: 600; cursor: pointer; font-family: monospace;" title="Restore all default settings">
-                        Reset Settings to Defaults
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
                 <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
                 <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 30px;">
                   <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;">×</button>
