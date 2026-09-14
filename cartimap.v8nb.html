@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.13.69-b200</title>
+    <title>CarTiMap v8.13.69-b215</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -173,7 +173,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
 .event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
 .event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
-.event-block { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon(0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px)); }
+.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon( 0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px) ); }
 .event-block:hover { filter: brightness(1.05); z-index: 40 !important; width: max-content !important; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.25)); }
 .timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
 .timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
@@ -194,7 +194,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b212';
+const APP_VERSION = 'v8.13.69-b215';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -313,7 +313,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
             let val = activeSlide ? activeSlide[f] : 'N/A';
             if (val instanceof Date) val = val.toISOString();
             if (Array.isArray(val)) val = val.length > 0 ? `[${val.join(', ')}]` : '[]';
-            return html`<div style="color: #50fa7b; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;" title=${val}>
+            return html`<div style="color: #50fa7b; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;" title="${val}">
               <span style="color: #aaa;">${f.toUpperCase()}:</span> ${val || 'NULL'}
             </div>`;
           })}
@@ -420,18 +420,18 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
   credits = credits.map(s => String(s).trim());
 
   const getCleanUrl = (rawUrl) => {
-    const cleanMediaUrl = rawUrl.trim();
+    const url = rawUrl.trim();
     if (url.toLowerCase().startsWith('<iframe')) {
       const match = url.match(/src=["']([^"']+)["']/);
       return match ? match.at(1) : '#';
     }
-    return cleanMediaUrl;
+    return url;
   };
 
   const handleScroll = (e) => {
     if (dragRef.current.isDown) return;
-    const scrollWidthVal = carouselWidthRef.current || e.target.clientWidth;
-    const scrollItemIdx = Math.round(e.target.scrollLeft / scrollWidthVal);
+    const width = carouselWidthRef.current || e.target.clientWidth;
+    const idx = Math.round(e.target.scrollLeft / width);
     if (idx !== activeMediaIdx) setActiveMediaIdx(idx);
   };
 
@@ -440,7 +440,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     if (!carouselRef.current) return;
     const newIdx = activeMediaIdx + direction;
     if (newIdx >= 0 && newIdx < mediaItems.length) {
-      const navWidthVal = carouselWidthRef.current || carouselRef.current.clientWidth;
+      const width = carouselWidthRef.current || carouselRef.current.clientWidth;
       carouselRef.current.scrollTo({ left: newIdx * width, behavior: 'smooth' });
     }
   };
@@ -462,8 +462,8 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     if (!dragRef.current.isDown) return;
     dragRef.current.isDown = false;
     carouselRef.current.classList.remove('is-dragging');
-    const clickNavWidthVal = carouselWidthRef.current || carouselRef.current.clientWidth;
-    const navItemIdx = Math.round(carouselRef.current.scrollLeft / navWidthVal);
+    const width = carouselWidthRef.current || carouselRef.current.clientWidth;
+    const idx = Math.round(carouselRef.current.scrollLeft / width);
     setActiveMediaIdx(idx);
     carouselRef.current.scrollTo({ left: idx * width, behavior: 'smooth' });
   };
@@ -483,11 +483,11 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
 
     if (lowUrl.includes('youtube.com') || lowUrl.includes('youtu.be')) {
       let embedUrl = url;
-      if (!cleanMediaUrl.includes('/embed/')) {
+      if (!url.includes('/embed/')) {
         const idMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
         if (idMatch) embedUrl = `https://www.youtube.com/embed/${idMatch.at(1)}?enablejsapi=1`;
-      } else if (!cleanMediaUrl.includes('enablejsapi=1')) {
-        embedUrl += (cleanMediaUrl.includes('?') ? '&' : '?') + 'enablejsapi=1';
+      } else if (!url.includes('enablejsapi=1')) {
+        embedUrl += (url.includes('?') ? '&' : '?') + 'enablejsapi=1';
       }
       const tMatch = url.match(/[?&]t=([^&]+)/);
       if (tMatch) {
@@ -501,23 +501,23 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
         }
         embedUrl += `&start=${seconds}`;
       }
-      return html`<iframe src=${embedUrl} loading="lazy" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+      return html`<iframe src="${embedUrl}" loading="lazy" style="width: 100%; height: 100%; border: none;" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
     }
 
     const isHttpBlocked = lowUrl.startsWith('http://') && window.location.protocol === 'https:';
     if (evalUrl.endsWith('.pdf') || isHttpBlocked) {
       return html`
         <div style="position: relative; width: 100%; height: 100%; background: #222; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
-          <iframe src=${url} loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
+          <iframe src="${url}" loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
         </div>
       `;
     }
 
-    if (evalUrl.match(/\.(jpeg|jpg|gif|png|svg|webp)$/) || cleanMediaUrl.startsWith('data:image')) {
-      return html`<img src=${url} style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
+    if (evalUrl.match(/\.(jpeg|jpg|gif|png|svg|webp)$/) || url.startsWith('data:image')) {
+      return html`<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; display: block;" loading="lazy" />`;
     }
 
-    return html`<iframe src=${url} loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
+    return html`<iframe src="${url}" loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>`;
   };
 
   const currentMediaItem = mediaItems[activeMediaIdx] || '';
@@ -569,8 +569,8 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
               </div>
               ${(itemCaption || itemCredit) ? html`
                 <div style="flex: 0 0 auto; background: rgba(0,0,0,0.85); color: #fff; padding: 10px 15px; font-size: 0.85rem; line-height: 1.4; border-top: 1px solid #444; z-index: 10; display: flex; flex-direction: column; gap: 4px; pointer-events: auto;">
-                  ${itemCaption ? html`<div style="color: #ddd; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href=${cUrl} target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
-                  ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: ${isCreditUrl ? html`<a href=${itemCredit} target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
+                  ${itemCaption ? html`<div style="color: #ddd; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="${cUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 2px;" title="Open media in new tab">${itemCaption}</a></div>` : ''}
+                  ${itemCredit ? html`<div style="font-size: 0.72rem; color: #888; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Credit: ${isCreditUrl ? html`<a href="${itemCredit}" target="_blank" rel="noopener noreferrer" style="color: #8be9fd; text-decoration: none;">${itemCredit}</a>` : html`<span>${itemCredit}</span>`}</div>` : ''}
                 </div>
               ` : ''}
             </div>
@@ -603,10 +603,10 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
 
   const getParsedTags = (rawTagsArray) => {
     if (!rawTagsArray || rawTagsArray.length === 0) return [];
-    let parsedTagsAcc = [];
+    let tags = [];
     (Array.isArray(rawTagsArray) ? rawTagsArray : [rawTagsArray]).forEach(t => {
-      if (typeof t === 'string') parsedTagsAcc.push(...t.split(/[|·;·\n\-]/));
-      else parsedTagsAcc.push(t);
+      if (typeof t === 'string') tags.push(...t.split(/[|·;·\n\-]/));
+      else tags.push(t);
     });
     return tags.map(s => String(s).trim()).filter(Boolean);
   };
@@ -616,7 +616,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     return String(rawPlace).replace(/[\r\n]+/g, ' · ').trim();
   };
 
-  const rawTagsList = getParsedTags(slide.tags);
+  const tags = getParsedTags(slide.tags);
   const hasLocation = slide.place && String(slide.place).trim() !== '';
 
   const goPrev = () => { if (activeIndex > 0) setActiveIndex(activeIndex - 1); };
@@ -669,13 +669,13 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
               ${isDateValid ? html`<div class="metadata-date" style="font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</div>` : ''}
               <div class="metadata-pills-wrapper">
                 ${hasLocation ? html`<span class="place-pill"><span style="margin-right: 4px;">📍</span> ${formatPlaces(slide.place)}</span>` : ''}
-                ${slideParsedTags.map(tag => html`<span class="tag-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span>${tag}</span></span>`)}
+                ${tags.map(tag => html`<span class="tag-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span>${tag}</span></span>`)}
               </div>
             </div>
             <div class="title-header-container" style="width: 100%; padding: 0; box-sizing: border-box;">
               <h2 style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease; color: #222;">
               ${slide.webPage && (slide.webPage.startsWith('http://') || slide.webPage.startsWith('https://'))
-                ? html`<a href=${slide.webPage} target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 122, 204, 0.4); text-underline-offset: 4px; pointer-events: auto;" dangerouslySetInnerHTML=${{"__html": slide.title}}></a>`
+                ? html`<a href="${slide.webPage}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 122, 204, 0.4); text-underline-offset: 4px; pointer-events: auto;" dangerouslySetInnerHTML=${{"__html": slide.title}}></a>`
                 : html`<span dangerouslySetInnerHTML=${{"__html": slide.title}}></span>`}
             </h2>
             </div>
@@ -725,20 +725,15 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     return String(str).replace(/<[^>]*>/g, '').trim();
   };
 
-  const formatLabelSmart = (text) => {
-    if (!text) return { lines: ['Untitled'], pxWidth: 70 };
-    const clean = safeStripHTML(text);
-    const words = clean.split(/\s+/).filter(Boolean);
-    if (words.length <= 3) {
-      const w1 = Math.max(70, clean.length * 7.2 + 28);
-      return { lines: [clean], pxWidth: w1 };
-    }
+  const formatLabelSmart = (titleStr, maxPx = 180) => {
+    if (!titleStr) return { lines: ['Untitled'], pxWidth: 60 };
+    const clean = safeStripHTML(titleStr);
+    const words = clean.split(/\s+/);
+    if (words.length <= 3) return { lines: [clean], pxWidth: Math.max(60, clean.length * 7 + 35) };
     const mid = Math.ceil(words.length / 2);
-    const l1 = words.slice(0, mid).join(' ');
-    const l2 = words.slice(mid).join(' ');
-    const maxLen = Math.max(l1.length, l2.length);
-    const w2 = Math.max(70, maxLen * 7.2 + 28);
-    return { lines: [l1, l2], pxWidth: w2 };
+    const line1 = words.slice(0, mid).join(' ');
+    const line2 = words.slice(mid).join(' ');
+    return { lines: [line1, line2], pxWidth: Math.max(60, Math.max(line1.length, line2.length) * 7 + 35) };
   };
 
   const getParsedTags = (rawTagsArray) => {
@@ -803,8 +798,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
   if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
 
-  let containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
-  let trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+  const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+  const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
   const visibleTimeSpanMs = renderTimeRange / zoomLevel;
 
   const visibleLeftMs = renderMinTime + (viewLeftEdge / trackWidthPx) * renderTimeRange;
@@ -829,7 +824,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   }, [zoomLevel, renderTimeRange, setVisibleTimeSpan]);
 
   const getExactNodeScrollPos = (nodeGlobalIdx, trackW, containerW) => {
-    const nodeTarget = data[nodeGlobalIdx];
+    const activeNode = data[nodeGlobalIdx];
     if (!activeNode || !activeNode.startDate) return 0;
     const basePx = ((activeNode.startDate.min - renderMinTime) / renderTimeRange) * trackW;
     return basePx - (containerW / 2);
@@ -857,16 +852,16 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           setZoomLevel(2.5);
         }
       }
-      const innerContainerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+      const containerW = wrapperRef.current.clientWidth || 1000;
       const targetTrackW = Math.max(containerW, containerW * zoomLevel);
-      const initScrollPos = getExactNodeScrollPos(activeIndex, targetTrackW, innerContainerW);
+      const scrollPos = getExactNodeScrollPos(activeIndex, targetTrackW, containerW);
       wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
     }
   }, [activeIndex]);
 
   const handleManualZoom = (newZoom, centerType = 'center', eventX = 0) => {
     if (!wrapperRef.current) return;
-    const clientContainerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+    const containerW = wrapperRef.current.clientWidth;
     const currentTrackW = Math.max(containerW, containerW * zoomLevel);
     const newTrackW = Math.max(containerW, containerW * newZoom);
 
@@ -876,7 +871,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
     const focalPct = focalPx / currentTrackW;
     const newFocalPx = focalPct * newTrackW;
-    const targetScrollPosB = newFocalPx - (centerType === 'mouse' ? eventX : (containerW / 2));
+    const targetScrollPos = newFocalPx - (centerType === 'mouse' ? eventX : (containerW / 2));
 
     scrollTargetPayloadRef.current = { type: 'raw', value: targetScrollPos };
     setZoomLevel(newZoom);
@@ -884,9 +879,9 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
   const handleNodeClick = (globalIdx) => {
     if (!dragRef.current.hasDragged) {
-      containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
-      trackWidthPx = Math.max(containerW, containerW * zoomLevel);
-      const exactScrollPos = getExactNodeScrollPos(globalIdx, trackWidthPx, containerW);
+      const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+      const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+      const scrollPos = getExactNodeScrollPos(globalIdx, trackWidthPx, containerW);
       wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
       setActiveIndex(globalIdx);
     }
@@ -895,41 +890,31 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const onDown = (e) => {
     if (zoomLock !== 'hard') setZoomLock('soft');
     if (e.touches && e.touches.length === 2) {
-      const touchStartA = Array.from(e.touches).at(0);
-      const touchStartB = Array.from(e.touches).at(1);
-      if (touchStartA && touchStartB) {
-        touchZoomRef.current = { initialDist: Math.hypot(touchStartA.clientX - touchStartB.clientX, touchStartA.clientY - touchStartB.clientY), initialZoom: zoomLevel };
-      }
+      const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
+      touchZoomRef.current = { initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY), initialZoom: zoomLevel };
       return;
     }
-    const touchStartPoint = e.touches ? Array.from(e.touches).at(0) : e;
-    if (touchStartPoint && wrapperRef.current) {
-      dragRef.current = { isDragging: true, startX: touchStartPoint.clientX, scrollLeft: wrapperRef.current.scrollLeft, hasDragged: false };
-      wrapperRef.current.classList.add('is-dragging');
-    }
+    const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+    dragRef.current = { isDragging: true, startX: t1.clientX, scrollLeft: wrapperRef.current.scrollLeft, hasDragged: false };
+    wrapperRef.current.classList.add('is-dragging');
     if (caliperTooltip) setCaliperTooltip(null);
   };
 
-  const onUp = () => { dragRef.current.isDragging = false; if (wrapperRef.current) wrapperRef.current.classList.remove('is-dragging'); };
+  const onUp = () => { dragRef.current.isDragging = false; wrapperRef.current?.classList.remove('is-dragging'); };
 
   const onMove = (e) => {
     if (e.touches && e.touches.length === 2 && touchZoomRef.current.initialDist > 0) {
-      const touchMoveA = Array.from(e.touches).at(0);
-      const touchMoveB = Array.from(e.touches).at(1);
-      if (touchMoveA && touchMoveB) {
-        const dist = Math.hypot(touchMoveA.clientX - touchMoveB.clientX, touchMoveA.clientY - touchMoveB.clientY);
-        const factor = dist / touchZoomRef.current.initialDist;
-        handleManualZoom(Math.max(1, Math.min(2000, touchZoomRef.current.initialZoom * factor)), 'center');
-      }
+      const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const factor = dist / touchZoomRef.current.initialDist;
+      handleManualZoom(Math.max(1, Math.min(2000, touchZoomRef.current.initialZoom * factor)), 'center');
       return;
     }
     if (!dragRef.current.isDragging) return;
-    const touchMovePoint = e.touches ? Array.from(e.touches).at(0) : e;
-    if (touchMovePoint && wrapperRef.current) {
-      const dx = dragRef.current.startX - touchMovePoint.clientX;
-      if (Math.abs(dx) > 3) dragRef.current.hasDragged = true;
-      wrapperRef.current.scrollLeft = dragRef.current.scrollLeft + dx;
-    }
+    const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+    const dx = dragRef.current.startX - t1.clientX;
+    if (Math.abs(dx) > 3) dragRef.current.hasDragged = true;
+    wrapperRef.current.scrollLeft = dragRef.current.scrollLeft + dx;
   };
 
   const onWheel = (e) => {
@@ -957,7 +942,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
     const topPos = laneIdx * laneHeight;
     const blockHeight = Math.max(24, ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight);
-    // Cleared duplicate declarations
+    const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
+    const hasMedia = item.media && item.media.length > 0;
 
     const stackKey = `${itemStartMs}_${laneIdx}`;
     if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
@@ -981,17 +967,18 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: rgba(204,0,0,0.6); z-index: 900;"></div>`;
     }
 
-    const hasMedia = !!(item.media || item.mediaUrl || item.embedUrl || item.youtube || item.image || item.photo);
-    const { lines, pxWidth } = formatLabelSmart(item.title);
-    const totalWidth = pxWidth + (hasMedia ? 18 : 0);
+    const durationRibbon = hasDuration ? html`
+      <div class="duration-ribbon" style="position: absolute; left: 0; right: 0; top: ${blockHeight / 2}px; transform: translateY(-50%); height: 8px; background: ${isActive ? 'rgba(0, 122, 204, 0.45)' : 'rgba(0, 122, 204, 0.25)'}; border: 1px solid ${isActive ? '#007acc' : '#66b2ff'}; border-radius: 4px; z-index: 15; pointer-events: none;"></div>
+    ` : '';
 
     return html`
-      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: ${topPos}px; height: ${laneHeight}px; width: ${hasDuration ? `calc(${endPct - startPct}% - ${xOffset}px)` : `${totalWidth}px`}; z-index: ${isActive ? 50 : 10};" onClick=${() => handleNodeClick(globalIndex)}>
+      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)}>
         ${dropLine}
-        <div class="event-block" style="position: absolute; top: 0; left: 0; height: 100%; --diag-w: 10px; width: ${hasDuration ? '100%' : `${totalWidth}px`}; background: ${isActive ? '#007acc' : (isVip ? '#ffb300' : '#ffffff')}; color: ${isActive ? '#ffffff' : '#222222'}; border: 1px solid ${isActive ? '#005a99' : (isVip ? '#e69900' : '#cccccc')}; font-weight: ${isActive ? '700' : '500'}; clip-path: polygon(0 calc(50% - 12px), 10px 0, 100% 0, 100% 100%, 10px 100%, 0 calc(50% + 12px)); display: flex; align-items: center; padding: 2px 8px 2px 14px; box-sizing: border-box; font-size: 0.75rem; cursor: pointer;">
-          ${hasMedia ? html`<svg style="margin-right: 6px; flex-shrink: 0; width: 12px; height: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>` : ''}
-          <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.15; max-width: 100%; text-align: left;">
-            ${lines.map(lineText => html`<span class="event-title-line" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${lineText}</span>`)}
+        ${durationRibbon}
+        <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
+          ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>` : ''}
+          <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
+            ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
           </div>
         </div>
       </div>
@@ -1001,7 +988,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   return html`
     <style>
       .event-group:hover { z-index: 99999 !important; }
-      .event-group:hover .event-block { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon(0 calc(50% - 12px), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + 12px)); }
+      .event-group:hover .event-block { transform: translateY(-50%) scale(1.08) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; border-color: #007acc !important; z-index: 99999 !important; width: max-content !important; min-width: var(--calc-w) !important; }
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
@@ -1032,9 +1019,9 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           }
         </button>
         <button class="status-btn" onClick=${() => {
-          containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
-          trackWidthPx = Math.max(containerW, containerW * zoomLevel);
-          const snapScrollPos = getExactNodeScrollPos(activeIndex, trackWidthPx, containerW);
+          const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
+          const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
+          const scrollPos = getExactNodeScrollPos(activeIndex, trackWidthPx, containerW);
           if (wrapperRef.current) wrapperRef.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
         }} title="Center Active Event (🎯)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
@@ -1077,19 +1064,6 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.11.10';
 
 // 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
-
-const SymbologyLegend = () => html`
-  <div class="symbology-legend-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; font-size: 0.82rem; color: #333; line-height: 1.3;">
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #28a745; display: inline-block; flex-shrink: 0;"></span> Active Story Feature</div>
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #ffb300; display: inline-block; flex-shrink: 0;"></span> VIP Priority Feature</div>
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #007acc; display: inline-block; flex-shrink: 0;"></span> Standard Marker</div>
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 18px; height: 2px; border-top: 2px dashed #007acc; display: inline-block; flex-shrink: 0;"></span> Directional Route (80px >)</div>
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 10px; background: rgba(40,167,69,0.35); border: 1px solid #28a745; display: inline-block; flex-shrink: 0;"></span> Spatial Polygon Area</div>
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 10px; background: #007acc; clip-path: polygon(0 0, 3px 0, 100% 0, 100% 100%, 3px 100%, 0 100%); display: inline-block; flex-shrink: 0;"></span> Timeline Hexagon Node</div>
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; color: #007acc; flex-shrink: 0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span> Media-Linked Record</div>
-  </div>
-`;
-
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           const mapDomRef = useRef(null);
           const miniMapDomRef = useRef(null);
@@ -1140,28 +1114,6 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [basemapsRegistry]);
           const [basemapOpacity, setBasemapOpacity] = useState(1.0);
           const [showGrid, setShowGrid] = useState(false);
-
-          useEffect(() => {
-            const container = mapDomRef.current;
-            if (!container) return;
-            const ro = new ResizeObserver(() => {
-              if (mapInstance.current) {
-                try { mapInstance.current.invalidateSize({ animate: false }); } catch(e){}
-              }
-            });
-            ro.observe(container);
-            return () => ro.disconnect();
-          }, []);
-
-          useEffect(() => {
-            const map = mapInstance.current;
-            if (!map) return;
-            const timer = setTimeout(() => {
-              try { map.invalidateSize({ animate: false }); } catch(e){}
-            }, 120);
-            return () => clearTimeout(timer);
-          }, [maxPane, activeIndex, data]);
-
           const [showLegendMenu, setShowLegendMenu] = useState(false);
           const [showLayersMenu, setShowLayersMenu] = useState(false);
 
@@ -1317,15 +1269,6 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [basemapsRegistry, maxGlobalZoom]);
 
           useEffect(() => {
-            if (baseLayerRef.current && typeof baseLayerRef.current.setOpacity === 'function') {
-              baseLayerRef.current.setOpacity(basemapOpacity);
-            }
-            if (miniBaseLayerRef.current && typeof miniBaseLayerRef.current.setOpacity === 'function') {
-              miniBaseLayerRef.current.setOpacity(basemapOpacity);
-            }
-          }, [basemapOpacity]);
-
-          useEffect(() => {
             const map = mapInstance.current;
             const miniMap = miniMapInstance.current;
             if (!map || !miniMap || !basemapsRegistry) return;
@@ -1336,7 +1279,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               const config = basemapsRegistry.find(b => b.id === activeBasemap);
               if (config) {
                 const tileUrl = config.url || '';
-                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href=${config.attrLink || '#'} target="_blank">${config.attrText || ''}</a>` };
+                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
                 baseLayerRef.current = L.tileLayer(tileUrl, { ...layerOpts, zIndex: 0 }).addTo(map);
                 miniBaseLayerRef.current = L.tileLayer(tileUrl, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
               }
@@ -1359,7 +1302,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 const z = idx + 10;
                 const dynamicOpacity = overlayOpacities[o.id] !== undefined ? overlayOpacities[o.id] : (o.defaultOpacity !== undefined ? o.defaultOpacity : (o.defaultopacity !== undefined ? parseFloat(o.defaultopacity) : 0.3));
                 const isWms = (o.format && String(o.format).toLowerCase() === 'wms') || !!o.wmsLayer || String(o.url).toLowerCase().includes('wms');
-                const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href=${o.attrLink || '#'} target="_blank">${o.attrText || ''}</a>`, zIndex: z };
+                const layerOpts = { maxNativeZoom: o.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: dynamicOpacity, attribution: `<a href="${o.attrLink || '#'}" target="_blank">${o.attrText || ''}</a>`, zIndex: z };
                 if (isWms) {
                   overlayLayersRef.current[o.id] = L.tileLayer.wms(o.url, { ...layerOpts, layers: o.wmsLayer || 'default', format: 'image/png', transparent: true }).addTo(map);
                 } else {
@@ -1619,7 +1562,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   <input type="checkbox" id="over_${o.id}" checked=${isChecked} onChange=${(e) => { if (e.target.checked) setActiveOverlays(prev => [...prev, o.id]); else setActiveOverlays(prev => prev.filter(id => id !== o.id)); }} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
                     <label for="over_${o.id}" style="cursor: pointer; font-weight: 500; color: #222;">${o.label}</label>
-                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href=${o.attrLink || '#'} target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
+                    ${o.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${o.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!o.attrLink) e.preventDefault(); }}>${o.attrText}</a></span>` : ''}
                   </div>
                 </div>
                 ${isChecked ? html`
@@ -1640,7 +1583,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   <input type="radio" id="base_${b.id}" name="basemap_radio" checked=${isChecked} onChange=${() => setActiveBasemap(b.id)} style="margin: 2px 0 0 0; cursor: pointer; flex-shrink: 0;" />
                   <div style="display: inline; margin: 0;">
                     <label for="base_${b.id}" style="cursor: pointer; font-weight: 500; color: #222;">${b.label}</label>
-                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href=${b.attrLink || '#'} target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
+                    ${b.attrText ? html`<span style="margin: 0 4px; color: #ccc;">|</span><span class="layer-attribution-link" style="font-size: 0.75rem;"><a href="${b.attrLink || '#'}" target="_blank" onClick=${(e) => { e.stopPropagation(); if(!b.attrLink) e.preventDefault(); }}>${b.attrText}</a></span>` : ''}
                   </div>
                 </div>
                 ${isChecked ? html`
@@ -1680,11 +1623,31 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           }, [showGrid, mapZoom]);
 
           const legendMenuNode = showLegendMenu ? html`
-  <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 300px; font-size: 0.82rem; color: #333; position: absolute; left: 44px; top: 12px; z-index: 2000;">
-    <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Cartographic Symbology Legend</div>
-    <${SymbologyLegend} />
-  </div>
-` : '';
+            <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 280px; font-size: 0.82rem; color: #333; position: absolute; right: 44px; top: 12px; z-index: 20000;">
+              <div style="font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Map Legend</span>
+                <button onClick=${() => setShowLegendMenu(false)} style="border: none; background: none; cursor: pointer; font-size: 0.9rem; color: #888;">&times;</button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #28a745; display: inline-block;"></span>
+                  <span>Active Story Event</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffb300; display: inline-block;"></span>
+                  <span>VIP Feature</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: #007acc; display: inline-block;"></span>
+                  <span>Standard Marker</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 18px; height: 3px; background: #007acc; display: inline-block;"></span>
+                  <span>Spatial Polyline / Polygon</span>
+                </div>
+              </div>
+            </div>
+          ` : '';
 
           const layersMenuNode = showLayersMenu ? html`
             <div style="background: rgba(255,255,255,0.98); border: 1px solid #ccc; border-radius: 6px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: max-content; max-width: 320px; max-height: 50vh; overflow-y: auto; font-size: 0.85rem; color: #333; position: absolute; right: 44px; top: 12px; z-index: 20000;">
@@ -2380,19 +2343,6 @@ const App = () => {
           // =========================================================================
           // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
           // =========================================================================
-          
-          const copyShareUrl = () => {
-            const url = new URL(window.location.href);
-            url.searchParams.set('slide', activeIndex + 1);
-            if (mapZoom) url.searchParams.set('mapzoom', mapZoom);
-            navigator.clipboard.writeText(url.toString()).then(() => {
-              if (typeof addLog === 'function') addLog(`[Share] Copied state URL: ${url.toString()}`, 'success');
-              alert('Copied shareable state URL to clipboard!');
-            }).catch(() => {
-              prompt('Copy shareable state URL:', url.toString());
-            });
-          };
-
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
             : '';
@@ -2407,9 +2357,6 @@ const App = () => {
           const filterBtnText = showButtonText ? html`<span>Filters</span>` : '';
 
           const canGoBack = slideHistory && slideHistory.length > 0;
-          
-          const shareBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${copyShareUrl} title="Copy Shareable State URL"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>${showButtonText ? html`<span>Share</span>` : ''}</button>`;
-
           const backBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} disabled=${!canGoBack} style="opacity: ${canGoBack ? '1' : '0.38'}; cursor: ${canGoBack ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoBack ? 'auto' : 'none'};" title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`;
 
           const canGoForward = forwardHistory && forwardHistory.length > 0;
@@ -2607,7 +2554,6 @@ const App = () => {
                     ${resetLayoutBtn}
                     ${settingsBtn}
                     ${telemetryBtn}
-                ${shareBtn}
                   </div>
 
                   <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
@@ -2703,65 +2649,18 @@ const App = () => {
 
                 <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
                 <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 0; border-radius: 12px; background: #fff;">
-                  <!-- Locked Fixed Header Bar -->
-                  <div style="position: sticky; top: 0; background: #ffffff; border-bottom: 1px solid #eee; padding: 15px 20px; z-index: 101000; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                      <div style="width: 120px; height: 32px; flex-shrink: 0;">
-                        <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
-                      </div>
-                      <h3 dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.title : 'Dataset Specs & About' }} style="margin: 0; font-size: 1.25rem; color: #222; font-weight: 700; line-height: 1.2;"></h3>
+                <div id="about-modal" class="tm-modal" style="display: ${isAboutOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; width: 85%; max-width: 800px; max-height: 85vh; padding: 30px;">
+                  <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #999;">×</button>
+                  <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
+                    <div style="display: flex; justify-content: center; width: 100%; margin-bottom: 20px;">
+                      <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
                     </div>
-                    <button class="modal-close" onClick=${() => setIsAboutOpen(false)} style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #444; display: flex; align-items: center; justify-content: center; padding: 0; outline: none; transition: background 0.2s;" title="Close Modal (Esc)">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                  </div>
-                  <!-- Independent Scrollable Body -->
-                  <div style="overflow-y: auto; flex-grow: 1; padding: 20px 25px; box-sizing: border-box; text-align: left;">
-                    <div class="slide-desc" dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.description : 'No project description provided.' }}></div>
-                    <div style="border-top: 1px solid #eee; margin-top: 20px; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
+                    <h3>${aboutData ? aboutData.title : 'Dataset Specs'}</h3>
+                    <p style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; color: #444;">${aboutData ? aboutData.description : 'No project description provided.'}</p>
+                    <div style="border-top: 1px solid #eee; padding-top: 15px; font-size: 0.85rem; color: #555; line-height: 1.5; font-family: monospace;">
                       <strong>Ingested GID:</strong> ${new URLSearchParams(window.location.search).get('gid') || 'Default'}<br/>
                       <strong>Active Modules:</strong><br/>
                       ${Object.entries(MODULE_VERSIONS).map(([k, v]) => `• ${k}: ${v}`).join('\n        ')}
-                    </div>
-                    <div style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px;">
-                      <h4 style="margin: 0 0 10px 0; color: #333; font-size: 0.95rem; font-weight: 700;">Cartographic Symbology Legend</h4>
-                      <${SymbologyLegend} />
-                    </div>
-                  </div>
-                </div>
-                    </div>
-
-                    <!-- Section 3: URL Parameter Specifications Matrix -->
-                    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 24px;">
-                      <h4 style="margin: 0 0 12px 0; font-size: 1rem; color: #007acc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚙️ URL Configuration Parameters</h4>
-                      <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; color: #444; font-family: monospace;">
-                        <thead>
-                          <tr style="background: #f1f3f5; text-align: left;">
-                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Parameter</th>
-                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Description</th>
-                            <th style="padding: 6px 10px; border: 1px solid #dee2e6;">Example</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>source</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Google Sheets Database ID</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?source=1BxiMVs...</td></tr>
-                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>gid</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Sheet Tab GID</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?gid=0</td></tr>
-                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>slide</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Initial Slide Index (1-based)</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?slide=5</td></tr>
-                          <tr><td style="padding: 6px 10px; border: 1px solid #dee2e6;"><code>mapzoom</code></td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">Initial Map Zoom Level</td><td style="padding: 6px 10px; border: 1px solid #dee2e6;">?mapzoom=14</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <!-- Section 4: Cartographic Symbology Legend -->
-                    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-bottom: 12px;">
-                      <h4 style="margin: 0 0 12px 0; font-size: 1rem; color: #007acc; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🗺️ Cartographic Symbology Legend</h4>
-                      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 0.85rem; color: #333;">
-                        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: #28a745; border-radius: 3px; display: inline-block;"></span> Active Slide Feature</div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: #ffb300; border-radius: 3px; display: inline-block;"></span> VIP Priority Feature</div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: #007acc; border-radius: 3px; display: inline-block;"></span> Standard Feature</div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: bold; color: #007acc;">- - › - -</span> Directional Polyline (80px Chevrons)</div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 14px; background: rgba(0,122,204,0.35); border: 1px solid #007acc; display: inline-block;"></span> Spatial Area Polygon</div>
-                      </div>
                     </div>
                   </div>
                 </div>
