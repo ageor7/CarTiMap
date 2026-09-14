@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b217';
+const APP_VERSION = 'v8.13.69-b218';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1481,12 +1481,15 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
             let rafId = null;
             const renderChevrons = () => {
-              const map = mapInstance.current;
-              if (!map || !chevronLayerRef.current) return;
-              chevronLayerRef.current.clearLayers();
-              markersRef.current.forEach((layers, slideIdx) => {
-                const isActive = slideIdx === activeIndex;
-                layers.forEach(layer => {
+              if (rafId) cancelAnimationFrame(rafId);
+              rafId = requestAnimationFrame(() => {
+                const map = mapInstance.current;
+                if (!map || !chevronLayerRef.current) return;
+                chevronLayerRef.current.clearLayers();
+
+                // Scope chevrons exclusively to active slide polylines [REF: MAP-GEOM-03]
+                const activeLayers = markersRef.current[activeIndex] || [];
+                activeLayers.forEach(layer => {
                   if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
                     try {
                       const latlngs = layer.getLatLngs ? layer.getLatLngs() : [];
@@ -1495,38 +1498,32 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                         const flatPts = Array.isArray(pts) ? pts.flat(2) : pts;
                         if (flatPts && flatPts.length >= 2) {
                           const containerPts = flatPts.map(ll => map.latLngToContainerPoint(ll));
-                          let accumulatedPx = 0;
-                          let nextTargetPx = 40;
                           for (let i = 0; i < containerPts.length - 1; i++) {
                             const p1 = containerPts[i];
                             const p2 = containerPts[i + 1];
                             const segLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-                            if (segLen <= 0) continue;
-                            while (accumulatedPx + segLen >= nextTargetPx) {
-                              const ratio = (nextTargetPx - accumulatedPx) / segLen;
-                              const cx = p1.x + ratio * (p2.x - p1.x);
-                              const cy = p1.y + ratio * (p2.y - p1.y);
-                              const latLng = map.containerPointToLatLng(L.point(cx, cy));
-                              const angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI);
-                              const strokeCol = isActive ? '#28a745' : '#007acc';
-                              const arrowSvg = `<svg width="12" height="12" viewBox="0 0 24 24" style="transform: rotate(${angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="${strokeCol}" stroke="#ffffff" stroke-width="1.5"/></svg>`;
-                              const arrowMarker = L.marker(latLng, {
-                                icon: L.divIcon({
-                                  html: arrowSvg,
-                                  className: 'chevron-icon',
-                                  iconSize: [12, 12],
-                                  iconAnchor: [6, 6]
-                                }),
-                                interactive: false
-                              });
-                              chevronLayerRef.current.addLayer(arrowMarker);
-                              nextTargetPx += 60;
-                            }
-                            accumulatedPx += segLen;
+                            if (segLen < 15) continue; // Skip tiny segments
+
+                            // Place exactly ONE midpoint arrow per line segment (ratio = 0.5)
+                            const cx = p1.x + 0.5 * (p2.x - p1.x);
+                            const cy = p1.y + 0.5 * (p2.y - p1.y);
+                            const latLng = map.containerPointToLatLng(L.point(cx, cy));
+                            const angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI);
+                            const arrowSvg = `<svg width="12" height="12" viewBox="0 0 24 24" style="transform: rotate(${angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="#28a745" stroke="#ffffff" stroke-width="1.5"/></svg>`;
+                            const arrowMarker = L.marker(latLng, {
+                              icon: L.divIcon({
+                                className: 'chevron-icon',
+                                html: arrowSvg,
+                                iconSize: [12, 12],
+                                iconAnchor: [6, 6]
+                              }),
+                              interactive: false
+                            });
+                            chevronLayerRef.current.addLayer(arrowMarker);
                           }
                         }
                       });
-                    } catch(e) {}
+                    } catch (e) {}
                   }
                 });
               });
