@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b218';
+const APP_VERSION = 'v8.13.69-b220';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1733,6 +1733,10 @@ MODULE_VERSIONS['MapViewer'] = 'v6.4.70-b171';
 // 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b178 ] ===
 const App = () => {
+  const safeStripHTML = (str) => {
+    if (!str) return '';
+    return String(str).replace(/<[^>]*>/g, '').trim();
+  };
           // APP_VERSION bound to top-level HTML header per Directive I.3.c
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
