@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.13.69-b193</title>
+    <title>CarTiMap v8.13.69-b194</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -194,7 +194,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b193';
+const APP_VERSION = 'v8.13.69-b194';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1083,6 +1083,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
           useEffect(() => {
             if (basemapsRegistry && basemapsRegistry.length > 0) {
+              // Sanitize Protomaps URL if overwritten by LayersT with dummy key
+              basemapsRegistry.forEach(b => {
+                if (b.url && (b.url.includes('YOUR_API_KEY') || b.url.includes('api.protomaps.com'))) {
+                  b.url = 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt';
+                }
+              });
               if (!initialLoadRef.current) {
                 const bases = basemapsRegistry.filter(b => (b.type || 'base').toLowerCase() !== 'overlay');
                 const defaultBase = bases.find(b => b.active) || bases.at(0);
@@ -1271,19 +1277,20 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               }
               const config = basemapsRegistry.find(b => b.id === activeBasemap);
               if (config) {
-                const isVector = (config.format && ['vector', 'pbf', 'mvt'].includes(String(config.format).toLowerCase())) || String(config.url).endsWith('.mvt');
+                const tileUrl = (config.url && (config.url.includes('YOUR_API_KEY') || config.url.includes('api.protomaps.com'))) ? 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt' : config.url;
+                const isVector = (config.format && ['vector', 'pbf', 'mvt'].includes(String(config.format).toLowerCase())) || String(tileUrl).endsWith('.mvt');
                 if (isVector && typeof protomapsL !== 'undefined') {
                   try {
-                    baseLayerRef.current = protomapsL.leafletLayer({ url: config.url, theme: 'light' }).addTo(map);
-                    miniBaseLayerRef.current = protomapsL.leafletLayer({ url: config.url, theme: 'light' }).addTo(miniMap);
+                    baseLayerRef.current = protomapsL.leafletLayer({ url: tileUrl, theme: 'light' }).addTo(map);
+                    miniBaseLayerRef.current = protomapsL.leafletLayer({ url: tileUrl, theme: 'light' }).addTo(miniMap);
                     return;
                   } catch (err) {
                     console.warn('[MapViewer] Protomaps vector init failed, falling back to L.tileLayer', err);
                   }
                 }
                 const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
-                baseLayerRef.current = L.tileLayer(config.url, { ...layerOpts, zIndex: 0 }).addTo(map);
-                miniBaseLayerRef.current = L.tileLayer(config.url, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
+                baseLayerRef.current = L.tileLayer(tileUrl, { ...layerOpts, zIndex: 0 }).addTo(map);
+                miniBaseLayerRef.current = L.tileLayer(tileUrl, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
               }
             };
             renderBasemap();
@@ -1433,20 +1440,23 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   });
                   try {
                     const latlngs = layer.getLatLngs ? layer.getLatLngs() : [];
-                    const flat = Array.isArray(latlngs[0]) ? latlngs.flat() : latlngs;
-                    if (flat && flat.length >= 2) {
-                      const pA = flat[flat.length - 2];
-                      const pB = flat[flat.length - 1];
-                      if (pA && pB && pA.lat != null && pB.lat != null) {
-                        const angleDeg = Math.atan2(pB.lat - pA.lat, pB.lng - pA.lng) * (180 / Math.PI);
-                        const arrowSvg = `<svg width="14" height="14" viewBox="0 0 24 24" style="transform: rotate(${-angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="${strokeCol}" stroke="#ffffff" stroke-width="1.5"/></svg>`;
-                        const arrowMarker = L.marker(pB, {
-                          icon: L.divIcon({ className: 'polyline-arrowhead', html: arrowSvg, iconSize: [14, 14], iconAnchor: [7, 7] }),
-                          interactive: false
-                        });
-                        markerLayer.current.addLayer(arrowMarker);
+                    const subPaths = (Array.isArray(latlngs) && Array.isArray(latlngs[0])) ? latlngs : [latlngs];
+                    subPaths.forEach(pts => {
+                      const flatPts = Array.isArray(pts) ? pts.flat(2) : pts;
+                      if (flatPts && flatPts.length >= 2) {
+                        const pA = flatPts[flatPts.length - 2];
+                        const pB = flatPts[flatPts.length - 1];
+                        if (pA && pB && pA.lat != null && pB.lat != null) {
+                          const angleDeg = Math.atan2(pB.lat - pA.lat, pB.lng - pA.lng) * (180 / Math.PI);
+                          const arrowSvg = `<svg width="14" height="14" viewBox="0 0 24 24" style="transform: rotate(${-angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="${strokeCol}" stroke="#ffffff" stroke-width="1.5"/></svg>`;
+                          const arrowMarker = L.marker(pB, {
+                            icon: L.divIcon({ className: 'polyline-arrowhead', html: arrowSvg, iconSize: [14, 14], iconAnchor: [7, 7] }),
+                            interactive: false
+                          });
+                          markerLayer.current.addLayer(arrowMarker);
+                        }
                       }
-                    }
+                    });
                   } catch (e) {}
                 } else if (layer.setStyle) {
                   layer.setStyle({
@@ -2317,7 +2327,7 @@ const App = () => {
               setMaxPane(null);
               window.dispatchEvent(new Event('resize'));
             }} title="Reset Layout Viewport">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><polyline points="16 3 21 8 16 13"></polyline><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><polyline points="8 21 3 16 8 11"></polyline></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
               ${resetLayoutBtnText}
             </button>
           `;
@@ -2416,7 +2426,7 @@ const App = () => {
             ? html`<div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
                 <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
                 <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%"></div></div>
-                <div class="status-text" style="font-family: monospace; font-size: 0.95rem;">${status.text}</div>
+                <div class="status-text" style="font-family: monospace; font-size: 0.95rem; margin-top: 1.2rem;"><br/>${status.text}</div>
               </div>`
             : '';
 
@@ -2498,7 +2508,7 @@ const App = () => {
                   </div>
 
                   <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
-                  <div class="status-center" style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; z-index: 101; font-size: 0.95rem;">
+                  <div class="status-center" style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
                     ${prevBtn}
 
                     <div style="display: flex; align-items: center; gap: 4px; font-family: monospace; font-size: 0.95rem;">
