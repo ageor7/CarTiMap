@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b230';
+const APP_VERSION = 'v8.13.69-b231';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -999,27 +999,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
   const viewPadMs = visibleTimeSpanMs * 0.5;
 
-    const SECOND = 1000; const MINUTE = 60 * SECOND; const HOUR = 60 * MINUTE; const DAY = 24 * HOUR; const MONTH = 30 * DAY; const YEAR = 365.25 * DAY;
-    const scaleConfigs = [
-      { ms: 100 * YEAR, type: 'year', step: 100, minorType: 'year', minorStep: 10, minorCount: 10 },
-      { ms: 10 * YEAR, type: 'year', step: 10, minorType: 'year', minorStep: 1, minorCount: 10 },
-      { ms: 2 * YEAR, type: 'year', step: 2, minorType: 'month', minorStep: 2, minorCount: 12 },
-      { ms: YEAR, type: 'year', step: 1, minorType: 'month', minorStep: 1, minorCount: 12 },
-      { ms: 6 * MONTH, type: 'month', step: 6, minorType: 'month', minorStep: 1, minorCount: 6 },
-      { ms: MONTH, type: 'month', step: 1, minorType: 'day', minorStep: 3, minorCount: 10 },
-      { ms: 15 * DAY, type: 'day', step: 15, minorType: 'day', minorStep: 1, minorCount: 15 },
-      { ms: 5 * DAY, type: 'day', step: 5, minorType: 'day', minorStep: 1, minorCount: 5 },
-      { ms: DAY, type: 'day', step: 1, minorType: 'hour', minorStep: 3, minorCount: 8 },
-      { ms: 12 * HOUR, type: 'hour', step: 12, minorType: 'hour', minorStep: 1, minorCount: 12 },
-      { ms: 6 * HOUR, type: 'hour', step: 6, minorType: 'hour', minorStep: 1, minorCount: 6 },
-      { ms: 2 * HOUR, type: 'hour', step: 2, minorType: 'minute', minorStep: 15, minorCount: 8 },
-      { ms: HOUR, type: 'hour', step: 1, minorType: 'minute', minorStep: 10, minorCount: 6 },
-      { ms: 30 * MINUTE, type: 'minute', step: 30, minorType: 'minute', minorStep: 5, minorCount: 6 },
-      { ms: 15 * MINUTE, type: 'minute', step: 15, minorType: 'minute', minorStep: 1, minorCount: 15 },
-      { ms: 10 * MINUTE, type: 'minute', step: 10, minorType: 'minute', minorStep: 1, minorCount: 10 },
-      { ms: 5 * MINUTE, type: 'minute', step: 5, minorType: 'minute', minorStep: 1, minorCount: 5 },
-      { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
-    ];
+
 
     const targetMsPerMajorTick = Math.max((120 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
     let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
@@ -1046,7 +1026,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       else if (activeScale.type === 'minute') iterDate.setMinutes(iterDate.getMinutes() + activeScale.step);
     }
 
-    const viewportCenterMs = visibleLeftMs + (visibleTimeSpanMs / 2);
+    // viewportCenterMs previously declared
     let minDist = Infinity;
     let centerTickIndex = -1;
     majorTicksData.forEach((d, i) => {
@@ -1237,7 +1217,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.40-b230';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.41-b231';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
