@@ -204,8 +204,8 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b249';
-document.title = 'CarTiMap Core - ' + APP_VERSION;
+const APP_VERSION = 'v8.13.69-b257';
+document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -597,19 +597,45 @@ MODULE_VERSIONS['MediaViewer'] = 'v2.13.6';
 
 // 🔽🔽🔽 [ START_INJECT: ContentSlider v5.7.0 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: ContentSlider v5.7.0 ] ===
-const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, dateLocale, formatSmartDate}) => {
+const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, dateLocale, formatSmartDate, onSelectAllFilters}) => {
   const touchStartX = useRef(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollAreaRef = useRef(null);
 
-  const slide = data[activeIndex];
+  const slide = (data && data.length > 0) ? (data[activeIndex] || data[0]) : null;
 
   useEffect(() => {
     if (scrollAreaRef.current) scrollAreaRef.current.scrollTo({ top: 0, behavior: 'auto' });
     setIsScrolled(false);
   }, [activeIndex]);
 
-  if (!slide) return null;
+  if (!slide) {
+    return html`
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 32px 24px; text-align: center; background: #fcfcfc; font-family: system-ui, -apple-system, sans-serif;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(0, 122, 204, 0.08); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+        </div>
+        <div style="font-size: 1.05rem; font-weight: 700; color: #222; margin-bottom: 8px; font-family: monospace;">
+          No Filter Checkboxes Selected
+        </div>
+        <div style="font-size: 0.85rem; color: #555; max-width: 340px; line-height: 1.5; margin-bottom: 20px; font-family: monospace;">
+          Please select at least one Swimlane or Data Stream checkbox in the <strong style="color: #007acc;">Filter menu</strong> (bottom bar) to display story slides.
+        </div>
+        ${onSelectAllFilters ? html`
+          <button 
+            onClick=${onSelectAllFilters} 
+            style="background: #007acc; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(0,122,204,0.25); font-family: monospace; transition: background 0.2s;"
+            onMouseOver=${(e) => { e.currentTarget.style.background = '#005999'; }}
+            onMouseOut=${(e) => { e.currentTarget.style.background = '#007acc'; }}
+          >
+            Select All Filters
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }
 
   const getParsedTags = (rawTagsArray) => {
     if (!rawTagsArray || rawTagsArray.length === 0) return [];
@@ -839,7 +865,13 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     { ms: MINUTE, type: 'minute', step: 1, minorType: 'second', minorStep: 10, minorCount: 6 }
   ];
 
-  if (validData.length === 0) return html`<div style="padding:1rem;">No valid temporal data.</div>`;
+  if (validData.length === 0) {
+    return html`
+      <div class="timeline-scrubber-wrapper" style="height: 100%; display: flex; align-items: center; justify-content: center; color: #888; font-family: monospace; font-size: 0.85rem; background: #fafafa;">
+        <span>0 Events Displayed — Select at least one Filter checkbox</span>
+      </div>
+    `;
+  }
 
   const containerW = wrapperRef.current ? wrapperRef.current.clientWidth : 1000;
   const trackWidthPx = Math.max(containerW, containerW * zoomLevel);
@@ -1811,44 +1843,50 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 if (!map || !chevronLayerRef.current) return;
                 chevronLayerRef.current.clearLayers();
 
-                // Scope chevrons exclusively to active slide polylines [REF: MAP-GEOM-03]
-                const activeLayers = markersRef.current[activeIndex] || [];
-                activeLayers.forEach(layer => {
-                  if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-                    try {
-                      const latlngs = layer.getLatLngs ? layer.getLatLngs() : [];
-                      const subPaths = (Array.isArray(latlngs) && Array.isArray(latlngs[0])) ? latlngs : [latlngs];
-                      subPaths.forEach(pts => {
-                        const flatPts = Array.isArray(pts) ? pts.flat(2) : pts;
-                        if (flatPts && flatPts.length >= 2) {
-                          const containerPts = flatPts.map(ll => map.latLngToContainerPoint(ll));
-                          for (let i = 0; i < containerPts.length - 1; i++) {
-                            const p1 = containerPts[i];
-                            const p2 = containerPts[i + 1];
-                            const segLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-                            if (segLen < 15) continue; // Skip tiny segments
+                // Render directional chevrons for all polylines across all slides [REF: MAP-GEOM-03]
+                markersRef.current.forEach((layers, slideIdx) => {
+                  const isActive = slideIdx === activeIndex;
+                  const item = data[slideIdx] || {};
+                  const isVip = item.priority && item.priority.toLowerCase() === 'vip';
+                  const fillColor = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
 
-                            // Place exactly ONE midpoint arrow per line segment (ratio = 0.5)
-                            const cx = p1.x + 0.5 * (p2.x - p1.x);
-                            const cy = p1.y + 0.5 * (p2.y - p1.y);
-                            const latLng = map.containerPointToLatLng(L.point(cx, cy));
-                            const angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI);
-                            const arrowSvg = `<svg width="12" height="12" viewBox="0 0 24 24" style="transform: rotate(${angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="#28a745" stroke="#ffffff" stroke-width="1.5"/></svg>`;
-                            const arrowMarker = L.marker(latLng, {
-                              icon: L.divIcon({
-                                className: 'chevron-icon',
-                                html: arrowSvg,
-                                iconSize: [12, 12],
-                                iconAnchor: [6, 6]
-                              }),
-                              interactive: false
-                            });
-                            chevronLayerRef.current.addLayer(arrowMarker);
+                  layers.forEach(layer => {
+                    if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                      try {
+                        const latlngs = layer.getLatLngs ? layer.getLatLngs() : [];
+                        const subPaths = (Array.isArray(latlngs) && Array.isArray(latlngs[0])) ? latlngs : [latlngs];
+                        subPaths.forEach(pts => {
+                          const flatPts = Array.isArray(pts) ? pts.flat(2) : pts;
+                          if (flatPts && flatPts.length >= 2) {
+                            const containerPts = flatPts.map(ll => map.latLngToContainerPoint(ll));
+                            for (let i = 0; i < containerPts.length - 1; i++) {
+                              const p1 = containerPts[i];
+                              const p2 = containerPts[i + 1];
+                              const segLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+                              if (segLen < 15) continue; // Skip tiny segments
+
+                              // Place exactly ONE midpoint arrow per line segment (ratio = 0.5)
+                              const cx = p1.x + 0.5 * (p2.x - p1.x);
+                              const cy = p1.y + 0.5 * (p2.y - p1.y);
+                              const latLng = map.containerPointToLatLng(L.point(cx, cy));
+                              const angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI);
+                              const arrowSvg = `<svg width="12" height="12" viewBox="0 0 24 24" style="transform: rotate(${angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="${fillColor}" stroke="#ffffff" stroke-width="1.5"/></svg>`;
+                              const arrowMarker = L.marker(latLng, {
+                                icon: L.divIcon({
+                                  className: 'chevron-icon',
+                                  html: arrowSvg,
+                                  iconSize: [12, 12],
+                                  iconAnchor: [6, 6]
+                                }),
+                                interactive: false
+                              });
+                              chevronLayerRef.current.addLayer(arrowMarker);
+                            }
                           }
-                        }
-                      });
-                    } catch (e) {}
-                  }
+                        });
+                      } catch (e) {}
+                    }
+                  });
                 });
               });
             };
@@ -2077,6 +2115,12 @@ const App = () => {
           const [isSettingsOpen, setIsSettingsOpen] = useState(false);
           const [isMenuOpen, setIsMenuOpen] = useState(false);
           const [isFilterOpen, setIsFilterOpen] = useState(false);
+          const [filterFlashMsg, setFilterFlashMsg] = useState(null);
+
+          const triggerFilterFlash = (msg) => {
+            setFilterFlashMsg(msg);
+            addLog(msg, 'warning');
+          };
           const [isSearchOpen, setIsSearchOpen] = useState(false);
           const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef(null);
@@ -2461,11 +2505,13 @@ const App = () => {
             if (activeTags.includes(tag)) {
               if (activeTags.length > 1) {
                 setActiveTags(activeTags.filter(t => t !== tag));
+                setFilterFlashMsg(null);
               } else {
-                addLog('Cannot deselect all swimlanes. At least one must remain active.', 'warning');
+                triggerFilterFlash(`To keep at least one category active, filtered to ${activeTags.join(', ')}`);
               }
             } else {
               setActiveTags([...activeTags, tag]);
+              setFilterFlashMsg(null);
             }
           };
 
@@ -2473,11 +2519,13 @@ const App = () => {
             if (activeExtractTypes.includes(type)) {
               if (activeExtractTypes.length > 1) {
                 setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
+                setFilterFlashMsg(null);
               } else {
-                addLog('At least one data stream must remain active.', 'warning');
+                triggerFilterFlash(`To keep at least one category active, filtered to ${activeExtractTypes.join(', ')}`);
               }
             } else {
               setActiveExtractTypes([...activeExtractTypes, type]);
+              setFilterFlashMsg(null);
             }
           };
 
@@ -2799,6 +2847,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               </button>`
             : '';
 
+          const handleSelectAllFilters = () => {
+            setActiveTags([...allTags]);
+            setActiveExtractTypes([...masterExtractTypes]);
+            addLog('Restored all swimlanes and data streams to active view.', 'info');
+          };
           const masterExtractTypes = Array.from(new Set(unfilteredData.map(d => d.extractType).filter(Boolean)));
           const isExtractFiltered = masterExtractTypes.length > 0 && activeExtractTypes.length < masterExtractTypes.length;
           const isTagFiltered = allTags.length > 0 && activeTags.length < allTags.length;
@@ -2812,32 +2865,85 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const filterPopup = isFilterOpen
-            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
-                <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
-                  <span>Active Swimlanes</span>
-                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.8rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
+            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 10005; display: flex; flex-direction: column; gap: 6px;" onClick=${(e) => e.stopPropagation()}>
+                ${filterFlashMsg ? html`
+                  <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 8px 10px; font-size: 0.78rem; font-family: monospace; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; cursor: pointer;" onClick=${() => setFilterFlashMsg(null)} title="Click to dismiss">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                      <span>${filterFlashMsg}</span>
+                    </div>
+                    <span style="font-size: 0.95rem; font-weight: bold; padding: 0 4px; color: #856404; opacity: 0.8;" title="Dismiss">×</span>
+                  </div>
+                ` : ''}
+                <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; font-family: monospace;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; width: 100%;">
+                    <input type="checkbox"
+                      checked=${allTags.length > 0 && activeTags.length === allTags.length}
+                      onChange=${() => {
+                        const curSlideForTags = data.at(activeIndex) || unfilteredData.at(activeIndex) || unfilteredData[0];
+                        const curSlideTags = (curSlideForTags && curSlideForTags.tags && curSlideForTags.tags.length > 0)
+                          ? curSlideForTags.tags.filter(t => allTags.includes(t))
+                          : [];
+                        const activeSlideTagSelection = curSlideTags.length > 0 ? curSlideTags : (allTags.length > 0 ? [allTags[0]] : []);
+                        if (activeTags.length > activeSlideTagSelection.length) {
+                          setActiveTags(activeSlideTagSelection);
+                          const labelText = activeSlideTagSelection.join(', ');
+                          triggerFilterFlash(`To keep at least one category active, filtered to ${labelText}`);
+                          addLog(`Deselected all swimlanes except active slide's (${labelText}).`, 'info');
+                        } else {
+                          setActiveTags([...allTags]);
+                          setFilterFlashMsg(null);
+                          addLog('Selected all swimlanes.', 'info');
+                        }
+                      }}
+                      style="cursor: pointer;"
+                    />
+                    <span>Active Swimlanes</span>
+                  </label>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; padding-right: 4px;">
+                <div style="display: flex; flex-direction: column; gap: 4px; padding-right: 2px;">
                   ${allTags.map(tag => html`
-                    <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+                    <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.82rem;">
                       <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
-                      <span style="font-family: monospace; color: #555;">${tag}</span>
+                      <span style="font-family: monospace; color: #444;">${tag}</span>
                     </label>
                   `)}
                 </div>
-                <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 8px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
-                  <span>Data Streams</span>
+                <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 6px; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; font-family: monospace;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; width: 100%;">
+                    <input type="checkbox"
+                      checked=${masterExtractTypes.length > 0 && activeExtractTypes.length === masterExtractTypes.length}
+                      onChange=${() => {
+                        const curSlideForTypes = data.at(activeIndex) || unfilteredData.at(activeIndex) || unfilteredData[0];
+                        const curType = curSlideForTypes ? curSlideForTypes.extractType : null;
+                        const activeSlideTypeSelection = (curType && masterExtractTypes.includes(curType))
+                          ? [curType]
+                          : (masterExtractTypes.length > 0 ? [masterExtractTypes[0]] : []);
+                        if (activeExtractTypes.length > activeSlideTypeSelection.length) {
+                          setActiveExtractTypes(activeSlideTypeSelection);
+                          const labelText = activeSlideTypeSelection.join(', ');
+                          triggerFilterFlash(`To keep at least one category active, filtered to ${labelText}`);
+                          addLog(`Deselected all data streams except active slide's (${labelText}).`, 'info');
+                        } else {
+                          setActiveExtractTypes([...masterExtractTypes]);
+                          setFilterFlashMsg(null);
+                          addLog('Selected all data streams.', 'info');
+                        }
+                      }}
+                      style="cursor: pointer;"
+                    />
+                    <span>Data Streams</span>
+                  </label>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; flex-direction: column; gap: 4px; padding-right: 2px;">
                   ${masterExtractTypes.map(type => html`
-                    <label key=${type} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+                    <label key=${type} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.82rem;">
                       <input type="checkbox" checked=${activeExtractTypes.includes(type)} onChange=${() => handleToggleExtractType(type)} style="cursor: pointer;" />
-                      <span style="font-family: monospace; color: #555;">${type}</span>
+                      <span style="font-family: monospace; color: #444;">${type}</span>
                     </label>
                   `)}
                 </div>
-              </div>`
-            : '';
+              </div>`: '';
 
           const searchHistoryLayout = (searchHistory.length > 0 && !searchQuery)
             ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>`
@@ -2869,6 +2975,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       setMaxPane=${setMaxPane}
                       dateLocale=${dateLocale}
                       formatSmartDate=${formatSmartDate}
+                      onSelectAllFilters=${handleSelectAllFilters}
                     />
                   </div>
 
@@ -2990,6 +3097,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
                     ${filterBtn}
                     ${filterPopup}
+            ${(!isFilterOpen && filterFlashMsg) ? html`
+              <div style="position: absolute; bottom: calc(100% + 10px); right: 120px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; font-family: monospace; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.18); z-index: 10005; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span>${filterFlashMsg}</span>
+              </div>
+            ` : ''}
                     ${searchBtn}
                     ${backBtn}
                     ${forwardBtn}
