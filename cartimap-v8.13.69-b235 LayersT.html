@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b234';
+const APP_VERSION = 'v8.13.69-b235';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2199,7 +2199,7 @@ const App = () => {
                 }).filter(b => b.id && b.url);
               };
 
-              const rawLayersRows = (sheetsData && (sheetsData.LayersT || sheetsData.Layers)) ? (sheetsData.LayersT || sheetsData.Layers) : null;
+              const rawLayersRows = (typeof sheetsData !== 'undefined' && sheetsData && (sheetsData.LayersT || sheetsData.Layers)) ? (sheetsData.LayersT || sheetsData.Layers) : ((typeof window !== 'undefined' && window.sheetsData && (window.sheetsData.LayersT || window.sheetsData.Layers)) ? (window.sheetsData.LayersT || window.sheetsData.Layers) : null);
               let parsedBMs = [];
               if (rawLayersRows && Array.isArray(rawLayersRows) && rawLayersRows.length > 0) {
                 parsedBMs = parseLayersTRows(rawLayersRows);
