@@ -80,7 +80,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .visual-pane.no-media .map-pane { width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; flex: 1 1 100% !important; }
 .visual-pane.no-media .resizer-dyn-secondary { display: none !important; }
 .visual-pane.no-media .media-pane { display: none !important; }
-.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible !important; z-index: 100 !important; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; }
+.map-pane { background: #e0e0e0; position: relative; min-height: 0; min-width: 0; overflow: visible !important; z-index: 100 !important; flex: 0 0 var(--secondary-split); height: var(--secondary-split); width: 100%; container-type: inline-size; }
 .resizer-dyn-secondary { background: #eee; transition: background 0.2s; z-index: 50; flex-shrink: 0; position: relative; touch-action: none; height: 4px; width: 100%; cursor: row-resize; }
 .media-pane { background: #111; overflow: hidden; position: relative; min-height: 0; min-width: 0; z-index: 30; flex: 1 1 auto; height: auto; width: 100%; }
 .media-carousel { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; width: 100%; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
@@ -131,8 +131,8 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tm-opacity-slider { -webkit-appearance: none; width: 100px; height: 4px; background: #ddd; border-radius: 2px; outline: none; }
 .tm-opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; }
 .tm-opacity-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; border: none; }
-.minimap-wrapper { position: absolute; bottom: 24px; left: 12px; width: 140px; height: 140px; background: #fff; border: 2px solid #ccc; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; overflow: hidden; min-width: 60px; min-height: 60px; max-width: none !important; max-height: none !important; flex-shrink: 0 !important; touch-action: none; }
-@media (max-width: 1023px) { .minimap-wrapper { width: 85px; height: 85px; bottom: 12px !important; left: 12px !important; } }
+.minimap-wrapper { position: absolute; bottom: 24px; left: 12px; width: clamp(80px, 22cqw, 140px); height: clamp(80px, 22cqw, 140px); background: #fff; border: 2px solid #ccc; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; overflow: hidden; min-width: 60px; min-height: 60px; max-width: none !important; max-height: none !important; flex-shrink: 0 !important; touch-action: none; }
+@media (max-width: 1023px) { .minimap-wrapper { bottom: 12px !important; left: 12px !important; } }
 .minimap-wrapper.hide { display: none; }
 .minimap-map-canvas { width: 100%; height: 100%; }
 .minimap-resize-handle { position: absolute; bottom: 0; right: 0; width: 20px; height: 20px; z-index: 2000; cursor: nwse-resize; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.85); border-top-left-radius: 4px; user-select: none; touch-action: none; border-left: 1px solid rgba(0,0,0,0.15); border-top: 1px solid rgba(0,0,0,0.15); transition: background 0.2s; }
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b246';
+const APP_VERSION = 'v8.13.69-b247';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1272,6 +1272,15 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               window.removeEventListener('mouseup', stopResize);
               window.removeEventListener('touchmove', doResize);
               window.removeEventListener('touchend', stopResize);
+              if (minimapWrapperRef.current) {
+                try {
+                  const finalW = minimapWrapperRef.current.offsetWidth;
+                  const finalH = minimapWrapperRef.current.offsetHeight;
+                  if (finalW && finalH) {
+                    localStorage.setItem('tm_minimap_size', JSON.stringify({ w: finalW, h: finalH }));
+                  }
+                } catch(e) {}
+              }
             };
 
             window.addEventListener('pointermove', doResize);
@@ -1332,6 +1341,19 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           const [showLayersMenu, setShowLayersMenu] = useState(false);
 
           minimapOffsetRef.current = minimapOffset;
+
+          useEffect(() => {
+            try {
+              const savedSize = JSON.parse(localStorage.getItem('tm_minimap_size'));
+              if (savedSize && savedSize.w && savedSize.h && minimapWrapperRef.current) {
+                minimapWrapperRef.current.style.width = `${savedSize.w}px`;
+                minimapWrapperRef.current.style.height = `${savedSize.h}px`;
+                if (miniMapInstance.current) {
+                  miniMapInstance.current.invalidateSize();
+                }
+              }
+            } catch(e) {}
+          }, []);
 
           const extractLayers = (layerObj) => {
             let layers = [];
@@ -1936,7 +1958,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               <div ref=${mapDomRef} style="flex: 1; min-height: 0; width: 100%; overflow: hidden;"></div>
               <div class="minimap-wrapper" ref=${minimapWrapperRef}>
                 <div class="minimap-map-canvas" ref=${miniMapDomRef}></div>
-                <div class="minimap-resize-handle" onPointerDown=${handleMinimapResizeStart} onMouseDown=${handleMinimapResizeStart} onTouchStart=${handleMinimapResizeStart} title="Drag to resize Minimap">
+                <div class="minimap-resize-handle" onPointerDown=${handleMinimapResizeStart} onMouseDown=${handleMinimapResizeStart} onTouchStart=${handleMinimapResizeStart} onDoubleClick=${() => { try { localStorage.removeItem('tm_minimap_size'); if (minimapWrapperRef.current) { minimapWrapperRef.current.style.width = ''; minimapWrapperRef.current.style.height = ''; if (miniMapInstance.current) miniMapInstance.current.invalidateSize(); } } catch(e) {} }} title="Drag to resize Minimap (Double-click to reset)">
                   <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#555" stroke-width="1.8">
                     <path d="M11 1L1 11M11 6L6 11M11 10L10 11" />
                   </svg>
