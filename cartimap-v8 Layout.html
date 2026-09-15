@@ -132,7 +132,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tm-opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; }
 .tm-opacity-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #007acc; cursor: pointer; border: none; }
 .minimap-wrapper { position: absolute; bottom: 24px; left: 12px; width: 140px; height: 140px; background: #fff; border: 2px solid #ccc; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; overflow: hidden; min-width: 60px; min-height: 60px; max-width: none !important; max-height: none !important; flex-shrink: 0 !important; touch-action: none; }
-@media (max-width: 1023px) { .minimap-wrapper { bottom: 12px !important; left: 12px !important; } }
+@media (max-width: 1023px) { .minimap-wrapper { width: 85px; height: 85px; bottom: 12px !important; left: 12px !important; } }
 .minimap-wrapper.hide { display: none; }
 .minimap-map-canvas { width: 100%; height: 100%; }
 .minimap-resize-handle { position: absolute; bottom: 0; right: 0; width: 20px; height: 20px; z-index: 2000; cursor: nwse-resize; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.85); border-top-left-radius: 4px; user-select: none; touch-action: none; border-left: 1px solid rgba(0,0,0,0.15); border-top: 1px solid rgba(0,0,0,0.15); transition: background 0.2s; }
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b245';
+const APP_VERSION = 'v8.13.69-b246';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
