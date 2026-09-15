@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b252';
+const APP_VERSION = 'v8.13.69-b253';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -602,7 +602,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollAreaRef = useRef(null);
 
-  const slide = data[activeIndex];
+  const slide = (data && data.length > 0) ? (data[activeIndex] || data[0]) : null;
 
   useEffect(() => {
     if (scrollAreaRef.current) scrollAreaRef.current.scrollTo({ top: 0, behavior: 'auto' });
