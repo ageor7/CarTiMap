@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b240';
+const APP_VERSION = 'v8.13.69-b241';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2362,16 +2362,19 @@ const App = () => {
           // =========================================================================
           const startPrimaryResize = (e) => {
             e.preventDefault();
-            const startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
+            const isDesktop = window.innerWidth >= 1024;
             const appNode = document.getElementById('app-layout') || document.documentElement;
-            const startSplit = parseFloat(getComputedStyle(appNode).getPropertyValue('--primary-split')) || 50;
-            const docW = appNode.clientWidth || window.innerWidth;
+            const startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
+            const startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
+            const startSplit = parseFloat(getComputedStyle(appNode).getPropertyValue('--primary-split')) || (isDesktop ? 50 : 55);
+            const containerDim = isDesktop ? (appNode.clientWidth || window.innerWidth) : (appNode.clientHeight || window.innerHeight);
 
             const doDrag = (moveEvent) => {
               const currentX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientX);
-              if (currentX === undefined) return;
-              const diffX = currentX - startX;
-              const pctDiff = (diffX / docW) * 100;
+              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientY);
+              if (isDesktop ? currentX === undefined : currentY === undefined) return;
+              const diff = isDesktop ? (currentX - startX) : (startY - currentY);
+              const pctDiff = (diff / containerDim) * 100;
               const newSplit = Math.max(15, Math.min(85, startSplit + pctDiff));
               appNode.style.setProperty('--primary-split', `${newSplit}%`);
               document.documentElement.style.setProperty('--primary-split', `${newSplit}%`);
@@ -2393,17 +2396,22 @@ const App = () => {
 
           const startSecondaryResize = (e) => {
             e.preventDefault();
-            const startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
+            const isDesktop = window.innerWidth >= 1024;
             const visualNode = appRef.current ? appRef.current.querySelector('.visual-pane') : null;
             const appNode = document.getElementById('app-layout') || document.documentElement;
+            const startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
+            const startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
             const startSplit = parseFloat(getComputedStyle(appNode).getPropertyValue('--secondary-split')) || 50;
-            const containerH = visualNode ? visualNode.clientHeight : (window.innerHeight * 0.5);
+            const containerDim = visualNode 
+              ? (isDesktop ? visualNode.clientHeight : visualNode.clientWidth) 
+              : (isDesktop ? (window.innerHeight * 0.5) : (window.innerWidth * 0.5));
 
             const doDrag = (moveEvent) => {
+              const currentX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientX);
               const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientY);
-              if (currentY === undefined) return;
-              const diffY = currentY - startY;
-              const pctDiff = (diffY / containerH) * 100;
+              if (isDesktop ? currentY === undefined : currentX === undefined) return;
+              const diff = isDesktop ? (currentY - startY) : (currentX - startX);
+              const pctDiff = (diff / containerDim) * 100;
               const newSplit = Math.max(15, Math.min(85, startSplit + pctDiff));
               appNode.style.setProperty('--secondary-split', `${newSplit}%`);
               document.documentElement.style.setProperty('--secondary-split', `${newSplit}%`);
