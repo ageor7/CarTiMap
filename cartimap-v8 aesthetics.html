@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b249';
+const APP_VERSION = 'v8.13.69-b250';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1811,44 +1811,50 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 if (!map || !chevronLayerRef.current) return;
                 chevronLayerRef.current.clearLayers();
 
-                // Scope chevrons exclusively to active slide polylines [REF: MAP-GEOM-03]
-                const activeLayers = markersRef.current[activeIndex] || [];
-                activeLayers.forEach(layer => {
-                  if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-                    try {
-                      const latlngs = layer.getLatLngs ? layer.getLatLngs() : [];
-                      const subPaths = (Array.isArray(latlngs) && Array.isArray(latlngs[0])) ? latlngs : [latlngs];
-                      subPaths.forEach(pts => {
-                        const flatPts = Array.isArray(pts) ? pts.flat(2) : pts;
-                        if (flatPts && flatPts.length >= 2) {
-                          const containerPts = flatPts.map(ll => map.latLngToContainerPoint(ll));
-                          for (let i = 0; i < containerPts.length - 1; i++) {
-                            const p1 = containerPts[i];
-                            const p2 = containerPts[i + 1];
-                            const segLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-                            if (segLen < 15) continue; // Skip tiny segments
+                // Render directional chevrons for all polylines across all slides [REF: MAP-GEOM-03]
+                markersRef.current.forEach((layers, slideIdx) => {
+                  const isActive = slideIdx === activeIndex;
+                  const item = data[slideIdx] || {};
+                  const isVip = item.priority && item.priority.toLowerCase() === 'vip';
+                  const fillColor = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
 
-                            // Place exactly ONE midpoint arrow per line segment (ratio = 0.5)
-                            const cx = p1.x + 0.5 * (p2.x - p1.x);
-                            const cy = p1.y + 0.5 * (p2.y - p1.y);
-                            const latLng = map.containerPointToLatLng(L.point(cx, cy));
-                            const angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI);
-                            const arrowSvg = `<svg width="12" height="12" viewBox="0 0 24 24" style="transform: rotate(${angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="#28a745" stroke="#ffffff" stroke-width="1.5"/></svg>`;
-                            const arrowMarker = L.marker(latLng, {
-                              icon: L.divIcon({
-                                className: 'chevron-icon',
-                                html: arrowSvg,
-                                iconSize: [12, 12],
-                                iconAnchor: [6, 6]
-                              }),
-                              interactive: false
-                            });
-                            chevronLayerRef.current.addLayer(arrowMarker);
+                  layers.forEach(layer => {
+                    if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                      try {
+                        const latlngs = layer.getLatLngs ? layer.getLatLngs() : [];
+                        const subPaths = (Array.isArray(latlngs) && Array.isArray(latlngs[0])) ? latlngs : [latlngs];
+                        subPaths.forEach(pts => {
+                          const flatPts = Array.isArray(pts) ? pts.flat(2) : pts;
+                          if (flatPts && flatPts.length >= 2) {
+                            const containerPts = flatPts.map(ll => map.latLngToContainerPoint(ll));
+                            for (let i = 0; i < containerPts.length - 1; i++) {
+                              const p1 = containerPts[i];
+                              const p2 = containerPts[i + 1];
+                              const segLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+                              if (segLen < 15) continue; // Skip tiny segments
+
+                              // Place exactly ONE midpoint arrow per line segment (ratio = 0.5)
+                              const cx = p1.x + 0.5 * (p2.x - p1.x);
+                              const cy = p1.y + 0.5 * (p2.y - p1.y);
+                              const latLng = map.containerPointToLatLng(L.point(cx, cy));
+                              const angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI);
+                              const arrowSvg = `<svg width="12" height="12" viewBox="0 0 24 24" style="transform: rotate(${angleDeg + 90}deg); display: block;"><path d="M12 2L2 22l10-4 10 4z" fill="${fillColor}" stroke="#ffffff" stroke-width="1.5"/></svg>`;
+                              const arrowMarker = L.marker(latLng, {
+                                icon: L.divIcon({
+                                  className: 'chevron-icon',
+                                  html: arrowSvg,
+                                  iconSize: [12, 12],
+                                  iconAnchor: [6, 6]
+                                }),
+                                interactive: false
+                              });
+                              chevronLayerRef.current.addLayer(arrowMarker);
+                            }
                           }
-                        }
-                      });
-                    } catch (e) {}
-                  }
+                        });
+                      } catch (e) {}
+                    }
+                  });
                 });
               });
             };
@@ -2812,27 +2818,28 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const filterPopup = isFilterOpen
-            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 12px; width: max-content; max-width: 280px; z-index: 10005; display: flex; flex-direction: column; gap: 8px;" onClick=${(e) => e.stopPropagation()}>
-                <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
+            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 10005; display: flex; flex-direction: column; gap: 6px;" onClick=${(e) => e.stopPropagation()}>
+                <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
                   <span>Active Swimlanes</span>
-                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.8rem; cursor: pointer; padding: 0;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Select All</button>
+                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.75rem; cursor: pointer; padding: 0; font-weight: 600;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Reset (Select all)</button>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; padding-right: 4px;">
+                <div style="display: flex; flex-direction: column; gap: 4px; padding-right: 2px;">
                   ${allTags.map(tag => html`
-                    <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+                    <label key=${tag} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.82rem;">
                       <input type="checkbox" checked=${activeTags.includes(tag)} onChange=${() => handleToggleTag(tag)} style="cursor: pointer;" />
-                      <span style="font-family: monospace; color: #555;">${tag}</span>
+                      <span style="font-family: monospace; color: #444;">${tag}</span>
                     </label>
                   `)}
                 </div>
-                <div style="font-weight: 600; font-size: 0.95rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 8px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
+                <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 6px; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
                   <span>Data Streams</span>
+                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.75rem; cursor: pointer; padding: 0; font-weight: 600;" onClick=${() => { setActiveExtractTypes(masterExtractTypes); addLog('Restored all extract types to active view.', 'info'); }}>Reset (Select all)</button>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; flex-direction: column; gap: 4px; padding-right: 2px;">
                   ${masterExtractTypes.map(type => html`
-                    <label key=${type} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.9rem;">
+                    <label key=${type} style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 0.82rem;">
                       <input type="checkbox" checked=${activeExtractTypes.includes(type)} onChange=${() => handleToggleExtractType(type)} style="cursor: pointer;" />
-                      <span style="font-family: monospace; color: #555;">${type}</span>
+                      <span style="font-family: monospace; color: #444;">${type}</span>
                     </label>
                   `)}
                 </div>
