@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b237';
+const APP_VERSION = 'v8.13.69-b238';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1348,6 +1348,17 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               const container = mapDomRef.current;
               const map = L.map(container, { zoomControl: false, attributionControl: false, minZoom: 1, maxZoom: maxGlobalZoom, renderer: L.svg({ padding: 1.0 }) }).setView(new L.LatLng(37.9838, 23.7275), 13);
               L.control.scale({ position: 'bottomright', imperial: true, metric: true }).addTo(map);
+
+              // [REF: UI-42] InvalidateSize on resize observer & maxPane transitions
+              if (window.ResizeObserver && mapDomRef.current && mapDomRef.current.parentElement) {
+                const ro = new ResizeObserver(() => {
+                  setTimeout(() => {
+                    if (mapInstance.current) mapInstance.current.invalidateSize();
+                    if (miniMapInstance.current) miniMapInstance.current.invalidateSize();
+                  }, 120);
+                });
+                ro.observe(mapDomRef.current.parentElement);
+              }
               map.on('zoomend', () => setMapZoom(map.getZoom()));
               mapInstance.current = map;
 
@@ -1441,16 +1452,44 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               if (baseLayerRef.current) {
                 try { map.removeLayer(baseLayerRef.current); miniMap.removeLayer(miniBaseLayerRef.current); } catch(e){}
               }
-              const config = basemapsRegistry.find(b => b.id === activeBasemap);
+              const config = basemapsRegistry.find(b => b.id === activeBasemap) || basemapsRegistry.find(b => b.id === 'no-basemap');
               if (config) {
                 const tileUrl = config.url || '';
-                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href=${config.attrLink || '#'} target="_blank">${config.attrText || ''}</a>` };
-                baseLayerRef.current = L.tileLayer(tileUrl, { ...layerOpts, zIndex: 0 }).addTo(map);
-                miniBaseLayerRef.current = L.tileLayer(tileUrl, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
+                const isVector = (config.format === 'pbf' || config.format === 'mvt' || config.format === 'vector' || tileUrl.includes('.mvt'));
+                const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
+                
+                if (isVector && window.protomapsL) {
+                  try {
+                    baseLayerRef.current = window.protomapsL.leafletLayer({ url: tileUrl, theme: 'light' }).addTo(map);
+                    miniBaseLayerRef.current = window.protomapsL.leafletLayer({ url: tileUrl, theme: 'light' }).addTo(miniMap);
+                  } catch(err) {
+                    baseLayerRef.current = L.tileLayer(tileUrl, { ...layerOpts, zIndex: 0 }).addTo(map);
+                  }
+                } else if (isVector && window.L && window.L.maplibreGL) {
+                  try {
+                    baseLayerRef.current = L.maplibreGL({ style: tileUrl || './style.json', attribution: layerOpts.attribution, zIndex: 0, opacity: basemapOpacity }).addTo(map);
+                    miniBaseLayerRef.current = L.maplibreGL({ style: tileUrl || './style.json', attribution: false, zIndex: 0, opacity: basemapOpacity }).addTo(miniMap);
+                  } catch(err) {
+                    baseLayerRef.current = L.tileLayer(tileUrl, { ...layerOpts, zIndex: 0 }).addTo(map);
+                  }
+                } else {
+                  baseLayerRef.current = L.tileLayer(tileUrl, { ...layerOpts, zIndex: 0 }).addTo(map);
+                  miniBaseLayerRef.current = L.tileLayer(tileUrl, { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity }).addTo(miniMap);
+                }
               }
             };
             renderBasemap();
           }, [activeBasemap, basemapsRegistry, maxGlobalZoom, basemapOpacity]);
+
+          useEffect(() => {
+            if (mapInstance.current) {
+              const timer = setTimeout(() => {
+                mapInstance.current.invalidateSize();
+                if (miniMapInstance.current) miniMapInstance.current.invalidateSize();
+              }, 150);
+              return () => clearTimeout(timer);
+            }
+          }, [maxPane]);
 
           useEffect(() => {
             const map = mapInstance.current;
@@ -1718,7 +1757,8 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             const nameB = String(b.label || b.title || b.name || b.id || '').toLowerCase();
             return nameA.localeCompare(nameB);
           });
-          const bases = basemapsRegistry ? sortAlpha(basemapsRegistry.filter(b => (b.type || 'base').toLowerCase() !== 'overlay')) : [];
+          const basesRaw = basemapsRegistry ? sortAlpha(basemapsRegistry.filter(b => (b.type || 'base').toLowerCase() !== 'overlay')) : [];
+          const bases = basesRaw.filter((b, idx, arr) => arr.findIndex(x => x.id === b.id || (x.id === 'no-basemap' && b.id === 'none') || (x.id === 'none' && b.id === 'no-basemap')) === idx);
           const overlays = basemapsRegistry ? sortAlpha(basemapsRegistry.filter(b => (b.type || 'base').toLowerCase() === 'overlay')) : [];
 
           const renderOverlayRow = (o) => {
@@ -1949,7 +1989,7 @@ const App = () => {
             { id: 'opentopo', label: 'OpenTopoMap', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 17, active: false, attrText: 'OpenTopoMap', attrLink: 'https://opentopomap.org' },
             { id: 'protomaps-light', label: 'Protomaps Vector Light', type: 'base', url: 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt', format: 'vector', maxZoom: 18, active: false, attrText: 'Protomaps / OSM', attrLink: 'https://protomaps.com' },
             { id: 'wms-academic', label: 'Academic WMS Service', type: 'base', url: 'https://geodata.harvard.edu/geoserver/wms', format: 'wms', maxZoom: 19, active: false, attrText: 'Harvard Geospatial', attrLink: 'https://geodata.harvard.edu' },
-            { id: 'none', label: 'No Basemap (Blank Canvas)', type: 'base', url: '', format: 'none', maxZoom: 22, active: false, attrText: 'Blank Canvas', attrLink: '' }
+            { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '' }
           ]);
           const [zoomLock, setZoomLock] = useState(() => {
             try { return JSON.parse(localStorage.getItem('tm_zoom_lock')) ?? false; }
