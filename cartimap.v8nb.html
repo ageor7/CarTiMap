@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b248';
+const APP_VERSION = 'v8.13.69-b249';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1629,7 +1629,43 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               let featureLayers = [];
 
               // Pre-split location strings by <br>, newlines, or pipes per [REF: MAP-01c]
-              const locParts = rawLocStr.split(/<br\s*\/?>|\r?\n|\||(?=(?:POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)\s*\()/i).map(s => s.trim()).filter(Boolean);
+              const splitLocationString = (rawStr) => {
+                if (!rawStr) return [];
+                const initialParts = String(rawStr).split(/<br\s*\/?>|\r?\n|\|/i).map(s => s.trim()).filter(Boolean);
+                const finalParts = [];
+                const wktKeywordRe = /\b(?:POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON)\b\s*\(/gi;
+                initialParts.forEach(part => {
+                  if (/^\s*GEOMETRYCOLLECTION\b/i.test(part)) {
+                    finalParts.push(part);
+                  } else {
+                    const matches = [];
+                    let m;
+                    wktKeywordRe.lastIndex = 0;
+                    while ((m = wktKeywordRe.exec(part)) !== null) {
+                      matches.push(m.index);
+                    }
+                    if (matches.length <= 1) {
+                      finalParts.push(part);
+                    } else {
+                      let depth = 0;
+                      let start = 0;
+                      for (let i = 0; i < part.length; i++) {
+                        if (part[i] === '(') depth++;
+                        else if (part[i] === ')') depth--;
+                        if (depth === 0 && matches.includes(i + 1)) {
+                          const sub = part.substring(start, i + 1).trim();
+                          if (sub) finalParts.push(sub);
+                          start = i + 1;
+                        }
+                      }
+                      const lastSub = part.substring(start).trim();
+                      if (lastSub) finalParts.push(lastSub);
+                    }
+                  }
+                });
+                return finalParts;
+              };
+              const locParts = splitLocationString(rawLocStr);
 
               locParts.forEach(locStr => {
                 try {
