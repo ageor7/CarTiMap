@@ -204,8 +204,8 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b255';
-document.title = 'CarTiMap Core - ' + APP_VERSION;
+const APP_VERSION = 'v8.13.69-b256';
+document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -2120,7 +2120,6 @@ const App = () => {
           const triggerFilterFlash = (msg) => {
             setFilterFlashMsg(msg);
             addLog(msg, 'warning');
-            setTimeout(() => setFilterFlashMsg(null), 3200);
           };
           const [isSearchOpen, setIsSearchOpen] = useState(false);
           const [searchQuery, setSearchQuery] = useState('');
@@ -2506,11 +2505,13 @@ const App = () => {
             if (activeTags.includes(tag)) {
               if (activeTags.length > 1) {
                 setActiveTags(activeTags.filter(t => t !== tag));
+                setFilterFlashMsg(null);
               } else {
                 triggerFilterFlash('⚠️ At least one Swimlane filter must remain active!');
               }
             } else {
               setActiveTags([...activeTags, tag]);
+              setFilterFlashMsg(null);
             }
           };
 
@@ -2518,11 +2519,13 @@ const App = () => {
             if (activeExtractTypes.includes(type)) {
               if (activeExtractTypes.length > 1) {
                 setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
+                setFilterFlashMsg(null);
               } else {
                 triggerFilterFlash('⚠️ At least one Data Stream filter must remain active!');
               }
             } else {
               setActiveExtractTypes([...activeExtractTypes, type]);
+              setFilterFlashMsg(null);
             }
           };
 
@@ -2864,9 +2867,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           const filterPopup = isFilterOpen
             ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 10005; display: flex; flex-direction: column; gap: 6px;" onClick=${(e) => e.stopPropagation()}>
                 ${filterFlashMsg ? html`
-                  <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 8px 10px; font-size: 0.78rem; font-family: monospace; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    <span>${filterFlashMsg}</span>
+                  <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 8px 10px; font-size: 0.78rem; font-family: monospace; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; cursor: pointer;" onClick=${() => setFilterFlashMsg(null)} title="Click to dismiss">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                      <span>${filterFlashMsg}</span>
+                    </div>
+                    <span style="font-size: 0.95rem; font-weight: bold; padding: 0 4px; color: #856404; opacity: 0.8;" title="Dismiss">×</span>
                   </div>
                 ` : ''}
                 <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; font-family: monospace;">
@@ -2886,6 +2892,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           addLog(`Deselected all swimlanes except active slide's (${labelText}).`, 'info');
                         } else {
                           setActiveTags([...allTags]);
+                          setFilterFlashMsg(null);
                           addLog('Selected all swimlanes.', 'info');
                         }
                       }}
@@ -2919,6 +2926,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           addLog(`Deselected all data streams except active slide's (${labelText}).`, 'info');
                         } else {
                           setActiveExtractTypes([...masterExtractTypes]);
+                          setFilterFlashMsg(null);
                           addLog('Selected all data streams.', 'info');
                         }
                       }}
