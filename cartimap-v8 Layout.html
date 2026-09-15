@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b242';
+const APP_VERSION = 'v8.13.69-b243';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1363,7 +1363,6 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               mapInstance.current = map;
 
               
-          useEffect(() => {
             if (window.ResizeObserver && miniMapDomRef.current) {
               const miniRo = new ResizeObserver(() => {
                 if (miniMapInstance.current) {
@@ -1371,9 +1370,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 }
               });
               miniRo.observe(miniMapDomRef.current);
-              return () => miniRo.disconnect();
             }
-          }, []);
 
           const miniMap = L.map(miniMapDomRef.current, { zoomControl: false, attributionControl: false, dragging: true, touchZoom: true, scrollWheelZoom: true, doubleClickZoom: true, boxZoom: false }).setView(new L.LatLng(37.9838, 23.7275), 0);
               miniMapInstance.current = miniMap;
@@ -2762,7 +2759,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   </div>
 
                   <!-- Primary Vertical Column Resizer Splitter -->
-                  <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize} style="width: 4px; background: #eee; cursor: col-resize; z-index: 50; flex-shrink: 0;"></div>
+                  <div class="resizer-dyn-primary" onMouseDown=${startPrimaryResize} onTouchStart=${startPrimaryResize}></div>
 
                   <!-- Visual Pane containing MapViewer and MediaViewer -->
                   <div class="visual-pane ${!activeSlide.media || activeSlide.media.length === 0 ? 'no-media' : ''}" style="display: flex; min-height: 0; min-width: 0; z-index: 20;">
@@ -2787,7 +2784,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     </div>
 
                     <!-- Secondary Horizontal Row Resizer Splitter -->
-                    <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize} style="height: 4px; background: #eee; cursor: row-resize; z-index: 50; flex-shrink: 0;"></div>
+                    <div class="resizer-dyn-secondary" onMouseDown=${startSecondaryResize} onTouchStart=${startSecondaryResize}></div>
 
                     <!-- Media Viewer Container -->
                     <div class="media-pane ${maxPane === 'media' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'media' ? 'pane-hidden' : ''}" style="position: relative; min-height: 0; z-index: 30; background: #111;">
