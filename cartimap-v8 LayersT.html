@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b239';
+const APP_VERSION = 'v8.13.69-b240';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1465,22 +1465,14 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               const config = basemapsRegistry.find(b => b.id === activeBasemap) || basemapsRegistry.find(b => b.id === 'no-basemap');
               if (config) {
                 const tileUrl = config.url || '';
-                const isVector = (config.format === 'pbf' || config.format === 'mvt' || config.format === 'vector' || tileUrl.includes('.mvt'));
+                const fmt = String(config.format || '').toLowerCase().trim();
+                const isVector = (fmt === 'pbf' || fmt === 'mvt' || fmt === 'vector' || tileUrl.includes('.mvt'));
                 const layerOpts = { maxNativeZoom: config.maxZoom || 19, maxZoom: maxGlobalZoom, opacity: basemapOpacity, attribution: `<a href="${config.attrLink || '#'}" target="_blank">${config.attrText || ''}</a>` };
                 
                 if (isVector) {
                   if (window.L && window.L.maplibreGL) {
                     try {
-                      const vectorStyle = (tileUrl.endsWith('.json') || tileUrl.includes('style.json')) ? tileUrl : {
-                        version: 8,
-                        sources: { 'protomaps': { type: 'vector', tiles: [tileUrl], minzoom: 0, maxzoom: config.maxZoom || 18 } },
-                        layers: [
-                          { id: 'background', type: 'background', paint: { 'background-color': '#f4f3f0' } },
-                          { id: 'water', type: 'fill', source: 'protomaps', 'source-layer': 'water', paint: { 'fill-color': '#a0c8f0' } },
-                          { id: 'boundaries', type: 'line', source: 'protomaps', 'source-layer': 'boundaries', paint: { 'line-color': '#cccccc', 'line-width': 1 } },
-                          { id: 'roads', type: 'line', source: 'protomaps', 'source-layer': 'roads', paint: { 'line-color': '#ffffff', 'line-width': 1.5 } }
-                        ]
-                      };
+                      const vectorStyle = (tileUrl.endsWith('.json') || tileUrl.includes('style.json')) ? tileUrl : './style.json';
                       baseLayerRef.current = L.maplibreGL({ style: vectorStyle, attribution: layerOpts.attribution, zIndex: 0, opacity: basemapOpacity }).addTo(map);
                       miniBaseLayerRef.current = L.maplibreGL({ style: vectorStyle, attribution: false, zIndex: 0, opacity: basemapOpacity }).addTo(miniMap);
                     } catch(err) {
