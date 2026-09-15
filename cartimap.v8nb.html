@@ -200,7 +200,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b232';
+const APP_VERSION = 'v8.13.69-b235';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1866,7 +1866,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.4.103-b232';
+MODULE_VERSIONS['MapViewer'] = 'v6.4.104-b233';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2176,29 +2176,49 @@ const App = () => {
               setAllTags(uniqueTagsList);
               setActiveTags(uniqueTagsList);
 
-              if (basemapsCsv) {
-                const baseResult = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
-                const basemaps = baseResult.data.map(row => {
+              const parseLayersTRows = (rows) => {
+                return rows.map(row => {
                   const norm = {};
                   for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                  const isActive = /^(true|yes)$/i.test(String(norm.active || norm.isdefault || norm.default || '').trim());
+                  const rawOpac = parseFloat(norm.defaultopacity || norm.opacity);
+                  const rawType = String(norm.type || norm.layertype || '').toLowerCase().trim();
                   return {
-                    id: exactGet(norm, 'id'),
-                    label: exactGet(norm, 'label'),
-                    type: exactGet(norm, 'type'),
-                    url: exactGet(norm, 'url'),
-                    format: exactGet(norm, 'format'),
-                    maxZoom: parseInt(exactGet(norm, 'maxzoom') || 19, 10),
-                    active: exactGet(norm, 'active').toLowerCase() === 'true',
-                    attrText: exactGet(norm, 'attribution text'),
-                    attrLink: exactGet(norm, 'attribution link'),
-                    wmsLayer: exactGet(norm, 'wms layer'),
-                    defaultOpacity: (exactGet(norm, 'default opacity') !== '' && !isNaN(parseFloat(exactGet(norm, 'default opacity')))) ? parseFloat(exactGet(norm, 'default opacity')) : 0.3
+                    id: norm.id || norm.name || '',
+                    label: norm.label || norm.title || norm.name || '',
+                    type: (rawType === 'overlay' || rawType === 'wms') ? 'overlay' : 'base',
+                    url: norm.url || norm.tileurl || norm.link || norm.wmsurl || norm.templateurl || norm.source || '',
+                    maxZoom: parseInt(norm.maxzoom || norm.maxzoomlevel, 10) || 19,
+                    active: isActive,
+                    attrText: norm.attrtext || norm.attribution || norm.credit || norm['attribution text'] || '',
+                    attrLink: norm.attrlink || norm.attributionlink || norm['attribution link'] || '',
+                    defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac,
+                    format: norm.format || norm.tileformat || 'xyz',
+                    wmsLayer: norm.wmslayer ? decodeURIComponent(String(norm.wmslayer).trim()) : (norm['wms layer'] ? decodeURIComponent(String(norm['wms layer']).trim()) : 'default')
                   };
                 }).filter(b => b.id && b.url);
-                setBasemapsRegistry(basemaps);
-                addLog(`Basemaps registry parsed. Found ${basemaps.length} configured tile services.`, 'info');
-              } else {
-                setBasemapsRegistry([{ id: 'osm', label: 'OpenStreetMap', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: true, attrText: 'OpenStreetMap', attrLink: 'https://openstreetmap.org' }]);
+              };
+
+              const rawLayersRows = (typeof sheetsData !== 'undefined' && sheetsData && (sheetsData.LayersT || sheetsData.Layers)) ? (sheetsData.LayersT || sheetsData.Layers) : ((typeof window !== 'undefined' && window.sheetsData && (window.sheetsData.LayersT || window.sheetsData.Layers)) ? (window.sheetsData.LayersT || window.sheetsData.Layers) : null);
+              let parsedBMs = [];
+              if (rawLayersRows && Array.isArray(rawLayersRows) && rawLayersRows.length > 0) {
+                parsedBMs = parseLayersTRows(rawLayersRows);
+              } else if (basemapsCsv) {
+                const baseResult = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
+                parsedBMs = parseLayersTRows(baseResult.data);
+              }
+
+              if (parsedBMs.length > 0) {
+                setBasemapsRegistry(prev => {
+                  const merged = [...prev];
+                  parsedBMs.forEach(bm => {
+                    const existIdx = merged.findIndex(m => m.id === bm.id);
+                    if (existIdx >= 0) merged[existIdx] = bm;
+                    else merged.push(bm);
+                  });
+                  return merged;
+                });
+                addLog(`[v8.12.74 Ingestion] LayersT registry parsed. Merged ${parsedBMs.length} spatial services into basemapsRegistry.`, 'info');
               }
 
               if (!hasInitializedRef.current) {
