@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b256';
+const APP_VERSION = 'v8.13.69-b257';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2507,7 +2507,7 @@ const App = () => {
                 setActiveTags(activeTags.filter(t => t !== tag));
                 setFilterFlashMsg(null);
               } else {
-                triggerFilterFlash('⚠️ At least one Swimlane filter must remain active!');
+                triggerFilterFlash(`To keep at least one category active, filtered to ${activeTags.join(', ')}`);
               }
             } else {
               setActiveTags([...activeTags, tag]);
@@ -2521,7 +2521,7 @@ const App = () => {
                 setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
                 setFilterFlashMsg(null);
               } else {
-                triggerFilterFlash('⚠️ At least one Data Stream filter must remain active!');
+                triggerFilterFlash(`To keep at least one category active, filtered to ${activeExtractTypes.join(', ')}`);
               }
             } else {
               setActiveExtractTypes([...activeExtractTypes, type]);
@@ -2888,7 +2888,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         if (activeTags.length > activeSlideTagSelection.length) {
                           setActiveTags(activeSlideTagSelection);
                           const labelText = activeSlideTagSelection.join(', ');
-                          triggerFilterFlash(`Filtered to active slide swimlane: ${labelText}`);
+                          triggerFilterFlash(`To keep at least one category active, filtered to ${labelText}`);
                           addLog(`Deselected all swimlanes except active slide's (${labelText}).`, 'info');
                         } else {
                           setActiveTags([...allTags]);
@@ -2922,7 +2922,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         if (activeExtractTypes.length > activeSlideTypeSelection.length) {
                           setActiveExtractTypes(activeSlideTypeSelection);
                           const labelText = activeSlideTypeSelection.join(', ');
-                          triggerFilterFlash(`Filtered to active slide stream: ${labelText}`);
+                          triggerFilterFlash(`To keep at least one category active, filtered to ${labelText}`);
                           addLog(`Deselected all data streams except active slide's (${labelText}).`, 'info');
                         } else {
                           setActiveExtractTypes([...masterExtractTypes]);
