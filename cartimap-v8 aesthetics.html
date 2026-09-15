@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b250';
+const APP_VERSION = 'v8.13.69-b251';
 document.title = 'CarTiMap Core - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2819,9 +2819,23 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           const filterPopup = isFilterOpen
             ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 10005; display: flex; flex-direction: column; gap: 6px;" onClick=${(e) => e.stopPropagation()}>
-                <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
-                  <span>Active Swimlanes</span>
-                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.75rem; cursor: pointer; padding: 0; font-weight: 600;" onClick=${() => { setActiveTags(allTags); addLog('Restored all swimlanes to active view.', 'info'); }}>Reset (Select all)</button>
+                <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 2px; display: flex; align-items: center; font-family: monospace;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; width: 100%;">
+                    <input type="checkbox"
+                      checked=${allTags.length > 0 && activeTags.length === allTags.length}
+                      onChange=${() => {
+                        if (activeTags.length === allTags.length) {
+                          setActiveTags([]);
+                          addLog('Deselected all swimlanes.', 'info');
+                        } else {
+                          setActiveTags([...allTags]);
+                          addLog('Selected all swimlanes.', 'info');
+                        }
+                      }}
+                      style="cursor: pointer;"
+                    />
+                    <span>Active Swimlanes</span>
+                  </label>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 4px; padding-right: 2px;">
                   ${allTags.map(tag => html`
@@ -2831,9 +2845,23 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     </label>
                   `)}
                 </div>
-                <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 6px; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; font-family: monospace;">
-                  <span>Data Streams</span>
-                  <button style="border: none; background: transparent; color: #007acc; font-size: 0.75rem; cursor: pointer; padding: 0; font-weight: 600;" onClick=${() => { setActiveExtractTypes(masterExtractTypes); addLog('Restored all extract types to active view.', 'info'); }}>Reset (Select all)</button>
+                <div style="font-weight: 600; font-size: 0.85rem; color: #333; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-top: 6px; margin-bottom: 2px; display: flex; align-items: center; font-family: monospace;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; width: 100%;">
+                    <input type="checkbox"
+                      checked=${masterExtractTypes.length > 0 && activeExtractTypes.length === masterExtractTypes.length}
+                      onChange=${() => {
+                        if (activeExtractTypes.length === masterExtractTypes.length) {
+                          setActiveExtractTypes([]);
+                          addLog('Deselected all data streams.', 'info');
+                        } else {
+                          setActiveExtractTypes([...masterExtractTypes]);
+                          addLog('Selected all data streams.', 'info');
+                        }
+                      }}
+                      style="cursor: pointer;"
+                    />
+                    <span>Data Streams</span>
+                  </label>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 4px; padding-right: 2px;">
                   ${masterExtractTypes.map(type => html`
