@@ -1,4 +1,4 @@
-# CarTiMap Engine Master Blueprint (v8.13.23)
+# CarTiMap Engine Master Blueprint (v8.13.69-b261)
 ### The Living Technical, Spatial-Temporal & Historiographical Specification
 
 This living document contains the rigid engineering, mathematical, cartographic, and methodological specifications for **CarTiMap** and the **HGBB extracts database**. Standardized using the semantic anchor system `[REF: TAG-NAME]`, these rules are bidirectionally deep-linked between the active Preact/Leaflet codebase, the spreadsheet database schemas, and the physical postgraduate thesis (*Forensic Visualisation and Triangulation of Historical Narratives*, Georgiadis 2026) [REF: DOC-01].
@@ -8,7 +8,7 @@ This living document contains the rigid engineering, mathematical, cartographic,
 ## 1. Engineering Protocols & Coding Rules <a name="category-1"></a>
 
 ### [REF: DOC-01] Two-Tier Documentation (REF-TAGS) [UPDATED]
-To prevent technical debt and ensure absolute cross-session consistency, the project documentation is bifurcated. The master repository `README.md` serves as the primary epistemic portal and developer-facing guide, detailing standard API behaviors, URL queries, and database schemas. The companion file `BLUEPRINT.md` houses the rigid architectural, physical, and mathematical parameters of the system. These tiers are permanently interlinked with the physical LaTeX/Word manuscript using the `[REF: TAG-NAME]` semantic taxonomy. Every blueprint entry must carry its specific chapter and section coordinates (e.g., Chapter 5.4, Page 51), ensuring complete referential traceability between the running code, the database paradata, and the academic defense text. Zero duplication.
+To prevent technical debt and ensure absolute cross-session consistency, the project documentation is bifurcated. The master repository `README.md` serves as the primary epistemic portal and developer-facing guide, detailing standard API behaviors, URL queries, and database schemas. The companion file `Blueprint.md` houses the rigid architectural, physical, and mathematical parameters of the system. These tiers are permanently interlinked with the physical LaTeX/Word manuscript using the `[REF: TAG-NAME]` semantic taxonomy. Every blueprint entry must carry its specific chapter and section coordinates (e.g., Chapter 5.4, Page 51), ensuring complete referential traceability between the running code, the database paradata, and the academic defense text. Zero duplication.
 
 ### [REF: ARCH-01] Two-Stage Data Pipeline
 To support dynamic on-the-fly re-rendering without network latency, the engine strictly separates raw data ingestion (`rawCsvRows`) from the compiled data state (`data`).
@@ -620,3 +620,32 @@ Modal elements (.tm-modal and .search-modal) are locked into flex layout boxes w
 * **[REF: PERF-01c] Dual-Axis Keyboard Navigation Contract:** Global keyboard listeners MUST bifurcate directional arrow keys:
   1) `ArrowLeft` / `ArrowRight`: Triggers `jumpToSlide()` array index changes.
   2) `ArrowUp` / `ArrowDown`: Triggers vertical `scrollBy({ top: ±120 })` viewport scrolling on `.content-slider-pane`.
+
+## 11. Conformed Baseline Expansion Addenda (v8.13.68-b174 to v8.13.69-b261) <a name="category-11"></a>
+
+### Category 1: Engineering Protocols & Two-Tier Documentation
+* **[REF: DOC-01] Two-Tier Documentation Architecture (REF-TAGS) [REVISED - 2026-09-15]:** The technical specifications are strictly bifurcated into the primary developer portal (`README.md`) and the rigid architectural, physical, and mathematical specification (`Blueprint.md`, formerly `BLUEPRINT.md`). All entries are indexed via the `[REF: TAG-NAME]` semantic taxonomy interlinked with thesis chapter and section coordinates.
+* **[REF: DOC-03] GitHub Artifact & Release Ledger Protocol [REVISED - 2026-09-15]:** Every code patch or release milestone MUST generate Markdown artifacts prior to code delivery: `git commit` messages for SCM, `CHANGELOG.md` for chronological history, and `Blueprint.md` for architectural specifications. Semantic versioning is enforced across all candidate builds.
+
+### Category 2: Data Schema & Upstream ETL Pipeline
+* **[REF: ETL-01] Single-Line Contiguous WKT Ingestion Specification:** Upstream spatial cells in `ExtractsT` and `GeoLU` containing complex geometries (`LINESTRING`, `POLYGON`, `GEOMETRYCOLLECTION`) MUST be stored as single, contiguous strings without internal line breaks (`CHAR(10)`) or `<br>` tags to prevent multiline fracture during ETL `SPLIT` operations.
+* **[REF: ETL-08] Native AST Decorator & ISO 8601-2 / EDTF Level 3 Parsing:** Integrated native `compileCartiMapAST` recursive descent decorator to evaluate Choice Sets (`[]`), Inclusive Lists (`{}`), Durations (`..`), and uncertainty qualifiers (`?`/`~`) without external CDN binaries or V8 main-thread blocking.
+* **[REF: ETL-12] Parallel Multi-Media & Caption Alignment Contract:** The upstream ETL compiler (`MAKEARRAY`) MUST NOT execute flat deduplication across media, caption, and credit vectors. Columns 6, 7, and 8 MUST be sorted in parallel using `HSTACK` to guarantee `mediaItems[i]` maps to its true historical `captions[i]` and `credits[i]`.
+
+### Category 3: Cartographic Physics & Map Stage Optics
+* **[REF: MAP-PIN-01] Option A Pure Pin Head & Floating Top-Right Shoulder Badge Specification [STABLE - 2026-09-15]:** The custom SVG map pin head circle (`.pin-head`) MUST render in 100% solid color with zero text or numbers embedded inside: Active Green (`#28a745`), VIP Gold (`#ffb300`), or Inactive Blue (`#007acc`). When multiple co-located features exist at identical coordinates (`badgeCount > 1`), `MapViewer` MUST render a floating dark pill badge (`+1`, `+2`) attached outside the pin head on its top-right shoulder (`top: -5px, right: -7px`).
+* **[REF: MAP-ZSTACK-01] FeatureGroup Vector Layer Stack & Selectability Specification [STABLE - 2026-09-15]:** `MapViewer` MUST instantiate and mount Leaflet FeatureGroups in strict bottom-to-top z-index order: `polygonLayer` (bottom, `bringToBack()`) -> `polylineLayer` (middle) -> `clusterLayer` -> `markerLayer` (pins, `setZIndexOffset(10000)`, `zIndex = '10000'`) -> `chevronLayerRef` (topmost arrows). Polylines and Markers MUST sit physically above Polygon fills to ensure 100% click-selectability across the stage.
+* **[REF: MAP-02] State-Based Layer Swapping & DOM Style Sanitization [STABLE - 2026-09-15]:** Active slide non-VIP markers MUST be temporarily promoted from `clusterLayer` (`L.markerClusterGroup`) to `markerLayer` (`L.featureGroup`) with explicit DOM style sanitization (`layer._icon.style.display = 'block'; layer._icon.style.opacity = '1'; layer._icon.style.zIndex = '10000'`). This guarantees that multi-point nodes (`Patra`, `Megara Airfield`, `Piraeus Port`) remain unswallowed and 100% visible regardless of zoom level.
+* **[REF: MAP-GEOM-04b] Context-Aware Structural Sub-Label Delimiter Protocol [STABLE - 2026-09-15]:** `MapViewer` MUST split `item.subLabels` and `item.place` strings using strictly the context-aware structural regex: `/(?:\s+-\s+|[
+]+\s*-?\s*|\||·|;|·)/`. The parser MUST distinguish structural list hyphens (`Patra - Megara`) and multiline bullet dashes (`- Patra
+- Megara`) from word-internal hyphens (`Nea-Smyrni`), preventing array geometry corruption while guaranteeing 1:1 node tooltip mapping across `MULTIPOINT` GIS features.
+* **[REF: MAP-04b] Individualized MULTIPOINT Sub-Node Tooltips:** Extracted `MULTIPOINT` layers MUST map 1:1 to `subLabels` or `places` vectors, automatically appending symmetrical `(i/N)` index fallback indicators (`Patra (1/3)`, `Patra (2/3)`, `Patra (3/3)`) when vector counts are less than extracted spatial layer counts.
+* **[REF: MAP-GEOM-03] Polyline Directional Chevron Vector Layer:** `MapViewer` MUST mount `chevronLayerRef` (`L.featureGroup()`) to render SVG directional arrows (`<svg...><path d="M12 2L2 22l10-4 10 4z".../></svg>`) at segment midpoints across active and inactive polylines, inheriting active (`#28a745`), VIP (`#ffb300`), or inactive (`#007acc`) color fills.
+
+### Category 6: Timeline Scrubber & Swimlane Physics
+* **[REF: TL-05b] Duration Lane & Swimlane Vertical Isolation Specification [STABLE - 2026-09-15]:** Swimlane grid lines (`.tag-lane`) and sticky swimlane label containers (`.tag-lane-label`) inside `TimelineScrubber` MUST be elevated to `bottom: 38px`, establishing strict vertical separation from the 10px Duration Lane band (`28px` to `38px` from bottom). Swimlane heights MUST be calculated using `laneHeight = Math.max(20, (containerHeight - 55) / laneCount)`, and `AppOrchestrator` MUST allocate `(laneCount * 24) + 55px` as the required timeline height.
+* **[REF: TL-05c] Top-Right Timeline Control Cluster Specification:** `TimelineScrubber` MUST mount a 7-button control cluster in the top-right corner: 1) Zoom In (`+`), 2) Zoom Factor, 3) Zoom Out (`-`), 4) Center Active Event (`🎯`), 5) Reset View (`↺`), 6) Fullscreen Expand (`↕`), and 7) Minimize (`-`).
+
+### Category 8: Application Orchestration & UX Intercepts
+* **[REF: UI-66b] Active-Slide Preserving Filter Intercept:** Category filter deselect operations in `AppOrchestrator` MUST retain categories associated with the active slide, displaying a persistent status bar toast notification: `'To keep at least one category active, filtered to <category>'`.
+* **[REF: UI-08b] Standardized Document Title Protocol:** Browser document title MUST be standardized to `document.title = 'CarTiMap - ' + APP_VERSION` across version initialization and route changes.

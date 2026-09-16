@@ -1,129 +1,113 @@
-# CarTiMap (v8.x)
-### A Zero-Build, High-Performance Spatial-Temporal Storytelling Engine for Qualitative Humanities
+# CarTiMap — Spatial-Temporal Historical Reconstruction Engine
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Engine Size](https://img.shields.io/badge/Size-%3C500KB-success)](https://github.com/ageor7/CarTiMap)
-[![Preact](https://img.shields.io/badge/Framework-Preact--ESM-orange)](https://preactjs.com/)
-[![Leaflet](https://img.shields.io/badge/GIS-Leaflet.js-green)](https://leafletjs.com/)
+> **Version:** `v8.13.69-b261` (Conformed Production Baseline)  
+> **Identity:** CarTiMap (formerly CarTiMapper) — A zero-build, high-performance TimeMapper on steroids  
+> **Core Objective:** Forensic spatial-temporal visualization, historical triangulation, and multimodal narrative storytelling  
+> **Primary Case Study:** *Forensic Visualisation and Triangulation of Historical Narratives: The 1944 Hotel Grande Bretagne Sabotage Operation* (Alexandros Georgiadis, 2026)
 
----
+**CarTiMap** is a high-performance, single-file application that seamlessly integrates interactive cartography (Leaflet) with a high-fidelity, data-dense swimlane timeline and a synchronized media carousel. Built entirely without a build step (Webpack/Node), this engine runs natively in the browser using Preact (`htm`), Vanilla JavaScript, and CSS.
 
-## 🗺️ System Overview <a name="overview"></a>
-
-**CarTiMap** (Cartographic, Carousel-enabled Time Mapper) is a lightweight (<500KB), future-proof, client-side visualization application designed to synchronize complex narrative data with interactive georeferenced maps and chronological timelines. Built entirely without a build step (no Webpack, npm, or Node compilation), CarTiMap executes natively in the browser utilizing **Preact**, **HTM**, and **Vanilla JavaScript (ESM)**. 
-
-The application is engineered to consume dynamic datasets published directly as CSV feeds from **Google Sheets**, which serves as the "Source of Truth" `[REF: ETL-04]`. CarTiMap orchestrates these inputs into three responsive, resizable viewport panels (the **"Hero Stage"**):
-1. **The Leaflet Map Pane** (35% top-left, resizable): Incorporates dynamic WKT/GeoJSON rendering, MarkerCluster spatial indexing, and custom overlapping coordinate fanning.
-2. **The Media Carousel Pane** (35% top-right, resizable): Supports multi-asset carousel swiping, auto-fitting aspect ratios, and clickable attributions.
-3. **The Content Panel** (55% middle band, resizable): Renders fluid, HTML-enriched narrative descriptions with auto-minimizing Micro-Scroll headers.
-4. **The Navigation Timeline Scrubber** (10% bottom band, resizable): Features multi-lane tag swimlanes, custom zoom locks, and a high-density chronological Z-Stacking engine.
+It is designed to consume published Google Sheets (CSVs) and dynamically orchestrate a cinematic, data-driven narrative across three responsive panes: Map, Media, and Narrative Content Slider.
 
 ---
 
-## 🚀 Autonomous Quick Start (No Academic Background Required) <a name="quickstart"></a>
+### ✨ Architectural Highlights & Core Features
 
-If you are a developer looking to deploy or customize CarTiMap purely as a technical tool, follow this zero-dependency workflow:
+#### 🗺 Cinematic Geo-Engine (`MapViewer v6.4.122-b261`)
+*   **WKT & GeoJSON Architecture:** Natively parses Well-Known Text (`POINT`, `LINESTRING`, `POLYGON`, `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON`, `GEOMETRYCOLLECTION`) and valid GeoJSON.
+*   **Option A Pure Pin Heads & Floating Shoulder Badges (`[REF: MAP-PIN-01]`):** Pin heads render 100% solid color without text clutter (Active Green `#28a745`, VIP Gold `#ffb300`, Inactive Blue `#007acc`). Overlapping co-located items render a floating dark pill badge (`+1`, `+2`) on the top-right shoulder (`top: -5px, right: -7px`).
+*   **Explicit Vector Layer Z-Stack (`[REF: MAP-ZSTACK-01]`):** FeatureGroups mount in strict vertical order: `polygonLayer` (bottom, `bringToBack()`) $\rightarrow$ `polylineLayer` (middle) $\rightarrow$ `clusterLayer` $\rightarrow$ `markerLayer` (pins, `zIndex = 10000`) $\rightarrow$ `chevronLayerRef` (topmost arrows), ensuring lines and pins sit physically above polygons for 100% click-selectability.
+*   **State-Based Layer Swapping (`[REF: MAP-02]`):** Active non-VIP markers dynamically promote out of `MarkerClusterGroup` into `markerLayer` with DOM style sanitization (`display: 'block'`, `zIndex = '10000'`), preventing multi-point nodes (`Patra`, `Megara Airfield`, `Piraeus Port`) from being swallowed by cluster bubbles regardless of zoom level.
+*   **Context-Aware Sub-Label Delimiter Engine (`[REF: MAP-GEOM-04b]`):** Smart regex `/(?:\s+-\s+|[\r\n]+\s*-?\s*|\||·|;|·)/` splits list dashes and bullet breaks while preserving compound proper nouns (`Nea-Smyrni`, `Port-au-Prince`).
+*   **Dynamic Radar Minimap:** Secondary Leaflet projection matrix tracking main map focal depth with user-adjustable zoom offsets (`-2` to `-8`).
 
-### 1. Deployment & Hosting
-Since CarTiMap is a monolithic, single-file browser application, you do not need to configure an application server:
-* Simply clone the repository and open `index.html` locally in any modern browser, or host it on a static server (e.g., GitHub Pages, Netlify, Vercel).
-* The engine loads Preact and Leaflet asynchronously from optimized edge CDNs (`esm.sh` and `unpkg.com`), bypassing CORS constraints and securing rapid Time-to-Interactive (TTI).
+#### ⏱ Multi-Lane Swimlane Scrubber (`TimelineScrubber v26.12.44-b260`)
+*   **Duration Lane Isolation (`[REF: TL-05b]`):** Swimlane grid lines and sticky labels elevate to `bottom: 38px`, cleanly separating them from the 10px Duration Lane band (`28px` to `38px` from bottom).
+*   **Tag Gravity Matrix:** Weighted combinatorial sorting algorithm grouping co-occurring topic swimlanes on the Y-axis.
+*   **ISO 8601-2 / EDTF Precision:** Hatched pattern fills for approximate durations, sub-dot indicators for Set/List dates, and drop lines for pinpoint timestamps.
 
-### 2. Analytical URL Parameters
-You can programmatically control the boot-state and active dataset of the application directly through URL query strings:
+#### 📽 Synchronized Media Carousel & Content Slider (`ContentSlider v5.8.36-b253`, `MediaViewer v2.13.7-b228`)
+*   **Omni-Splitter Matrix Ingestion:** Synchronizes parallel media arrays (`Media`, `Media Caption`, `Media Credit`) split by newlines (`CHAR(10)` / `\n`) or pipes (`|`).
+*   **Multi-Format Carousel:** Supports high-res photos, YouTube videos with start timestamps (`t=...`), PDF archival documents, and interactive map iframes.
+*   **Sticky Header & Master Typographic Envelope:** 85ch Master Envelope flushing Date strings, Tags, and Places cleanly to the margins.
 
-| Parameter | Accepted Input | Action |
+#### 🎛 System Identity & Telemetry (`AppOrchestrator v3.7.154-b261`, `VibeMonitor v2.2.16-b228`)
+*   **Vibe-Monitor Developer HUD:** Draggable, resizable diagnostic console tracking real-time data ingestion, row validation, coordinate success rates, and module manifests.
+*   **Active-Slide Preserving Filter Intercept:** Master category deselect retains active slide items, displaying toast notifications.
+
+---
+
+### 📦 Conformed Production Module Matrix (`v8.13.69-b261`)
+
+| Module | Version | Core Function & Responsibility |
 | :--- | :--- | :--- |
-| `?source=` | `String` (e.g., `1K9kZynV...`) | The unique ID of the target Google Sheet containing the dataset. |
-| `&gid=` | `Integer` (e.g., `1652171772`) | The specific tab GID of your compiled event ledger (`ExtractsGroupedV`). |
-| `&bgid=` | `Integer` | The tab GID of the `LayersT` sheet containing basemaps and overlays. |
-| `&slide=` | `Integer` | Bypasses chronological sorting to force-mount a specific slide index. |
-| `&mapzoom=` | `Integer` (1 - 22) | Overrides Leaflet auto-zoom calculations to lock a fixed camera depth. |
-| `&date=` | `ISO-8601 String` | Conducts a binary search to anchor the map/timeline to the nearest chronological node. |
-| `&theme=` | `String` (e.g., `dark`, `classic`)| Dynamically overwrites root CSS custom properties prior to DOM render. |
-
-*Example URL:*
-`https://ageor7.github.io/CarTiMap/index.html?source=1K9kZynV-IGUd-yT6GiGsIabfjF-k-sn5qAeEONzNIE&bgid=1652171772&slide=1&mapzoom=11`
+| **AppOrchestrator** | `v3.7.154-b261` | Global state orchestration, URL hash/query routing, filter intercepts, status bar, and viewport layout physics. |
+| **MapViewer** | `v6.4.122-b261` | Leaflet GIS stage, WKT parsing, Option A pin heads, vector z-stacking, state-based layer swapping. |
+| **ContentSlider** | `v5.8.36-b253` | Hero narrative carousel, HTML/JSX execution, media gallery sync, multi-author bibliography parsing. |
+| **MediaViewer** | `v2.13.7-b228` | Modal media stage for high-res maps, YouTube videos, audio tracks, and PDF archival documents. |
+| **TimelineScrubber** | `v26.12.44-b260` | Multi-lane swimlane scrubber, EDTF date rendering, duration bands, zoom locking engine. |
+| **ASTCompiler** | `v1.2.74-b228` | Native ECMAScript AST decorator (`compileCartiMapAST`) for ISO 8601-2 Level 3 EDTF date parsing. |
+| **VibeMonitor** | `v2.2.16-b228` | Real-time telemetry dashboard monitoring DOM health, memory bounds, and spatial-temporal errors. |
 
 ---
 
-## 📊 Database Schema (The Google Sheet Structure) <a name="schema"></a>
+### 🚀 Usage & Deployment
 
-CarTiMap expects a flat CSV input exported from your Google Sheet. The spreadsheet headers are case-insensitive and map directly to the presentation layers:
+Because CarTiMap utilizes a **Zero-Build Architecture**, there is nothing to install, compile, or bundle.
 
-| Column Header | Data Type | Structural Behavior |
+#### 1. Deployment Steps
+1. Format a Google Sheet with the standard schema (`HGBB Extracts DB`).
+2. Publish the sheet to the web as a CSV.
+3. Open `cartimap.v8.13.69-b261.html.js` in any browser or deploy to a static host (GitHub Pages, Vercel, Netlify, or local file system).
+4. Append your Google Sheet ID to the URL syntax:
+   ```text
+   https://ageor7.github.io/CarTiMap/?source=YOUR_GOOGLE_SHEET_ID
+   ```
+
+#### 2. 📊 Spreadsheet Schema
+The engine parses the first row of your CSV as headers (case-insensitive):
+
+| Column Header | Type | Description |
 | :--- | :--- | :--- |
-| **Title** | `HTML / String` | The main header of the narrative slide. Supports inline HTML formatting (e.g., `<b>`, `<i>`). |
-| **Start** | `Date / Time` | Format: `DD/MM/YYYY HH:MM:SS.sss` or standard ISO 8601-2 EDTF. Required. |
-| **End** | `Date / Time` | Format: `DD/MM/YYYY HH:MM:SS.sss` or EDTF. Optional. Marks duration spans. |
-| **Description** | `HTML / String` | The primary narrative payload. Supports links, text blocks, and embedded markup. |
-| **Place** | `String` | Semantic locations. Multi-places separated by pipe (`\|`) will compile. Truncates at first comma on HUD. |
-| **Location** | `Geo-Data` | Accepts standard `Lat, Lon` pairs, valid GeoJSON syntax, or Well-Known Text (`WKT`). |
-| **Priority** | `String` | Setting to `VIP` forces markers to break out of clusters and render as distinct pins on the map. |
-| **Tags** | `String` | Comma or newline-delimited categorizations. Routes events into vertical swimlanes on the timeline. |
-| **Media** | `URI` | Media URLs (images, YouTube links, PDFs, iframes). Multiple assets can be split via `\n` or `\|`. |
-| **Media Caption**| `String` | Captions mapped 1:1 to your Media URLs (concatenated and aligned). |
-| **Media Credit** | `String` | Attributions and copyrights mapped 1:1 to Media URLs. |
-| **SubLabels** | `String` | Custom hover tooltip overrides for multi-point or polyline geometries. |
+| **Title** | String | Main event header rendered on timeline and content slider. |
+| **Start** | Date/Time | ISO 8601-2 / EDTF string or `DD/MM/YYYY HH:MM:SS`. Required. |
+| **End** | Date/Time | ISO 8601-2 / EDTF string or `DD/MM/YYYY HH:MM:SS`. Optional duration boundary. |
+| **Description** | HTML/String | Narrative body text. Supports standard HTML formatting (`<b>`, `<i>`, `<a>`, `<p>`). |
+| **Place** | String | Human-readable location names (`Patra; Megara Airfield; Piraeus Port`). |
+| **Location** | Geo-Data | Accepts `Lat, Lon`, WKT strings (`POINT`, `LINESTRING`, `POLYGON`, `GEOMETRYCOLLECTION`), or GeoJSON. |
+| **Priority** | String | Set to `VIP` to force markers to break out of clusters and render as gold pins. |
+| **Tags** | String | Comma or line-break separated tags for categorization and swimlane routing. |
+| **Media** | URL | Links to images, YouTube videos, or PDFs. Multiple links split by `CHAR(10)` or `\|`. |
+| **Media Caption** | String | Captions corresponding to the media URLs (1:1 index mapped). |
+| **Media Credit** | String | Attributions corresponding to the media URLs (1:1 index mapped). |
+| **SubLabels** | String | Custom map tooltip overrides for specific multi-geometry layers. |
+
+#### 3. 📈 Multi-Media & Single-Line WKT Conventions
+* **CHAR(10) Array Synchronization:** To attach multiple media items to a slide, separate entries in Google Sheets using newlines (`Alt+Enter`). The engine synchronizes `Media`, `Caption`, and `Credit` arrays by their relative index.
+* **Single-Line WKT Geometries:** All WKT strings (`LINESTRING`, `POLYGON`, `GEOMETRYCOLLECTION`) must be stored as **single, contiguous lines without internal newlines (`CHAR(10)`)** to prevent fracture during upstream ETL `SPLIT` operations.
 
 ---
 
-## 🔗 Bidirectional Academic Traceability Map <a name="traceability"></a>
+### 🎛 URL Query & Parameter API
 
-For researchers and thesis evaluators, this matrix maps the theoretical, methodological, and historical arguments presented in the Master's Thesis (*Subterranean Stratigraphy and the Fog of War: Reconstructing the December 1944 Sabotage of the Hotel Grande Bretagne*, Georgiadis 2026) directly to the engineering specs and live code blocks within this repository:
+Control the application initialization state by appending query parameters (`?param1=val1&param2=val2`):
 
-| Academic Thesis Target | Methodological Concept | System Architecture Anchor | Code / DB Reference Identifier |
+| Parameter | Type | Example | Description |
 | :--- | :--- | :--- | :--- |
-| **Chapter 4.3, Page 35** | Action Snippet Decomposition (QCA) | [BLUEPRINT.md#meth-01](BLUEPRINT.md#meth-01) | `[REF: METH-01]` Triangulation & Reliability |
-| **Chapter 4.4, Page 37** | Relational Ingestion & Flattening | [BLUEPRINT.md#etl-01](BLUEPRINT.md#etl-01) | `[REF: ETL-01]` Google Sheets Consolidation |
-| **Chapter 4.6, Page 41** | Source Reliability scoring | [BLUEPRINT.md#etl-10](BLUEPRINT.md#etl-10) | `[REF: METH-01]` 12-Tier Reliability Matrix |
-| **Chapter 5.1, Page 45** | Zero-Frontend-Cleaning Mandate | [BLUEPRINT.md#etl-04](BLUEPRINT.md#etl-04) | `[REF: ETL-04]` Hard Presentation Boundaries |
-| **Chapter 5.3, Page 51** | Kinematic GPU Hardware Offloading | [BLUEPRINT.md#ui-197](BLUEPRINT.md#ui-197) | `[REF: UI-197]` Morphological Header Scaling |
-| **Chapter 5.4, Page 51** | Well-Known Text Axis Inversion | [BLUEPRINT.md#map-01b](BLUEPRINT.md#map-01b) | `[REF: MAP-01b]` WKT Coordinate Translation |
-| **Chapter 5.4, Page 51** | Visual Geometry Eclipsing | [BLUEPRINT.md#tl-18](BLUEPRINT.md#tl-18) | `[REF: TL-18]` Z-Stacking Density Engine |
-| **Chapter 5.5, Page 52** | ISO 8601-2 Temporal Uncertainty | [BLUEPRINT.md#etl-08](BLUEPRINT.md#etl-08) | `[REF: ETL-08]` Native AST Compiler |
-| **Chapter 5.5, Page 52** | Opacity Attenuation (Aura Filter) | [BLUEPRINT.md#map-06](BLUEPRINT.md#map-06) | `[REF: MAP-06]` Temporal Ghosting |
-| **Chapter 5.6, Page 53** | Constant Time DOM Reconciliation | [BLUEPRINT.md#perf-02](BLUEPRINT.md#perf-02) | `[REF: PERF-02]` O(1) Pointer-Based Delta Tracker |
-| **Chapter 6.5, Page 61** | Plausibility Triangulation | [BLUEPRINT.md#map-02b](BLUEPRINT.md#map-02b) | `[REF: MAP-02b]` Identical Coordinate Stacking |
+| `source` | String | `?source=1K9kZynV...` | Targets a specific Google Sheet ID. |
+| `gid` | Integer | `&gid=0` | Targets a specific tab within the Google Sheet. |
+| `bgid` | Integer | `&bgid=1652171772` | Targets a specific `LayersT` tab for basemaps and overlays. |
+| `slide` | Integer/String | `&slide=14` | Forces the engine to initialize on a specific slide index or item ID. |
+| `date` | Date String | `&date=1944-12-25` | Anchors the camera to the event closest to the requested date. |
+| `mapzoom` | Integer | `&mapzoom=12` | Overrides initial Leaflet map zoom level. |
+| `categories` | CSV String | `&categories=Storyline` | Active category filters on load. |
+| `zoomlock` | Enum | `&zoomlock=auto` | Timeline scrubber zoom lock mode (`off`, `soft`, `auto`, `hard`). |
 
 ---
 
-## 📐 Core Engineering Highlights & Algorithms <a name="algorithms"></a>
+### 📚 Two-Tier Documentation Architecture (`[REF: DOC-01]`)
 
-CarTiMap's reputation as a top-tier digital humanities platform rests on its computational solutions to the visual and relational bottlenecks of historical GIS:
+To eliminate technical debt and prevent architectural drift, the documentation is strictly bifurcated:
 
-### 1. Constant-Time Transition Optimization (The Delta Tracker) `[REF: PERF-02]`
-Standard visualization tools redraw the entire canvas upon slide changes, operating in $O(N)$ linear complexity. To secure smooth, high-velocity scrubbing, the CarTiMap state-machine utilizes a persistent memory pointer (`prevActiveIndexRef`). During transitions, the engine calculates the delta and updates exactly two DOM elements: it demotes the previously active pin and promotes the new target. The remaining map layers are untouched, keeping performance stable even on lower-end tablets.
-
-### 2. Z-Stacking Density Engine & "Stacked Pin" `[REF: TL-18 / MAP-02b]`
-When multiple historical actions share mathematically identical coordinates (e.g., multiple diplomatic, political, and subterranean events occurring inside the Hotel Grande Bretagne), standard mapping libraries overlap and eclipse markers.
-* **On the Map:** CarTiMap intercepts overlapping points and groups them into a custom "Stacked Pin" featuring a numeric depth badge. Clicking this pin triggers a native `spiderfy` animation, fanning the markers out on the map.
-* **On the Timeline:** Concurrent timeline events are automatically detected via an $O(1)$ stack registry (`stackRegistry`). They are fanned out along the Z-axis utilizing precise, incremental CSS `calc()` offsets (+6px X, +4px Y) combined with high-contrast depth badges, communicating chronological volume without vertical swimlane bloat.
-
-### 3. 4D Telemetry Hoisting & Temporal Ghosting `[REF: TL-19 / MAP-06]`
-The `TimelineScrubber` passively calculates and broadcasts its active horizontal viewport boundaries (`[visibleLeftMs, visibleRightMs]`) back to the global orchestrator. The map layer actively monitors this broadcast; any georeferenced marker that falls outside the active epoch is degraded to 20% opacity. This "Temporal Ghosting" visually isolates the active chronological chapter while preserving historical context at the margins.
-
-### 4. Zero-Build Native AST Compiler `[REF: ETL-08]`
-Standard browser engines cannot parse extended historical date-time intervals (such as ISO 8601-2 Level 2 Choice Sets `[1944-12-25, 1944-12-26]` or approximate years `194X`). To resolve this without introducing massive, 1MB Nearley.js parser binaries, CarTiMap incorporates a lightweight, recursive-descent **Native AST Compiler** (`compileCartiMapAST`). This compiler deconstructs extended strings into primitive, integer-compliant nodes, allowing the lightweight parser to evaluate timeline coordinates safely without runtime string-coercion.
-
----
-
-## 🛠️ Technology Stack & Library Integrations <a name="techstack"></a>
-
-To maintain its strict "Anti-Bloat CDN Mandate" `[REF: PROT-13]`, the engine operates strictly under a **<500KB footprint** using modern, un-transpiled web standards:
-
-*   **Preact & HTM (via esm.sh):** Serves as the reactive UI layer. HTM enables JSX-like syntax natively in the browser without requiring a Babel compilation step.
-*   **Leaflet (v1.9.4):** Orchestrates georeferenced spatial coordinates.
-*   **Wicket (v1.3.8):** Natively parses OGC Well-Known Text (WKT) geometries (Point, MultiPoint, LineString, Polygon) into Leaflet vector paths.
-*   **PapaParse (v5.4.1):** Drives the high-speed local CSV parsing pipeline.
-*   **MarkerCluster:** Manages R-Tree spatial indexing and coordinate decluttering.
-*   **MapLibre GL JS & Leaflet Integration:** Dynamically initialized *only* when a Vector Tile basemap (`.mvt` / `.pbf`) is requested, preserving resources on standard raster platforms.
-
----
-
-## 📝 License & Attribution <a name="license"></a>
-
-This software is released under the **MIT License**.
-Designed and developed by **Alexandros Georgiadis** (2026) as part of the Master's of Arts Dissertation in Digital Humanities.
-
-*For detailed architectural specifications, please refer directly to the companion file:* `BLUEPRINT.md`.
+*   **`README.md` (This File):** Epistemic portal, project overview, visual features, spreadsheet schemas, URL API, and developer onboarding.
+*   **`Blueprint.md` (formerly `BLUEPRINT.md`):** Rigid architectural, physical, mathematical, and spatial specifications indexed via the `[REF: TAG-NAME]` semantic anchor taxonomy interlinked with thesis chapter/section coordinates (*Forensic Visualisation and Triangulation of Historical Narratives*, Georgiadis 2026).
