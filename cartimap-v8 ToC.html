@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b273';
+const APP_VERSION = 'v8.14.1-b274';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2311,10 +2311,6 @@ const App = () => {
           const [polygonOpacity, setPolygonOpacity] = useState(() => {
             try { return parseFloat(localStorage.getItem('tm_polygon_opacity')) || 0.4; }
             catch (e) { return 0.4; }
-          });
-          const [showButtonText, setShowButtonText] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_show_button_text')) ?? false; }
-            catch (e) { return false; }
           });
           const [dateLocale, setDateLocale] = useState(() => {
             try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
