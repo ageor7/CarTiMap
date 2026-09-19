@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b274';
+const APP_VERSION = 'v8.14.1-b275';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2929,6 +2929,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // =========================================================================
           // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
           // =========================================================================
+          const showButtonText = statusWidth >= 520;
+          const isSpaceConstrained = statusWidth < 380;
+
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
             : '';
@@ -2936,12 +2939,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           const backBtnText = showButtonText ? html`<span>Back</span>` : '';
           const resetLayoutBtnText = showButtonText ? html`<span>Reset Layout</span>` : '';
           const tocBtnText = showButtonText ? html`<span>ToC</span>` : '';
-          const tocBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsTocOpen(!isTocOpen)} title="Table of Contents (📖)" style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 0.85rem; line-height: 1;">📖</span>
-              ${tocBtnText}
-            </button>
-          `;
           const settingsBtnText = showButtonText ? html`<span>Settings</span>` : '';
           const telemetryBtnText = showButtonText ? html`<span>Telemetry</span>` : '';
           const prevBtnText = showButtonText ? html`<span>Prev</span>` : '';
@@ -2953,40 +2950,42 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           const backBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} disabled=${!canGoBack} style="opacity: ${canGoBack ? '1' : '0.38'}; cursor: ${canGoBack ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoBack ? 'auto' : 'none'};" title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`;
 
           const canGoForward = forwardHistory && forwardHistory.length > 0;
-          const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward to Next Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg></button>`;
+          const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward to Next Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg>${nextBtnText}</button>`;
 
           const resetLayoutBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => {
-              const appNode = document.getElementById('app-layout') || document.documentElement;
-              appNode.style.setProperty('--primary-split', '50%');
-              appNode.style.setProperty('--secondary-split', '50%');
-              document.documentElement.style.setProperty('--primary-split', '50%');
-              document.documentElement.style.setProperty('--secondary-split', '50%');
-              setMinimapOffset(-4);
-              setTimelineRequiredHeight(185);
-              setIsTimelineExpanded(false);
-              setIsTimelineMinimized(false);
-              setMaxPane(null);
-              window.dispatchEvent(new Event('resize'));
-            }} title="Reset Layout Viewport">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${resetLayout} title="Reset Layout Viewport (55/50/10)" style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-              ${resetLayoutBtnText}
+              ${showButtonText ? html`<span>Reset Layout</span>` : ''}
+            </button>
+          `;
+
+          const tocBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsTocOpen(!isTocOpen)} title="Table of Contents (📖)" style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 0.85rem; line-height: 1;">📖</span>
+              ${showButtonText ? html`<span>ToC</span>` : ''}
             </button>
           `;
 
           const settingsBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(true)} title="Engine Configurations">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              ${settingsBtnText}
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(!isSettingsOpen)} title="Engine Configurations (⚙️)" style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 0.85rem; line-height: 1;">⚙️</span>
+              ${showButtonText ? html`<span>Settings</span>` : ''}
             </button>
           `;
 
           const telemetryBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Logs">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              ${telemetryBtnText}
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Monitor (📊)" style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 0.85rem; line-height: 1;">📊</span>
+              ${showButtonText ? html`<span>Telemetry</span>` : ''}
             </button>
           `;
+
+          const aboutBtn = aboutData ? html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs & About (ℹ️)" style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 0.85rem; line-height: 1;">ℹ️</span>
+              ${showButtonText ? html`<span>Specs</span>` : ''}
+            </button>
+          ` : '';
 
           const prevBtn = html`
             <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node">
@@ -3008,47 +3007,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               ${searchBtnText}
             </button>
           `;
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
-          // =========================================================================
-          const showButtonText = statusWidth >= 520;
-          const isSpaceConstrained = statusWidth < 380;
-
-          const tocBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsTocOpen(!isTocOpen)} title="Table of Contents (📖)" style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 0.85rem; line-height: 1;">📖</span>
-              ${showButtonText ? html`<span>ToC</span>` : ''}
-            </button>
-          `;
-
-          const settingsBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(!isSettingsOpen)} title="Engine Configurations (⚙️)" style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 0.85rem; line-height: 1;">⚙️</span>
-              ${showButtonText ? html`<span>Settings</span>` : ''}
-            </button>
-          `;
-
-          const resetLayoutBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${resetLayout} title="Reset Layout Viewport (55/50/10)" style="display: flex; align-items: center; gap: 4px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-              ${showButtonText ? html`<span>Reset Layout</span>` : ''}
-            </button>
-          `;
-
-          const telemetryBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Monitor (📊)" style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 0.85rem; line-height: 1;">📊</span>
-              ${showButtonText ? html`<span>Telemetry</span>` : ''}
-            </button>
-          `;
-
-          const aboutBtn = aboutData ? html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs & About (ℹ️)" style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 0.85rem; line-height: 1;">ℹ️</span>
-              ${showButtonText ? html`<span>Specs</span>` : ''}
-            </button>
-          ` : '';
 
           const logoCommandHub = html`
             <div style="position: relative; display: inline-flex; align-items: center;">
