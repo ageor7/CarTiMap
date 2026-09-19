@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b277';
+const APP_VERSION = 'v8.14.1-b279';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.16-b265';
+MODULE_VERSIONS["VibeMonitor"] = 'v2.2.17-b279';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.7-b271';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.8-b279';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.36-b271';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.37-b279';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -909,7 +909,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   };
 
   useEffect(() => {
-    const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+    const activeSlide = data[activeIndex]; const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
     if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
       const containerW = wrapperRef.current.clientWidth || 1000;
       const targetTrackW = Math.max(containerW, containerW * zoomLevel);
@@ -923,7 +923,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       prevActiveIndexRef.current = activeIndex;
       if (zoomLock === 'hard') return;
       const timeoutId = setTimeout(() => {
-        const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+        const activeSlide = data[activeIndex]; const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
         if (activeDataIndex >= 0) {
           if (zoomLock === 'auto') {
             let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
@@ -1253,7 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b271';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.1-b279';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2228,7 +2228,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.6-b271';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.9-b279';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2946,7 +2946,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
           // =========================================================================
           const showButtonText = statusWidth >= 520;
-          const isSpaceConstrained = statusWidth < 600;
+          const hideTelemetry = statusWidth < 680;
+          const hideSettings  = statusWidth < 580;
+          const hideReset     = statusWidth < 480;
+          const hideToc       = statusWidth < 380;
+          const hideSpecs     = statusWidth < 280;
+          const isSpaceConstrained = statusWidth < 680;
 
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
@@ -3244,13 +3249,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
     </style>
                   <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative;">
                     ${logoCommandHub}
-                    ${isSpaceConstrained ? html`${resetLayoutBtn}` : html`
-                      ${tocBtn}
-                      ${settingsBtn}
-                      ${resetLayoutBtn}
-                      ${telemetryBtn}
-                      ${aboutBtn}
-                    `}
+                    ${!hideToc ? tocBtn : ''}
+                    ${!hideSettings ? settingsBtn : ''}
+                    ${!hideReset ? resetLayoutBtn : ''}
+                    ${!hideTelemetry ? telemetryBtn : ''}
+                    ${!hideSpecs ? aboutBtn : ''}
                   </div>
 
                   <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
@@ -3593,7 +3596,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.7-b271';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.15-b279';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3717,7 +3720,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.7-b271';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.74-b271';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.75-b279';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
