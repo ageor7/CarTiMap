@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b275';
+const APP_VERSION = 'v8.14.1-b276';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2262,7 +2262,23 @@ const App = () => {
             addLog(msg, 'warning');
           };
           const [isSearchOpen, setIsSearchOpen] = useState(false);
-          const [isTocOpen, setIsTocOpen] = useState(false);
+                    const [isTocOpen, setIsTocOpen] = useState(false);
+
+          const resetLayout = () => {
+            const appNode = document.getElementById('app-layout') || document.documentElement;
+            if (appNode) {
+              appNode.style.setProperty('--primary-split', '50%');
+              appNode.style.setProperty('--secondary-split', '50%');
+            }
+            document.documentElement.style.setProperty('--primary-split', '50%');
+            document.documentElement.style.setProperty('--secondary-split', '50%');
+            if (typeof setMinimapOffset === 'function') setMinimapOffset(-4);
+            if (typeof setTimelineRequiredHeight === 'function') setTimelineRequiredHeight(185);
+            if (typeof setIsTimelineExpanded === 'function') setIsTimelineExpanded(false);
+            if (typeof setIsTimelineMinimized === 'function') setIsTimelineMinimized(false);
+            if (typeof setMaxPane === 'function') setMaxPane(null);
+            window.dispatchEvent(new Event('resize'));
+          };
           const [maxAutoZoom, setMaxAutoZoom] = useState(() => parseInt(localStorage.getItem('tm_max_auto_zoom'), 10) || 18);
           const [statusWidth, setStatusWidth] = useState(300);
           const statusBrandRef = useRef(null);
