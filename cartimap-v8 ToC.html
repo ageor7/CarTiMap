@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b276';
+const APP_VERSION = 'v8.14.1-b277';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2946,7 +2946,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
           // =========================================================================
           const showButtonText = statusWidth >= 520;
-          const isSpaceConstrained = statusWidth < 380;
+          const isSpaceConstrained = statusWidth < 600;
 
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
@@ -3026,10 +3026,31 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           const logoCommandHub = html`
             <div style="position: relative; display: inline-flex; align-items: center;">
-              <button class="status-btn-text" onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="CarTiMap Command Hub & Tools" style="height: 32px; padding: 0 4px; border: 1px solid ${isMenuOpen ? '#007acc' : (isSpaceConstrained ? '#ccc' : 'transparent')}; background: ${isMenuOpen ? '#e6f4ff' : (isSpaceConstrained ? '#f8f9fa' : 'transparent')}; border-radius: 4px; display: flex; align-items: center; gap: 4px; cursor: pointer; flex-shrink: 0; transition: all 0.15s;">
+              <button class="status-btn-text" onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="CarTiMap Command Hub & Tools" style="height: 32px; padding: 0 6px; border: 1px solid ${isMenuOpen ? '#007acc' : '#ccc'}; background: ${isMenuOpen ? '#e6f4ff' : '#f8f9fa'}; border-radius: 4px; display: flex; align-items: center; gap: 4px; cursor: pointer; flex-shrink: 0; transition: all 0.15s;">
                 <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
-                ${isSpaceConstrained ? html`<span style="font-size: 0.75rem; color: #007acc; font-weight: bold; margin-left: 2px;">▼</span>` : ''}
+                <span style="font-size: 0.75rem; color: #007acc; font-weight: bold; margin-left: 2px;">▼</span>
               </button>
+
+              ${isMenuOpen && html`
+                <div class="tm-dropdown-menu" style="position: fixed; top: 42px; left: 10px; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 8px; display: flex; flex-direction: column; gap: 4px; z-index: 99999 !important; min-width: 220px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                  <div style="font-size: 0.72rem; color: #007acc; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚡ CarTiMap Command Hub</div>
+                  <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>📖</span> Table of Contents
+                  </button>
+                  <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>⚙️</span> Engine Settings
+                  </button>
+                  <button onClick=${() => { setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>📊</span> Telemetry Monitor
+                  </button>
+                  <button onClick=${() => { resetLayout(); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>↺</span> Reset Viewport Layout
+                  </button>
+                  <button onClick=${() => { setIsAboutOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>ℹ️</span> Dataset Specs & About
+                  </button>
+                </div>
+              `}
             </div>
           `;
           const handleSelectAllFilters = () => {
@@ -3204,7 +3225,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
 
                 <!-- Conformed 38px Status Cockpit sitting clean in the vertical column flow -->
-                <div class="global-status-bar status-bar" style="height: 38px; flex-shrink: 0; display: flex; align-items: center; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative;">
+                <div class="global-status-bar status-bar" ref=${statusBrandRef} style="height: 38px; flex-shrink: 0; display: flex; align-items: center; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative;">
                   <style>
                     .record-select-input::-webkit-outer-spin-button,
                     .record-select-input::-webkit-inner-spin-button {
@@ -3221,7 +3242,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
       }
 
     </style>
-                  <div class="status-left" ref=${statusBrandRef} style="display: flex; align-items: center; gap: 6px; position: relative;">
+                  <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative;">
                     ${logoCommandHub}
                     ${isSpaceConstrained ? html`${resetLayoutBtn}` : html`
                       ${tocBtn}
