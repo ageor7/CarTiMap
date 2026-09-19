@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b279';
+const APP_VERSION = 'v8.14.1-b280';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.17-b279';
+MODULE_VERSIONS["VibeMonitor"] = 'v2.2.18-b280';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.8-b279';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.9-b280';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.37-b279';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.38-b280';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1253,7 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.1-b279';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.2-b280';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1867,7 +1867,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 } else {
                   rawLabel = item.place ? formatPlaces(item.place) : (item.title || 'Untitled');
                 }
-                layer.bindTooltip(safeStripHTML(rawLabel), { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
+                const shortLabel = safeStripHTML(rawLabel).split(',')[0].trim(); layer.bindTooltip(shortLabel, { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
                 if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer);
                 else markerLayer.current.addLayer(layer);
                 validMarkers++;
@@ -2228,7 +2228,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.9-b279';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.10-b280';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2945,13 +2945,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // =========================================================================
           // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
           // =========================================================================
-          const showButtonText = statusWidth >= 520;
-          const hideTelemetry = statusWidth < 680;
-          const hideSettings  = statusWidth < 580;
-          const hideReset     = statusWidth < 480;
-          const hideToc       = statusWidth < 380;
-          const hideSpecs     = statusWidth < 280;
-          const isSpaceConstrained = statusWidth < 680;
+          const showButtonText = statusWidth >= 620;
+          const hideTelemetry = statusWidth < 520;
+          const hideSettings  = statusWidth < 440;
+          const hideReset     = statusWidth < 360;
+          const hideToc       = statusWidth < 300;
+          const hideSpecs     = false; // Specs/About button is statically anchored in status line
+          const isSpaceConstrained = statusWidth < 520;
 
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
@@ -3037,7 +3037,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               </button>
 
               ${isMenuOpen && html`
-                <div class="tm-dropdown-menu" style="position: fixed; top: 42px; left: 10px; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 8px; display: flex; flex-direction: column; gap: 4px; z-index: 99999 !important; min-width: 220px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                <div class="tm-dropdown-menu" style="position: fixed; bottom: 42px; left: 10px; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 8px; display: flex; flex-direction: column; gap: 4px; z-index: 99999 !important; min-width: 220px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                   <div style="font-size: 0.72rem; color: #007acc; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚡ CarTiMap Command Hub</div>
                   <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
                     <span>📖</span> Table of Contents
@@ -3253,7 +3253,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     ${!hideSettings ? settingsBtn : ''}
                     ${!hideReset ? resetLayoutBtn : ''}
                     ${!hideTelemetry ? telemetryBtn : ''}
-                    ${!hideSpecs ? aboutBtn : ''}
+                    ${aboutBtn}
                   </div>
 
                   <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
@@ -3596,7 +3596,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.15-b279';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.16-b280';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3720,7 +3720,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.15-b279';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.75-b279';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.76-b280';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
