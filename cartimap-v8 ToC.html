@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b270';
+const APP_VERSION = 'v8.14.1-b272';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.7-b265';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.7-b271';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.36-b265';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.36-b271';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1253,7 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b265';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b271';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2036,24 +2036,31 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
           useEffect(() => {
             const map = mapInstance.current;
-            const markers = markersRef.current;
-            if (!map || markers.length === 0) return;
-            const activeLayers = markers.at(activeIndex);
-            if (activeLayers && activeLayers.length > 0) {
-              const activeFeatureGroup = L.featureGroup(activeLayers);
-              setTimeout(() => {
+            if (!map) return;
+            const triggerFly = () => {
+              const markers = markersRef.current;
+              if (!markers || markers.length === 0) return;
+              const activeLayers = markers[activeIndex] || markers.at(activeIndex);
+              if (activeLayers && activeLayers.length > 0) {
+                const activeFeatureGroup = L.featureGroup(activeLayers);
                 try {
                   const bounds = activeFeatureGroup.getBounds();
-                  if (bounds.isValid()) {
+                  if (bounds && bounds.isValid()) {
                     map.stop();
-                    map.flyToBounds(bounds, { animate: true, duration: 2.5, maxZoom: maxAutoZoom });
+                    if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+                      map.flyTo(bounds.getCenter(), maxAutoZoom, { animate: true, duration: 2.0 });
+                    } else {
+                      map.flyToBounds(bounds, { animate: true, duration: 2.0, maxZoom: maxAutoZoom, padding: [30, 30] });
+                    }
                     hasFitBounds.current = true;
                   }
-                  activeLayers.forEach(l => { if (l.openTooltip) l.openTooltip(); });
+                  activeLayers.forEach(l => { if (l && l.openTooltip) l.openTooltip(); });
                 } catch(err) {}
-              }, 250);
-            }
-          }, [activeIndex, maxAutoZoom]);
+              }
+            };
+            const timer = setTimeout(triggerFly, 200);
+            return () => clearTimeout(timer);
+          }, [activeIndex, maxAutoZoom, data]);
 
           const sortAlpha = (arr) => [...arr].sort((a, b) => {
             const nameA = String(a.label || a.title || a.name || a.id || '').toLowerCase();
@@ -2221,7 +2228,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.2-b265';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.6-b271';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2331,8 +2338,12 @@ const App = () => {
             { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '' }
           ]);
           const [zoomLock, setZoomLock] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_zoom_lock')) ?? false; }
-            catch (e) { return false; }
+            try {
+              const stored = localStorage.getItem('tm_zoom_lock');
+              if (stored === 'hard') return 'hard';
+              if (stored === 'soft') return 'soft';
+              return 'auto';
+            } catch(e) { return 'auto'; }
           });
           const appRef = useRef(null);
           const hasInitializedRef = useRef(false);
@@ -3005,11 +3016,35 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
           // =========================================================================
-          const aboutBtn = aboutData 
-            ? html`<button class="status-btn-text" style="height: 28px; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; gap: 6px; cursor: pointer; flex-shrink: 0;" onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs & About">
-                <${CarTiMapperLogo} context="status" appVersion=${getFluidVersionString(statusWidth)} />
-              </button>`
-            : '';
+          const logoCommandHub = html`
+            <div style="position: relative; display: inline-flex; align-items: center;">
+              <button class="status-btn-text" onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="CarTiMap Command Hub & Tools" style="height: 32px; padding: 0 6px; border: 1px solid ${isMenuOpen ? '#007acc' : 'transparent'}; background: ${isMenuOpen ? '#e6f4ff' : 'transparent'}; border-radius: 4px; display: flex; align-items: center; gap: 4px; cursor: pointer; flex-shrink: 0; transition: all 0.15s;">
+                <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
+                <span style="font-size: 0.7rem; color: #007acc; font-weight: bold; margin-left: 2px;">▼</span>
+              </button>
+
+              ${isMenuOpen && html`
+                <div class="tm-dropdown-menu" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 8px; display: flex; flex-direction: column; gap: 3px; z-index: 10005; min-width: 220px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                  <div style="font-size: 0.72rem; color: #007acc; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚡ CarTiMap Command Hub</div>
+                  <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>📖</span> Table of Contents
+                  </button>
+                  <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>⚙️</span> Engine Settings
+                  </button>
+                  <button onClick=${() => { setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>📊</span> Telemetry Monitor
+                  </button>
+                  <button onClick=${() => { resetLayout(); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>↺</span> Reset Viewport Layout
+                  </button>
+                  <button onClick=${() => { setIsAboutOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>ℹ️</span> Dataset Specs & About
+                  </button>
+                </div>
+              `}
+            </div>
+          `;
 
           const handleSelectAllFilters = () => {
             setActiveTags([...allTags]);
@@ -3200,32 +3235,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
       }
 
     </style>
-                  <div class="status-left" ref=${statusBrandRef} style="display: flex; align-items: center; gap: 6px; position: relative;">
-                    ${aboutBtn}
+                  <div class="status-left" ref=${statusBrandRef} style="display: flex; align-items: center; gap: 8px; position: relative;">
+                    ${logoCommandHub}
                     ${resetLayoutBtn}
-                    ${tocBtn}
-                    ${settingsBtn}
-
-                    ${isMenuOpen && html`
-                      <div class="tm-dropdown-menu" style="position: absolute; top: calc(100% + 4px); left: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 10005; min-width: 200px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
-                        <div style="font-size: 0.72rem; color: #888; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">CarTiMap Command Hub</div>
-                        <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>📖</span> Table of Contents
-                        </button>
-                        <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>⚙️</span> Engine Configurations
-                        </button>
-                        <button onClick=${() => { resetLayout(); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>↺</span> Reset Viewport Layout
-                        </button>
-                        <button onClick=${() => { setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>📊</span> System Telemetry
-                        </button>
-                        <button onClick=${() => { setIsAboutOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>ℹ️</span> Dataset Specs & About
-                        </button>
-                      </div>
-                    `}
                   </div>
 
                   <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
@@ -3519,11 +3531,30 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                   const isActive = child.idx === activeIndex;
                                   return html`
                                     <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
-                                      <!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
+<!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
                                       <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
                                         <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
                                         <span>${child.sub || child.mainTitle || g.title}</span>
                                       </div>
+
+                                      <!-- Line 2: Metadata row displaying Dates, Places, and Tags -->
+                                      ${(() => {
+                                        const itemDateStr = (child.item.startDate || child.item.start) ? formatSmartDate(child.item.startDate, child.item.endDate, dateLocale) : '';
+                                        const itemPlaceStr = (child.item.place || child.item.location) ? safeStripHTML(formatPlaces(child.item.place || child.item.location)) : '';
+                                        if (!itemDateStr && !itemPlaceStr && (!child.tags || child.tags.length === 0)) return '';
+                                        return html`
+                                          <div style="display: flex; align-items: center; gap: 10px; margin-left: 28px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem;">
+                                            ${itemDateStr ? html`<span style="color: #007acc; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e5ff; font-weight: 500;">🕒 ${itemDateStr}</span>` : ''}
+                                            ${itemPlaceStr ? html`<span style="color: #28a745; background: #f2fcf5; padding: 2px 6px; border-radius: 4px; border: 1px solid #c3e6cb; font-weight: 500;">📍 ${itemPlaceStr}</span>` : ''}
+                                            ${child.tags && child.tags.length > 0 ? html`
+                                              <div style="display: flex; align-items: center; gap: 4px;">
+                                                <span style="color: #888;">🏷️</span>
+                                                ${child.tags.map(t => html`<span style="background: #f0f0f0; color: #444; padding: 1px 6px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.75rem;">${t}</span>`)}
+                                              </div>
+                                            ` : ''}
+                                          </div>
+                                        `;
+                                      })()}
                                       <div style="display: flex; align-items: center; gap: 12px; margin-left: 28px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem;">
                                         ${child.item.start ? html`<span style="color: #007acc; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e5ff;">🕒 ${formatSmartDate(child.item.startDate, child.item.endDate, dateLocale)}</span>` : ''}
                                         ${child.tags && child.tags.length > 0 ? html`
@@ -3549,7 +3580,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.2-b265';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.7-b271';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3673,7 +3704,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.2-b265';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.74-b265';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.74-b271';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
