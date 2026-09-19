@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.0-b262';
+const APP_VERSION = 'v8.14.1-b263';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.1-b191';
+MODULE_VERSIONS["VibeMonitor"] = 'v2.2.16-b263';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -668,7 +668,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.6';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.7-b263';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -803,7 +803,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.0-b164';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.36-b263';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1409,7 +1409,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.41-b231';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b263';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2381,7 +2381,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.4.104-b233';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.1-b263';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2415,7 +2415,6 @@ const App = () => {
             addLog(msg, 'warning');
           };
           const [isSearchOpen, setIsSearchOpen] = useState(false);
-          const [isSettingsOpen, setIsSettingsOpen] = useState(false);
           const [isTocOpen, setIsTocOpen] = useState(false);
           const [statusWidth, setStatusWidth] = useState(300);
           const statusBrandRef = useRef(null);
@@ -2433,7 +2432,7 @@ const App = () => {
           }, []);
 
           const getFluidVersionString = (w) => {
-            if (w >= 240) return 'v8.14.0-b262';
+            if (w >= 240) return 'v8.14.1-b263';
             if (w >= 180) return 'v8.14-b262';
             if (w >= 130) return 'v8-b262';
             if (w >= 80) return 'b262';
@@ -2531,9 +2530,9 @@ const App = () => {
           useEffect(() => {
             const urlParams = new URLSearchParams(window.location.search);
             const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
-            let source = urlParams.get('source') || urlParams.get('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+            let source = urlParams.get('source') || urlParams.get('amp;source') || '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE';
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
-            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid');
+            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || (source === '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE' ? '1652171772' : null);
 
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
@@ -3525,7 +3524,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.120-b223';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.1-b263';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3649,7 +3648,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.120-b223';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.27-b155';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.74-b263';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
