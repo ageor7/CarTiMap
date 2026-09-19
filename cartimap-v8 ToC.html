@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b267';
+const APP_VERSION = 'v8.14.1-b269';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -3202,30 +3202,27 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
     </style>
                   <div class="status-left" ref=${statusBrandRef} style="display: flex; align-items: center; gap: 6px; position: relative;">
                     ${aboutBtn}
+                    ${resetLayoutBtn}
                     ${tocBtn}
                     ${settingsBtn}
 
-                    <!-- Aggregated Actions Overflow Menu -->
-                    <button class="status-btn" onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="Engine Actions & Tools" style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; background: ${isMenuOpen ? '#e6f4ff' : 'transparent'}; border: 1px solid ${isMenuOpen ? '#91caff' : 'transparent'}; border-radius: 4px; font-weight: bold;">
-                      <span>⋮</span>
-                    </button>
-
                     ${isMenuOpen && html`
-                      <div class="tm-dropdown-menu" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); padding: 6px; display: flex; flex-direction: column; gap: 4px; z-index: 10005; min-width: 160px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
-                        <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                      <div class="tm-dropdown-menu" style="position: absolute; top: calc(100% + 4px); left: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 10005; min-width: 200px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                        <div style="font-size: 0.72rem; color: #888; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: bold;">CarTiMap Command Hub</div>
+                        <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
                           <span>📖</span> Table of Contents
                         </button>
-                        <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>⚙️</span> Engine Settings
+                        <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>⚙️</span> Engine Configurations
                         </button>
-                        <button onClick=${() => { resetLayout(); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>↺</span> Reset Layout
+                        <button onClick=${() => { resetLayout(); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>↺</span> Reset Viewport Layout
                         </button>
-                        <button onClick=${() => { setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>📊</span> Telemetry Monitor
+                        <button onClick=${() => { setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>📊</span> System Telemetry
                         </button>
-                        <button onClick=${() => { setIsAboutOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                          <span>ℹ️</span> Dataset Specs
+                        <button onClick=${() => { setIsAboutOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 7px 10px; text-align: left; font-size: 0.83rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>ℹ️</span> Dataset Specs & About
                         </button>
                       </div>
                     `}
@@ -3452,7 +3449,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
               ${isTocOpen && html`
                 <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 3500; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
-                  <div style="background: #ffffff; width: 75vw; height: 75vh; max-width: 900px; max-height: 800px; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                  <div style="background: #ffffff; width: 80vw; height: 80vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                     <div style="padding: 16px 20px; border-bottom: 1px solid #e0e0e0; background: #f8f9fa; display: flex; align-items: center; justify-content: space-between;">
                       <h3 style="margin: 0; font-size: 1.2rem; color: #111; display: flex; align-items: center; gap: 8px; font-weight: 700;">📖 Table of Contents</h3>
                       <button onClick=${() => setIsTocOpen(false)} style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #666; font-weight: bold;">✕</button>
@@ -3464,21 +3461,53 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         const groups = [];
                         let currentGroup = null;
 
+                        const groupMap = new Map();
+                        const groupOrder = [];
+
                         data.forEach((item, idx) => {
-                          const rawTitle = (item.title || 'Untitled').replace(/<[^>]*>/g, '').trim();
-                          // Strip leading number, fullstop, space: '01. ', '1. ', '03 - '
-                          const normTitle = rawTitle.replace(/^\d+[\.\)\-]?\s*/, '').trim() || rawTitle;
+                          const rawTitleField = item.title || '';
+                          const rawSubField = item.subtitle || item.place || '';
                           
-                          const rawSub = (item.subtitle || item.place || '').replace(/<[^>]*>/g, '').trim();
-                          const rawTags = Array.isArray(item.tags) ? item.tags : (item.tags ? String(item.tags).split(',').map(s => s.trim()).filter(Boolean) : []);
-                          
-                          if (currentGroup && currentGroup.title === normTitle) {
-                            currentGroup.items.push({ idx, item, sub: rawSub, tags: rawTags });
+                          let mainTitle = '';
+                          let subTitle = '';
+
+                          // Split via <p*> tag inside Title field per Directive 5
+                          const pMatch = rawTitleField.match(/<p[^>]*>/i);
+                          if (pMatch) {
+                            const pIdx = pMatch.index;
+                            const rawHead = rawTitleField.substring(0, pIdx);
+                            const rawTail = rawTitleField.substring(pIdx + pMatch[0].length);
+                            mainTitle = rawHead.replace(/<[^>]*>/g, '').trim();
+                            subTitle = rawTail.replace(/<[^>]*>/g, '').trim();
                           } else {
-                            currentGroup = { title: normTitle, firstIdx: idx, items: [{ idx, item, sub: rawSub, tags: rawTags }] };
-                            groups.push(currentGroup);
+                            mainTitle = rawTitleField.replace(/<[^>]*>/g, '').trim();
+                            subTitle = rawSubField.replace(/<[^>]*>/g, '').trim();
                           }
+
+                          if (!mainTitle) mainTitle = 'Untitled';
+
+                          // Strip leading number, fullstop, space ('<number>. ')
+                          const normGroupTitle = mainTitle.replace(/^\d+[\.\)\-]?\s*/, '').trim();
+                          const rawTags = Array.isArray(item.tags) ? item.tags : (item.tags ? String(item.tags).split(',').map(s => s.trim()).filter(Boolean) : []);
+
+                          if (!groupMap.has(normGroupTitle)) {
+                            groupMap.set(normGroupTitle, {
+                              title: normGroupTitle,
+                              items: []
+                            });
+                            groupOrder.push(normGroupTitle);
+                          }
+
+                          groupMap.get(normGroupTitle).items.push({
+                            idx,
+                            item,
+                            sub: subTitle,
+                            mainTitle,
+                            tags: rawTags
+                          });
                         });
+
+                        const groups = groupOrder.map(key => groupMap.get(key));
 
                         return groups.map(g => {
                           return html`
@@ -3496,7 +3525,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                       <!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
                                       <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
                                         <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
-                                        <span>${child.sub || `Item #${child.idx + 1}`}</span>
+                                        <span>${child.sub || child.mainTitle || g.title}</span>
                                       </div>
                                       <div style="display: flex; align-items: center; gap: 12px; margin-left: 28px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem;">
                                         ${child.item.start ? html`<span style="color: #007acc; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e5ff;">🕒 ${formatSmartDate(child.item.startDate, child.item.endDate, dateLocale)}</span>` : ''}
