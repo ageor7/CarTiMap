@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b264';
+const APP_VERSION = 'v8.14.1-b265';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.16-b264';
+MODULE_VERSIONS["VibeMonitor"] = 'v2.2.16-b265';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.7-b264';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.7-b265';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.36-b264';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.36-b265';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1253,7 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b264';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b265';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2225,7 +2225,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.2-b264';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.2-b265';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2277,9 +2277,9 @@ const App = () => {
 
           const getFluidVersionString = (width) => {
             if (width >= 240) return APP_VERSION;
-            if (width >= 180) return APP_VERSION.replace(/\.\d+-/, '-');
-            if (width >= 130) return APP_VERSION.replace(/v\d+\.\d+\.\d+-/, 'v8-');
-            if (width >= 80) return APP_VERSION.split('-').at(-1) || '';
+            if (width >= 180) return APP_VERSION.replace(/\.\d+(?=-b)/, '');
+            if (width >= 130) return APP_VERSION.replace(/\.\d+\.\d+(?=-b)/, '');
+            if (width >= 80) return APP_VERSION.replace(/^v\d+\.\d+\.\d+-/, '');
             return '';
           };
           const [searchQuery, setSearchQuery] = useState('');
@@ -2931,6 +2931,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           const backBtnText = showButtonText ? html`<span>Back</span>` : '';
           const resetLayoutBtnText = showButtonText ? html`<span>Reset Layout</span>` : '';
+          const tocBtnText = showButtonText ? html`<span>ToC</span>` : '';
+          const tocBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsTocOpen(!isTocOpen)} title="Table of Contents (📖)" style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 0.85rem; line-height: 1;">📖</span>
+              ${tocBtnText}
+            </button>
+          `;
           const settingsBtnText = showButtonText ? html`<span>Settings</span>` : '';
           const telemetryBtnText = showButtonText ? html`<span>Telemetry</span>` : '';
           const prevBtnText = showButtonText ? html`<span>Prev</span>` : '';
@@ -3003,7 +3010,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // =========================================================================
           const aboutBtn = aboutData 
             ? html`<button class="status-btn-text" style="height: 28px; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; gap: 6px; cursor: pointer; flex-shrink: 0;" onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs & About">
-                <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
+                <${CarTiMapperLogo} context="status" appVersion=${getFluidVersionString(statusWidth)} />
               </button>`
             : '';
 
@@ -3196,10 +3203,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
       }
 
     </style>
-                  <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
+                  <div class="status-left" ref=${statusBrandRef} style="display: flex; align-items: center; gap: 8px;">
                     ${aboutBtn}
                     ${resetLayoutBtn}
                     ${settingsBtn}
+                  ${tocBtn}
                     ${telemetryBtn}
                   </div>
 
@@ -3366,28 +3374,61 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               ${appLayout}
 
               ${isSettingsOpen && html`
-                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 3600; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
-                  <div style="background: #fff; width: 380px; max-width: 90vw; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); padding: 20px; font-family: sans-serif;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 16px;">
-                      <h3 style="margin: 0; font-size: 1.1rem; color: #111; display: flex; align-items: center; gap: 6px;">⚙️ CarTiMap Settings</h3>
-                      <button onClick=${() => setIsSettingsOpen(false)} style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #666;">✕</button>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
-                      <div>
-                        <label style="font-size: 0.85rem; font-weight: 600; color: #333; display: block; margin-bottom: 6px;">Polygon Fill Opacity: ${Math.round(polygonOpacity * 100)}%</label>
-                        <input type="range" min="0" max="1" step="0.05" value=${polygonOpacity} onChange=${(e) => setPolygonOpacity(parseFloat(e.target.value))} style="width: 100%; cursor: pointer;" />
-                      </div>
-                      <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-size: 0.85rem; font-weight: 600; color: #333;">Viewport Baseline Reset</span>
-                        <button onClick=${() => { resetLayout(); setIsSettingsOpen(false); }} style="background: #f0f0f0; border: 1px solid #ccc; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">Reset (55/50/10)</button>
-                      </div>
-                    </div>
-                    <div style="margin-top: 20px; text-align: right;">
-                      <button onClick=${() => setIsSettingsOpen(false)} style="background: #007acc; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Close</button>
-                    </div>
+            <div class="tm-backdrop open" onClick=${() => setIsSettingsOpen(false)} style="z-index: 99999 !important;"></div>
+            <div id="settings-modal" class="tm-modal open" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000 !important; width: 85%; max-width: 480px; max-height: 85vh; overflow-y: auto; background: #fff; border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; font-family: monospace; box-sizing: border-box;" onClick=${(e) => e.stopPropagation()}>
+              <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
+              <h3 style="margin-top: 0; font-size: 1.25rem; margin-bottom: 20px; color: #222; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">⚙️ Engine Settings</h3>
+              
+              <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Data Locale Format</label>
+                  <select value=${dateLocale} onChange=${e => { setDateLocale(e.target.value); try { localStorage.setItem('tm_date_locale', e.target.value); } catch(err){} }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.88rem; font-family: monospace; background: #fff;">
+                    <option value="en-GB">European (DD/MM/YYYY)</option>
+                    <option value="en-US">American (MM/DD/YYYY)</option>
+                    <option value="el-GR">Greek (ΗΗ/ΜΜ/ΕΕΕΕ)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Chrono Parse Engine Mode</label>
+                  <select value=${dateEngineMode} onChange=${e => { setDateEngineMode(e.target.value); try { localStorage.setItem('tm_date_engine_mode', e.target.value); } catch(err){} }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.88rem; font-family: monospace; background: #fff;">
+                    <option value="auto">Auto-Detect Chronologies (Default)</option>
+                    <option value="edtf">Strict ISO 8601-2 / EDTF Only</option>
+                    <option value="legacy">Strict Gregorian Serial / DD-MM-YYYY Fallback</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Map Auto-Zoom Depth</label>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="range" min="10" max="18" step="1" value=${maxAutoZoom} onInput=${e => { const val = parseInt(e.target.value); setMaxAutoZoom(val); try { localStorage.setItem('tm_max_auto_zoom', val); } catch(err){} }} style="flex-grow: 1; cursor: pointer;" />
+                    <span style="font-family: monospace; font-size: 0.95rem; color: #007acc; font-weight: 700; width: 30px; text-align: right;">${maxAutoZoom}z</span>
                   </div>
                 </div>
-              `}
+
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Minimap Zoom Offset</label>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="range" min="-8" max="0" step="1" value=${minimapOffset} onInput=${e => { const val = parseInt(e.target.value); setMinimapOffset(val); try { localStorage.setItem('tm_minimap_offset', val); } catch(err){} }} style="flex-grow: 1; cursor: pointer;" />
+                    <span style="font-family: monospace; font-size: 0.95rem; color: #007acc; font-weight: 700; width: 30px; text-align: right;">${minimapOffset}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Global Polygon Opacity</label>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="range" min="0.1" max="1.0" step="0.05" value=${polygonOpacity} onInput=${e => { const val = parseFloat(e.target.value); setPolygonOpacity(val); try { localStorage.setItem('tm_polygon_opacity', val); } catch(err){} }} style="flex-grow: 1; cursor: pointer;" />
+                    <span style="font-family: monospace; font-size: 0.95rem; color: #007acc; font-weight: 700; width: 30px; text-align: right;">${Math.round(polygonOpacity * 100)}%</span>
+                  </div>
+                </div>
+
+                <div style="border-top: 1px solid #eee; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                  <button onClick=${() => { setMinimapOffset(-4); setMaxAutoZoom(15); setPolygonOpacity(0.4); setDateLocale('en-GB'); setDateEngineMode('auto'); resetLayout(); setIsSettingsOpen(false); }} style="background: #f0f0f0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; font-family: monospace; cursor: pointer;">Reset Defaults</button>
+                  <button onClick=${() => setIsSettingsOpen(false)} style="background: #007acc; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; font-family: monospace; cursor: pointer;">Done</button>
+                </div>
+              </div>
+            </div>
+          `}
 
               ${isTocOpen && html`
                 <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 3500; display: flex; justify-content: start;" onClick=${(e) => e.stopPropagation()}>
@@ -3445,7 +3486,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.2-b264';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.2-b265';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3569,7 +3610,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.2-b264';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.74-b264';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.74-b265';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
