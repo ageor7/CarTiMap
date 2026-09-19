@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b263';
+const APP_VERSION = 'v8.14.1-b264';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.16-b263';
+MODULE_VERSIONS["VibeMonitor"] = 'v2.2.16-b264';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -519,86 +519,8 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
       return html`
         <div style="position: relative; width: 100%; height: 100%; background: #222; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;">
           <iframe src=${url} loading="lazy" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
-        
-          ${isSettingsOpen && html`
-            <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 3600; display: flex; align-items: center; justify-content: center;">
-              <div style="background: #fff; width: 380px; max-width: 90vw; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); padding: 20px; font-family: sans-serif;">
-                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 16px;">
-                  <h3 style="margin: 0; font-size: 1.1rem; color: #111; display: flex; align-items: center; gap: 6px;">⚙️ CarTiMap Settings</h3>
-                  <button onClick=${() => setIsSettingsOpen(false)} style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #666;">✕</button>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                  <div>
-                    <label style="font-size: 0.85rem; font-weight: 600; color: #333; display: block; margin-bottom: 6px;">Polygon Fill Opacity: ${Math.round(polygonOpacity * 100)}%</label>
-                    <input type="range" min="0" max="1" step="0.05" value=${polygonOpacity} onChange=${(e) => setPolygonOpacity(parseFloat(e.target.value))} style="width: 100%; cursor: pointer;" />
-                  </div>
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span style="font-size: 0.85rem; font-weight: 600; color: #333;">Viewport Baseline Reset</span>
-                    <button onClick=${() => { resetLayout(); setIsSettingsOpen(false); }} style="background: #f0f0f0; border: 1px solid #ccc; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">Reset (55/50/10)</button>
-                  </div>
-                </div>
-                <div style="margin-top: 20px; text-align: right;">
-                  <button onClick=${() => setIsSettingsOpen(false)} style="background: #007acc; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Close</button>
-                </div>
-              </div>
-            </div>
-          `}
-
-          ${isTocOpen && html`
-            <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 3500; display: flex; justify-content: start;">
-              <div style="background: #ffffff; width: 360px; max-width: 90vw; height: 100%; box-shadow: 4px 0 24px rgba(0,0,0,0.25); display: flex; flex-direction: column;">
-                <div style="padding: 16px; border-bottom: 1px solid #e0e0e0; background: #f8f9fa; display: flex; align-items: center; justify-content: space-between;">
-                  <h3 style="margin: 0; font-size: 1.05rem; color: #111; display: flex; align-items: center; gap: 8px;">📖 Table of Contents</h3>
-                  <button onClick=${() => setIsTocOpen(false)} style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #666;">✕</button>
-                </div>
-                <div style="flex: 1; overflow-y: auto; padding: 12px;">
-                  ${(() => {
-                    if (!data || data.length === 0) return html`<div style="color: #888; font-size: 0.85rem; padding: 12px;">No slides loaded.</div>`;
-                    
-                    const groups = [];
-                    let currentGroup = null;
-
-                    data.forEach((item, idx) => {
-                      const rawTitle = (item.title || 'Untitled').replace(/<[^>]*>/g, '').trim();
-                      const rawSub = (item.subtitle || item.place || '').replace(/<[^>]*>/g, '').trim();
-                      
-                      if (currentGroup && currentGroup.title === rawTitle) {
-                        currentGroup.items.push({ idx, item, sub: rawSub });
-                      } else {
-                        currentGroup = { title: rawTitle, firstIdx: idx, items: [{ idx, item, sub: rawSub }] };
-                        groups.push(currentGroup);
-                      }
-                    });
-
-                    return groups.map(g => {
-                      return html`
-                        <div style="margin-bottom: 10px; border: 1px solid #eaeaea; border-radius: 6px; overflow: hidden;">
-                          <div style="background: #f4f6f8; padding: 8px 12px; font-weight: 700; font-size: 0.85rem; color: #222; border-bottom: 1px solid #eaeaea; display: flex; align-items: center; justify-content: space-between;">
-                            <span>${g.title}</span>
-                            <span style="font-size: 0.75rem; color: #666; background: #e0e0e0; padding: 1px 6px; border-radius: 10px;">${g.items.length}</span>
-                          </div>
-                          <div style="display: flex; flex-direction: column;">
-                            ${g.items.map(child => {
-                              const isActive = child.idx === activeIndex;
-                              return html`
-                                <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '4px solid #28a745' : '4px solid transparent'}; transition: background 0.15s;">
-                                  <div style="font-size: 0.82rem; font-weight: ${isActive ? '700' : '500'}; color: ${isActive ? '#007acc' : '#333'};"><span style="color: #888; font-family: monospace; margin-right: 6px;">#${child.idx + 1}</span>${child.sub || g.title}</div>
-                                  ${child.item.start && html`<div style="font-size: 0.72rem; color: #777; font-family: monospace; margin-top: 2px;">🕒 ${child.item.start}</div>`}
-                                </div>
-                              `;
-                            })}
-                          </div>
-                        </div>
-                      `;
-                    });
-                  })()}
-                </div>
-              </div>
-            </div>
-          `}
         </div>
       `;
-
     }
 
     if (evalUrl.match(/\.(jpeg|jpg|gif|png|svg|webp)$/) || url.startsWith('data:image')) {
@@ -668,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.7-b263';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.7-b264';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -803,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.36-b263';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.36-b264';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1157,86 +1079,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         <div class="timeline-ruler-tick" style="left: ${d.pctLeft}%;">
           <div style="height: 10px; width: 1px; background: #666;"></div>
           <span style="font-size: 0.75rem; font-family: monospace; color: ${isCenter ? '#007acc' : '#555'}; font-weight: ${isCenter ? '700' : '400'}; margin-top: 2px; white-space: nowrap;">${labelText}</span>
-        
-          ${isSettingsOpen && html`
-            <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 3600; display: flex; align-items: center; justify-content: center;">
-              <div style="background: #fff; width: 380px; max-width: 90vw; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); padding: 20px; font-family: sans-serif;">
-                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 16px;">
-                  <h3 style="margin: 0; font-size: 1.1rem; color: #111; display: flex; align-items: center; gap: 6px;">⚙️ CarTiMap Settings</h3>
-                  <button onClick=${() => setIsSettingsOpen(false)} style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #666;">✕</button>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                  <div>
-                    <label style="font-size: 0.85rem; font-weight: 600; color: #333; display: block; margin-bottom: 6px;">Polygon Fill Opacity: ${Math.round(polygonOpacity * 100)}%</label>
-                    <input type="range" min="0" max="1" step="0.05" value=${polygonOpacity} onChange=${(e) => setPolygonOpacity(parseFloat(e.target.value))} style="width: 100%; cursor: pointer;" />
-                  </div>
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span style="font-size: 0.85rem; font-weight: 600; color: #333;">Viewport Baseline Reset</span>
-                    <button onClick=${() => { resetLayout(); setIsSettingsOpen(false); }} style="background: #f0f0f0; border: 1px solid #ccc; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">Reset (55/50/10)</button>
-                  </div>
-                </div>
-                <div style="margin-top: 20px; text-align: right;">
-                  <button onClick=${() => setIsSettingsOpen(false)} style="background: #007acc; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Close</button>
-                </div>
-              </div>
-            </div>
-          `}
-
-          ${isTocOpen && html`
-            <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 3500; display: flex; justify-content: start;">
-              <div style="background: #ffffff; width: 360px; max-width: 90vw; height: 100%; box-shadow: 4px 0 24px rgba(0,0,0,0.25); display: flex; flex-direction: column;">
-                <div style="padding: 16px; border-bottom: 1px solid #e0e0e0; background: #f8f9fa; display: flex; align-items: center; justify-content: space-between;">
-                  <h3 style="margin: 0; font-size: 1.05rem; color: #111; display: flex; align-items: center; gap: 8px;">📖 Table of Contents</h3>
-                  <button onClick=${() => setIsTocOpen(false)} style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #666;">✕</button>
-                </div>
-                <div style="flex: 1; overflow-y: auto; padding: 12px;">
-                  ${(() => {
-                    if (!data || data.length === 0) return html`<div style="color: #888; font-size: 0.85rem; padding: 12px;">No slides loaded.</div>`;
-                    
-                    const groups = [];
-                    let currentGroup = null;
-
-                    data.forEach((item, idx) => {
-                      const rawTitle = (item.title || 'Untitled').replace(/<[^>]*>/g, '').trim();
-                      const rawSub = (item.subtitle || item.place || '').replace(/<[^>]*>/g, '').trim();
-                      
-                      if (currentGroup && currentGroup.title === rawTitle) {
-                        currentGroup.items.push({ idx, item, sub: rawSub });
-                      } else {
-                        currentGroup = { title: rawTitle, firstIdx: idx, items: [{ idx, item, sub: rawSub }] };
-                        groups.push(currentGroup);
-                      }
-                    });
-
-                    return groups.map(g => {
-                      return html`
-                        <div style="margin-bottom: 10px; border: 1px solid #eaeaea; border-radius: 6px; overflow: hidden;">
-                          <div style="background: #f4f6f8; padding: 8px 12px; font-weight: 700; font-size: 0.85rem; color: #222; border-bottom: 1px solid #eaeaea; display: flex; align-items: center; justify-content: space-between;">
-                            <span>${g.title}</span>
-                            <span style="font-size: 0.75rem; color: #666; background: #e0e0e0; padding: 1px 6px; border-radius: 10px;">${g.items.length}</span>
-                          </div>
-                          <div style="display: flex; flex-direction: column;">
-                            ${g.items.map(child => {
-                              const isActive = child.idx === activeIndex;
-                              return html`
-                                <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '4px solid #28a745' : '4px solid transparent'}; transition: background 0.15s;">
-                                  <div style="font-size: 0.82rem; font-weight: ${isActive ? '700' : '500'}; color: ${isActive ? '#007acc' : '#333'};"><span style="color: #888; font-family: monospace; margin-right: 6px;">#${child.idx + 1}</span>${child.sub || g.title}</div>
-                                  ${child.item.start && html`<div style="font-size: 0.72rem; color: #777; font-family: monospace; margin-top: 2px;">🕒 ${child.item.start}</div>`}
-                                </div>
-                              `;
-                            })}
-                          </div>
-                        </div>
-                      `;
-                    });
-                  })()}
-                </div>
-              </div>
-            </div>
-          `}
         </div>
       `;
-
     });
   const stackRegistry = {};
 
@@ -1409,7 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b263';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b264';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1421,7 +1265,7 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.0-b263';
 
 // 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
-const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds, setIsSettingsOpen }) => {
+const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           const mapDomRef = useRef(null);
           const miniMapDomRef = useRef(null);
           const minimapWrapperRef = useRef(null);
@@ -2381,7 +2225,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.1-b263';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.2-b264';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2431,11 +2275,11 @@ const App = () => {
             }
           }, []);
 
-          const getFluidVersionString = (w) => {
-            if (w >= 240) return 'v8.14.1-b263';
-            if (w >= 180) return 'v8.14-b262';
-            if (w >= 130) return 'v8-b262';
-            if (w >= 80) return 'b262';
+          const getFluidVersionString = (width) => {
+            if (width >= 240) return APP_VERSION;
+            if (width >= 180) return APP_VERSION.replace(/\.\d+-/, '-');
+            if (width >= 130) return APP_VERSION.replace(/v\d+\.\d+\.\d+-/, 'v8-');
+            if (width >= 80) return APP_VERSION.split('-').at(-1) || '';
             return '';
           };
           const [searchQuery, setSearchQuery] = useState('');
@@ -2532,7 +2376,7 @@ const App = () => {
             const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
             let source = urlParams.get('source') || urlParams.get('amp;source') || '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE';
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
-            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || (source === '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE' ? '1652171772' : null);
+            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
 
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
@@ -3314,7 +3158,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         setMinimapOffset=${setMinimapOffset}
                         maxPane=${maxPane}
                         setMaxPane=${setMaxPane}
-                        polygonOpacity=${polygonOpacity} setIsSettingsOpen=${() => setIsSettingsOpen(true)}
+                        polygonOpacity=${polygonOpacity}
                         showButtonText=${showButtonText}
                         visibleTimeBounds=${visibleTimeBounds}
                       />
@@ -3520,11 +3364,88 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
               ${loadingScreen}
               ${appLayout}
+
+              ${isSettingsOpen && html`
+                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 3600; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
+                  <div style="background: #fff; width: 380px; max-width: 90vw; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); padding: 20px; font-family: sans-serif;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 16px;">
+                      <h3 style="margin: 0; font-size: 1.1rem; color: #111; display: flex; align-items: center; gap: 6px;">⚙️ CarTiMap Settings</h3>
+                      <button onClick=${() => setIsSettingsOpen(false)} style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #666;">✕</button>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                      <div>
+                        <label style="font-size: 0.85rem; font-weight: 600; color: #333; display: block; margin-bottom: 6px;">Polygon Fill Opacity: ${Math.round(polygonOpacity * 100)}%</label>
+                        <input type="range" min="0" max="1" step="0.05" value=${polygonOpacity} onChange=${(e) => setPolygonOpacity(parseFloat(e.target.value))} style="width: 100%; cursor: pointer;" />
+                      </div>
+                      <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: #333;">Viewport Baseline Reset</span>
+                        <button onClick=${() => { resetLayout(); setIsSettingsOpen(false); }} style="background: #f0f0f0; border: 1px solid #ccc; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">Reset (55/50/10)</button>
+                      </div>
+                    </div>
+                    <div style="margin-top: 20px; text-align: right;">
+                      <button onClick=${() => setIsSettingsOpen(false)} style="background: #007acc; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Close</button>
+                    </div>
+                  </div>
+                </div>
+              `}
+
+              ${isTocOpen && html`
+                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 3500; display: flex; justify-content: start;" onClick=${(e) => e.stopPropagation()}>
+                  <div style="background: #ffffff; width: 360px; max-width: 90vw; height: 100%; box-shadow: 4px 0 24px rgba(0,0,0,0.25); display: flex; flex-direction: column;">
+                    <div style="padding: 16px; border-bottom: 1px solid #e0e0e0; background: #f8f9fa; display: flex; align-items: center; justify-content: space-between;">
+                      <h3 style="margin: 0; font-size: 1.05rem; color: #111; display: flex; align-items: center; gap: 8px;">📖 Table of Contents</h3>
+                      <button onClick=${() => setIsTocOpen(false)} style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #666;">✕</button>
+                    </div>
+                    <div style="flex: 1; overflow-y: auto; padding: 12px;">
+                      ${(() => {
+                        if (!data || data.length === 0) return html`<div style="color: #888; font-size: 0.85rem; padding: 12px;">No slides loaded.</div>`;
+                        
+                        const groups = [];
+                        let currentGroup = null;
+
+                        data.forEach((item, idx) => {
+                          const rawTitle = (item.title || 'Untitled').replace(/<[^>]*>/g, '').trim();
+                          const rawSub = (item.subtitle || item.place || '').replace(/<[^>]*>/g, '').trim();
+                          
+                          if (currentGroup && currentGroup.title === rawTitle) {
+                            currentGroup.items.push({ idx, item, sub: rawSub });
+                          } else {
+                            currentGroup = { title: rawTitle, firstIdx: idx, items: [{ idx, item, sub: rawSub }] };
+                            groups.push(currentGroup);
+                          }
+                        });
+
+                        return groups.map(g => {
+                          return html`
+                            <div style="margin-bottom: 10px; border: 1px solid #eaeaea; border-radius: 6px; overflow: hidden;">
+                              <div style="background: #f4f6f8; padding: 8px 12px; font-weight: 700; font-size: 0.85rem; color: #222; border-bottom: 1px solid #eaeaea; display: flex; align-items: center; justify-content: space-between;">
+                                <span>${g.title}</span>
+                                <span style="font-size: 0.75rem; color: #666; background: #e0e0e0; padding: 1px 6px; border-radius: 10px;">${g.items.length}</span>
+                              </div>
+                              <div style="display: flex; flex-direction: column;">
+                                ${g.items.map(child => {
+                                  const isActive = child.idx === activeIndex;
+                                  return html`
+                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '4px solid #28a745' : '4px solid transparent'}; transition: background 0.15s;">
+                                      <div style="font-size: 0.82rem; font-weight: ${isActive ? '700' : '500'}; color: ${isActive ? '#007acc' : '#333'};"><span style="color: #888; font-family: monospace; margin-right: 6px;">#${child.idx + 1}</span>${child.sub || g.title}</div>
+                                      ${child.item.start && html`<div style="font-size: 0.72rem; color: #777; font-family: monospace; margin-top: 2px;">🕒 ${child.item.start}</div>`}
+                                    </div>
+                                  `;
+                                })}
+                              </div>
+                            </div>
+                          `;
+                        });
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              `}
             </div>
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.1-b263';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.2-b264';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3648,7 +3569,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.1-b263';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.74-b263';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.74-b264';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
