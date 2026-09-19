@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b266';
+const APP_VERSION = 'v8.14.1-b267';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1813,9 +1813,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
                 if (layer instanceof L.Polygon) {
                   layer.setStyle({
-                    stroke: true,
-                    color: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
-                    weight: isActive ? 2.5 : 1,
+                    stroke: false, weight: 0,
                     fillColor: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
                     fillOpacity: isActive ? Math.min(polygonOpacity + 0.25, 0.65) : polygonOpacity
                   });
@@ -1908,9 +1906,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               layers.forEach(layer => {
                 if (layer instanceof L.Polygon) {
                   layer.setStyle({
-                    stroke: true,
-                    color: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
-                    weight: isActive ? 2.5 : 1,
+                    stroke: false, weight: 0,
                     fillColor: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
                     fillOpacity: isActive ? Math.min(polygonOpacity + 0.25, 0.65) : polygonOpacity
                   });
@@ -2911,7 +2907,7 @@ const SymbologyLegend = () => html`
 const CarTiMapperLogo = ({ context, appVersion }) => {
             const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
-            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 400; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span><span style="font-size: 0.68rem; font-family: monospace; color: #007acc; font-weight: 600; line-height: 1;">${appVersion}</span></div></div>`;
+            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 400; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span></div></div>`;
             return html`
               <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
                 <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
@@ -3204,16 +3200,39 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
       }
 
     </style>
-                  <div class="status-left" ref=${statusBrandRef} style="display: flex; align-items: center; gap: 8px;">
+                  <div class="status-left" ref=${statusBrandRef} style="display: flex; align-items: center; gap: 6px; position: relative;">
                     ${aboutBtn}
-                    ${resetLayoutBtn}
+                    ${tocBtn}
                     ${settingsBtn}
-                  ${tocBtn}
-                    ${telemetryBtn}
+
+                    <!-- Aggregated Actions Overflow Menu -->
+                    <button class="status-btn" onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="Engine Actions & Tools" style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; background: ${isMenuOpen ? '#e6f4ff' : 'transparent'}; border: 1px solid ${isMenuOpen ? '#91caff' : 'transparent'}; border-radius: 4px; font-weight: bold;">
+                      <span>⋮</span>
+                    </button>
+
+                    ${isMenuOpen && html`
+                      <div class="tm-dropdown-menu" style="position: absolute; top: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); padding: 6px; display: flex; flex-direction: column; gap: 4px; z-index: 10005; min-width: 160px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                        <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>📖</span> Table of Contents
+                        </button>
+                        <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>⚙️</span> Engine Settings
+                        </button>
+                        <button onClick=${() => { resetLayout(); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>↺</span> Reset Layout
+                        </button>
+                        <button onClick=${() => { setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>📊</span> Telemetry Monitor
+                        </button>
+                        <button onClick=${() => { setIsAboutOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 6px 10px; text-align: left; font-size: 0.82rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                          <span>ℹ️</span> Dataset Specs
+                        </button>
+                      </div>
+                    `}
                   </div>
 
                   <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
-                  <div class="status-center" style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: auto;">
+                  <div class="status-center" style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: auto; z-index: 10;">
                     ${prevBtn}
 
                     <div style="display: flex; align-items: center; gap: 4px; font-family: monospace; font-size: 0.95rem;">
@@ -3239,28 +3258,29 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     </div>
 
                     ${nextBtn}
-
-                    ${visibleTimeSpan ? (() => {
-                      const parts = visibleTimeSpan.split(' (');
-                      const [ spanStrPart = '', zoomStrPart = '' ] = parts;
-                      const spanStr = spanStrPart.replace('Span: ', '');
-                      const zoomStr = zoomStrPart.replace('Zoom: ', '').replace(')', '');
-                      return html`
-                        <div class="telemetry-span-zoom" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin-left: 12px; font-size: 0.78rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none;">
-                          <div style="display: flex; align-items: center; gap: 4px;">
-                            <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>
-                            <span style="font-family: monospace; color: #333;">${spanStr}</span>
-                          </div>
-                          ${zoomStr ? html`
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                              <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>
-                              <span style="font-family: monospace; color: #333;">${zoomStr}</span>
-                            </div>
-                          ` : ''}
-                        </div>
-                      `;
-                    })() : ''}
                   </div>
+
+                  <!-- Telemetry Scale Metrics anchored cleanly to the right of Next button without skewing navigation centering -->
+                  ${visibleTimeSpan ? (() => {
+                    const parts = visibleTimeSpan.split(' (');
+                    const [ spanStrPart = '', zoomStrPart = '' ] = parts;
+                    const spanStr = spanStrPart.replace('Span: ', '');
+                    const zoomStr = zoomStrPart.replace('Zoom: ', '').replace(')', '');
+                    return html`
+                      <div class="telemetry-span-zoom" style="position: absolute; left: calc(50% + 95px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                          <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>
+                          <span style="font-family: monospace; color: #333;">${spanStr}</span>
+                        </div>
+                        ${zoomStr ? html`
+                          <div style="display: flex; align-items: center; gap: 4px;">
+                            <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>
+                            <span style="font-family: monospace; color: #333;">${zoomStr}</span>
+                          </div>
+                        ` : ''}
+                      </div>
+                    `;
+                  })() : ''}
 
                   <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
                     ${filterBtn}
@@ -3446,13 +3466,16 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
                         data.forEach((item, idx) => {
                           const rawTitle = (item.title || 'Untitled').replace(/<[^>]*>/g, '').trim();
+                          // Strip leading number, fullstop, space: '01. ', '1. ', '03 - '
+                          const normTitle = rawTitle.replace(/^\d+[\.\)\-]?\s*/, '').trim() || rawTitle;
+                          
                           const rawSub = (item.subtitle || item.place || '').replace(/<[^>]*>/g, '').trim();
                           const rawTags = Array.isArray(item.tags) ? item.tags : (item.tags ? String(item.tags).split(',').map(s => s.trim()).filter(Boolean) : []);
                           
-                          if (currentGroup && currentGroup.title === rawTitle) {
+                          if (currentGroup && currentGroup.title === normTitle) {
                             currentGroup.items.push({ idx, item, sub: rawSub, tags: rawTags });
                           } else {
-                            currentGroup = { title: rawTitle, firstIdx: idx, items: [{ idx, item, sub: rawSub, tags: rawTags }] };
+                            currentGroup = { title: normTitle, firstIdx: idx, items: [{ idx, item, sub: rawSub, tags: rawTags }] };
                             groups.push(currentGroup);
                           }
                         });
@@ -3460,6 +3483,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         return groups.map(g => {
                           return html`
                             <div style="margin-bottom: 14px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff;">
+                              <!-- Heading showing ONLY the normalized Group Title (no subtitle) -->
                               <div style="background: #f1f3f5; padding: 10px 14px; font-weight: 800; font-size: 0.95rem; color: #111; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between;">
                                 <span>${g.title}</span>
                                 <span style="font-size: 0.75rem; color: #007acc; background: #e6f4ff; border: 1px solid #bae0ff; padding: 2px 8px; border-radius: 10px;">${g.items.length} ${g.items.length === 1 ? 'item' : 'items'}</span>
@@ -3468,13 +3492,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                 ${g.items.map(child => {
                                   const isActive = child.idx === activeIndex;
                                   return html`
-                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
-                                      <div style="font-size: 0.92rem; font-weight: 700; color: ${isActive ? '#007acc' : '#222'}; display: flex; align-items: center; gap: 8px;">
-                                        <span style="color: #888; font-family: monospace; font-size: 0.85rem;">#${child.idx + 1}</span>
-                                        <span>${g.title}</span>
+                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
+                                      <!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
+                                      <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
+                                        <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
+                                        <span>${child.sub || `Item #${child.idx + 1}`}</span>
                                       </div>
-                                      ${child.sub ? html`<div style="font-size: 0.85rem; color: #555; font-style: italic; margin-left: 28px; line-height: 1.3;">${child.sub}</div>` : ''}
-                                      <div style="display: flex; align-items: center; gap: 12px; margin-left: 28px; margin-top: 4px; flex-wrap: wrap; font-size: 0.78rem;">
+                                      <div style="display: flex; align-items: center; gap: 12px; margin-left: 28px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem;">
                                         ${child.item.start ? html`<span style="color: #007acc; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e5ff;">🕒 ${formatSmartDate(child.item.startDate, child.item.endDate, dateLocale)}</span>` : ''}
                                         ${child.tags && child.tags.length > 0 ? html`
                                           <div style="display: flex; align-items: center; gap: 4px;">
