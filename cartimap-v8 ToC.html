@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b269';
+const APP_VERSION = 'v8.14.1-b270';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -3458,9 +3458,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       ${(() => {
                         if (!data || data.length === 0) return html`<div style="color: #888; font-size: 0.9rem; padding: 16px;">No slides loaded.</div>`;
                         
-                        const groups = [];
-                        let currentGroup = null;
-
                         const groupMap = new Map();
                         const groupOrder = [];
 
