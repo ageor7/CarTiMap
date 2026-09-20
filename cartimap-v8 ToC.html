@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b286';
+const APP_VERSION = 'v8.14.1-b287';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.24-b286';
+MODULE_VERSIONS["VibeMonitor"] = 'v2.2.25-b287';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.15-b286';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.16-b287';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.44-b286';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.45-b287';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1253,7 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.8-b286';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.9-b287';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2228,7 +2228,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.16-b286';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.17-b287';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2284,16 +2284,40 @@ const App = () => {
           const statusBrandRef = useRef(null);
 
           useEffect(() => {
-            if (statusBrandRef.current && window.ResizeObserver) {
-              const ro = new ResizeObserver(entries => {
+            const handleResize = () => {
+              if (statusBrandRef.current) {
+                const w = statusBrandRef.current.clientWidth || statusBrandRef.current.offsetWidth || window.innerWidth;
+                if (w > 0) setStatusWidth(w);
+              } else {
+                setStatusWidth(window.innerWidth);
+              }
+            };
+            handleResize();
+            window.addEventListener('resize', handleResize);
+            let ro = null;
+            if (window.ResizeObserver) {
+              ro = new ResizeObserver(entries => {
                 for (let entry of entries) {
-                  if (entry.contentRect) setStatusWidth(entry.contentRect.width);
+                  if (entry.contentRect && entry.contentRect.width > 0) {
+                    setStatusWidth(entry.contentRect.width);
+                  }
                 }
               });
-              ro.observe(statusBrandRef.current);
-              return () => ro.disconnect();
+              const checkAndObserve = () => {
+                if (statusBrandRef.current) {
+                  ro.observe(statusBrandRef.current);
+                  handleResize();
+                } else {
+                  setTimeout(checkAndObserve, 100);
+                }
+              };
+              checkAndObserve();
             }
-          }, []);
+            return () => {
+              window.removeEventListener('resize', handleResize);
+              if (ro) ro.disconnect();
+            };
+          }, [status.active]);
 
           const getFluidVersionString = (width) => {
             if (width >= 240) return APP_VERSION;
@@ -3037,7 +3061,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               </button>
 
               ${isMenuOpen && html`
-                <div class="tm-dropdown-menu" style="position: fixed; bottom: 38px; left: 10px; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 8px; display: flex; flex-direction: column; gap: 4px; z-index: 99999 !important; min-width: 220px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                <div class="tm-dropdown-menu" style="position: absolute; bottom: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 8px; display: flex; flex-direction: column; gap: 4px; z-index: 99999 !important; min-width: 220px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                   <div style="font-size: 0.72rem; color: #007acc; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚡ CarTiMap Command Hub</div>
                   <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
                     <span>📖</span> Table of Contents
@@ -3516,7 +3540,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           const parseAndDedupeTags = (tagsInput) => {
                             if (!tagsInput) return [];
                             const rawArr = Array.isArray(tagsInput) ? tagsInput : [tagsInput];
-                            const splitRegex = /[|·;·\n\r,-]+/;
+                            const splitRegex = /[|·;·\n\r,-\/•\t]+/;
                             const seen = new Map();
                             rawArr.forEach(entry => {
                               if (typeof entry === 'string') {
@@ -3612,7 +3636,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.22-b286';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.23-b287';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3736,7 +3760,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.22-b286';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.82-b286';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.83-b287';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
