@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b292';
+const APP_VERSION = 'v8.14.1-b293';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1091,6 +1091,24 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
     const globalIndex = data.findIndex(d => d.id === item.id);
     const startPct = Number((((itemStartMs - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+    
+    let durationStr = '';
+    if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
+      const diffMs = item.endDate.max - itemStartMs;
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays >= 365) {
+        const yrs = (diffDays / 365.25).toFixed(1);
+        durationStr = `${yrs} yrs`;
+      } else if (diffDays >= 30) {
+        const mos = Math.round(diffDays / 30.43);
+        durationStr = `${mos} mos`;
+      } else if (diffDays >= 1) {
+        durationStr = `${diffDays} days`;
+      } else {
+        const hrs = Math.round(diffMs / (1000 * 60 * 60));
+        durationStr = `${hrs} hrs`;
+      }
+    }
     const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
     const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
     const topPos = (laneIdx * laneHeight) + 15;
@@ -1165,10 +1183,14 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
 
     return html`
-      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)}>
+      const durationTooltip = durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : '';
+    const fullNodeTooltip = `${safeStripHTML(item.title)}${durationTooltip}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick node to focus slide`;
+
+    return html`
+      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)} title="${fullNodeTooltip}">
         ${dropLine}
         ${xAxisMarker}
-        <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --half-lane: ${laneHeight / 2}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
+        <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --half-lane: ${laneHeight / 2}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};" title="${fullNodeTooltip}">
           ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>` : ''}
           <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
             ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
@@ -3097,7 +3119,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           const logoCommandHub = html`
             <div style="position: relative; display: inline-flex; align-items: center;">
-              <button onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="CarTiMap Command Hub & Tools" style="height: 32px; padding: 0; border: none; background: transparent; display: flex; align-items: center; cursor: pointer; flex-shrink: 0; outline: none;">
+              <button onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="CarTiMap Engine ${APP_VERSION} — Command Hub & System Tools" style="height: 32px; padding: 0; border: none; background: transparent; display: flex; align-items: center; cursor: pointer; flex-shrink: 0; outline: none;">
                 <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
               </button>
 
@@ -3471,7 +3493,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
 
                 <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="search-modal" class="tm-modal" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; height: 80vh; padding: 30px;">
+                <div id="search-modal" class="tm-modal ${isSearchOpen ? 'open' : ''}" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; height: 80vh; padding: 30px;">
                   <button class="modal-close" onClick=${() => setIsSearchOpen(false)} style="position: absolute; top: 16px; right: 16px; z-index: 101000; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #333; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1; transition: all 0.2s;" title="Close Search (Esc)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
