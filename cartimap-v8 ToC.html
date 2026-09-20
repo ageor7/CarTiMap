@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b281';
+const APP_VERSION = 'v8.14.1-b282';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.19-b281';
+MODULE_VERSIONS["VibeMonitor"] = 'v2.2.20-b282';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.10-b281';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.11-b282';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.39-b281';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.40-b282';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1253,7 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.3-b281';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.4-b282';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2228,7 +2228,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.11-b281';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.12-b282';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2543,7 +2543,8 @@ const App = () => {
                   media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
                   mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
                   mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
-                  tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/(?:,|\r|\n|\||;|·)+/).map(t => t.trim()).filter(Boolean) : [],
+                  tags: exactGet(norm, 'tags') ? Array.from(new Set(exactGet(norm, 'tags').split(/(?:,||
+|\||;|·)+/).map(t => t.trim()).filter(Boolean))) : [],
                   extractType: exactGet(norm, 'extract type') || 'Storyline'
                 };
               });
@@ -2945,13 +2946,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // =========================================================================
           // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
           // =========================================================================
-          const showButtonText = statusWidth >= 620;
-          const hideTelemetry = statusWidth < 520;
-          const hideSettings  = statusWidth < 440;
-          const hideReset     = statusWidth < 360;
-          const hideToc       = statusWidth < 300;
-          const hideSpecs     = false; // Specs/About button is statically anchored in status line
-          const isSpaceConstrained = statusWidth < 520;
+          const showButtonText = statusWidth >= 520;
+          const hideTelemetry = false;
+          const hideSettings  = false;
+          const hideReset     = false;
+          const hideToc       = false;
+          const hideSpecs     = false;
+          const isSpaceConstrained = statusWidth < 320;
 
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
@@ -3516,19 +3517,27 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           const parseAndDedupeTags = (tagsInput) => {
                             if (!tagsInput) return [];
                             const rawArr = Array.isArray(tagsInput) ? tagsInput : [tagsInput];
-                            const splitRegex = /(?:\||·|;|·|\n|\-|,)/;
-                            const tokens = [];
+                            const splitRegex = /(?:\||·|;|·|
+|\-|,)/;
+                            const seen = new Map();
                             rawArr.forEach(entry => {
                               if (typeof entry === 'string') {
                                 entry.split(splitRegex).forEach(t => {
                                   const clean = t.trim();
-                                  if (clean) tokens.push(clean);
+                                  if (clean) {
+                                    const key = clean.toLowerCase();
+                                    if (!seen.has(key)) seen.set(key, clean);
+                                  }
                                 });
                               } else if (entry) {
-                                tokens.push(String(entry).trim());
+                                const clean = String(entry).trim();
+                                if (clean) {
+                                  const key = clean.toLowerCase();
+                                  if (!seen.has(key)) seen.set(key, clean);
+                                }
                               }
                             });
-                            return Array.from(new Set(tokens));
+                            return Array.from(seen.values());
                           };
                           const rawTags = parseAndDedupeTags(item.tags);
 
@@ -3613,7 +3622,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.17-b281';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.18-b282';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3737,7 +3746,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.17-b281';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.77-b281';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.78-b282';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
