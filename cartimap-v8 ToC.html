@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b293';
+const APP_VERSION = 'v8.14.1-b294';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -732,7 +732,8 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.8.47-b289';
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.10 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
-const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
+const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
+  const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? s.text : (s && s.date ? s.date.toLocaleDateString(loc || 'en-GB') : 'Undated')));
   const wrapperRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0, hasDragged: false });
@@ -1182,14 +1183,9 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colInactive}; z-index: 900;"></div>`;
     }
 
-    const durationTooltip = durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : '';
-
-
-    const fullNodeTooltip = `${safeStripHTML(item.title)}${durationTooltip}
-Dates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}
-Click node to focus slide`;
-
-
+    return html`
+      const durationTooltip = durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : '';
+    const fullNodeTooltip = `${safeStripHTML(item.title)}${durationTooltip}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick node to focus slide`;
 
     return html`
       <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)} title="${fullNodeTooltip}">
@@ -3449,6 +3445,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     isTimelineMinimized=${isTimelineMinimized}
                     setIsTimelineMinimized=${setIsTimelineMinimized}
                     dateLocale=${dateLocale}
+                    formatSmartDate=${formatSmartDate}
                     timelineRequiredHeight=${timelineRequiredHeight}
                   />
                 </div>
