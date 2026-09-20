@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b289';
+const APP_VERSION = 'v8.14.1-b290';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2356,6 +2356,12 @@ const App = () => {
             try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
             catch (e) { return 'en-GB'; }
           });
+          const [showButtonText, setShowButtonText] = useState(() => {
+            try {
+              const stored = localStorage.getItem('tm_show_button_text');
+              return stored === 'true';
+            } catch(e) { return false; }
+          });
           const [dateEngineMode, setDateEngineMode] = useState(() => {
             try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
             catch (e) { return 'auto'; }
@@ -2967,15 +2973,25 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           };
 
           // =========================================================================
-          // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
+          // === [ APP_ORCHESTRATOR SUBBLOCK 10: DYNAMIC BUTTON AGGREGATION ] ===
           // =========================================================================
-          const showButtonText = statusWidth >= 620;
-          const hideTelemetry  = statusWidth < 680;
-          const hideSettings   = statusWidth < 580;
-          const hideReset      = statusWidth < 480;
-          const hideToc        = statusWidth < 380;
-          const hideSpecs      = statusWidth < 280;
-          const isSpaceConstrained = statusWidth < 280;
+          const leftAvailableWidth = Math.max(0, (statusWidth / 2) - 120);
+          const rightAvailableWidth = Math.max(0, (statusWidth / 2) - 120);
+          const logoW = 100;
+          const btnW = showButtonText ? 85 : 38;
+
+          const hideTelemetry = leftAvailableWidth < (logoW + 5 * btnW);
+          const hideSettings  = leftAvailableWidth < (logoW + 4 * btnW);
+          const hideReset     = leftAvailableWidth < (logoW + 3 * btnW);
+          const hideToc       = leftAvailableWidth < (logoW + 2 * btnW);
+          const hideSpecs     = leftAvailableWidth < (logoW + 1 * btnW);
+          const isSpaceConstrained = hideSpecs;
+
+          const showTelemetryLabels = rightAvailableWidth >= 200;
+          const showTelemetry = rightAvailableWidth >= 100;
+          const hideRightHistory = rightAvailableWidth < 180;
+          const hideRightSearch  = rightAvailableWidth < 130;
+          const hideRightFilter  = rightAvailableWidth < 80;
 
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
@@ -3055,9 +3071,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           const logoCommandHub = html`
             <div style="position: relative; display: inline-flex; align-items: center;">
-              <button class="status-btn-text" onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="CarTiMap Command Hub & Tools" style="height: 32px; padding: 0 6px; border: 1px solid ${isMenuOpen ? '#007acc' : '#ccc'}; background: ${isMenuOpen ? '#e6f4ff' : '#f8f9fa'}; border-radius: 4px; display: flex; align-items: center; gap: 4px; cursor: pointer; flex-shrink: 0; transition: all 0.15s;">
+              <button onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="CarTiMap Command Hub & Tools" style="height: 32px; padding: 0; border: none; background: transparent; display: flex; align-items: center; cursor: pointer; flex-shrink: 0; outline: none;">
                 <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
-                <span style="font-size: 0.75rem; color: #007acc; font-weight: bold; margin-left: 2px;">▼</span>
               </button>
 
               ${isMenuOpen && html`
@@ -3065,6 +3080,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <div style="font-size: 0.72rem; color: #007acc; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚡ CarTiMap Command Hub</div>
                   <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
                     <span>📖</span> Table of Contents
+                  </button>
+                  <button onClick=${() => { setIsSearchOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>🔍</span> Interactive Search
+                  </button>
+                  <button onClick=${() => { setIsFilterOpen(!isFilterOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <span>⚡</span> Filter Swimlanes & Streams
                   </button>
                   <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
                     <span>⚙️</span> Engine Settings
@@ -3271,13 +3292,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
       }
 
     </style>
-                  <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative; max-width: calc(50vw - 110px); overflow: hidden;">
+                  <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative; max-width: calc(50vw - 120px); overflow: hidden;">
                     ${logoCommandHub}
                     ${!hideToc ? tocBtn : ''}
                     ${!hideSettings ? settingsBtn : ''}
                     ${!hideReset ? resetLayoutBtn : ''}
                     ${!hideTelemetry ? telemetryBtn : ''}
-                    ${aboutBtn}
+                    ${!hideSpecs ? aboutBtn : ''}
                   </div>
 
                   <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
@@ -3310,7 +3331,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   </div>
 
                   <!-- Telemetry Scale Metrics anchored cleanly to the right of Next button without skewing navigation centering -->
-                  ${visibleTimeSpan ? (() => {
+                  ${(visibleTimeSpan && showTelemetry) ? (() => {
                     const parts = visibleTimeSpan.split(' (');
                     const [ spanStrPart = '', zoomStrPart = '' ] = parts;
                     const spanStr = spanStrPart.replace('Span: ', '');
@@ -3318,12 +3339,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     return html`
                       <div class="telemetry-span-zoom" style="position: absolute; left: calc(50% + 95px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
                         <div style="display: flex; align-items: center; gap: 4px;">
-                          <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>
+                          ${showTelemetryLabels ? html`<span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>` : ''}
                           <span style="font-family: monospace; color: #333;">${spanStr}</span>
                         </div>
                         ${zoomStr ? html`
                           <div style="display: flex; align-items: center; gap: 4px;">
-                            <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>
+                            ${showTelemetryLabels ? html`<span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>` : ''}
                             <span style="font-family: monospace; color: #333;">${zoomStr}</span>
                           </div>
                         ` : ''}
@@ -3331,8 +3352,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     `;
                   })() : ''}
 
-                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
-                    ${filterBtn}
+                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 6px; max-width: calc(50vw - 120px); overflow: hidden; justify-content: flex-end;">
+                    ${!hideRightFilter ? filterBtn : ''}
                     ${filterPopup}
             ${(!isFilterOpen && filterFlashMsg) ? html`
               <div style="position: absolute; bottom: calc(100% + 10px); right: 120px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; font-family: monospace; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.18); z-index: 10005; display: flex; align-items: center; gap: 8px;">
@@ -3340,9 +3361,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 <span>${filterFlashMsg}</span>
               </div>
             ` : ''}
-                    ${searchBtn}
-                    ${backBtn}
-                    ${forwardBtn}
+                    ${!hideRightSearch ? searchBtn : ''}
+                    ${!hideRightHistory ? html`${backBtn}${forwardBtn}` : ''}
                   </div>
                 </div>
 
@@ -3449,6 +3469,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               <h3 style="margin-top: 0; font-size: 1.25rem; margin-bottom: 20px; color: #222; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">⚙️ Engine Settings</h3>
               
               <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Icon Labels</label>
+                  <select value=${showButtonText ? 'yes' : 'no'} onChange=${e => { const val = e.target.value === 'yes'; setShowButtonText(val); try { localStorage.setItem('tm_show_button_text', String(val)); } catch(err){} }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.88rem; font-family: monospace; background: #fff;">
+                    <option value="no">Icons Only (Compact - Default)</option>
+                    <option value="yes">Show Text Labels</option>
+                  </select>
+                </div>
                 <div>
                   <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Data Locale Format</label>
                   <select value=${dateLocale} onChange=${e => { setDateLocale(e.target.value); try { localStorage.setItem('tm_date_locale', e.target.value); } catch(err){} }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.88rem; font-family: monospace; background: #fff;">
@@ -3636,7 +3663,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.25-b289';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.26-b290';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
