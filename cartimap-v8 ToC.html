@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b280';
+const APP_VERSION = 'v8.14.1-b281';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.18-b280';
+MODULE_VERSIONS["VibeMonitor"] = 'v2.2.19-b281';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.9-b280';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.10-b281';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.38-b280';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.39-b281';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1253,7 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.2-b280';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.3-b281';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2228,7 +2228,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.10-b280';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.11-b281';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -3513,7 +3513,24 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
                           // Strip leading number, fullstop, space ('<number>. ')
                           const normGroupTitle = mainTitle.replace(/^\d+[\.\)\-]?\s*/, '').trim();
-                          const rawTags = Array.isArray(item.tags) ? item.tags : (item.tags ? String(item.tags).split(',').map(s => s.trim()).filter(Boolean) : []);
+                          const parseAndDedupeTags = (tagsInput) => {
+                            if (!tagsInput) return [];
+                            const rawArr = Array.isArray(tagsInput) ? tagsInput : [tagsInput];
+                            const splitRegex = /(?:\||·|;|·|\n|\-|,)/;
+                            const tokens = [];
+                            rawArr.forEach(entry => {
+                              if (typeof entry === 'string') {
+                                entry.split(splitRegex).forEach(t => {
+                                  const clean = t.trim();
+                                  if (clean) tokens.push(clean);
+                                });
+                              } else if (entry) {
+                                tokens.push(String(entry).trim());
+                              }
+                            });
+                            return Array.from(new Set(tokens));
+                          };
+                          const rawTags = parseAndDedupeTags(item.tags);
 
                           if (!groupMap.has(normGroupTitle)) {
                             groupMap.set(normGroupTitle, {
@@ -3596,7 +3613,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.16-b280';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.17-b281';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3720,7 +3737,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.16-b280';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.76-b280';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.77-b281';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
