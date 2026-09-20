@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b292';
+const APP_VERSION = 'v8.14.1-b291';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -2974,7 +2974,7 @@ const SymbologyLegend = () => html`
 const CarTiMapperLogo = ({ context, appVersion }) => {
             const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
-            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 36px; width: 58px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 1.08rem; font-weight: 700; color: #111; line-height: 1; font-family: system-ui, -apple-system, sans-serif; letter-spacing: -0.2px;">CarTiMap</span></div></div>`;
+            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 400; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span></div></div>`;
             return html`
               <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
                 <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
@@ -2989,35 +2989,23 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // =========================================================================
           // === [ APP_ORCHESTRATOR SUBBLOCK 10: DYNAMIC BUTTON AGGREGATION ] ===
           // =========================================================================
-          const leftAvailableWidth = Math.max(0, (statusWidth / 2) - 100);
-          const logoW = 135; // Enlarged Logo width
-          
-          // Smart label fallback: if showButtonText is active but left space < 350px, fall back to compact icon mode
-          const effectiveBtnW = (showButtonText && leftAvailableWidth >= 350) ? 85 : 38;
+          const leftAvailableWidth = Math.max(0, (statusWidth / 2) - 120);
+          const rightAvailableWidth = Math.max(0, (statusWidth / 2) - 120);
+          const logoW = 100;
+          const btnW = showButtonText ? 85 : 38;
 
-          const hideTelemetry = leftAvailableWidth < (logoW + 5 * effectiveBtnW);
-          const hideSettings  = leftAvailableWidth < (logoW + 4 * effectiveBtnW);
-          const hideReset     = leftAvailableWidth < (logoW + 3 * effectiveBtnW);
-          const hideSpecs     = leftAvailableWidth < (logoW + 2 * effectiveBtnW);
-          const hideToc       = leftAvailableWidth < (logoW + 1 * effectiveBtnW); // ToC is level 1 = LAST to collapse
+          const hideTelemetry = leftAvailableWidth < (logoW + 5 * btnW);
+          const hideSettings  = leftAvailableWidth < (logoW + 4 * btnW);
+          const hideReset     = leftAvailableWidth < (logoW + 3 * btnW);
+          const hideSpecs     = leftAvailableWidth < (logoW + 2 * btnW);
+          const hideToc       = leftAvailableWidth < (logoW + 1 * btnW);
           const isSpaceConstrained = hideSpecs;
 
-          // Right Side & Telemetry Span/Zoom boundary calculation
-          const rawRightWidth = Math.max(0, (statusWidth / 2) - 100);
-          const showTelemetry = visibleTimeSpan && rawRightWidth >= 90;
-          const showTelemetryLabels = rawRightWidth >= 220;
-
-          // Account for Span & Zoom telemetry readout width in overlap calculations
-          let telemetryOffset = 100; // default clearance for center cockpit
-          if (showTelemetry) {
-            telemetryOffset = showTelemetryLabels ? 180 : 150;
-          }
-
-          const rightAvailableWidth = Math.max(0, (statusWidth / 2) - telemetryOffset);
-
-          const hideRightHistory = rightAvailableWidth < 160;
-          const hideRightSearch  = rightAvailableWidth < 100;
-          const hideRightFilter  = rightAvailableWidth < 50;
+          const showTelemetryLabels = rightAvailableWidth >= 200;
+          const showTelemetry = rightAvailableWidth >= 100;
+          const hideRightHistory = rightAvailableWidth < 180;
+          const hideRightSearch  = rightAvailableWidth < 130;
+          const hideRightFilter  = rightAvailableWidth < 80;
 
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
@@ -3147,8 +3135,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const filterPopup = isFilterOpen
-            ? html`<div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.15); z-index: 99998 !important;" onClick=${() => setIsFilterOpen(false)}>
-                <div style="position: absolute; bottom: calc(100% + 6px); right: 0; background: #fff; border: 1px solid rgba(128,128,128,0.25); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 100000 !important; display: flex; flex-direction: column; gap: 6px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+            ? html`<div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.2); z-index: 99998 !important;" onClick=${() => setIsFilterOpen(false)}>
+                <div style="position: fixed; bottom: 42px; right: 20px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 100000 !important; display: flex; flex-direction: column; gap: 6px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                 ${filterFlashMsg ? html`
                   <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 8px 10px; font-size: 0.78rem; font-family: monospace; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; cursor: pointer;" onClick=${() => setFilterFlashMsg(null)} title="Click to dismiss">
                     <div style="display: flex; align-items: center; gap: 6px;">
@@ -3319,7 +3307,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
       }
 
     </style>
-                  <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative; max-width: calc(50vw - 100px); overflow: visible;">
+                  <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative; max-width: calc(50vw - 120px); overflow: hidden;">
                     ${logoCommandHub}
                     ${!hideToc ? tocBtn : ''}
                     ${!hideSettings ? settingsBtn : ''}
@@ -3346,12 +3334,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           }
                         }}
                         onKeyDown=${(e) => {
-                          if (e.key === 'Escape') {
-                            if (e.target) e.target.blur();
-                            setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
-                          } else {
-                            e.stopPropagation();
-                          }
+                          e.stopPropagation();
                         }}
                         style="width: 26px; background: rgba(0, 0, 0, 0.04); border: none; border-radius: 3px; text-align: center; font-family: monospace; font-size: 0.9rem; font-weight: 700; padding: 1px 2px; color: #222; outline: none;"
                         title="Jump to Record Index (Editable)"
@@ -3384,8 +3367,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     `;
                   })() : ''}
 
-                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 6px; max-width: calc(50vw - ${telemetryOffset}px); overflow: visible; justify-content: flex-end;">
-                    ${!hideRightFilter ? html`<div style="position: relative; display: inline-flex; align-items: center;">${filterBtn}${filterPopup}</div>` : ''}
+                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 6px; max-width: calc(50vw - 120px); overflow: hidden; justify-content: flex-end;">
+                    ${!hideRightFilter ? filterBtn : ''}
+                    ${filterPopup}
             ${(!isFilterOpen && filterFlashMsg) ? html`
               <div style="position: absolute; bottom: calc(100% + 10px); right: 120px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; font-family: monospace; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.18); z-index: 10005; display: flex; align-items: center; gap: 8px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
@@ -3475,7 +3459,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <button class="modal-close" onClick=${() => setIsSearchOpen(false)} style="position: absolute; top: 16px; right: 16px; z-index: 101000; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #333; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1; transition: all 0.2s;" title="Close Search (Esc)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
-                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} onKeyDown=${(e) => { if (e.key === 'Escape') { e.target.blur(); setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false); } }} style="flex-shrink: 0; width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
+                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} style="flex-shrink: 0; width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
                   <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
                     ${searchHistoryLayout}
                     ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
@@ -3694,7 +3678,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.27-b292';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.27-b291';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
