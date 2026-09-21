@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b298';
+const APP_VERSION = 'v8.14.1-b299';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1137,8 +1137,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
     const topPos = (laneIdx * laneHeight) + 15;
     const blockHeight = Math.max(24, ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight);
-    const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title), 180, hasMedia);
     const hasMedia = item.media && item.media.length > 0;
+    const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title), 180, hasMedia);
 
     const stackKey = `${itemStartMs}_${laneIdx}`;
     if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
