@@ -177,7 +177,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
 .event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
 .event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
-.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 6px 2px calc(var(--diag-w) + 12px); clip-path: polygon( 0 calc(50% - var(--half-lane, 12px)), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + var(--half-lane, 12px)) ); }
+.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 4px 2px calc(var(--diag-w) + 6px); clip-path: polygon( 0 calc(50% - var(--half-lane, 12px)), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + var(--half-lane, 12px)) ); }
 .event-block:hover { filter: brightness(1.05); z-index: 40 !important; width: max-content !important; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.25)); }
 .timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
 .timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b296';
+const APP_VERSION = 'v8.14.1-b297';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -763,14 +763,14 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   };
 
   const formatLabelSmart = (titleStr, maxPx = 180) => {
-    if (!titleStr) return { lines: ['Untitled'], pxWidth: 50 };
+    if (!titleStr) return { lines: ['Untitled'], pxWidth: 40 };
     const clean = safeStripHTML(titleStr);
     const words = clean.split(/\s+/);
-    if (words.length <= 3) return { lines: [clean], pxWidth: Math.max(50, Math.round(clean.length * 6.8 + 18)) };
+    if (words.length <= 3) return { lines: [clean], pxWidth: Math.max(40, Math.round(clean.length * 6.0 + 10)) };
     const mid = Math.ceil(words.length / 2);
     const line1 = words.slice(0, mid).join(' ');
     const line2 = words.slice(mid).join(' ');
-    return { lines: [line1, line2], pxWidth: Math.max(50, Math.round(Math.max(line1.length, line2.length) * 6.8 + 18)) };
+    return { lines: [line1, line2], pxWidth: Math.max(40, Math.round(Math.max(line1.length, line2.length) * 6.0 + 10)) };
   };
 
   const getParsedTags = (rawTagsArray) => {
@@ -1029,9 +1029,15 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 2000) : Math.max(zoomLevel / 1.5, 1), 'mouse', e.clientX - wrapperRef.current.getBoundingClientRect().left);
   };
 
+  const rafScrollRef = useRef(null);
   const onScroll = () => {
-    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-    scrollTimeout.current = setTimeout(() => { if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft); }, 100);
+    if (wrapperRef.current) {
+      const scrollPos = wrapperRef.current.scrollLeft;
+      if (rafScrollRef.current) cancelAnimationFrame(rafScrollRef.current);
+      rafScrollRef.current = requestAnimationFrame(() => {
+        setViewLeftEdge(scrollPos);
+      });
+    }
   };
 
   const viewPadMs = visibleTimeSpanMs * 0.5;
@@ -3018,10 +3024,10 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           // Smart label fallback: if showButtonText is active but left space < 350px, fall back to compact icon mode
           const effectiveBtnW = (showButtonText && leftAvailableWidth >= 350) ? 85 : 38;
 
-          const hideTelemetry = leftAvailableWidth < (logoW + 5 * effectiveBtnW);
-          const hideSettings  = leftAvailableWidth < (logoW + 4 * effectiveBtnW);
+          const hideSpecs     = leftAvailableWidth < (logoW + 5 * effectiveBtnW);
+          const hideTelemetry = leftAvailableWidth < (logoW + 4 * effectiveBtnW);
           const hideReset     = leftAvailableWidth < (logoW + 3 * effectiveBtnW);
-          const hideSpecs     = leftAvailableWidth < (logoW + 2 * effectiveBtnW);
+          const hideSettings  = leftAvailableWidth < (logoW + 2 * effectiveBtnW);
           const hideToc       = leftAvailableWidth < (logoW + 1 * effectiveBtnW); // ToC is level 1 = LAST to collapse
           const isSpaceConstrained = hideSpecs;
 
@@ -3063,7 +3069,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward to Next Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg>${nextBtnText}</button>`;
 
           const resetLayoutBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${resetLayout} title="Reset Layout Viewport (55/50/10)" style="display: flex; align-items: center; gap: 4px;">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); resetLayout(); }} title="Reset Layout Viewport (55/50/10)" style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
               ${showButtonText ? html`<span>Reset Layout</span>` : ''}
             </button>
@@ -3112,7 +3118,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const searchBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSearchOpen(true)} title="Interactive Query Index">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); setIsSearchOpen(true); }} title="Interactive Query Index">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               ${searchBtnText}
             </button>
@@ -3163,16 +3169,16 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           const isFilteringActive = isExtractFiltered || isTagFiltered;
 
           const filterBtn = html`
-            <button class="status-btn ${isFilteringActive || isFilterOpen ? 'active' : ''}" onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
+            <button class="${showButtonText ? 'status-btn-text' : 'status-btn'} ${isFilteringActive || isFilterOpen ? 'active' : ''}" onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
               ${filterBtnText}
             </button>
           `;
 
           const filterPopup = isFilterOpen
-            ? html`<div class="tm-dropdown-menu" style="position: absolute; bottom: calc(100% + 6px); right: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 99999 !important; display: flex; flex-direction: column; gap: 6px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+            ? html`<div class="tm-dropdown-menu" style="position: absolute; bottom: calc(100% + 6px); right: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 12px 14px; width: 280px; box-sizing: border-box; z-index: 99999 !important; display: flex; flex-direction: column; gap: 6px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                 ${filterFlashMsg ? html`
-                  <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 8px 10px; font-size: 0.78rem; font-family: monospace; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; cursor: pointer;" onClick=${() => setFilterFlashMsg(null)} title="Click to dismiss">
+                  <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 6px 8px; font-size: 0.74rem; line-height: 1.25; font-family: monospace; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; cursor: pointer; width: 100%; box-sizing: border-box;" onClick=${() => setFilterFlashMsg(null)} title="Click to dismiss">
                     <div style="display: flex; align-items: center; gap: 6px;">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                       <span>${filterFlashMsg}</span>
