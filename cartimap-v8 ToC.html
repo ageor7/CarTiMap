@@ -177,7 +177,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
 .event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
 .event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
-.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon( 0 calc(50% - var(--half-lane, 12px)), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + var(--half-lane, 12px)) ); }
+.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 6px 2px calc(var(--diag-w) + 12px); clip-path: polygon( 0 calc(50% - var(--half-lane, 12px)), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + var(--half-lane, 12px)) ); }
 .event-block:hover { filter: brightness(1.05); z-index: 40 !important; width: max-content !important; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.25)); }
 .timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
 .timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b295';
+const APP_VERSION = 'v8.14.1-b296';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -763,14 +763,14 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   };
 
   const formatLabelSmart = (titleStr, maxPx = 180) => {
-    if (!titleStr) return { lines: ['Untitled'], pxWidth: 60 };
+    if (!titleStr) return { lines: ['Untitled'], pxWidth: 50 };
     const clean = safeStripHTML(titleStr);
     const words = clean.split(/\s+/);
-    if (words.length <= 3) return { lines: [clean], pxWidth: Math.max(60, clean.length * 7 + 35) };
+    if (words.length <= 3) return { lines: [clean], pxWidth: Math.max(50, Math.round(clean.length * 6.8 + 18)) };
     const mid = Math.ceil(words.length / 2);
     const line1 = words.slice(0, mid).join(' ');
     const line2 = words.slice(mid).join(' ');
-    return { lines: [line1, line2], pxWidth: Math.max(60, Math.max(line1.length, line2.length) * 7 + 35) };
+    return { lines: [line1, line2], pxWidth: Math.max(50, Math.round(Math.max(line1.length, line2.length) * 6.8 + 18)) };
   };
 
   const getParsedTags = (rawTagsArray) => {
@@ -3170,8 +3170,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const filterPopup = isFilterOpen
-            ? html`<div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.15); z-index: 99998 !important;" onClick=${() => setIsFilterOpen(false)}>
-                <div style="position: absolute; bottom: calc(100% + 6px); right: 0; background: #fff; border: 1px solid rgba(128,128,128,0.25); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 100000 !important; display: flex; flex-direction: column; gap: 6px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+            ? html`<div class="tm-dropdown-menu" style="position: absolute; bottom: calc(100% + 6px); right: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 99999 !important; display: flex; flex-direction: column; gap: 6px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                 ${filterFlashMsg ? html`
                   <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 8px 10px; font-size: 0.78rem; font-family: monospace; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; cursor: pointer;" onClick=${() => setFilterFlashMsg(null)} title="Click to dismiss">
                     <div style="display: flex; align-items: center; gap: 6px;">
@@ -3249,7 +3248,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     </label>
                   `)}
                 </div>
-              </div></div>`: '';
+              </div>`: '';
 
           const searchHistoryLayout = (searchHistory.length > 0 && !searchQuery)
             ? html`<div style="margin-bottom: 15px;"><div style="font-size: 0.85rem; color: #888; margin-bottom: 8px; font-family: monospace;">Recent Searches:</div><div style="display: flex; flex-wrap: wrap; gap: 6px;">${searchHistory.map(h => html`<button style="background: #f0f0f0; border: 1px solid #ddd; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; color: #444; font-family: monospace;" onClick=${() => setSearchQuery(h)}>${h}</button>`)}</div></div>`
