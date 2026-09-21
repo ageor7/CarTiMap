@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b301';
+const APP_VERSION = 'v8.14.1-b302';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.2.36-b301';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.2.37-b302';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.27-b301';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.28-b302';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.56-b301';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.57-b302';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1177,7 +1177,34 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
 
     if (!xAxisMarker && hasDuration) {
-      const spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      const overlappingEvents = validData.filter(other => {
+        const oStart = other.startDate ? other.startDate.min : renderMinTime;
+        const oEnd = (other.endDate && !isNaN(other.endDate.max)) ? other.endDate.max : ((other.startDate && !isNaN(other.startDate.max) && other.startDate.max > oStart) ? other.startDate.max : oStart);
+        return (oStart <= endVal && oEnd >= itemStartMs);
+      });
+
+      let spanMarkerTooltip = '';
+      if (overlappingEvents.length > 1) {
+        const eventList = overlappingEvents.map((ev, i) => {
+          const oStart = ev.startDate ? ev.startDate.min : renderMinTime;
+          const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
+          let durText = '';
+          if (oEnd > oStart) {
+            const dMs = oEnd - oStart;
+            const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
+            if (dDays >= 365) durText = ` (${(dDays / 365.25).toFixed(1)} yrs)`;
+            else if (dDays >= 30) durText = ` (${Math.round(dDays / 30.43)} mos)`;
+            else if (dDays >= 1) durText = ` (${dDays} days)`;
+            else durText = ` (${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs)`;
+          }
+          const isCurrent = ev.id === item.id;
+          return `${i + 1}. ${isCurrent ? '▶ ' : ''}${safeStripHTML(ev.title)}${durText}`;
+        }).join('\n');
+
+        spanMarkerTooltip = `🔍 Concurrent Active Events (${overlappingEvents.length}) in Duration Span:\n${eventList}\n\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      } else {
+        spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      }
       if (isActive) {
         const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
         const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
@@ -1296,7 +1323,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.23-b301';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.24-b302';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2281,7 +2308,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.29-b301';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.30-b302';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -3738,7 +3765,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.37-b301';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.38-b302';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3862,7 +3889,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.37-b301';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.94-b301';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.95-b302';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
