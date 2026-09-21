@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b305';
+const APP_VERSION = 'v8.15.0-b306';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -363,7 +363,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.3.0-b305';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.3.1-b306';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -591,7 +591,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.14.0-b305';
+MODULE_VERSIONS['MediaViewer'] = 'v2.14.1-b306';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -726,7 +726,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.9.0-b305';
+MODULE_VERSIONS['ContentSlider'] = 'v5.9.1-b306';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1326,7 +1326,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.0-b305';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.1-b306';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2311,7 +2311,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.6.0-b305';
+MODULE_VERSIONS['MapViewer'] = 'v6.6.1-b306';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -3571,6 +3571,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               ${appLayout}
 
               ${durationInspectionPayload && html`
+          <div id="duration-inspection-root">
             <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important;"></div>
             <div id="duration-inspection-modal" class="tm-modal open" style="display: block; width: 90%; max-width: 850px; max-height: 80vh; overflow-y: auto; z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); padding: 20px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
               <button class="modal-close" onClick=${() => setDurationInspectionPayload(null)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
@@ -3598,7 +3599,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     else durText = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
                   }
                   return html`
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: ${isSelected ? '#e6f4ff' : '#ffffff'}; border: 1px solid ${isSelected ? '#007acc' : '#e0e0e0'}; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onClick=${() => { jumpToSlide(data.findIndex(d => d.id === ev.id)); setDurationInspectionPayload(null); }}>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: ${isSelected ? '#e6f4ff' : '#ffffff'}; border: 1px solid ${isSelected ? '#007acc' : '#e0e0e0'}; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onClick=${(e) => { e.stopPropagation(); const tIdx = data.findIndex(d => d.id === ev.id); setDurationInspectionPayload(null); if (tIdx !== -1) { setTimeout(() => jumpToSlide(tIdx), 10); } }}>
                       <div style="display: flex; flex-direction: column; gap: 4px; max-width: 75%;">
                         <div style="font-weight: ${isSelected ? '700' : '600'}; color: ${isSelected ? '#007acc' : '#222'}; font-size: 0.9rem;">
                           ${i + 1}. ${safeStripHTML(ev.title)}
@@ -3613,8 +3614,10 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 })}
               </div>
             </div>
+          </div>
           `}
           ${isSettingsOpen && html`
+          <div id="settings-modal-root">
             <div class="tm-backdrop open" onClick=${() => setIsSettingsOpen(false)} style="z-index: 99999 !important;"></div>
             <div id="settings-modal" class="tm-modal open" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000 !important; width: 85%; max-width: 480px; max-height: 85vh; overflow-y: auto; background: #fff; border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; font-family: monospace; box-sizing: border-box;" onClick=${(e) => e.stopPropagation()}>
               <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
@@ -3676,6 +3679,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
               </div>
             </div>
+          </div>
           `}
 
               ${isTocOpen && html`
@@ -3815,7 +3819,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.0-b305';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.1-b306';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3939,7 +3943,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.0-b305';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.0-b305';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.1-b306';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
