@@ -10,9 +10,11 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="">
 
     </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket-leaflet.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -41,7 +43,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tm-modal::-webkit-scrollbar-thumb, .content-scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
 /* --- [ SubBlock: VibeMonitor & Universal Modals ] --- */
-#vibe-monitor { position: fixed; z-index: 9999; background: #1a1a1a; color: #eee; border: 1px solid #444; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; font-family: monospace; resize: both; min-width: 320px; min-height: 200px; width: 760px; height: 320px; max-width: 95vw; max-height: 85vh; }
+#vibe-monitor { position: fixed; z-index: 9999; background: #1a1a1a; color: #eee; border: 1px solid #444; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; font-family: monospace; resize: both; min-width: 280px; min-height: 200px; width: 320px; height: auto; max-width: 95vw; max-height: 90vh; }
 #vibe-header { background: #333; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #444; user-select: none; font-weight: 600; flex-shrink: 0; }
 .vibe-close-btn { background: transparent; color: #aaa; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.2s; }
 .vibe-close-btn:hover { color: #ff5555; }
@@ -203,6 +205,7 @@ import htm from 'https://esm.sh/htm';
 import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
+const html = htm.bind(h);
 if (!Array.prototype.at) {
   Array.prototype.at = function(n) {
     n = Math.trunc(n) || 0;
@@ -215,12 +218,11 @@ if (!String.prototype.at) {
   String.prototype.at = function(n) {
     n = Math.trunc(n) || 0;
     if (n < 0) n += this.length;
-    if (n < 0 || n >= this.length) return "";
-    return this.charAt(n);
+    if (n < 0 || n >= this.length) return undefined;
+    return this[n];
   };
 }
-const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b319';
+const APP_VERSION = 'v8.15.0-b320';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -243,7 +245,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   const monitorRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [pos, setPos] = useState({"x": -1000, "y": -1000});
-  const [size, setSize] = useState({"w": "760px", "h": "320px"});
+  const [size, setSize] = useState({"w": "640px", "h": "auto"});
   const dragStart = useRef({"x": 0, "y": 0});
   const hasInitPos = useRef(false);
   const [isConfigMode, setIsConfigMode] = useState(false);
@@ -254,10 +256,9 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
 
   useEffect(() => {
     if (!hasInitPos.current) {
-      const activeTimelineH = isTimelineExpanded ? timelineRequiredHeight : Math.max(120, window.innerHeight * 0.10);
-      const monitorH = 320;
-      const yPos = Math.max(10, window.innerHeight - activeTimelineH - 38 - 12 - monitorH);
-      setPos({"x": 15, "y": yPos});
+      const activeTimelineH = isTimelineExpanded ? timelineRequiredHeight : (window.innerHeight * 0.10);
+      const yPos = window.innerHeight - activeTimelineH - 32 - 10 - 250;
+      setPos({"x": 15, "y": Math.max(10, yPos)});
       hasInitPos.current = true;
     }
   }, [isTimelineExpanded, timelineRequiredHeight]);
@@ -300,7 +301,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   const handleToggleField = (field) => {
     const newFields = trackedFields.includes(field) ? trackedFields.filter(f => f !== field) : [...trackedFields, field];
     setTrackedFields(newFields);
-    try { localStorage.setItem('tm_telemetry_fields', JSON.stringify(newFields)); } catch(e){}
+    localStorage.setItem('tm_telemetry_fields', JSON.stringify(newFields));
   };
 
   const availableFields = activeSlide ? Object.keys(activeSlide) : ['id', 'title', 'startDate', 'endDate', 'place', 'location', 'priority', 'tags'];
@@ -379,7 +380,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.3.14-b319';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.2.38-b303';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -397,7 +398,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     carouselWidthRef.current = carouselRef.current.clientWidth;
     if (window.ResizeObserver) {
       const ro = new ResizeObserver(entries => {
-        const entry = entries[0];
+        const entry = entries.at(0);
         if (entry) carouselWidthRef.current = entry.contentRect.width;
       });
       ro.observe(carouselRef.current);
@@ -450,7 +451,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     const url = rawUrl.trim();
     if (url.toLowerCase().startsWith('<iframe')) {
       const match = url.match(/src=["']([^"']+)["']/);
-      return match ? match[1] : '#';
+      return match ? match.at(1) : '#';
     }
     return url;
   };
@@ -506,25 +507,25 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
   const renderMedia = (rawUrl) => {
     const url = getCleanUrl(rawUrl);
     const lowUrl = url.toLowerCase();
-    const evalUrl = lowUrl.split('?')[0] || '';
+    const evalUrl = lowUrl.split('?').at(0) || '';
 
     if (lowUrl.includes('youtube.com') || lowUrl.includes('youtu.be')) {
       let embedUrl = url;
       if (!url.includes('/embed/')) {
         const idMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-        if (idMatch) embedUrl = `https://www.youtube.com/embed/${idMatch[1]}?enablejsapi=1`;
+        if (idMatch) embedUrl = `https://www.youtube.com/embed/${idMatch.at(1)}?enablejsapi=1`;
       } else if (!url.includes('enablejsapi=1')) {
         embedUrl += (url.includes('?') ? '&' : '?') + 'enablejsapi=1';
       }
       const tMatch = url.match(/[?&]t=([^&]+)/);
       if (tMatch) {
-        const tVal = tMatch[1];
+        const tVal = tMatch.at(1);
         let seconds = parseInt(tVal, 10);
         if (isNaN(seconds)) {
           const hVal = tVal.match(/(\d+)h/);
           const mVal = tVal.match(/(\d+)m/);
           const sVal = tVal.match(/(\d+)s/);
-          seconds = (hVal ? parseInt(hVal[1], 10) * 3600 : 0) + (mVal ? parseInt(mVal[1], 10) * 60 : 0) + (sVal ? parseInt(sVal[1], 10) : 0);
+          seconds = (hVal ? parseInt(hVal.at(1), 10) * 3600 : 0) + (mVal ? parseInt(mVal.at(1), 10) * 60 : 0) + (sVal ? parseInt(sVal.at(1), 10) : 0);
         }
         embedUrl += `&start=${seconds}`;
       }
@@ -607,7 +608,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.14.14-b319';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.29-b303';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -742,14 +743,14 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.9.14-b319';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.58-b303';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.10 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
-const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane, setDurationInspectionPayload }) => {
+const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
   const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? s.text : (s && s.date ? s.date.toLocaleDateString(loc || 'en-GB') : 'Undated')));
   const wrapperRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -761,13 +762,13 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const [containerHeight, setContainerHeight] = useState(200);
   const [viewLeftEdge, setViewLeftEdge] = useState(0);
   const [caliperTooltip, setCaliperTooltip] = useState(null);
-  
+  const [durationModalData, setDurationModalData] = useState(null);
   const hoverTimeoutRef = useRef(null);
   const lastMouseXRef = useRef(0);
 
   useEffect(() => {
     const ro = new ResizeObserver(entries => {
-      const entry = entries[0];
+      const entry = entries.at(0);
       if (entry && entry.target) {
         setContainerHeight(entry.target.clientHeight);
       }
@@ -843,23 +844,23 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           if (d.tags) {
             const tList = getParsedTags(d.tags);
             if (tList.includes(cand)) {
-              if (tList.includes(orderedTags[orderedTags.length - 1])) interLast++;
-              if (tList.includes(orderedTags[0])) interFirst++;
+              if (tList.includes(orderedTags.at(-1))) interLast++;
+              if (tList.includes(orderedTags.at(0))) interFirst++;
             }
           }
         });
         if (interLast > maxIntersection) { maxIntersection = interLast; bestMatchIdx = i; insertPos = 'push'; }
         if (interFirst > maxIntersection) { maxIntersection = interFirst; bestMatchIdx = i; insertPos = 'unshift'; }
       }
-      if (insertPos === 'push') { orderedTags.push(remaining[bestMatchIdx]); remaining.splice(bestMatchIdx, 1); }
-      else { orderedTags.unshift(remaining[bestMatchIdx]); remaining.splice(bestMatchIdx, 1); }
+      if (insertPos === 'push') { orderedTags.push(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
+      else { orderedTags.unshift(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
     }
   const laneCount = Math.max(1, orderedTags.length);
   const availableHeight = Math.max(40, containerHeight - 53);
   const laneHeight = Math.max(16, Math.min(36, availableHeight / laneCount));
 
   const validData = (data || []).filter(d => d.startDate && !isNaN(d.startDate.min));
-  const minTimeRaw = validData.length > 0 ? validData[0].startDate.min : new Date().getTime();
+  const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
   let maxTimeRaw = minTimeRaw;
 
   validData.forEach(d => {
@@ -957,10 +958,10 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const activeSlide = data[activeIndex]; const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
         if (activeDataIndex >= 0) {
           if (zoomLock === 'auto') {
-            let clusterMin = validData[Math.max(0, activeDataIndex - 2)].startDate.min;
-            let clusterMax = validData[activeDataIndex].endDate && !isNaN(validData[activeDataIndex].endDate.max) ? validData[activeDataIndex].endDate.max : validData[activeDataIndex].startDate.min;
+            let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
+            let clusterMax = validData.at(activeDataIndex).endDate && !isNaN(validData.at(activeDataIndex).endDate.max) ? validData.at(activeDataIndex).endDate.max : validData.at(activeDataIndex).startDate.min;
             for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
-              const node = validData[i];
+              const node = validData.at(i);
               clusterMax = Math.max(clusterMax, node.startDate.min);
               clusterMin = Math.min(clusterMin, node.startDate.min);
             }
@@ -1026,11 +1027,11 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const onDown = (e) => {
     if (zoomLock !== 'hard') setZoomLock('soft');
     if (e.touches && e.touches.length === 2) {
-      const t1 = (e.touches && e.touches.length > 0 ? e.touches[0] : null); const t2 = (e.touches && e.touches.length > 1 ? e.touches[1] : null);
+      const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
       touchZoomRef.current = { initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY), initialZoom: zoomLevel };
       return;
     }
-    const t1 = e.touches ? (e.touches && e.touches.length > 0 ? e.touches[0] : null) : e;
+    const t1 = e.touches ? Array.from(e.touches).at(0) : e;
     dragRef.current = { isDragging: true, startX: t1.clientX, scrollLeft: wrapperRef.current.scrollLeft, hasDragged: false };
     wrapperRef.current.classList.add('is-dragging');
     if (caliperTooltip) setCaliperTooltip(null);
@@ -1040,14 +1041,14 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
   const onMove = (e) => {
     if (e.touches && e.touches.length === 2 && touchZoomRef.current.initialDist > 0) {
-      const t1 = (e.touches && e.touches.length > 0 ? e.touches[0] : null); const t2 = (e.touches && e.touches.length > 1 ? e.touches[1] : null);
+      const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
       const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
       const factor = dist / touchZoomRef.current.initialDist;
       handleManualZoom(Math.max(1, Math.min(2000, touchZoomRef.current.initialZoom * factor)), 'center');
       return;
     }
     if (!dragRef.current.isDragging) return;
-    const t1 = e.touches ? (e.touches && e.touches.length > 0 ? e.touches[0] : null) : e;
+    const t1 = e.touches ? Array.from(e.touches).at(0) : e;
     const dx = dragRef.current.startX - t1.clientX;
     if (Math.abs(dx) > 3) dragRef.current.hasDragged = true;
     wrapperRef.current.scrollLeft = dragRef.current.scrollLeft + dx;
@@ -1075,7 +1076,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
 
     const targetMsPerMajorTick = Math.max((120 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
-    let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs[scaleConfigs.length - 1];
+    let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
 
     let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
     iterDate.setMilliseconds(0);
@@ -1228,7 +1229,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
         const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); if (typeof setDurationInspectionPayload === 'function') setDurationInspectionPayload({ item, overlappingEvents }); }}></div>`;
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationModalData({ item, overlappingEvents }); }}></div>`;
       } else {
         const styleIdx = index % 4;
         const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
@@ -1237,7 +1238,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
         const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); if (typeof setDurationInspectionPayload === 'function') setDurationInspectionPayload({ item, overlappingEvents }); }}>
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationModalData({ item, overlappingEvents }); }}>
             <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}" title="${spanMarkerTooltip}"></div>
           </div>
         `;
@@ -1280,6 +1281,50 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
+      ${durationModalData ? html`
+        <div class="tm-backdrop open" onClick=${() => setDurationModalData(null)} style="z-index: 10000;"></div>
+        <div class="tm-modal open" style="display: block; width: 90%; max-width: 850px; max-height: 80vh; overflow-y: auto; z-index: 10001; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); padding: 20px; font-family: monospace;">
+          <button class="modal-close" onClick=${() => setDurationModalData(null)} title="Close">✕</button>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #007acc; padding-bottom: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <h3 style="margin: 0; font-size: 1.15rem; color: #222;">Duration Detail Inspection HUD</h3>
+            <span style="font-size: 0.75rem; background: #e6f4ff; color: #007acc; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${durationModalData.overlappingEvents.length} Concurrent Actions</span>
+          </div>
+          <div style="font-size: 0.85rem; color: #555; margin-bottom: 15px; background: #f8f9fa; padding: 8px 12px; border-radius: 4px; border: 1px solid #eee;">
+            <strong>Target Event:</strong> ${safeStripHTML(durationModalData.item.title)}<br/>
+            <strong>Time Interval:</strong> ${formatSmartDate(durationModalData.item.startDate, durationModalData.item.endDate, dateLocale)}
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 5px;">
+            ${durationModalData.overlappingEvents.map((ev, i) => {
+              const isSelected = ev.id === durationModalData.item.id;
+              const oStart = ev.startDate ? ev.startDate.min : renderMinTime;
+              const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
+              let durStr = '';
+              if (oEnd > oStart) {
+                const dMs = oEnd - oStart;
+                const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
+                if (dDays >= 365) durStr = `${(dDays / 365.25).toFixed(1)} yrs`;
+                else if (dDays >= 30) durStr = `${Math.round(dDays / 30.43)} mos`;
+                else if (dDays >= 1) durStr = `${dDays} days`;
+                else durStr = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
+              }
+              return html`
+                <div style="background: ${isSelected ? '#e6f4ff' : '#fafafa'}; border: 1px solid ${isSelected ? '#007acc' : '#e0e0e0'}; border-radius: 6px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center;" onClick=${() => { handleNodeClick(data.findIndex(d => d.id === ev.id)); setDurationModalData(null); }}>
+                  <div style="display: flex; flex-direction: column; gap: 4px; max-width: 75%;">
+                    <div style="font-weight: 700; color: ${isSelected ? '#007acc' : '#222'}; font-size: 0.9rem;">
+                      ${i + 1}. ${safeStripHTML(ev.title)}
+                    </div>
+                    <div style="font-size: 0.78rem; color: #666;">
+                      📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${ev.tags ? `• 🏷️ ${Array.isArray(ev.tags) ? ev.tags.join(', ') : ev.tags}` : ''}
+                    </div>
+                  </div>
+                  ${durStr ? html`<div style="font-size: 0.8rem; font-weight: 700; color: #007acc; background: #ffffff; border: 1px solid #70b8ff; padding: 4px 10px; border-radius: 12px; white-space: nowrap;">⏳ ${durStr}</div>` : ''}
+                </div>
+              `;
+            })}
+          </div>
+        </div>
+      ` : ''}
       <div class="timeline-window-toolbar" style="position: absolute; top: 8px; right: 12px; z-index: 1000; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.95); padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
         <button class="status-btn" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -1342,7 +1387,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.14-b319';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.25-b303';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1408,7 +1453,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   const finalW = minimapWrapperRef.current.offsetWidth;
                   const finalH = minimapWrapperRef.current.offsetHeight;
                   if (finalW && finalH) {
-                    try { localStorage.setItem('tm_minimap_size', JSON.stringify({ w: finalW, h: finalH })); } catch(e){}
+                    localStorage.setItem('tm_minimap_size', JSON.stringify({ w: finalW, h: finalH }));
                   }
                 } catch(e) {}
               }
@@ -1447,7 +1492,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             if (basemapsRegistry && basemapsRegistry.length > 0) {
               if (!initialLoadRef.current) {
                 const bases = basemapsRegistry.filter(b => (b.type || 'base').toLowerCase() !== 'overlay');
-                const defaultBase = bases.find(b => b.active) || bases[0];
+                const defaultBase = bases.find(b => b.active) || bases.at(0);
                 if (defaultBase && !activeBasemap) {
                   setActiveBasemap(defaultBase.id);
                 }
@@ -1477,7 +1522,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
           useEffect(() => {
             try {
-              const savedSize = (() => { try { return JSON.parse(localStorage.getItem('tm_minimap_size')); } catch(e) { return null; } })();
+              const savedSize = JSON.parse(localStorage.getItem('tm_minimap_size'));
               if (savedSize && savedSize.w && savedSize.h && minimapWrapperRef.current) {
                 minimapWrapperRef.current.style.width = `${savedSize.w}px`;
                 minimapWrapperRef.current.style.height = `${savedSize.h}px`;
@@ -2139,7 +2184,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             const triggerFly = () => {
               const markers = markersRef.current;
               if (!markers || markers.length === 0) return;
-              const activeLayers = markers[activeIndex] || markers[activeIndex];
+              const activeLayers = markers[activeIndex] || markers.at(activeIndex);
               if (activeLayers && activeLayers.length > 0) {
                 const activeFeatureGroup = L.featureGroup(activeLayers);
                 try {
@@ -2327,7 +2372,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.6.14-b319';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.31-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2346,13 +2391,10 @@ const App = () => {
           const [data, setData] = useState([]);
           const [aboutData, setAboutData] = useState(null);
           const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
-          const [retryTrigger, setRetryTrigger] = useState(0);
-          const [manualCsvRows, setManualCsvRows] = useState(null);
           const [activeIndex, setActiveIndex] = useState(0);
           const [slideHistory, setSlideHistory] = useState([]);
           const [forwardHistory, setForwardHistory] = useState([]);
-          const [isMonitorOpen, setIsMonitorOpen] = useState(true);
-          const [durationInspectionPayload, setDurationInspectionPayload] = useState(null);
+          const [isMonitorOpen, setIsMonitorOpen] = useState(false);
           const [isAboutOpen, setIsAboutOpen] = useState(false);
           const [isSettingsOpen, setIsSettingsOpen] = useState(false);
           const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -2494,7 +2536,7 @@ const App = () => {
           const hasInitializedRef = useRef(false);
 
           const addLog = (msg, type = 'info') => {
-            const timeStr = new Date().toTimeString().split(' ')[0];
+            const timeStr = new Date().toTimeString().split(' ').at(0);
             setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
           };
 
@@ -2531,58 +2573,27 @@ const App = () => {
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
             const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
 
-            const getEmbeddedPrimaryRows = () => {
-              try {
-                const globalSD = (typeof sheetsData !== 'undefined' && sheetsData) ? sheetsData : ((typeof window !== 'undefined' && window.sheetsData) ? window.sheetsData : null);
-                if (!globalSD) return null;
-                const targetArray = globalSD.ExtractsCombinedV || globalSD.SourcesT || globalSD.Primary || globalSD.Data || (Array.isArray(globalSD) ? globalSD : null);
-                return (Array.isArray(targetArray) && targetArray.length > 0) ? targetArray : null;
-              } catch(e) { return null; }
-            };
+            setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
+            addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
 
             const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
             const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
 
-            const embeddedRows = manualCsvRows || getEmbeddedPrimaryRows();
-            let fetchPromise;
-
-            if (embeddedRows) {
-              addLog(`[Local Ingestion] Direct memory dataset detected (${embeddedRows.length} records). Bypassing network fetch.`, 'info');
-              setStatus({ text: 'Compiling embedded datasets...', progress: 40, isFading: false, active: false });
-              fetchPromise = Promise.resolve([null, null, embeddedRows]);
-            } else {
-              setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
-              addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
-
-              fetchPromise = Promise.all([
-                fetch(fetchUrlPrimary).then(res => {
-                  if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
-                  return res.text();
-                }),
-                fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => res.ok ? res.text() : null).catch(() => null) : Promise.resolve(null),
-                null
-              ]).catch(err => {
-                const retryEmbedded = getEmbeddedPrimaryRows();
-                if (retryEmbedded) {
-                  addLog(`[Network Warning] Fetch failed (${err.message}). Falling back to embedded sheetsData.`, 'warning');
-                  return [null, null, retryEmbedded];
-                }
-                throw err;
-              });
-            }
-
-            fetchPromise.then(([primaryCsv, basemapsCsv, directRows]) => {
+            Promise.all([
+              fetch(fetchUrlPrimary).then(res => {
+                if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
+                return res.text();
+              }),
+              fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
+                if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status ${res.status})`);
+                return res.text();
+              }) : Promise.resolve(null)
+            ]).then(([primaryCsv, basemapsCsv]) => {
               setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
 
-              let rows = [];
-              if (directRows) {
-                rows = directRows;
-              } else if (primaryCsv) {
-                const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
-                if (results.errors.length > 0) {
-                  results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
-                }
-                rows = results.data;
+              const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
+              if (results.errors.length > 0) {
+                results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
               }
 
               const exactGet = (normObj, key) => {
@@ -2591,8 +2602,8 @@ const App = () => {
               };
 
               const firstRowNorm = {};
-              if (rows.length > 0) {
-                const [ firstRow ] = rows; for (let k in firstRow) firstRowNorm[k.toLowerCase().trim()] = firstRow[k];
+              if (results.data.length > 0) {
+                const [ firstRow ] = results.data; for (let k in firstRow) firstRowNorm[k.toLowerCase().trim()] = firstRow[k];
               }
 
               const aboutDataObj = {
@@ -2605,7 +2616,7 @@ const App = () => {
 
               let activeMode = dateEngineMode;
               if (activeMode === 'auto') {
-                const hasEDTF = rows.some(row => {
+                const hasEDTF = results.data.some(row => {
                   const norm = {};
                   for (let k in row) norm[k.toLowerCase().trim()] = row[k];
                   return exactGet(norm, 'start edtf') !== '';
@@ -2614,6 +2625,7 @@ const App = () => {
               }
               const isUS = dateLocale === 'en-US';
               const omniSplitRegex = /\||\r?\n/;
+              const rows = results.data;
 
               const parseChronoNode = (legacyStr, edtfStr, index, rowTitle) => {
                 const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
@@ -2821,7 +2833,7 @@ const App = () => {
               setStatus({ text: 'Database Sync Failure', progress: 100, isFading: false, active: false });
               addLog(`Database Sync Error: ${err.message}`, 'error');
             });
-          }, [rawCsvRows, dateEngineMode, dateLocale, retryTrigger, manualCsvRows]);
+          }, [rawCsvRows, dateEngineMode, dateLocale]);
 
           // --- [ Active filtering of datasets by swimlanes and streams ] ---
           useEffect(() => {
@@ -2990,7 +3002,7 @@ const App = () => {
 
           const goBack = () => {
             if (slideHistory.length > 0) {
-              const prev = slideHistory[slideHistory.length - 1];
+              const prev = slideHistory.at(-1);
               setSlideHistory(h => h.slice(0, -1));
               setForwardHistory(f => [...f, activeIndex]);
               setActiveIndex(prev);
@@ -2999,7 +3011,7 @@ const App = () => {
 
           const goForward = () => {
             if (forwardHistory.length > 0) {
-              const next = forwardHistory[forwardHistory.length - 1];
+              const next = forwardHistory.at(-1);
               setForwardHistory(f => f.slice(0, -1));
               setSlideHistory(h => [...h, activeIndex]);
               setActiveIndex(next);
@@ -3053,7 +3065,7 @@ const App = () => {
             if (qString && !searchHistory.includes(qString)) {
               const newH = [qString, ...searchHistory].slice(0, 8);
               setSearchHistory(newH);
-              try { localStorage.setItem('tm_search_history', JSON.stringify(newH)); } catch(e){}
+              localStorage.setItem('tm_search_history', JSON.stringify(newH));
             }
           };
 
@@ -3077,7 +3089,7 @@ const App = () => {
           };
 
           const searchResults = executeSearch(searchQuery);
-          const activeSlide = data[activeIndex];
+          const activeSlide = data.at(activeIndex);
           const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
 
           // =========================================================================
@@ -3286,7 +3298,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     <input type="checkbox"
                       checked=${allTags.length > 0 && activeTags.length === allTags.length}
                       onChange=${() => {
-                        const curSlideForTags = data[activeIndex] || unfilteredData[activeIndex] || unfilteredData[0];
+                        const curSlideForTags = data.at(activeIndex) || unfilteredData.at(activeIndex) || unfilteredData[0];
                         const curSlideTags = (curSlideForTags && curSlideForTags.tags && curSlideForTags.tags.length > 0)
                           ? curSlideForTags.tags.filter(t => allTags.includes(t))
                           : [];
@@ -3320,7 +3332,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     <input type="checkbox"
                       checked=${masterExtractTypes.length > 0 && activeExtractTypes.length === masterExtractTypes.length}
                       onChange=${() => {
-                        const curSlideForTypes = data[activeIndex] || unfilteredData[activeIndex] || unfilteredData[0];
+                        const curSlideForTypes = data.at(activeIndex) || unfilteredData.at(activeIndex) || unfilteredData[0];
                         const curType = curSlideForTypes ? curSlideForTypes.extractType : null;
                         const activeSlideTypeSelection = (curType && masterExtractTypes.includes(curType))
                           ? [curType]
@@ -3357,53 +3369,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           const searchResultsList = searchResults.map(res => html`<div class="search-result-item" onClick=${() => handleResultClick(res.id, searchQuery)}><div class="search-result-title" style="font-family: monospace; font-size: 0.95rem;">${safeStripHTML(res.title)}</div><div class="search-result-meta" style="font-family: monospace; font-size: 0.8rem;">${formatSmartDate(res.startDate, res.endDate, dateLocale)} ${res.place ? ` • ${safeStripHTML(formatPlaces(res.place))}` : ''}</div></div>`);
 
-          const handleLocalCsvFileSelect = (e) => {
-            const file = e.target.files && e.target.files[0];
-            if (!file) return;
-            addLog(`[Local CSV Hydration] Processing user uploaded file: "${file.name}" (${file.size} bytes)...`, 'info');
-            setStatus({ text: `Parsing local CSV "${file.name}"...`, progress: 35, isFading: false, active: false });
-            Papa.parse(file, {
-              header: true,
-              skipEmptyLines: true,
-              complete: (results) => {
-                if (results.data && results.data.length > 0) {
-                  addLog(`[Local CSV Hydration] Successfully parsed ${results.data.length} rows from "${file.name}". Hydrating engine...`, 'info');
-                  setManualCsvRows(results.data);
-                } else {
-                  addLog(`[Local CSV Hydration Error] File "${file.name}" contained no valid header rows.`, 'error');
-                  setStatus({ text: 'Local CSV Parsing Error: File is empty or invalid.', progress: 100, isFading: false, active: false });
-                }
-              },
-              error: (err) => {
-                addLog(`[Local CSV Hydration Error] ${err.message}`, 'error');
-                setStatus({ text: `Local CSV Parse Error: ${err.message}`, progress: 100, isFading: false, active: false });
-              }
-            });
-          };
-
-          const isSyncFailure = status.text && status.text.includes('Failure');
-
           const loadingScreen = (!status.active)
             ? html`<div class="loading-screen ${status.isFading ? 'fade-out' : ''}">
                 <${CarTiMapperLogo} context="splash" appVersion=${APP_VERSION} />
-                <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%; background: ${isSyncFailure ? '#dc3545' : '#007acc'};"></div></div>
-                <div class="status-text" style="font-family: monospace; font-size: 0.95rem; margin-top: 1.2rem; color: ${isSyncFailure ? '#dc3545' : '#333'};"><br/>${status.text}</div>
-                ${isSyncFailure ? html`
-                  <div style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; width: 90%; max-width: 480px; background: #ffffff; border: 1px solid #f5c6cb; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                    <div style="font-size: 0.85rem; color: #721c24; text-align: center; line-height: 1.4;">
-                      Google Sheets WAN connection timed out or is restricted. You can retry the connection or hydrate CarTiMap directly with a local database CSV file.
-                    </div>
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                      <button onClick=${() => { setStatus({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false }); setRetryTrigger(prev => prev + 1); }} style="background: #007acc; color: #ffffff; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; font-family: monospace; transition: background 0.2s;">
-                        🔄 Retry Connection
-                      </button>
-                      <label style="background: #28a745; color: #ffffff; padding: 10px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; font-family: monospace; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px;">
-                        📁 Upload Local CSV
-                        <input type="file" accept=".csv" onChange=${handleLocalCsvFileSelect} style="display: none;" />
-                      </label>
-                    </div>
-                  </div>
-                ` : ''}
+                <div class="loading-bar-container"><div class="loading-bar-fill" style="width: ${status.progress}%"></div></div>
+                <div class="status-text" style="font-family: monospace; font-size: 0.95rem; margin-top: 1.2rem;"><br/>${status.text}</div>
               </div>`
             : '';
 
@@ -3586,7 +3556,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     setZoomLock=${setZoomLock}
                     isTimelineMinimized=${isTimelineMinimized}
                     setIsTimelineMinimized=${setIsTimelineMinimized}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     dateLocale=${dateLocale}
                     formatSmartDate=${formatSmartDate}
                     timelineRequiredHeight=${timelineRequiredHeight}
@@ -3660,56 +3629,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               ${loadingScreen}
               ${appLayout}
 
-          <div id="duration-inspection-root" style="display: ${durationInspectionPayload ? 'block' : 'none'};">
-            <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important;"></div>
-            <div id="duration-inspection-modal" class="tm-modal open" style="display: block; width: 90%; max-width: 850px; max-height: 80vh; overflow-y: auto; z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); padding: 20px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
-              ${durationInspectionPayload ? html`
-              <button class="modal-close" onClick=${() => setDurationInspectionPayload(null)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #007acc; padding-bottom: 8px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <h3 style="margin: 0; font-size: 1.15rem; color: #222;">Duration Detail Inspection HUD</h3>
-                <span style="font-size: 0.75rem; background: #e6f4ff; color: #007acc; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${durationInspectionPayload.overlappingEvents.length} Concurrent Actions</span>
-              </div>
-              <div style="font-size: 0.85rem; color: #555; margin-bottom: 15px; background: #f8f9fa; padding: 8px 12px; border-radius: 4px; border: 1px solid #eee;">
-                <strong>Target Event:</strong> ${safeStripHTML(durationInspectionPayload.item.title)}<br/>
-                <strong>Time Interval:</strong> ${formatSmartDate(durationInspectionPayload.item.startDate, durationInspectionPayload.item.endDate, dateLocale)}
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 5px;">
-                ${durationInspectionPayload.overlappingEvents.map((ev, i) => {
-                  const isSelected = ev.id === durationInspectionPayload.item.id;
-                  const oStart = ev.startDate ? ev.startDate.min : 0;
-                  const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
-                  let durText = '';
-                  if (oEnd > oStart) {
-                    const dMs = oEnd - oStart;
-                    const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
-                    if (dDays >= 365) durText = `${(dDays / 365.25).toFixed(1)} yrs`;
-                    else if (dDays >= 30) durText = `${Math.round(dDays / 30.43)} mos`;
-                    else if (dDays >= 1) durText = `${dDays} days`;
-                    else durText = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
-                  }
-                  return html`
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: ${isSelected ? '#e6f4ff' : '#ffffff'}; border: 1px solid ${isSelected ? '#007acc' : '#e0e0e0'}; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onClick=${(e) => { e.stopPropagation(); const tIdx = data.findIndex(d => d.id === ev.id); setDurationInspectionPayload(null); if (tIdx !== -1) { setTimeout(() => jumpToSlide(tIdx), 10); } }}>
-                      <div style="display: flex; flex-direction: column; gap: 4px; max-width: 75%;">
-                        <div style="font-weight: ${isSelected ? '700' : '600'}; color: ${isSelected ? '#007acc' : '#222'}; font-size: 0.9rem;">
-                          ${i + 1}. ${safeStripHTML(ev.title)}
-                        </div>
-                        <div style="font-size: 0.78rem; color: #666;">
-                          📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${ev.tags ? `• 🏷️ ${Array.isArray(ev.tags) ? ev.tags.join(', ') : ev.tags}` : ''}
-                        </div>
-                      </div>
-                      ${durText ? html`<div style="font-size: 0.8rem; font-weight: 700; color: #007acc; background: #ffffff; border: 1px solid #70b8ff; padding: 4px 10px; border-radius: 12px; white-space: nowrap;">⏳ ${durText}</div>` : ''}
-                    </div>
-                  `;
-                })}
-              </div>
-            </div>
-          ` : ''}
-          </div>
-          <div id="settings-modal-root" style="display: ${isSettingsOpen ? 'block' : 'none'};">
+              ${isSettingsOpen && html`
             <div class="tm-backdrop open" onClick=${() => setIsSettingsOpen(false)} style="z-index: 99999 !important;"></div>
             <div id="settings-modal" class="tm-modal open" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000 !important; width: 85%; max-width: 480px; max-height: 85vh; overflow-y: auto; background: #fff; border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; font-family: monospace; box-sizing: border-box;" onClick=${(e) => e.stopPropagation()}>
-              ${isSettingsOpen ? html`
               <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
               <h3 style="margin-top: 0; font-size: 1.25rem; margin-bottom: 20px; color: #222; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">⚙️ Engine Settings</h3>
               
@@ -3768,9 +3690,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <button onClick=${() => setIsSettingsOpen(false)} style="background: #007acc; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; font-family: monospace; cursor: pointer;">Done</button>
                 </div>
               </div>
-            ` : ''}
             </div>
-          </div>
+          `}
 
               ${isTocOpen && html`
                 <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 3500; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
@@ -3909,7 +3830,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.14-b319';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.39-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3959,8 +3880,8 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.14-b319';
           // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
           if (clean.includes("..")) {
             const parts = clean.split("..");
-            const part0 = parts[0] || '';
-            const part1 = parts[1] || '';
+            const part0 = parts.at(0) || '';
+            const part1 = parts.at(1) || '';
             const v1 = compileCartiMapAST(part0);
             const v2 = compileCartiMapAST(part1);
             if (!v1 || !v2) return null;
@@ -4033,7 +3954,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.14-b319';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.14-b319';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.96-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
