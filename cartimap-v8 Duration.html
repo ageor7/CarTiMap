@@ -203,8 +203,24 @@ import htm from 'https://esm.sh/htm';
 import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
+if (!Array.prototype.at) {
+  Array.prototype.at = function(n) {
+    n = Math.trunc(n) || 0;
+    if (n < 0) n += this.length;
+    if (n < 0 || n >= this.length) return undefined;
+    return this[n];
+  };
+}
+if (!String.prototype.at) {
+  String.prototype.at = function(n) {
+    n = Math.trunc(n) || 0;
+    if (n < 0) n += this.length;
+    if (n < 0 || n >= this.length) return "";
+    return this.charAt(n);
+  };
+}
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b315';
+const APP_VERSION = 'v8.15.0-b316';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -363,7 +379,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.3.10-b315';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.3.11-b316';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -381,7 +397,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     carouselWidthRef.current = carouselRef.current.clientWidth;
     if (window.ResizeObserver) {
       const ro = new ResizeObserver(entries => {
-        const entry = entries.at(0);
+        const entry = entries[0];
         if (entry) carouselWidthRef.current = entry.contentRect.width;
       });
       ro.observe(carouselRef.current);
@@ -434,7 +450,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     const url = rawUrl.trim();
     if (url.toLowerCase().startsWith('<iframe')) {
       const match = url.match(/src=["']([^"']+)["']/);
-      return match ? match.at(1) : '#';
+      return match ? match[1] : '#';
     }
     return url;
   };
@@ -490,25 +506,25 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
   const renderMedia = (rawUrl) => {
     const url = getCleanUrl(rawUrl);
     const lowUrl = url.toLowerCase();
-    const evalUrl = lowUrl.split('?').at(0) || '';
+    const evalUrl = lowUrl.split('?')[0] || '';
 
     if (lowUrl.includes('youtube.com') || lowUrl.includes('youtu.be')) {
       let embedUrl = url;
       if (!url.includes('/embed/')) {
         const idMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-        if (idMatch) embedUrl = `https://www.youtube.com/embed/${idMatch.at(1)}?enablejsapi=1`;
+        if (idMatch) embedUrl = `https://www.youtube.com/embed/${idMatch[1]}?enablejsapi=1`;
       } else if (!url.includes('enablejsapi=1')) {
         embedUrl += (url.includes('?') ? '&' : '?') + 'enablejsapi=1';
       }
       const tMatch = url.match(/[?&]t=([^&]+)/);
       if (tMatch) {
-        const tVal = tMatch.at(1);
+        const tVal = tMatch[1];
         let seconds = parseInt(tVal, 10);
         if (isNaN(seconds)) {
           const hVal = tVal.match(/(\d+)h/);
           const mVal = tVal.match(/(\d+)m/);
           const sVal = tVal.match(/(\d+)s/);
-          seconds = (hVal ? parseInt(hVal.at(1), 10) * 3600 : 0) + (mVal ? parseInt(mVal.at(1), 10) * 60 : 0) + (sVal ? parseInt(sVal.at(1), 10) : 0);
+          seconds = (hVal ? parseInt(hVal[1], 10) * 3600 : 0) + (mVal ? parseInt(mVal[1], 10) * 60 : 0) + (sVal ? parseInt(sVal[1], 10) : 0);
         }
         embedUrl += `&start=${seconds}`;
       }
@@ -591,7 +607,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.14.10-b315';
+MODULE_VERSIONS['MediaViewer'] = 'v2.14.11-b316';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -726,7 +742,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.9.10-b315';
+MODULE_VERSIONS['ContentSlider'] = 'v5.9.11-b316';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -751,7 +767,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
   useEffect(() => {
     const ro = new ResizeObserver(entries => {
-      const entry = entries.at(0);
+      const entry = entries[0];
       if (entry && entry.target) {
         setContainerHeight(entry.target.clientHeight);
       }
@@ -827,23 +843,23 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           if (d.tags) {
             const tList = getParsedTags(d.tags);
             if (tList.includes(cand)) {
-              if (tList.includes(orderedTags.at(-1))) interLast++;
-              if (tList.includes(orderedTags.at(0))) interFirst++;
+              if (tList.includes(orderedTags[orderedTags.length - 1])) interLast++;
+              if (tList.includes(orderedTags[0])) interFirst++;
             }
           }
         });
         if (interLast > maxIntersection) { maxIntersection = interLast; bestMatchIdx = i; insertPos = 'push'; }
         if (interFirst > maxIntersection) { maxIntersection = interFirst; bestMatchIdx = i; insertPos = 'unshift'; }
       }
-      if (insertPos === 'push') { orderedTags.push(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
-      else { orderedTags.unshift(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
+      if (insertPos === 'push') { orderedTags.push(remaining[bestMatchIdx]); remaining.splice(bestMatchIdx, 1); }
+      else { orderedTags.unshift(remaining[bestMatchIdx]); remaining.splice(bestMatchIdx, 1); }
     }
   const laneCount = Math.max(1, orderedTags.length);
   const availableHeight = Math.max(40, containerHeight - 53);
   const laneHeight = Math.max(16, Math.min(36, availableHeight / laneCount));
 
   const validData = (data || []).filter(d => d.startDate && !isNaN(d.startDate.min));
-  const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
+  const minTimeRaw = validData.length > 0 ? validData[0].startDate.min : new Date().getTime();
   let maxTimeRaw = minTimeRaw;
 
   validData.forEach(d => {
@@ -941,10 +957,10 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const activeSlide = data[activeIndex]; const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
         if (activeDataIndex >= 0) {
           if (zoomLock === 'auto') {
-            let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
-            let clusterMax = validData.at(activeDataIndex).endDate && !isNaN(validData.at(activeDataIndex).endDate.max) ? validData.at(activeDataIndex).endDate.max : validData.at(activeDataIndex).startDate.min;
+            let clusterMin = validData[Math.max(0, activeDataIndex - 2)].startDate.min;
+            let clusterMax = validData[activeDataIndex].endDate && !isNaN(validData[activeDataIndex].endDate.max) ? validData[activeDataIndex].endDate.max : validData[activeDataIndex].startDate.min;
             for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
-              const node = validData.at(i);
+              const node = validData[i];
               clusterMax = Math.max(clusterMax, node.startDate.min);
               clusterMin = Math.min(clusterMin, node.startDate.min);
             }
@@ -1010,11 +1026,11 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const onDown = (e) => {
     if (zoomLock !== 'hard') setZoomLock('soft');
     if (e.touches && e.touches.length === 2) {
-      const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
+      const t1 = (e.touches && e.touches.length > 0 ? e.touches[0] : null); const t2 = (e.touches && e.touches.length > 1 ? e.touches[1] : null);
       touchZoomRef.current = { initialDist: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY), initialZoom: zoomLevel };
       return;
     }
-    const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+    const t1 = e.touches ? (e.touches && e.touches.length > 0 ? e.touches[0] : null) : e;
     dragRef.current = { isDragging: true, startX: t1.clientX, scrollLeft: wrapperRef.current.scrollLeft, hasDragged: false };
     wrapperRef.current.classList.add('is-dragging');
     if (caliperTooltip) setCaliperTooltip(null);
@@ -1024,14 +1040,14 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
   const onMove = (e) => {
     if (e.touches && e.touches.length === 2 && touchZoomRef.current.initialDist > 0) {
-      const t1 = Array.from(e.touches).at(0); const t2 = Array.from(e.touches).at(1);
+      const t1 = (e.touches && e.touches.length > 0 ? e.touches[0] : null); const t2 = (e.touches && e.touches.length > 1 ? e.touches[1] : null);
       const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
       const factor = dist / touchZoomRef.current.initialDist;
       handleManualZoom(Math.max(1, Math.min(2000, touchZoomRef.current.initialZoom * factor)), 'center');
       return;
     }
     if (!dragRef.current.isDragging) return;
-    const t1 = e.touches ? Array.from(e.touches).at(0) : e;
+    const t1 = e.touches ? (e.touches && e.touches.length > 0 ? e.touches[0] : null) : e;
     const dx = dragRef.current.startX - t1.clientX;
     if (Math.abs(dx) > 3) dragRef.current.hasDragged = true;
     wrapperRef.current.scrollLeft = dragRef.current.scrollLeft + dx;
@@ -1059,7 +1075,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
 
     const targetMsPerMajorTick = Math.max((120 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
-    let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
+    let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs[scaleConfigs.length - 1];
 
     let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
     iterDate.setMilliseconds(0);
@@ -1326,7 +1342,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.10-b315';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.11-b316';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1431,7 +1447,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             if (basemapsRegistry && basemapsRegistry.length > 0) {
               if (!initialLoadRef.current) {
                 const bases = basemapsRegistry.filter(b => (b.type || 'base').toLowerCase() !== 'overlay');
-                const defaultBase = bases.find(b => b.active) || bases.at(0);
+                const defaultBase = bases.find(b => b.active) || bases[0];
                 if (defaultBase && !activeBasemap) {
                   setActiveBasemap(defaultBase.id);
                 }
@@ -2123,7 +2139,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             const triggerFly = () => {
               const markers = markersRef.current;
               if (!markers || markers.length === 0) return;
-              const activeLayers = markers[activeIndex] || markers.at(activeIndex);
+              const activeLayers = markers[activeIndex] || markers[activeIndex];
               if (activeLayers && activeLayers.length > 0) {
                 const activeFeatureGroup = L.featureGroup(activeLayers);
                 try {
@@ -2311,7 +2327,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.6.10-b315';
+MODULE_VERSIONS['MapViewer'] = 'v6.6.11-b316';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2476,7 +2492,7 @@ const App = () => {
           const hasInitializedRef = useRef(false);
 
           const addLog = (msg, type = 'info') => {
-            const timeStr = new Date().toTimeString().split(' ').at(0);
+            const timeStr = new Date().toTimeString().split(' ')[0];
             setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
           };
 
@@ -3029,7 +3045,7 @@ const App = () => {
 
           const goBack = () => {
             if (slideHistory.length > 0) {
-              const prev = slideHistory.at(-1);
+              const prev = slideHistory[slideHistory.length - 1];
               setSlideHistory(h => h.slice(0, -1));
               setForwardHistory(f => [...f, activeIndex]);
               setActiveIndex(prev);
@@ -3038,7 +3054,7 @@ const App = () => {
 
           const goForward = () => {
             if (forwardHistory.length > 0) {
-              const next = forwardHistory.at(-1);
+              const next = forwardHistory[forwardHistory.length - 1];
               setForwardHistory(f => f.slice(0, -1));
               setSlideHistory(h => [...h, activeIndex]);
               setActiveIndex(next);
@@ -3116,7 +3132,7 @@ const App = () => {
           };
 
           const searchResults = executeSearch(searchQuery);
-          const activeSlide = data.at(activeIndex);
+          const activeSlide = data[activeIndex];
           const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
 
           // =========================================================================
@@ -3325,7 +3341,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     <input type="checkbox"
                       checked=${allTags.length > 0 && activeTags.length === allTags.length}
                       onChange=${() => {
-                        const curSlideForTags = data.at(activeIndex) || unfilteredData.at(activeIndex) || unfilteredData[0];
+                        const curSlideForTags = data[activeIndex] || unfilteredData[activeIndex] || unfilteredData[0];
                         const curSlideTags = (curSlideForTags && curSlideForTags.tags && curSlideForTags.tags.length > 0)
                           ? curSlideForTags.tags.filter(t => allTags.includes(t))
                           : [];
@@ -3359,7 +3375,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     <input type="checkbox"
                       checked=${masterExtractTypes.length > 0 && activeExtractTypes.length === masterExtractTypes.length}
                       onChange=${() => {
-                        const curSlideForTypes = data.at(activeIndex) || unfilteredData.at(activeIndex) || unfilteredData[0];
+                        const curSlideForTypes = data[activeIndex] || unfilteredData[activeIndex] || unfilteredData[0];
                         const curType = curSlideForTypes ? curSlideForTypes.extractType : null;
                         const activeSlideTypeSelection = (curType && masterExtractTypes.includes(curType))
                           ? [curType]
@@ -3906,7 +3922,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.10-b315';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.11-b316';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3956,8 +3972,8 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.10-b315';
           // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
           if (clean.includes("..")) {
             const parts = clean.split("..");
-            const part0 = parts.at(0) || '';
-            const part1 = parts.at(1) || '';
+            const part0 = parts[0] || '';
+            const part1 = parts[1] || '';
             const v1 = compileCartiMapAST(part0);
             const v2 = compileCartiMapAST(part1);
             if (!v1 || !v2) return null;
@@ -4030,7 +4046,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.10-b315';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.10-b315';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.11-b316';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
