@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b310';
+const APP_VERSION = 'v8.15.0-b311';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -363,7 +363,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.3.5-b310';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.3.6-b311';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -591,7 +591,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.14.5-b310';
+MODULE_VERSIONS['MediaViewer'] = 'v2.14.6-b311';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -726,7 +726,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.9.5-b310';
+MODULE_VERSIONS['ContentSlider'] = 'v5.9.6-b311';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1326,7 +1326,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.5-b310';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.6-b311';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2311,7 +2311,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.6.5-b310';
+MODULE_VERSIONS['MapViewer'] = 'v6.6.6-b311';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2513,27 +2513,63 @@ const App = () => {
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
             const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
 
-            setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
-            addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
+            const getEmbeddedPrimaryRows = () => {
+              const globalSD = (typeof sheetsData !== 'undefined' && sheetsData) ? sheetsData : ((typeof window !== 'undefined' && window.sheetsData) ? window.sheetsData : null);
+              if (!globalSD) return null;
+              const targetArray = globalSD.ExtractsCombinedV || globalSD.SourcesT || globalSD.Primary || globalSD.Data || (Array.isArray(globalSD) ? globalSD : null);
+              return (Array.isArray(targetArray) && targetArray.length > 0) ? targetArray : null;
+            };
 
-            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
-            const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
+            const embeddedRows = getEmbeddedPrimaryRows();
+            let fetchPromise;
 
-            Promise.all([
-              fetch(fetchUrlPrimary).then(res => {
-                if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
-                return res.text();
-              }),
-              fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
-                if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status ${res.status})`);
-                return res.text();
-              }) : Promise.resolve(null)
-            ]).then(([primaryCsv, basemapsCsv]) => {
+            if (embeddedRows) {
+              addLog(`[Local Ingestion] Direct embedded sheetsData detected (${embeddedRows.length} records). Bypassing network fetch.`, 'info');
+              fetchPromise = Promise.resolve([null, null, embeddedRows]);
+            } else {
+              setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
+              addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
+
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+              const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+              const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
+
+              fetchPromise = Promise.all([
+                fetch(fetchUrlPrimary, { signal: controller.signal }).then(res => {
+                  clearTimeout(timeoutId);
+                  if (!res.ok) throw new Error(`HTTP ${res.status} network error fetching primary dataset`);
+                  return res.text();
+                }),
+                fetchUrlBasemaps ? fetch(fetchUrlBasemaps, { signal: controller.signal }).then(res => {
+                  if (!res.ok) throw new Error(`HTTP ${res.status} network error fetching basemaps config`);
+                  return res.text();
+                }).catch(() => null) : Promise.resolve(null),
+                null
+              ]).catch(err => {
+                clearTimeout(timeoutId);
+                const retryEmbedded = getEmbeddedPrimaryRows();
+                if (retryEmbedded) {
+                  addLog(`[Network Warning] Google Sheets fetch failed (${err.message}). Falling back to embedded sheetsData.`, 'warning');
+                  return [null, null, retryEmbedded];
+                }
+                throw err;
+              });
+            }
+
+            fetchPromise.then(([primaryCsv, basemapsCsv, directRows]) => {
               setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
 
-              const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
-              if (results.errors.length > 0) {
-                results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
+              let rows = [];
+              if (directRows) {
+                rows = directRows;
+              } else if (primaryCsv) {
+                const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
+                if (results.errors.length > 0) {
+                  results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
+                }
+                rows = results.data;
               }
 
               const exactGet = (normObj, key) => {
@@ -2542,8 +2578,8 @@ const App = () => {
               };
 
               const firstRowNorm = {};
-              if (results.data.length > 0) {
-                const [ firstRow ] = results.data; for (let k in firstRow) firstRowNorm[k.toLowerCase().trim()] = firstRow[k];
+              if (rows.length > 0) {
+                const [ firstRow ] = rows; for (let k in firstRow) firstRowNorm[k.toLowerCase().trim()] = firstRow[k];
               }
 
               const aboutDataObj = {
@@ -2556,7 +2592,7 @@ const App = () => {
 
               let activeMode = dateEngineMode;
               if (activeMode === 'auto') {
-                const hasEDTF = results.data.some(row => {
+                const hasEDTF = rows.some(row => {
                   const norm = {};
                   for (let k in row) norm[k.toLowerCase().trim()] = row[k];
                   return exactGet(norm, 'start edtf') !== '';
@@ -2565,7 +2601,6 @@ const App = () => {
               }
               const isUS = dateLocale === 'en-US';
               const omniSplitRegex = /\||\r?\n/;
-              const rows = results.data;
 
               const parseChronoNode = (legacyStr, edtfStr, index, rowTitle) => {
                 const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
@@ -3819,7 +3854,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.5-b310';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.6-b311';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3943,7 +3978,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.5-b310';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.5-b310';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.6-b311';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
