@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.13.69-b258</title>
+    <title>CarTiMap v8.14.1-b301</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -87,7 +87,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .media-item-container { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 .status-bar, .global-status-bar { height: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative; }
 .status-left, .status-right { display: flex; align-items: center; gap: 8px; flex: 1; padding-right: 0 !important; }
-.status-left { padding-left: 0 !important; flex-shrink: 0 !important; }
+.status-left { padding-left: 0 !important; flex: 1 1 auto; min-width: 0; overflow: visible !important; }
 .status-center { display: flex; align-items: center; gap: 12px; justify-content: center; flex: 0 0 auto; }
 .timeline-pane { background: #ececec; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1); min-height: 0; z-index: 5; width: 100%; max-width: 100%; box-sizing: border-box; }
 
@@ -163,7 +163,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .tm-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 700px; max-height: 85vh; background: #fff; z-index: 100000 !important; border-radius: 12px; padding: 30px; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; color: #222; font-size: 1.1rem; }
 .modal-close { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #999; outline: none; }
 .modal-close:hover { color: #d32f2f; }
-.search-input { width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box; }
+.search-input { width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box; }
 .search-result-item { padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
 .search-result-item:hover { background: #f0f8ff; }
 .search-result-title { font-weight: 600; color: #222; font-size: 1rem; }
@@ -175,9 +175,9 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .timeline-track-container { position: relative; min-width: 100%; display: block; min-height: 100%; }
 .tag-lane { border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; box-sizing: border-box; width: 100%; position: absolute; left: 0; right: 0; }
 .tag-lane-label { position: sticky; left: 0; z-index: 100; padding: 0 10px; font-size: 0.75rem; color: #555; display: flex; align-items: center; height: 100%; background: inherit; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05);}
-.event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); }
+.event-group { position: absolute; z-index: 10; transition: z-index 0.2s; display: flex; align-items: flex-start; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); pointer-events: none; }
 .event-group.active { z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,122,204,0.4)); }
-.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 12px 2px calc(var(--diag-w) + 14px); clip-path: polygon( 0 calc(50% - var(--half-lane, 12px)), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + var(--half-lane, 12px)) ); }
+.event-block { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; font-size: 0.75rem; cursor: pointer; transition: filter 0.2s ease, width 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; --diag-w: 10px; padding: 2px 4px 2px calc(var(--diag-w) + 6px); clip-path: polygon( 0 calc(50% - var(--half-lane, 12px)), var(--diag-w) 0, 100% 0, 100% 100%, var(--diag-w) 100%, 0 calc(50% + var(--half-lane, 12px)) ); }
 .event-block:hover { filter: brightness(1.05); z-index: 40 !important; width: max-content !important; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.25)); }
 .timeline-axis { position: absolute; left: 0; right: 0; height: 28px; background: #e0e0e0; border-top: 2px solid #999; z-index: 5; }
 .timeline-ruler-tick { position: absolute; bottom: 0; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.13.69-b261';
+const APP_VERSION = 'v8.14.1-b303';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -362,7 +362,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS["VibeMonitor"] = 'v2.2.1-b191';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.2.38-b303';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.6';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.29-b303';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,14 +725,15 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.0-b164';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.58-b303';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.10 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
-const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
+const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
+  const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? s.text : (s && s.date ? s.date.toLocaleDateString(loc || 'en-GB') : 'Undated')));
   const wrapperRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0, hasDragged: false });
@@ -743,6 +744,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const [containerHeight, setContainerHeight] = useState(200);
   const [viewLeftEdge, setViewLeftEdge] = useState(0);
   const [caliperTooltip, setCaliperTooltip] = useState(null);
+  const [durationModalData, setDurationModalData] = useState(null);
   const hoverTimeoutRef = useRef(null);
   const lastMouseXRef = useRef(0);
 
@@ -761,15 +763,26 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     return String(str).replace(/<[^>]*>/g, '').trim();
   };
 
-  const formatLabelSmart = (titleStr, maxPx = 180) => {
-    if (!titleStr) return { lines: ['Untitled'], pxWidth: 60 };
+  const formatLabelSmart = (titleStr, maxPx = 180, hasMedia = false) => {
+    if (!titleStr) return { lines: ['Untitled'], pxWidth: 50 };
     const clean = safeStripHTML(titleStr);
-    const words = clean.split(/\s+/);
-    if (words.length <= 3) return { lines: [clean], pxWidth: Math.max(60, clean.length * 7 + 35) };
-    const mid = Math.ceil(words.length / 2);
-    const line1 = words.slice(0, mid).join(' ');
-    const line2 = words.slice(mid).join(' ');
-    return { lines: [line1, line2], pxWidth: Math.max(60, Math.max(line1.length, line2.length) * 7 + 35) };
+    const words = clean.split(/\s+/).filter(Boolean);
+    let lines = [];
+    if (words.length <= 3) {
+      lines = [clean];
+    } else if (words.length <= 7) {
+      const mid = Math.ceil(words.length / 2);
+      lines = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+    } else {
+      const t1 = Math.ceil(words.length / 3);
+      const t2 = Math.ceil((words.length - t1) / 2) + t1;
+      lines = [words.slice(0, t1).join(' '), words.slice(t1, t2).join(' '), words.slice(t2).join(' ')];
+    }
+    const maxLineChars = Math.max(...lines.map(l => l.length));
+    const mediaOffset = hasMedia ? 18 : 0;
+    const computedPx = Math.round(maxLineChars * 6.0 + 16 + mediaOffset);
+    const pxWidth = Math.min(maxPx, Math.max(50, computedPx));
+    return { lines, pxWidth };
   };
 
   const getParsedTags = (rawTagsArray) => {
@@ -825,7 +838,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       else { orderedTags.unshift(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
     }
   const laneCount = Math.max(1, orderedTags.length);
-  const laneHeight = Math.max(24, (containerHeight - 55) / laneCount);
+  const availableHeight = Math.max(40, containerHeight - 53);
+  const laneHeight = Math.max(16, Math.min(36, availableHeight / laneCount));
 
   const validData = (data || []).filter(d => d.startDate && !isNaN(d.startDate.min));
   const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
@@ -909,7 +923,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   };
 
   useEffect(() => {
-    const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+    const activeSlide = data[activeIndex]; const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
     if (activeDataIndex >= 0 && wrapperRef.current && !dragRef.current.isDragging) {
       const containerW = wrapperRef.current.clientWidth || 1000;
       const targetTrackW = Math.max(containerW, containerW * zoomLevel);
@@ -923,7 +937,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       prevActiveIndexRef.current = activeIndex;
       if (zoomLock === 'hard') return;
       const timeoutId = setTimeout(() => {
-        const activeDataIndex = validData.findIndex(d => d.id === activeIndex);
+        const activeSlide = data[activeIndex]; const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
         if (activeDataIndex >= 0) {
           if (zoomLock === 'auto') {
             let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
@@ -1028,9 +1042,15 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     handleManualZoom(e.deltaY < 0 ? Math.min(zoomLevel * 1.5, 2000) : Math.max(zoomLevel / 1.5, 1), 'mouse', e.clientX - wrapperRef.current.getBoundingClientRect().left);
   };
 
+  const rafScrollRef = useRef(null);
   const onScroll = () => {
-    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-    scrollTimeout.current = setTimeout(() => { if (wrapperRef.current) setViewLeftEdge(wrapperRef.current.scrollLeft); }, 100);
+    if (wrapperRef.current) {
+      const scrollPos = wrapperRef.current.scrollLeft;
+      if (rafScrollRef.current) cancelAnimationFrame(rafScrollRef.current);
+      rafScrollRef.current = requestAnimationFrame(() => {
+        setViewLeftEdge(scrollPos);
+      });
+    }
   };
 
   const viewPadMs = visibleTimeSpanMs * 0.5;
@@ -1091,12 +1111,36 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
     const globalIndex = data.findIndex(d => d.id === item.id);
     const startPct = Number((((itemStartMs - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+    
+    const endVal = (item.endDate && !isNaN(item.endDate.max))
+      ? item.endDate.max
+      : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStartMs)
+          ? item.startDate.max
+          : itemStartMs);
+
+    let durationStr = '';
+    if (endVal > itemStartMs) {
+      const diffMs = endVal - itemStartMs;
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays >= 365) {
+        const yrs = (diffDays / 365.25).toFixed(1);
+        durationStr = `${yrs} yrs`;
+      } else if (diffDays >= 30) {
+        const mos = Math.round(diffDays / 30.43);
+        durationStr = `${mos} mos`;
+      } else if (diffDays >= 1) {
+        durationStr = `${diffDays} days`;
+      } else if (diffMs > 0) {
+        const hrs = Math.round(diffMs / (1000 * 60 * 60));
+        durationStr = `${Math.max(1, hrs)} hrs`;
+      }
+    }
     const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
     const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
     const topPos = (laneIdx * laneHeight) + 15;
     const blockHeight = Math.max(24, ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight);
-    const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title));
     const hasMedia = item.media && item.media.length > 0;
+    const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title), 180, hasMedia);
 
     const stackKey = `${itemStartMs}_${laneIdx}`;
     if (!stackRegistry[stackKey]) stackRegistry[stackKey] = 0;
@@ -1135,11 +1179,39 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
 
     if (!xAxisMarker && hasDuration) {
+      const overlappingEvents = validData.filter(other => {
+        const oStart = other.startDate ? other.startDate.min : renderMinTime;
+        const oEnd = (other.endDate && !isNaN(other.endDate.max)) ? other.endDate.max : ((other.startDate && !isNaN(other.startDate.max) && other.startDate.max > oStart) ? other.startDate.max : oStart);
+        return (oStart <= endVal && oEnd >= itemStartMs);
+      });
+
+      let spanMarkerTooltip = '';
+      if (overlappingEvents.length > 1) {
+        const eventList = overlappingEvents.map((ev, i) => {
+          const oStart = ev.startDate ? ev.startDate.min : renderMinTime;
+          const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
+          let durText = '';
+          if (oEnd > oStart) {
+            const dMs = oEnd - oStart;
+            const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
+            if (dDays >= 365) durText = ` (${(dDays / 365.25).toFixed(1)} yrs)`;
+            else if (dDays >= 30) durText = ` (${Math.round(dDays / 30.43)} mos)`;
+            else if (dDays >= 1) durText = ` (${dDays} days)`;
+            else durText = ` (${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs)`;
+          }
+          const isCurrent = ev.id === item.id;
+          return `${i + 1}. ${isCurrent ? '▶ ' : ''}${safeStripHTML(ev.title)}${durText}`;
+        }).join('\n');
+
+        spanMarkerTooltip = `🔍 Concurrent Active Events (${overlappingEvents.length}) in Duration Span:\n${eventList}\n\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      } else {
+        spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      }
       if (isActive) {
         const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
         const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box;" title="${(isApproxStart || isApproxEnd) ? 'Approximate Duration. Click node to auto-zoom.' : ''}"></div>`;
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationModalData({ item, overlappingEvents }); }}></div>`;
       } else {
         const styleIdx = index % 4;
         const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
@@ -1148,8 +1220,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
         const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply;">
-            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}"></div>
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationModalData({ item, overlappingEvents }); }}>
+            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}" title="${spanMarkerTooltip}"></div>
           </div>
         `;
       }
@@ -1163,15 +1235,16 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       if (isApproxStart) dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colApprox}; z-index: 900; cursor: zoom-in;" title="Approximate Date"></div>`;
       else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colInactive}; z-index: 900;"></div>`;
     }
+    const fullNodeTooltip = `${safeStripHTML(item.title)}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick node to focus slide`;
 
     return html`
-      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}" onClick=${() => handleNodeClick(globalIndex)}>
+      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}; pointer-events: none;" onClick=${() => handleNodeClick(globalIndex)}>
         ${dropLine}
         ${xAxisMarker}
-        <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --half-lane: ${laneHeight / 2}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25};">
+        <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --half-lane: ${laneHeight / 2}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25}; pointer-events: auto;" title="${fullNodeTooltip}">
           ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>` : ''}
-          <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px;">
-            ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; width: 100%;">${l}</div>`)}
+          <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px; ${hasMedia ? 'padding-left: 14px;' : ''}">
+            ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; line-height: 1.15;">${l}</div>`)}
           </div>
         </div>
       </div>
@@ -1180,8 +1253,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
   return html`
     <style>
-      .event-group:hover { z-index: 99999 !important; }
-      .event-group:hover .event-block { transform: translateY(-50%) scale(1.08) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; border-color: #007acc !important; z-index: 99999 !important; width: max-content !important; min-width: var(--calc-w) !important; }
+      .event-block:hover { transform: translateY(-50%) scale(1.08) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; border-color: #007acc !important; z-index: 99999 !important; width: max-content !important; min-width: var(--calc-w) !important; filter: brightness(1.05); }
     
       .leaflet-bottom.leaflet-right .leaflet-control-scale {
         margin-bottom: 10px !important;
@@ -1191,6 +1263,50 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
+      ${durationModalData ? html`
+        <div class="tm-backdrop open" onClick=${() => setDurationModalData(null)} style="z-index: 10000;"></div>
+        <div class="tm-modal open" style="display: block; width: 90%; max-width: 850px; max-height: 80vh; overflow-y: auto; z-index: 10001; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); padding: 20px; font-family: monospace;">
+          <button class="modal-close" onClick=${() => setDurationModalData(null)} title="Close">✕</button>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #007acc; padding-bottom: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <h3 style="margin: 0; font-size: 1.15rem; color: #222;">Duration Detail Inspection HUD</h3>
+            <span style="font-size: 0.75rem; background: #e6f4ff; color: #007acc; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${durationModalData.overlappingEvents.length} Concurrent Actions</span>
+          </div>
+          <div style="font-size: 0.85rem; color: #555; margin-bottom: 15px; background: #f8f9fa; padding: 8px 12px; border-radius: 4px; border: 1px solid #eee;">
+            <strong>Target Event:</strong> ${safeStripHTML(durationModalData.item.title)}<br/>
+            <strong>Time Interval:</strong> ${formatSmartDate(durationModalData.item.startDate, durationModalData.item.endDate, dateLocale)}
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 5px;">
+            ${durationModalData.overlappingEvents.map((ev, i) => {
+              const isSelected = ev.id === durationModalData.item.id;
+              const oStart = ev.startDate ? ev.startDate.min : renderMinTime;
+              const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
+              let durStr = '';
+              if (oEnd > oStart) {
+                const dMs = oEnd - oStart;
+                const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
+                if (dDays >= 365) durStr = `${(dDays / 365.25).toFixed(1)} yrs`;
+                else if (dDays >= 30) durStr = `${Math.round(dDays / 30.43)} mos`;
+                else if (dDays >= 1) durStr = `${dDays} days`;
+                else durStr = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
+              }
+              return html`
+                <div style="background: ${isSelected ? '#e6f4ff' : '#fafafa'}; border: 1px solid ${isSelected ? '#007acc' : '#e0e0e0'}; border-radius: 6px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center;" onClick=${() => { handleNodeClick(data.findIndex(d => d.id === ev.id)); setDurationModalData(null); }}>
+                  <div style="display: flex; flex-direction: column; gap: 4px; max-width: 75%;">
+                    <div style="font-weight: 700; color: ${isSelected ? '#007acc' : '#222'}; font-size: 0.9rem;">
+                      ${i + 1}. ${safeStripHTML(ev.title)}
+                    </div>
+                    <div style="font-size: 0.78rem; color: #666;">
+                      📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${ev.tags ? `• 🏷️ ${Array.isArray(ev.tags) ? ev.tags.join(', ') : ev.tags}` : ''}
+                    </div>
+                  </div>
+                  ${durStr ? html`<div style="font-size: 0.8rem; font-weight: 700; color: #007acc; background: #ffffff; border: 1px solid #70b8ff; padding: 4px 10px; border-radius: 12px; white-space: nowrap;">⏳ ${durStr}</div>` : ''}
+                </div>
+              `;
+            })}
+          </div>
+        </div>
+      ` : ''}
       <div class="timeline-window-toolbar" style="position: absolute; top: 8px; right: 12px; z-index: 1000; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.95); padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
         <button class="status-btn" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -1253,7 +1369,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.41-b231';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.25-b303';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1266,6 +1382,16 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.12.41-b231';
 // 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
+          useEffect(() => {
+            const handleMapEsc = (e) => {
+              if (e.key === 'Escape') {
+                setShowLegendMenu(false);
+                setShowLayersMenu(false);
+              }
+            };
+            window.addEventListener('keydown', handleMapEsc);
+            return () => window.removeEventListener('keydown', handleMapEsc);
+          }, []);
           const mapDomRef = useRef(null);
           const miniMapDomRef = useRef(null);
           const minimapWrapperRef = useRef(null);
@@ -1813,9 +1939,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
                 if (layer instanceof L.Polygon) {
                   layer.setStyle({
-                    stroke: true,
-                    color: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
-                    weight: isActive ? 2.5 : 1,
+                    stroke: false, weight: 0,
                     fillColor: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
                     fillOpacity: isActive ? Math.min(polygonOpacity + 0.25, 0.65) : polygonOpacity
                   });
@@ -1869,7 +1993,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 } else {
                   rawLabel = item.place ? formatPlaces(item.place) : (item.title || 'Untitled');
                 }
-                layer.bindTooltip(safeStripHTML(rawLabel), { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
+                const shortLabel = safeStripHTML(rawLabel).split(',')[0].trim(); layer.bindTooltip(shortLabel, { direction: 'top', offset: L.point(0, -48), className: 'centered-tooltip' });
                 if (layer instanceof L.Marker && !isVip) clusterLayer.current.addLayer(layer);
                 else markerLayer.current.addLayer(layer);
                 validMarkers++;
@@ -1908,9 +2032,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               layers.forEach(layer => {
                 if (layer instanceof L.Polygon) {
                   layer.setStyle({
-                    stroke: true,
-                    color: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
-                    weight: isActive ? 2.5 : 1,
+                    stroke: false, weight: 0,
                     fillColor: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
                     fillOpacity: isActive ? Math.min(polygonOpacity + 0.25, 0.65) : polygonOpacity
                   });
@@ -2040,24 +2162,31 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
           useEffect(() => {
             const map = mapInstance.current;
-            const markers = markersRef.current;
-            if (!map || markers.length === 0) return;
-            const activeLayers = markers.at(activeIndex);
-            if (activeLayers && activeLayers.length > 0) {
-              const activeFeatureGroup = L.featureGroup(activeLayers);
-              setTimeout(() => {
+            if (!map) return;
+            const triggerFly = () => {
+              const markers = markersRef.current;
+              if (!markers || markers.length === 0) return;
+              const activeLayers = markers[activeIndex] || markers.at(activeIndex);
+              if (activeLayers && activeLayers.length > 0) {
+                const activeFeatureGroup = L.featureGroup(activeLayers);
                 try {
                   const bounds = activeFeatureGroup.getBounds();
-                  if (bounds.isValid()) {
+                  if (bounds && bounds.isValid()) {
                     map.stop();
-                    map.flyToBounds(bounds, { animate: true, duration: 2.5, maxZoom: maxAutoZoom });
+                    if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+                      map.flyTo(bounds.getCenter(), maxAutoZoom, { animate: true, duration: 2.0 });
+                    } else {
+                      map.flyToBounds(bounds, { animate: true, duration: 2.0, maxZoom: maxAutoZoom, padding: [30, 30] });
+                    }
                     hasFitBounds.current = true;
                   }
-                  activeLayers.forEach(l => { if (l.openTooltip) l.openTooltip(); });
+                  activeLayers.forEach(l => { if (l && l.openTooltip) l.openTooltip(); });
                 } catch(err) {}
-              }, 250);
-            }
-          }, [activeIndex, maxAutoZoom]);
+              }
+            };
+            const timer = setTimeout(triggerFly, 200);
+            return () => clearTimeout(timer);
+          }, [activeIndex, maxAutoZoom, data]);
 
           const sortAlpha = (arr) => [...arr].sort((a, b) => {
             const nameA = String(a.label || a.title || a.name || a.id || '').toLowerCase();
@@ -2225,7 +2354,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.4.104-b233';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.31-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2259,6 +2388,71 @@ const App = () => {
             addLog(msg, 'warning');
           };
           const [isSearchOpen, setIsSearchOpen] = useState(false);
+                    const [isTocOpen, setIsTocOpen] = useState(false);
+
+          const resetLayout = () => {
+            const appNode = document.getElementById('app-layout') || document.documentElement;
+            if (appNode) {
+              appNode.style.setProperty('--primary-split', '50%');
+              appNode.style.setProperty('--secondary-split', '50%');
+            }
+            document.documentElement.style.setProperty('--primary-split', '50%');
+            document.documentElement.style.setProperty('--secondary-split', '50%');
+            if (typeof setMinimapOffset === 'function') setMinimapOffset(-4);
+            const reqH = Math.max(185, (allTags.length || 1) * 28 + 55);
+            if (typeof setTimelineRequiredHeight === 'function') setTimelineRequiredHeight(reqH);
+            if (typeof setIsTimelineExpanded === 'function') setIsTimelineExpanded(false);
+            if (typeof setIsTimelineMinimized === 'function') setIsTimelineMinimized(false);
+            if (typeof setMaxPane === 'function') setMaxPane(null);
+            window.dispatchEvent(new Event('resize'));
+          };
+          const [maxAutoZoom, setMaxAutoZoom] = useState(() => parseInt(localStorage.getItem('tm_max_auto_zoom'), 10) || 18);
+          const [statusWidth, setStatusWidth] = useState(300);
+          const statusBrandRef = useRef(null);
+
+          useEffect(() => {
+            const handleResize = () => {
+              if (statusBrandRef.current) {
+                const w = statusBrandRef.current.clientWidth || statusBrandRef.current.offsetWidth || window.innerWidth;
+                if (w > 0) setStatusWidth(w);
+              } else {
+                setStatusWidth(window.innerWidth);
+              }
+            };
+            handleResize();
+            window.addEventListener('resize', handleResize);
+            let ro = null;
+            if (window.ResizeObserver) {
+              ro = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                  if (entry.contentRect && entry.contentRect.width > 0) {
+                    setStatusWidth(entry.contentRect.width);
+                  }
+                }
+              });
+              const checkAndObserve = () => {
+                if (statusBrandRef.current) {
+                  ro.observe(statusBrandRef.current);
+                  handleResize();
+                } else {
+                  setTimeout(checkAndObserve, 100);
+                }
+              };
+              checkAndObserve();
+            }
+            return () => {
+              window.removeEventListener('resize', handleResize);
+              if (ro) ro.disconnect();
+            };
+          }, [status.active]);
+
+          const getFluidVersionString = (width) => {
+            if (width >= 240) return APP_VERSION;
+            if (width >= 180) return APP_VERSION.replace(/\.\d+(?=-b)/, '');
+            if (width >= 130) return APP_VERSION.replace(/\.\d+\.\d+(?=-b)/, '');
+            if (width >= 80) return APP_VERSION.replace(/^v\d+\.\d+\.\d+-/, '');
+            return '';
+          };
           const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef(null);
 
@@ -2285,13 +2479,15 @@ const App = () => {
             try { return parseFloat(localStorage.getItem('tm_polygon_opacity')) || 0.4; }
             catch (e) { return 0.4; }
           });
-          const [showButtonText, setShowButtonText] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_show_button_text')) ?? false; }
-            catch (e) { return false; }
-          });
           const [dateLocale, setDateLocale] = useState(() => {
             try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
             catch (e) { return 'en-GB'; }
+          });
+          const [showButtonText, setShowButtonText] = useState(() => {
+            try {
+              const stored = localStorage.getItem('tm_show_button_text');
+              return stored === 'true';
+            } catch(e) { return false; }
           });
           const [dateEngineMode, setDateEngineMode] = useState(() => {
             try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
@@ -2311,8 +2507,12 @@ const App = () => {
             { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '' }
           ]);
           const [zoomLock, setZoomLock] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_zoom_lock')) ?? false; }
-            catch (e) { return false; }
+            try {
+              const stored = localStorage.getItem('tm_zoom_lock');
+              if (stored === 'hard') return 'hard';
+              if (stored === 'soft') return 'soft';
+              return 'auto';
+            } catch(e) { return 'auto'; }
           });
           const appRef = useRef(null);
           const hasInitializedRef = useRef(false);
@@ -2351,9 +2551,9 @@ const App = () => {
           useEffect(() => {
             const urlParams = new URLSearchParams(window.location.search);
             const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
-            let source = urlParams.get('source') || urlParams.get('amp;source') || '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI';
+            let source = urlParams.get('source') || urlParams.get('amp;source') || '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE';
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
-            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid');
+            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
 
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
@@ -2500,7 +2700,7 @@ const App = () => {
                   media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
                   mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
                   mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
-                  tags: exactGet(norm, 'tags') ? exactGet(norm, 'tags').split(/(?:,|\r|\n|\||;|·)+/).map(t => t.trim()).filter(Boolean) : [],
+                  tags: exactGet(norm, 'tags') ? Array.from(new Set(exactGet(norm, 'tags').split(/[,|;·\r\n]+/).map(t => t.trim()).filter(Boolean))) : [],
                   extractType: exactGet(norm, 'extract type') || 'Storyline'
                 };
               });
@@ -2804,8 +3004,12 @@ const App = () => {
 
           useEffect(() => {
             const handleKeyDown = (e) => {
+              if (e.key === 'Escape') {
+                if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
+                setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
+                return;
+              }
               if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
-              if (e.key === 'Escape') { setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); }
               else if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
               else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
               else if (e.key === 'ArrowDown') {
@@ -2887,7 +3091,7 @@ const SymbologyLegend = () => html`
 const CarTiMapperLogo = ({ context, appVersion }) => {
             const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
-            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 32px; width: 52px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 0.88rem; font-weight: 400; color: #222; line-height: 1; font-family: system-ui, sans-serif;">CarTiMap</span><span style="font-size: 0.68rem; font-family: monospace; color: #007acc; font-weight: 600; line-height: 1;">${appVersion}</span></div></div>`;
+            if (context === 'status') return html`<div style="display: flex; align-items: center; gap: 6px; height: 100%; white-space: nowrap;"><div style="height: 36px; width: 58px; display: flex; align-items: center; flex-shrink: 0;">${svgIcon}</div><div style="display: flex; align-items: baseline; gap: 4px;"><span style="font-size: 1.08rem; font-weight: 700; color: #111; line-height: 1; font-family: system-ui, -apple-system, sans-serif; letter-spacing: -0.2px;">CarTiMap</span></div></div>`;
             return html`
               <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #eee; text-align: center;">
                 <div style="width: 85%; max-width: 500px; height: auto; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12)); margin-bottom: 15px;">${svgIcon}</div>
@@ -2900,14 +3104,45 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           };
 
           // =========================================================================
-          // === [ APP_ORCHEST_SUBBLOCK 10: DECOUPLED BTN VARIABLES ] ===
+          // === [ APP_ORCHESTRATOR SUBBLOCK 10: DYNAMIC BUTTON AGGREGATION ] ===
           // =========================================================================
+          const leftAvailableWidth = Math.max(0, (statusWidth / 2) - 100);
+          const logoW = 135; // Enlarged Logo width
+          
+          // Smart label fallback: if showButtonText is active but left space < 350px, fall back to compact icon mode
+          const effectiveBtnW = (showButtonText && leftAvailableWidth >= 350) ? 85 : 38;
+
+          const hideSpecs     = leftAvailableWidth < (logoW + 5 * effectiveBtnW);
+          const hideTelemetry = leftAvailableWidth < (logoW + 4 * effectiveBtnW);
+          const hideReset     = leftAvailableWidth < (logoW + 3 * effectiveBtnW);
+          const hideSettings  = leftAvailableWidth < (logoW + 2 * effectiveBtnW);
+          const hideToc       = leftAvailableWidth < (logoW + 1 * effectiveBtnW); // ToC is level 1 = LAST to collapse
+          const isSpaceConstrained = hideSpecs;
+
+          // Right Side & Telemetry Span/Zoom boundary calculation
+          const rawRightWidth = Math.max(0, (statusWidth / 2) - 100);
+          const showTelemetry = visibleTimeSpan && rawRightWidth >= 90;
+          const showTelemetryLabels = rawRightWidth >= 220;
+
+          // Account for Span & Zoom telemetry readout width in overlap calculations
+          let telemetryOffset = 100; // default clearance for center cockpit
+          if (showTelemetry) {
+            telemetryOffset = showTelemetryLabels ? 180 : 150;
+          }
+
+          const rightAvailableWidth = Math.max(0, (statusWidth / 2) - telemetryOffset);
+
+          const hideRightHistory = rightAvailableWidth < 160;
+          const hideRightSearch  = rightAvailableWidth < 100;
+          const hideRightFilter  = rightAvailableWidth < 50;
+
           const downloadBtn = (aboutData && aboutData.downloadUrl) 
             ? html`<a href=${aboutData.downloadUrl} target="_blank" class="status-btn-text" style="text-decoration: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Dataset (CSV)</a>`
             : '';
 
           const backBtnText = showButtonText ? html`<span>Back</span>` : '';
           const resetLayoutBtnText = showButtonText ? html`<span>Reset Layout</span>` : '';
+          const tocBtnText = showButtonText ? html`<span>ToC</span>` : '';
           const settingsBtnText = showButtonText ? html`<span>Settings</span>` : '';
           const telemetryBtnText = showButtonText ? html`<span>Telemetry</span>` : '';
           const prevBtnText = showButtonText ? html`<span>Prev</span>` : '';
@@ -2919,40 +3154,42 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           const backBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goBack} disabled=${!canGoBack} style="opacity: ${canGoBack ? '1' : '0.38'}; cursor: ${canGoBack ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoBack ? 'auto' : 'none'};" title="Back to Previous Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 12 A 8 8 0 1 0 12 4"></path><polyline points="16 0 12 4 16 8"></polyline></svg>${backBtnText}</button>`;
 
           const canGoForward = forwardHistory && forwardHistory.length > 0;
-          const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward to Next Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg></button>`;
+          const forwardBtn = html`<button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${goForward} disabled=${!canGoForward} style="opacity: ${canGoForward ? '1' : '0.38'}; cursor: ${canGoForward ? 'pointer' : 'not-allowed'}; pointer-events: ${canGoForward ? 'auto' : 'none'};" title="Forward to Next Slide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 20 12 A 8 8 0 1 1 12 4"></path><polyline points="8 0 12 4 8 8"></polyline></svg>${nextBtnText}</button>`;
 
           const resetLayoutBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => {
-              const appNode = document.getElementById('app-layout') || document.documentElement;
-              appNode.style.setProperty('--primary-split', '50%');
-              appNode.style.setProperty('--secondary-split', '50%');
-              document.documentElement.style.setProperty('--primary-split', '50%');
-              document.documentElement.style.setProperty('--secondary-split', '50%');
-              setMinimapOffset(-4);
-              setTimelineRequiredHeight(140);
-              setIsTimelineExpanded(false);
-              setIsTimelineMinimized(false);
-              setMaxPane(null);
-              window.dispatchEvent(new Event('resize'));
-            }} title="Reset Layout Viewport">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); resetLayout(); }} title="Reset Layout Viewport (55/50/10)" style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-              ${resetLayoutBtnText}
+              ${showButtonText ? html`<span>Reset Layout</span>` : ''}
+            </button>
+          `;
+
+          const tocBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsTocOpen(!isTocOpen)} title="Table of Contents" style="display: flex; align-items: center; gap: 4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              ${showButtonText ? html`<span>ToC</span>` : ''}
             </button>
           `;
 
           const settingsBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(true)} title="Engine Configurations">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(!isSettingsOpen)} title="Engine Configurations" style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              ${settingsBtnText}
+              ${showButtonText ? html`<span>Settings</span>` : ''}
             </button>
           `;
 
           const telemetryBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Logs">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsMonitorOpen(!isMonitorOpen)} title="Telemetry Monitor" style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              ${telemetryBtnText}
+              ${showButtonText ? html`<span>Telemetry</span>` : ''}
             </button>
           `;
+
+          const aboutBtn = aboutData ? html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs & About" style="display: flex; align-items: center; gap: 4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              ${showButtonText ? html`<span>Specs</span>` : ''}
+            </button>
+          ` : '';
 
           const prevBtn = html`
             <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node">
@@ -2969,21 +3206,46 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const searchBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSearchOpen(true)} title="Interactive Query Index">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${(e) => { e.stopPropagation(); setIsSearchOpen(true); }} title="Interactive Query Index">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               ${searchBtnText}
             </button>
           `;
 
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 11: FULLY HOISTED CONDITIONAL VIEWS ] ===
-          // =========================================================================
-          const aboutBtn = aboutData 
-            ? html`<button class="status-btn-text" style="height: 28px; padding: 0 4px; border: none; background: transparent; display: flex; align-items: center; gap: 6px; cursor: pointer; flex-shrink: 0;" onClick=${() => setIsAboutOpen(!isAboutOpen)} title="Dataset Specs & About">
+          const logoCommandHub = html`
+            <div style="position: relative; display: inline-flex; align-items: center;">
+              <button onClick=${(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="CarTiMap Engine ${APP_VERSION} — Command Hub & System Tools" style="height: 32px; padding: 0; border: none; background: transparent; display: flex; align-items: center; cursor: pointer; flex-shrink: 0; outline: none;">
                 <${CarTiMapperLogo} context="status" appVersion=${APP_VERSION} />
-              </button>`
-            : '';
+              </button>
 
+              ${isMenuOpen && html`
+                <div class="tm-dropdown-menu" style="position: absolute; bottom: calc(100% + 6px); left: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 8px; display: flex; flex-direction: column; gap: 4px; z-index: 99999 !important; min-width: 220px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                  <div style="font-size: 0.72rem; color: #007acc; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚡ CarTiMap Command Hub</div>
+                  <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> Table of Contents
+                  </button>
+                  <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Engine Settings
+                  </button>
+                  <button onClick=${() => { resetLayout(); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg> Reset Viewport Layout
+                  </button>
+                  <button onClick=${() => { setIsMonitorOpen(!isMonitorOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Telemetry Monitor
+                  </button>
+                  <button onClick=${() => { setIsAboutOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> Dataset Specs & About
+                  </button>
+                  <button onClick=${() => { setIsFilterOpen(!isFilterOpen); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Swimlanes & Streams
+                  </button>
+                  <button onClick=${() => { setIsSearchOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Interactive Search
+                  </button>
+                </div>
+              `}
+            </div>
+          `;
           const handleSelectAllFilters = () => {
             setActiveTags([...allTags]);
             setActiveExtractTypes([...masterExtractTypes]);
@@ -2992,19 +3254,20 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           const masterExtractTypes = Array.from(new Set(unfilteredData.map(d => d.extractType).filter(Boolean)));
           const isExtractFiltered = masterExtractTypes.length > 0 && activeExtractTypes.length < masterExtractTypes.length;
           const isTagFiltered = allTags.length > 0 && activeTags.length < allTags.length;
-          const isFilteringActive = isExtractFiltered || isTagFiltered;
+          const isDataFiltered = unfilteredData.length > 0 && data.length < unfilteredData.length;
+          const isFilteringActive = isExtractFiltered || isTagFiltered || isDataFiltered;
 
           const filterBtn = html`
-            <button class="status-btn ${isFilteringActive || isFilterOpen ? 'active' : ''}" onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
+            <button class="${showButtonText ? 'status-btn-text' : 'status-btn'} ${isFilteringActive || isFilterOpen ? 'active' : ''}" style="${isFilteringActive ? 'background: #e6f4ff !important; border-color: #007acc !important; color: #007acc !important; font-weight: 700 !important;' : ''}" onClick=${(e) => { e.stopPropagation(); setIsFilterOpen(!isFilterOpen); }} title="Swimlanes Filtering">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
               ${filterBtnText}
             </button>
           `;
 
           const filterPopup = isFilterOpen
-            ? html`<div style="position: absolute; bottom: calc(100% + 5px); right: 120px; background: #fff; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); padding: 12px 14px; width: max-content; min-width: 240px; max-width: 320px; z-index: 10005; display: flex; flex-direction: column; gap: 6px;" onClick=${(e) => e.stopPropagation()}>
+            ? html`<div class="tm-dropdown-menu" style="position: absolute; bottom: calc(100% + 6px); right: 0; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 12px 14px; width: 280px; box-sizing: border-box; z-index: 99999 !important; display: flex; flex-direction: column; gap: 6px; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                 ${filterFlashMsg ? html`
-                  <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 8px 10px; font-size: 0.78rem; font-family: monospace; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; cursor: pointer;" onClick=${() => setFilterFlashMsg(null)} title="Click to dismiss">
+                  <div style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 6px 8px; font-size: 0.74rem; line-height: 1.25; font-family: monospace; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; cursor: pointer; width: 100%; box-sizing: border-box;" onClick=${() => setFilterFlashMsg(null)} title="Click to dismiss">
                     <div style="display: flex; align-items: center; gap: 6px;">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                       <span>${filterFlashMsg}</span>
@@ -3156,7 +3419,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
 
                 <!-- Conformed 38px Status Cockpit sitting clean in the vertical column flow -->
-                <div class="global-status-bar status-bar" style="height: 38px; flex-shrink: 0; display: flex; align-items: center; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative;">
+                <div class="global-status-bar status-bar" ref=${statusBrandRef} style="height: 38px; flex-shrink: 0; display: flex; align-items: center; background: #fff; border-top: 1px solid #ccc; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); box-sizing: border-box; padding: 0 10px; z-index: 100; position: relative;">
                   <style>
                     .record-select-input::-webkit-outer-spin-button,
                     .record-select-input::-webkit-inner-spin-button {
@@ -3173,15 +3436,17 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
       }
 
     </style>
-                  <div class="status-left" style="display: flex; align-items: center; gap: 8px;">
-                    ${aboutBtn}
-                    ${resetLayoutBtn}
-                    ${settingsBtn}
-                    ${telemetryBtn}
+                  <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative; max-width: calc(50vw - 100px); overflow: visible;">
+                    ${logoCommandHub}
+                    ${!hideToc ? tocBtn : ''}
+                    ${!hideSettings ? settingsBtn : ''}
+                    ${!hideReset ? resetLayoutBtn : ''}
+                    ${!hideTelemetry ? telemetryBtn : ''}
+                    ${!hideSpecs ? aboutBtn : ''}
                   </div>
 
                   <!-- Absolute center cockpit centering Prev/Next buttons [REF: UI-164c] -->
-                  <div class="status-center" style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
+                  <div class="status-center" style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: auto; z-index: 10;">
                     ${prevBtn}
 
                     <div style="display: flex; align-items: center; gap: 4px; font-family: monospace; font-size: 0.95rem;">
@@ -3198,7 +3463,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           }
                         }}
                         onKeyDown=${(e) => {
-                          e.stopPropagation();
+                          if (e.key === 'Escape') {
+                            if (e.target) e.target.blur();
+                            setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
+                          } else {
+                            e.stopPropagation();
+                          }
                         }}
                         style="width: 26px; background: rgba(0, 0, 0, 0.04); border: none; border-radius: 3px; text-align: center; font-family: monospace; font-size: 0.9rem; font-weight: 700; padding: 1px 2px; color: #222; outline: none;"
                         title="Jump to Record Index (Editable)"
@@ -3207,42 +3477,40 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     </div>
 
                     ${nextBtn}
-
-                    <!-- Non-bold left-aligned dynamic scale metrics directly adjacent to Next navigation control [REF: UI-164c] -->
-                    ${visibleTimeSpan ? (() => {
-                      const parts = visibleTimeSpan.split(' (');
-                      const [ spanStrPart = '', zoomStrPart = '' ] = parts;
-                      const spanStr = spanStrPart.replace('Span: ', '');
-                      const zoomStr = zoomStrPart.replace('Zoom: ', '').replace(')', '');
-                      return html`
-                        <div class="telemetry-span-zoom" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin-left: 12px; font-size: 0.8rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none;">
-                          <div style="display: flex; align-items: center; gap: 4px;">
-                            <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>
-                            <span style="font-family: monospace; color: #333;">${spanStr}</span>
-                          </div>
-                          ${zoomStr ? html`
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                              <span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>
-                              <span style="font-family: monospace; color: #333;">${zoomStr}</span>
-                            </div>
-                          ` : ''}
-                        </div>
-                      `;
-                    })() : ''}
                   </div>
 
-                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 8px;">
-                    ${filterBtn}
-                    ${filterPopup}
+                  <!-- Telemetry Scale Metrics anchored cleanly to the right of Next button without skewing navigation centering -->
+                  ${(visibleTimeSpan && showTelemetry) ? (() => {
+                    const parts = visibleTimeSpan.split(' (');
+                    const [ spanStrPart = '', zoomStrPart = '' ] = parts;
+                    const spanStr = spanStrPart.replace('Span: ', '');
+                    const zoomStr = zoomStrPart.replace('Zoom: ', '').replace(')', '');
+                    return html`
+                      <div class="telemetry-span-zoom" style="position: absolute; left: calc(50% + 95px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                          ${showTelemetryLabels ? html`<span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>` : ''}
+                          <span style="font-family: monospace; color: #333;">${spanStr}</span>
+                        </div>
+                        ${zoomStr ? html`
+                          <div style="display: flex; align-items: center; gap: 4px;">
+                            ${showTelemetryLabels ? html`<span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>` : ''}
+                            <span style="font-family: monospace; color: #333;">${zoomStr}</span>
+                          </div>
+                        ` : ''}
+                      </div>
+                    `;
+                  })() : ''}
+
+                  <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 6px; max-width: calc(50vw - ${telemetryOffset}px); overflow: visible; justify-content: flex-end;">
+                    ${!hideRightFilter ? html`<div style="position: relative; display: inline-flex; align-items: center;">${filterBtn}${filterPopup}</div>` : ''}
             ${(!isFilterOpen && filterFlashMsg) ? html`
               <div style="position: absolute; bottom: calc(100% + 10px); right: 120px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; font-family: monospace; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.18); z-index: 10005; display: flex; align-items: center; gap: 8px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 <span>${filterFlashMsg}</span>
               </div>
             ` : ''}
-                    ${searchBtn}
-                    ${backBtn}
-                    ${forwardBtn}
+                    ${!hideRightSearch ? searchBtn : ''}
+                    ${!hideRightHistory ? html`${backBtn}${forwardBtn}` : ''}
                   </div>
                 </div>
 
@@ -3271,6 +3539,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     isTimelineMinimized=${isTimelineMinimized}
                     setIsTimelineMinimized=${setIsTimelineMinimized}
                     dateLocale=${dateLocale}
+                    formatSmartDate=${formatSmartDate}
                     timelineRequiredHeight=${timelineRequiredHeight}
                   />
                 </div>
@@ -3320,11 +3589,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
 
                 <div class="tm-backdrop ${isSearchOpen ? 'open' : ''}" onClick=${() => setIsSearchOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="search-modal" class="tm-modal" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; height: 80vh; padding: 30px;">
+                <div id="search-modal" class="tm-modal ${isSearchOpen ? 'open' : ''}" style="display: ${isSearchOpen ? 'flex' : 'none'}; flex-direction: column; overflow: hidden; position: fixed; z-index: 100000 !important; height: 80vh; padding: 30px;">
                   <button class="modal-close" onClick=${() => setIsSearchOpen(false)} style="position: absolute; top: 16px; right: 16px; z-index: 101000; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #333; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1; transition: all 0.2s;" title="Close Search (Esc)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
-                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} style="flex-shrink: 0; width: 100%; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
+                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} onKeyDown=${(e) => { if (e.key === 'Escape') { e.target.blur(); setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false); } }} style="flex-shrink: 0; width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
                   <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
                     ${searchHistoryLayout}
                     ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
@@ -3341,11 +3610,209 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
               ${loadingScreen}
               ${appLayout}
+
+              ${isSettingsOpen && html`
+            <div class="tm-backdrop open" onClick=${() => setIsSettingsOpen(false)} style="z-index: 99999 !important;"></div>
+            <div id="settings-modal" class="tm-modal open" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000 !important; width: 85%; max-width: 480px; max-height: 85vh; overflow-y: auto; background: #fff; border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; font-family: monospace; box-sizing: border-box;" onClick=${(e) => e.stopPropagation()}>
+              <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
+              <h3 style="margin-top: 0; font-size: 1.25rem; margin-bottom: 20px; color: #222; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">⚙️ Engine Settings</h3>
+              
+              <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Icon Labels</label>
+                  <select value=${showButtonText ? 'yes' : 'no'} onChange=${e => { const val = e.target.value === 'yes'; setShowButtonText(val); try { localStorage.setItem('tm_show_button_text', String(val)); } catch(err){} }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.88rem; font-family: monospace; background: #fff;">
+                    <option value="no">Icons Only (Compact - Default)</option>
+                    <option value="yes">Show Text Labels</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Data Locale Format</label>
+                  <select value=${dateLocale} onChange=${e => { setDateLocale(e.target.value); try { localStorage.setItem('tm_date_locale', e.target.value); } catch(err){} }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.88rem; font-family: monospace; background: #fff;">
+                    <option value="en-GB">European (DD/MM/YYYY)</option>
+                    <option value="en-US">American (MM/DD/YYYY)</option>
+                    <option value="el-GR">Greek (ΗΗ/ΜΜ/ΕΕΕΕ)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Chrono Parse Engine Mode</label>
+                  <select value=${dateEngineMode} onChange=${e => { setDateEngineMode(e.target.value); try { localStorage.setItem('tm_date_engine_mode', e.target.value); } catch(err){} }} style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.88rem; font-family: monospace; background: #fff;">
+                    <option value="auto">Auto-Detect Chronologies (Default)</option>
+                    <option value="edtf">Strict ISO 8601-2 / EDTF Only</option>
+                    <option value="legacy">Strict Gregorian Serial / DD-MM-YYYY Fallback</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Map Auto-Zoom Depth</label>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="range" min="10" max="18" step="1" value=${maxAutoZoom} onInput=${e => { const val = parseInt(e.target.value); setMaxAutoZoom(val); try { localStorage.setItem('tm_max_auto_zoom', val); } catch(err){} }} style="flex-grow: 1; cursor: pointer;" />
+                    <span style="font-family: monospace; font-size: 0.95rem; color: #007acc; font-weight: 700; width: 30px; text-align: right;">${maxAutoZoom}z</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Minimap Zoom Offset</label>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="range" min="-8" max="0" step="1" value=${minimapOffset} onInput=${e => { const val = parseInt(e.target.value); setMinimapOffset(val); try { localStorage.setItem('tm_minimap_offset', val); } catch(err){} }} style="flex-grow: 1; cursor: pointer;" />
+                    <span style="font-family: monospace; font-size: 0.95rem; color: #007acc; font-weight: 700; width: 30px; text-align: right;">${minimapOffset}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label style="font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.88rem; color: #333;">Global Polygon Opacity</label>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="range" min="0.1" max="1.0" step="0.05" value=${polygonOpacity} onInput=${e => { const val = parseFloat(e.target.value); setPolygonOpacity(val); try { localStorage.setItem('tm_polygon_opacity', val); } catch(err){} }} style="flex-grow: 1; cursor: pointer;" />
+                    <span style="font-family: monospace; font-size: 0.95rem; color: #007acc; font-weight: 700; width: 30px; text-align: right;">${Math.round(polygonOpacity * 100)}%</span>
+                  </div>
+                </div>
+
+                <div style="border-top: 1px solid #eee; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                  <button onClick=${() => { setMinimapOffset(-4); setMaxAutoZoom(15); setPolygonOpacity(0.4); setDateLocale('en-GB'); setDateEngineMode('auto'); resetLayout(); setIsSettingsOpen(false); }} style="background: #f0f0f0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; font-family: monospace; cursor: pointer;">Reset Defaults</button>
+                  <button onClick=${() => setIsSettingsOpen(false)} style="background: #007acc; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; font-family: monospace; cursor: pointer;">Done</button>
+                </div>
+              </div>
+            </div>
+          `}
+
+              ${isTocOpen && html`
+                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 3500; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
+                  <div style="background: #ffffff; width: 80vw; height: 80vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
+                    <div style="padding: 16px 20px; border-bottom: 1px solid #e0e0e0; background: #f8f9fa; display: flex; align-items: center; justify-content: space-between;">
+                      <h3 style="margin: 0; font-size: 1.2rem; color: #111; display: flex; align-items: center; gap: 8px; font-weight: 700;">📖 Table of Contents</h3>
+                      <button onClick=${() => setIsTocOpen(false)} style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #666; font-weight: bold;">✕</button>
+                    </div>
+                    <div style="flex: 1; overflow-y: auto; padding: 16px;">
+                      ${(() => {
+                        if (!data || data.length === 0) return html`<div style="color: #888; font-size: 0.9rem; padding: 16px;">No slides loaded.</div>`;
+                        
+                        const groupMap = new Map();
+                        const groupOrder = [];
+
+                        data.forEach((item, idx) => {
+                          const rawTitleField = item.title || '';
+                          const rawSubField = item.subtitle || item.place || '';
+                          
+                          let mainTitle = '';
+                          let subTitle = '';
+
+                          // Split via <p*> tag inside Title field per Directive 5
+                          const pMatch = rawTitleField.match(/<p[^>]*>/i);
+                          if (pMatch) {
+                            const pIdx = pMatch.index;
+                            const rawHead = rawTitleField.substring(0, pIdx);
+                            const rawTail = rawTitleField.substring(pIdx + pMatch[0].length);
+                            mainTitle = rawHead.replace(/<[^>]*>/g, '').trim();
+                            subTitle = rawTail.replace(/<[^>]*>/g, '').trim();
+                          } else {
+                            mainTitle = rawTitleField.replace(/<[^>]*>/g, '').trim();
+                            subTitle = rawSubField.replace(/<[^>]*>/g, '').trim();
+                          }
+
+                          if (!mainTitle) mainTitle = 'Untitled';
+
+                          // Strip leading number, fullstop, space ('<number>. ')
+                          const normGroupTitle = mainTitle.replace(/^\d+[\.\)\-]?\s*/, '').trim();
+                          const parseAndDedupeTags = (tagsInput) => {
+                            if (!tagsInput) return [];
+                            const rawArr = Array.isArray(tagsInput) ? tagsInput : [tagsInput];
+                            const splitRegex = /[|·;·\n\r,-]+/;
+                            const seen = new Map();
+                            rawArr.forEach(entry => {
+                              if (typeof entry === 'string') {
+                                entry.split(splitRegex).forEach(t => {
+                                  const clean = t.trim();
+                                  if (clean) {
+                                    const key = clean.toLowerCase();
+                                    if (!seen.has(key)) seen.set(key, clean);
+                                  }
+                                });
+                              } else if (entry) {
+                                const clean = String(entry).trim();
+                                if (clean) {
+                                  const key = clean.toLowerCase();
+                                  if (!seen.has(key)) seen.set(key, clean);
+                                }
+                              }
+                            });
+                            return Array.from(seen.values());
+                          };
+                          const rawTags = parseAndDedupeTags(item.tags);
+
+                          if (!groupMap.has(normGroupTitle)) {
+                            groupMap.set(normGroupTitle, {
+                              title: normGroupTitle,
+                              items: []
+                            });
+                            groupOrder.push(normGroupTitle);
+                          }
+
+                          groupMap.get(normGroupTitle).items.push({
+                            idx,
+                            item,
+                            sub: subTitle,
+                            mainTitle,
+                            tags: rawTags
+                          });
+                        });
+
+                        const groups = groupOrder.map(key => groupMap.get(key));
+
+                        return groups.map(g => {
+                          return html`
+                            <div style="margin-bottom: 14px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff;">
+                              <!-- Heading showing ONLY the normalized Group Title (no subtitle) -->
+                              <div style="background: #f1f3f5; padding: 10px 14px; font-weight: 800; font-size: 0.95rem; color: #111; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between;">
+                                <span>${g.title}</span>
+                                <span style="font-size: 0.75rem; color: #007acc; background: #e6f4ff; border: 1px solid #bae0ff; padding: 2px 8px; border-radius: 10px;">${g.items.length} ${g.items.length === 1 ? 'item' : 'items'}</span>
+                              </div>
+                              <div style="display: flex; flex-direction: column;">
+                                ${g.items.map(child => {
+                                  const isActive = child.idx === activeIndex;
+                                  return html`
+                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
+<!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
+                                      <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
+                                        <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
+                                        <span>${child.sub || child.mainTitle || g.title}</span>
+                                      </div>
+
+                                      <!-- Line 2: Metadata row displaying Dates, Places, and Tags -->
+                                      ${(() => {
+                                        const itemDateStr = (child.item.startDate || child.item.start) ? formatSmartDate(child.item.startDate, child.item.endDate, dateLocale) : '';
+                                        const itemPlaceStr = (child.item.place || child.item.location) ? safeStripHTML(formatPlaces(child.item.place || child.item.location)) : '';
+                                        if (!itemDateStr && !itemPlaceStr && (!child.tags || child.tags.length === 0)) return '';
+                                        return html`
+                                          <div style="display: flex; align-items: center; gap: 10px; margin-left: 28px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem;">
+                                            ${itemDateStr ? html`<span style="color: #007acc; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e5ff; font-weight: 500;">🕒 ${itemDateStr}</span>` : ''}
+                                            ${itemPlaceStr ? html`<span style="color: #28a745; background: #f2fcf5; padding: 2px 6px; border-radius: 4px; border: 1px solid #c3e6cb; font-weight: 500;">📍 ${itemPlaceStr}</span>` : ''}
+                                            ${child.tags && child.tags.length > 0 ? html`
+                                              <div style="display: flex; align-items: center; gap: 4px;">
+                                                <span style="color: #888;">🏷️</span>
+                                                ${child.tags.map(t => html`<span style="background: #f0f0f0; color: #444; padding: 1px 6px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.75rem;">${t}</span>`)}
+                                              </div>
+                                            ` : ''}
+                                          </div>
+                                        `;
+                                      })()}
+
+                                    </div>
+                                  `;
+                                })}
+                              </div>
+                            </div>
+                          `;
+                        });
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              `}
             </div>
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.120-b223';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.39-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3469,7 +3936,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.7.120-b223';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.27-b155';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.96-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 

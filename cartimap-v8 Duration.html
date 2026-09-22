@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b314';
+const APP_VERSION = 'v8.15.0-b315';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -284,7 +284,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   const handleToggleField = (field) => {
     const newFields = trackedFields.includes(field) ? trackedFields.filter(f => f !== field) : [...trackedFields, field];
     setTrackedFields(newFields);
-    localStorage.setItem('tm_telemetry_fields', JSON.stringify(newFields));
+    try { localStorage.setItem('tm_telemetry_fields', JSON.stringify(newFields)); } catch(e){}
   };
 
   const availableFields = activeSlide ? Object.keys(activeSlide) : ['id', 'title', 'startDate', 'endDate', 'place', 'location', 'priority', 'tags'];
@@ -363,7 +363,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.3.9-b314';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.3.10-b315';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -591,7 +591,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.14.9-b314';
+MODULE_VERSIONS['MediaViewer'] = 'v2.14.10-b315';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -726,7 +726,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.9.9-b314';
+MODULE_VERSIONS['ContentSlider'] = 'v5.9.10-b315';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1326,7 +1326,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.9-b314';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.10-b315';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1392,7 +1392,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   const finalW = minimapWrapperRef.current.offsetWidth;
                   const finalH = minimapWrapperRef.current.offsetHeight;
                   if (finalW && finalH) {
-                    localStorage.setItem('tm_minimap_size', JSON.stringify({ w: finalW, h: finalH }));
+                    try { localStorage.setItem('tm_minimap_size', JSON.stringify({ w: finalW, h: finalH })); } catch(e){}
                   }
                 } catch(e) {}
               }
@@ -1461,7 +1461,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
 
           useEffect(() => {
             try {
-              const savedSize = JSON.parse(localStorage.getItem('tm_minimap_size'));
+              const savedSize = (() => { try { return JSON.parse(localStorage.getItem('tm_minimap_size')); } catch(e) { return null; } })();
               if (savedSize && savedSize.w && savedSize.h && minimapWrapperRef.current) {
                 minimapWrapperRef.current.style.width = `${savedSize.w}px`;
                 minimapWrapperRef.current.style.height = `${savedSize.h}px`;
@@ -2311,7 +2311,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.6.9-b314';
+MODULE_VERSIONS['MapViewer'] = 'v6.6.10-b315';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2364,7 +2364,7 @@ const App = () => {
             if (typeof setMaxPane === 'function') setMaxPane(null);
             window.dispatchEvent(new Event('resize'));
           };
-          const [maxAutoZoom, setMaxAutoZoom] = useState(() => parseInt(localStorage.getItem('tm_max_auto_zoom'), 10) || 18);
+          const [maxAutoZoom, setMaxAutoZoom] = useState(() => { try { return parseInt(localStorage.getItem('tm_max_auto_zoom'), 10) || 18; } catch(e) { return 18; } });
           const [statusWidth, setStatusWidth] = useState(300);
           const statusBrandRef = useRef(null);
 
@@ -2514,10 +2514,12 @@ const App = () => {
             const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
 
             const getEmbeddedPrimaryRows = () => {
-              const globalSD = (typeof sheetsData !== 'undefined' && sheetsData) ? sheetsData : ((typeof window !== 'undefined' && window.sheetsData) ? window.sheetsData : null);
-              if (!globalSD) return null;
-              const targetArray = globalSD.ExtractsCombinedV || globalSD.SourcesT || globalSD.Primary || globalSD.Data || (Array.isArray(globalSD) ? globalSD : null);
-              return (Array.isArray(targetArray) && targetArray.length > 0) ? targetArray : null;
+              try {
+                const globalSD = (typeof sheetsData !== 'undefined' && sheetsData) ? sheetsData : ((typeof window !== 'undefined' && window.sheetsData) ? window.sheetsData : null);
+                if (!globalSD) return null;
+                const targetArray = globalSD.ExtractsCombinedV || globalSD.SourcesT || globalSD.Primary || globalSD.Data || (Array.isArray(globalSD) ? globalSD : null);
+                return (Array.isArray(targetArray) && targetArray.length > 0) ? targetArray : null;
+              } catch(e) { return null; }
             };
 
             const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
@@ -2527,6 +2529,7 @@ const App = () => {
             let fetchPromise;
 
             if (embeddedRows) {
+              setStatus({ text: 'Compiling embedded datasets...', progress: 40, isFading: false, active: false });
               addLog(`[Local Ingestion] Direct embedded sheetsData detected (${embeddedRows.length} records). Bypassing network fetch.`, 'info');
               fetchPromise = Promise.resolve([null, null, embeddedRows]);
             } else {
@@ -2534,15 +2537,57 @@ const App = () => {
               addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
 
               const fetchWithTimeout = (url, timeoutMs = 5000) => {
-                const ctrl = new AbortController();
-                const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-                return fetch(url, { signal: ctrl.signal }).then(res => {
-                  clearTimeout(timer);
-                  if (!res.ok) throw new Error(`HTTP ${res.status} network error`);
-                  return res.text();
-                }).catch(err => {
-                  clearTimeout(timer);
-                  throw err;
+                return new Promise((resolve, reject) => {
+                  let timer = null;
+                  let hasSettled = false;
+
+                  if (typeof AbortController !== 'undefined') {
+                    const ctrl = new AbortController();
+                    timer = setTimeout(() => {
+                      if (!hasSettled) {
+                        hasSettled = true;
+                        try { ctrl.abort(); } catch(e){}
+                        reject(new Error(`Network timeout (${timeoutMs}ms limit exceeded)`));
+                      }
+                    }, timeoutMs);
+
+                    fetch(url, { signal: ctrl.signal }).then(res => {
+                      if (!hasSettled) {
+                        hasSettled = true;
+                        if (timer) clearTimeout(timer);
+                        if (!res.ok) throw new Error(`HTTP ${res.status} network error`);
+                        resolve(res.text());
+                      }
+                    }).catch(err => {
+                      if (!hasSettled) {
+                        hasSettled = true;
+                        if (timer) clearTimeout(timer);
+                        reject(err);
+                      }
+                    });
+                  } else {
+                    timer = setTimeout(() => {
+                      if (!hasSettled) {
+                        hasSettled = true;
+                        reject(new Error(`Network timeout (${timeoutMs}ms limit exceeded)`));
+                      }
+                    }, timeoutMs);
+
+                    fetch(url).then(res => {
+                      if (!hasSettled) {
+                        hasSettled = true;
+                        if (timer) clearTimeout(timer);
+                        if (!res.ok) throw new Error(`HTTP ${res.status} network error`);
+                        resolve(res.text());
+                      }
+                    }).catch(err => {
+                      if (!hasSettled) {
+                        hasSettled = true;
+                        if (timer) clearTimeout(timer);
+                        reject(err);
+                      }
+                    });
+                  }
                 });
               };
 
@@ -3047,7 +3092,7 @@ const App = () => {
             if (qString && !searchHistory.includes(qString)) {
               const newH = [qString, ...searchHistory].slice(0, 8);
               setSearchHistory(newH);
-              localStorage.setItem('tm_search_history', JSON.stringify(newH));
+              try { localStorage.setItem('tm_search_history', JSON.stringify(newH)); } catch(e){}
             }
           };
 
@@ -3861,7 +3906,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.9-b314';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.10-b315';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -3985,7 +4030,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.9-b314';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.9-b314';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.10-b315';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
