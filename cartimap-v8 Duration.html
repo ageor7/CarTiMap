@@ -222,7 +222,7 @@ if (!String.prototype.at) {
     return this[n];
   };
 }
-const APP_VERSION = 'v8.15.0-b321';
+const APP_VERSION = 'v8.15.0-b322';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -750,7 +750,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.8.58-b303';
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.10 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
-const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
+const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane, setDurationInspectionPayload }) => {
   const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? s.text : (s && s.date ? s.date.toLocaleDateString(loc || 'en-GB') : 'Undated')));
   const wrapperRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -2480,6 +2480,14 @@ const App = () => {
     }
   }, [isSearchOpen]);
           useEffect(() => { if (isSearchOpen) { setTimeout(() => { const el = document.querySelector('.search-input'); if (el) el.focus(); }, 50); } }, [isSearchOpen]);
+          useEffect(() => {
+            if (isTocOpen) {
+              setTimeout(() => {
+                const activeEl = document.querySelector('.toc-active-item');
+                if (activeEl) activeEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+              }, 60);
+            }
+          }, [isTocOpen]);
           const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
           const [searchHistory, setSearchHistory] = useState(() => {
             try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; }
@@ -3789,7 +3797,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                 ${g.items.map(child => {
                                   const isActive = child.idx === activeIndex;
                                   return html`
-                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
+                                    <div class=${isActive ? "toc-active-item" : "toc-item"} onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
 <!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
                                       <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
                                         <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
