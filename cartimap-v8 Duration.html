@@ -220,7 +220,7 @@ if (!String.prototype.at) {
   };
 }
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b318';
+const APP_VERSION = 'v8.15.0-b319';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -379,7 +379,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.3.13-b318';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.3.14-b319';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -607,7 +607,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.14.13-b318';
+MODULE_VERSIONS['MediaViewer'] = 'v2.14.14-b319';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -742,7 +742,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.9.13-b318';
+MODULE_VERSIONS['ContentSlider'] = 'v5.9.14-b319';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1342,7 +1342,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.13-b318';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.14-b319';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2327,7 +2327,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.6.13-b318';
+MODULE_VERSIONS['MapViewer'] = 'v6.6.14-b319';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2540,8 +2540,7 @@ const App = () => {
               } catch(e) { return null; }
             };
 
-const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
-            const fetchUrlDirectExport = `https://docs.google.com/spreadsheets/d/${source}/export?format=csv&gid=${gid}`;
+            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
             const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
 
             const embeddedRows = manualCsvRows || getEmbeddedPrimaryRows();
@@ -2555,96 +2554,17 @@ const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/t
               setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
               addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
 
-              const slowTimer = setTimeout(() => {
-                setStatus(prev => {
-                  if (!prev.active && prev.progress < 60) {
-                    addLog(`[Network Notice] Google Sheets response taking >5s. Waiting for payload...`, 'info');
-                    return { text: 'Google Sheets connection slow, waiting for payload response...', progress: 45, isFading: false, active: false };
-                  }
-                  return prev;
-                });
-              }, 5000);
-
-              const fetchWithTimeout = (url, timeoutMs = 12000) => {
-                return new Promise((resolve, reject) => {
-                  let timer = null;
-                  let hasSettled = false;
-
-                  if (typeof AbortController !== 'undefined') {
-                    const ctrl = new AbortController();
-                    timer = setTimeout(() => {
-                      if (!hasSettled) {
-                        hasSettled = true;
-                        try { ctrl.abort(); } catch(e){}
-                        reject(new Error(`Network timeout (${timeoutMs}ms limit exceeded)`));
-                      }
-                    }, timeoutMs);
-
-                    fetch(url, { signal: ctrl.signal }).then(res => {
-                      if (!hasSettled) {
-                        hasSettled = true;
-                        if (timer) clearTimeout(timer);
-                        if (!res.ok) throw new Error(`HTTP ${res.status} network error`);
-                        resolve(res.text());
-                      }
-                    }).catch(err => {
-                      if (!hasSettled) {
-                        hasSettled = true;
-                        if (timer) clearTimeout(timer);
-                        reject(err);
-                      }
-                    });
-                  } else {
-                    timer = setTimeout(() => {
-                      if (!hasSettled) {
-                        hasSettled = true;
-                        reject(new Error(`Network timeout (${timeoutMs}ms limit exceeded)`));
-                      }
-                    }, timeoutMs);
-
-                    fetch(url).then(res => {
-                      if (!hasSettled) {
-                        hasSettled = true;
-                        if (timer) clearTimeout(timer);
-                        if (!res.ok) throw new Error(`HTTP ${res.status} network error`);
-                        resolve(res.text());
-                      }
-                    }).catch(err => {
-                      if (!hasSettled) {
-                        hasSettled = true;
-                        if (timer) clearTimeout(timer);
-                        reject(err);
-                      }
-                    });
-                  }
-                });
-              };
-
-              const primaryPromise = fetchWithTimeout(fetchUrlPrimary, 6500).catch(err => {
-                addLog(`[Network Warning] Primary GViz endpoint slow/failed (${err.message}). Retrying via direct CSV export endpoint...`, 'warning');
-                setStatus({ text: 'GViz query endpoint slow. Retrying direct CSV export...', progress: 45, isFading: false, active: false });
-                return fetchWithTimeout(fetchUrlDirectExport, 6500);
-              });
-
-              const basemapsPromise = fetchUrlBasemaps ? fetchWithTimeout(fetchUrlBasemaps, 7000).catch(() => null) : Promise.resolve(null);
-
-              const networkPromise = Promise.all([primaryPromise, basemapsPromise, null]).then(res => {
-                clearTimeout(slowTimer);
-                return res;
-              }).catch(err => {
-                clearTimeout(slowTimer);
-                throw err;
-              });
-
-              const hardTimeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Network fetch hard timeout (14000ms limit exceeded)')), 14000);
-              });
-
-              fetchPromise = Promise.race([networkPromise, hardTimeoutPromise]).catch(err => {
-                clearTimeout(slowTimer);
+              fetchPromise = Promise.all([
+                fetch(fetchUrlPrimary).then(res => {
+                  if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
+                  return res.text();
+                }),
+                fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => res.ok ? res.text() : null).catch(() => null) : Promise.resolve(null),
+                null
+              ]).catch(err => {
                 const retryEmbedded = getEmbeddedPrimaryRows();
                 if (retryEmbedded) {
-                  addLog(`[Network Fallback] ${err.message}. Reverting to embedded sheetsData.`, 'warning');
+                  addLog(`[Network Warning] Fetch failed (${err.message}). Falling back to embedded sheetsData.`, 'warning');
                   return [null, null, retryEmbedded];
                 }
                 throw err;
@@ -3989,7 +3909,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.13-b318';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.14-b319';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -4113,7 +4033,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.13-b318';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.13-b318';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.14-b319';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
