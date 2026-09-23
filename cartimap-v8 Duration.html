@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b329';
+const APP_VERSION = 'v8.15.0-b331';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -732,7 +732,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.8.58-b303';
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.10 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
-const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
+const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane, setDurationInspectionPayload }) => {
   const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? s.text : (s && s.date ? s.date.toLocaleDateString(loc || 'en-GB') : 'Undated')));
   const wrapperRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -2389,6 +2389,19 @@ const App = () => {
           };
           const [isSearchOpen, setIsSearchOpen] = useState(false);
                     const [isTocOpen, setIsTocOpen] = useState(false);
+          const [durationInspectionPayload, setDurationInspectionPayload] = useState(null);
+
+          
+          useEffect(() => {
+            if (isTocOpen) {
+              setTimeout(() => {
+                const activeItem = document.querySelector('.toc-active-item');
+                if (activeItem) {
+                  activeItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+              }, 60);
+            }
+          }, [isTocOpen]);
 
           const resetLayout = () => {
             const appNode = document.getElementById('app-layout') || document.documentElement;
