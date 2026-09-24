@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b347';
+const APP_VERSION = 'v8.15.0-b348';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -744,7 +744,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const [containerHeight, setContainerHeight] = useState(200);
   const [viewLeftEdge, setViewLeftEdge] = useState(0);
   const [caliperTooltip, setCaliperTooltip] = useState(null);
-  
+  // modal state purged
   const hoverTimeoutRef = useRef(null);
   const lastMouseXRef = useRef(0);
 
@@ -1057,9 +1057,36 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
 
 
-    const targetMsPerMajorTick = Math.max((340 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 4);
+    // Dual Scale: Fine Minor Ticks (~70px) + Collision-Free Major Tick Labels (~280px)
+    const targetMsPerMinorTick = Math.max((70 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 20);
+    let minorScale = scaleConfigs.find(c => targetMsPerMinorTick > c.ms) || scaleConfigs.at(-1);
+
+    const targetMsPerMajorTick = Math.max((280 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 5);
     let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
 
+    // Minor Ticks Data (Small tick marks)
+    let mIter = new Date(Math.max(renderMinTime, visibleLeftMs - (minorScale.ms * 2)));
+    mIter.setMilliseconds(0);
+    if (minorScale.type === 'year') { mIter.setMonth(0, 1); mIter.setHours(0, 0, 0, 0); mIter.setFullYear(Math.floor(mIter.getFullYear() / minorScale.step) * minorScale.step); }
+    else if (minorScale.type === 'month') { mIter.setDate(1); mIter.setHours(0,0,0,0); mIter.setMonth(Math.floor(mIter.getMonth() / minorScale.step) * minorScale.step); }
+    else if (minorScale.type === 'day') { mIter.setHours(0,0,0,0); }
+    else if (minorScale.type === 'hour') { mIter.setMinutes(0,0,0); mIter.setHours(Math.floor(mIter.getHours() / minorScale.step) * minorScale.step); }
+    else if (minorScale.type === 'minute') { mIter.setSeconds(0,0); mIter.setMinutes(Math.floor(mIter.getMinutes() / minorScale.step) * minorScale.step); }
+
+    let mSafety = 0;
+    const mStopTime = Math.min(renderMaxTime, visibleRightMs + (minorScale.ms * 2));
+    const minorTicksData = [];
+    while (mIter.getTime() <= mStopTime && mSafety < 1000) {
+      mSafety++; const t = mIter.getTime();
+      if (t >= renderMinTime) minorTicksData.push({ t, pctLeft: ((t - renderMinTime) / renderTimeRange) * 100 });
+      if (minorScale.type === 'year') mIter.setFullYear(mIter.getFullYear() + minorScale.step);
+      else if (minorScale.type === 'month') mIter.setMonth(mIter.getMonth() + minorScale.step);
+      else if (minorScale.type === 'day') mIter.setDate(mIter.getDate() + minorScale.step);
+      else if (minorScale.type === 'hour') mIter.setHours(mIter.getHours() + minorScale.step);
+      else if (minorScale.type === 'minute') mIter.setMinutes(mIter.getMinutes() + minorScale.step);
+    }
+
+    // Major Ticks Data (Text Labels)
     let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
     iterDate.setMilliseconds(0);
     if (activeScale.type === 'year') { iterDate.setMonth(0, 1); iterDate.setHours(0, 0, 0, 0); iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step); }
@@ -1092,16 +1119,23 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       }
     });
 
-    const rulerTicksHTML = majorTicksData.map((d, i) => {
-      const labelText = activeScale.type === 'year' ? d.date.getFullYear() : (activeScale.type === 'month' ? d.date.toLocaleDateString(dateLocale, { month: 'short', year: 'numeric' }) : d.date.toLocaleDateString(dateLocale, { month: 'numeric', day: 'numeric', year: 'numeric' }));
-      const isCenter = i === centerTickIndex;
-      return html`
-        <div class="timeline-ruler-tick" style="left: ${d.pctLeft}%;">
-          <div style="height: 10px; width: 1px; background: #666;"></div>
-          <span style="font-size: 0.75rem; font-family: monospace; color: ${isCenter ? '#007acc' : '#555'}; font-weight: ${isCenter ? '700' : '400'}; margin-top: 2px; white-space: nowrap;">${labelText}</span>
-        </div>
-      `;
-    });
+    const minorTicksHTML = minorTicksData.map(m => html`
+      <div style="position: absolute; left: ${m.pctLeft}%; bottom: 0; width: 1px; height: 5px; background: #a0aec0; z-index: 1;"></div>
+    `);
+
+    const rulerTicksHTML = html`
+      ${minorTicksHTML}
+      ${majorTicksData.map((d, i) => {
+        const labelText = activeScale.type === 'year' ? d.date.getFullYear() : (activeScale.type === 'month' ? d.date.toLocaleDateString(dateLocale, { month: 'short', year: 'numeric' }) : d.date.toLocaleDateString(dateLocale, { month: 'numeric', day: 'numeric', year: 'numeric' }));
+        const isCenter = i === centerTickIndex;
+        return html`
+          <div class="timeline-ruler-tick" style="left: ${d.pctLeft}%; z-index: 2;">
+            <div style="height: 10px; width: 1.5px; background: #334155;"></div>
+            <span style="font-size: 0.72rem; font-family: monospace; color: ${isCenter ? '#007acc' : '#475569'}; font-weight: ${isCenter ? '700' : '500'}; margin-top: 2px; white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis;">${labelText}</span>
+          </div>
+        `;
+      })}
+    `;
   const stackRegistry = {};
 
   const markers = validData.map((item, index) => {
@@ -1211,7 +1245,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
         const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationInspectionPayload({ item, overlappingEvents }); }}></div>`;
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); if (typeof setDurationInspectionPayload === 'function') { const trackEl = wrapperRef.current; let pTime = itemStartMs; if (trackEl) { const rect = trackEl.getBoundingClientRect(); const clickX = Math.max(0, Math.min(rect.width, e.clientX - rect.left)); pTime = renderMinTime + (clickX / rect.width) * renderTimeRange; } const strictlyOverlapping = validData.filter(other => { const s = other.startDate ? other.startDate.min : renderMinTime; const eEnd = (other.endDate && !isNaN(other.endDate.max)) ? other.endDate.max : ((other.startDate && !isNaN(other.startDate.max) && other.startDate.max > s) ? other.startDate.max : s); return (s <= pTime && eEnd >= pTime) || (s <= endVal && eEnd >= itemStartMs); }); setDurationInspectionPayload({ item, overlappingEvents: strictlyOverlapping.length > 0 ? strictlyOverlapping : overlappingEvents, pointerTime: pTime }); } }}></div>`;
       } else {
         const styleIdx = index % 4;
         const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
@@ -1220,7 +1254,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
         const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationInspectionPayload({ item, overlappingEvents }); }}>
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); if (typeof setDurationInspectionPayload === 'function') { const trackEl = wrapperRef.current; let pTime = itemStartMs; if (trackEl) { const rect = trackEl.getBoundingClientRect(); const clickX = Math.max(0, Math.min(rect.width, e.clientX - rect.left)); pTime = renderMinTime + (clickX / rect.width) * renderTimeRange; } const strictlyOverlapping = validData.filter(other => { const s = other.startDate ? other.startDate.min : renderMinTime; const eEnd = (other.endDate && !isNaN(other.endDate.max)) ? other.endDate.max : ((other.startDate && !isNaN(other.startDate.max) && other.startDate.max > s) ? other.startDate.max : s); return (s <= pTime && eEnd >= pTime) || (s <= endVal && eEnd >= itemStartMs); }); setDurationInspectionPayload({ item, overlappingEvents: strictlyOverlapping.length > 0 ? strictlyOverlapping : overlappingEvents, pointerTime: pTime }); } }}>
             <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}" title="${spanMarkerTooltip}"></div>
           </div>
         `;
@@ -2484,11 +2518,11 @@ const App = () => {
             return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim();
           };
 
-          const formatSmartDate = (startInput, endObj, locale) => {
-            if (!startInput && startInput !== 0) return 'Undated';
-            
+          const formatSmartDate = (startInput, endInput, locale) => {
+            if (startInput === null || startInput === undefined) return 'Undated';
+
             const toValidDate = (val) => {
-              if (!val && val !== 0) return null;
+              if (val === null || val === undefined) return null;
               if (typeof val === 'number') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
               if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
               if (typeof val === 'object') {
@@ -2501,17 +2535,21 @@ const App = () => {
               return null;
             };
 
-            if (typeof startInput === 'object' && startInput && startInput.isEDTF && startInput.text) return startInput.text;
-            const d = toValidDate(startInput);
-            if (!d) return (typeof startInput === 'string' ? startInput : 'Undated');
-            if (typeof d === 'string') return d;
+            const d1 = toValidDate(startInput);
+            if (typeof d1 === 'string') return d1;
+            if (!d1) return typeof startInput === 'string' ? startInput : 'Undated';
 
-            const dEnd = toValidDate(endObj);
-            if (dEnd && typeof dEnd !== 'string') {
-              if (dEnd.getTime() === d.getTime()) return d.toLocaleDateString(locale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-              return d.toLocaleDateString(locale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' – ' + dEnd.toLocaleDateString(locale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const d2 = toValidDate(endInput);
+            const loc = locale || 'en-GB';
+            const opt = { day: '2-digit', month: 'short', year: 'numeric' };
+
+            if (d2 && typeof d2 !== 'string') {
+              if (d2.getTime() === d1.getTime()) {
+                return d1.toLocaleDateString(loc, opt);
+              }
+              return d1.toLocaleDateString(loc, opt) + ' – ' + d2.toLocaleDateString(loc, opt);
             }
-            return d.toLocaleDateString(locale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            return d1.toLocaleDateString(loc, opt);
           };
 
           const formatPlaces = (placeStr) => {
@@ -3498,7 +3536,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     data=${data}
                     activeIndex=${activeIndex}
                     setActiveIndex=${jumpToSlide}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     addLog=${addLog}
                     activeTags=${activeTags}
                     isTimelineExpanded=${isTimelineExpanded}
@@ -3517,6 +3554,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     dateLocale=${dateLocale}
                     formatSmartDate=${formatSmartDate}
                     timelineRequiredHeight=${timelineRequiredHeight}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                   />
                 </div>
 
@@ -3582,7 +3620,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           return html`
             <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
-              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
+              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight}
+                    setDurationInspectionPayload=${setDurationInspectionPayload} />
 
               ${loadingScreen}
               ${appLayout}
@@ -3746,7 +3785,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                 ${g.items.map(child => {
                                   const isActive = child.idx === activeIndex;
                                   return html`
-                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} class="${isActive ? 'toc-active-item' : ''}" style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
+                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
 <!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
                                       <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
                                         <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
@@ -3785,11 +3824,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
               `}
             </div>
-
+          
       ${durationInspectionPayload ? html`
         <div id="duration-inspection-root">
           <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important; background: rgba(0,0,0,0.55);"></div>
-          <div id="duration-inspection-modal" class="tm-modal open" style="z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); padding: 24px; font-family: monospace; width: 92%; max-width: 920px; max-height: 88vh; overflow-y: auto;">
+          <div id="duration-inspection-modal" class="tm-modal open" style="z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); padding: 24px 28px; font-family: monospace; width: 95vw; max-width: 1150px; max-height: 92vh; overflow-y: auto;">
             <button class="modal-close" onClick=${() => setDurationInspectionPayload(null)} title="Close (Esc)" style="position: absolute; top: 18px; right: 20px; z-index: 10; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; color: #475569;">✕</button>
             
             <!-- Header with High-Precision Optical Microscope SVG Icon -->
@@ -3810,13 +3849,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               </span>
             </div>
 
-            <!-- Cursor Time Focus & Duration Range Summary Box (Simplified Single Line) -->
+            <!-- Single-Line Cursor Focus & Duration Span Summary -->
             ${(() => {
               const events = durationInspectionPayload.overlappingEvents || [];
               if (events.length === 0) return html`<div style="color: #666; padding: 12px;">No concurrent events found at this time coordinate.</div>`;
 
               const selItem = durationInspectionPayload.item;
-              const pTime = durationInspectionPayload.pointerTime || (selItem && selItem.startDate ? selItem.startDate.min : (events[0].startDate ? events[0].startDate.min : 0));
+              const pTime = durationInspectionPayload.pointerTime || (selItem && selItem.startDate ? selItem.startDate.min : (events[0] && events[0].startDate ? events[0].startDate.min : 0));
               
               const focusDateStr = formatSmartDate(pTime, null, dateLocale);
 
@@ -3860,21 +3899,21 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
               return html`
                 <div>
-                  <!-- Focus Coordinate & Duration Span Single-Line Summary Box -->
-                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 0.9rem; color: #0f172a; font-weight: 700;">
+                  <!-- Simplified Single-Item Summary Box -->
+                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 0.88rem; color: #0f172a; font-weight: 700;">
                       🎯 Cursor Focus: <span style="color: #007acc;">${focusDateStr}</span>
-                      ${hasEventSpan ? html`<span style="margin-left: 12px; font-size: 0.85rem; color: #16a34a;">• Duration Span: ${formatSmartDate(itemStart, itemEnd, dateLocale)}</span>` : ''}
+                      ${hasEventSpan ? html`<span style="margin-left: 12px; color: #16a34a; font-weight: 600;">• Duration Span: ${formatSmartDate(itemStart, itemEnd, dateLocale)}</span>` : ''}
                     </div>
                   </div>
 
-                  <!-- 10-Tick Aligned Top X-Axis Ruler Scale Header (Flush Edge Padding 17.5px left / 29.5px right) -->
-                  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 17.5px 12px 29.5px; margin-bottom: 14px; position: relative;">
+                  <!-- 10-Tick Top X-Axis Ruler Scale Header (Flush 100% Track Edge Matching Mini-Gantt Track Bars) -->
+                  <div style="background: #ffffff; border: 1.5px solid transparent; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; position: relative;">
                     <div style="position: relative; width: 100%; height: 32px; overflow: visible;">
-                      <!-- Scale Axis Line (The scale part matching Gantt bars) -->
+                      <!-- Scale Axis Line (Flush 0% to 100% Edge Matching Mini-Gantt Bars) -->
                       <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #cbd5e1;"></div>
-                      
-                      <!-- 10 Ticks -->
+
+                      <!-- 10 Scale Ticks -->
                       ${ticks.map(t => html`
                         <div style="position: absolute; left: ${t.pct}%; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 5;">
                           <div style="font-size: 0.68rem; color: #475569; font-weight: 600; white-space: nowrap; margin-bottom: 2px;">${t.label}</div>
@@ -3892,8 +3931,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     </div>
                   </div>
 
-                  <!-- Multi-Lane Gantt Cards Container (Card Padding 12px 16px) -->
-                  <div style="display: flex; flex-direction: column; gap: 10px; max-height: 48vh; overflow-y: scroll; padding-right: 4px;">
+                  <!-- Multi-Lane Gantt Cards Container (Expanded Height to Avoid Scrollbars) -->
+                  <div style="display: flex; flex-direction: column; gap: 10px; max-height: 65vh; overflow-y: auto;">
                     ${events.map((ev, i) => {
                       const isMainActiveSlide = data[activeIndex] && ev.id === data[activeIndex].id;
                       const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
@@ -3925,7 +3964,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                setDurationInspectionPayload(null);
                              }}>
                           
-                          <!-- Event Title & Metadata Header -->
+                          <!-- Event Title & Metadata Header (Clean Header without 'Active Slide' text badge) -->
                           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#1e293b'}; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
                               <span style="color: #64748b; font-family: monospace; font-size: 0.82rem;">#${i + 1}</span>
@@ -3936,7 +3975,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                             </div>
                           </div>
 
-                          <!-- Mini-Gantt Track -->
+                          <!-- Mini-Gantt Track (Exact Pixel Alignment with Ruler Scale Axis Line above) -->
                           <div style="position: relative; width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0;">
                             <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${isMainActiveSlide ? '#22c55e' : '#007acc'}; border-radius: 4px; opacity: 0.85;"></div>
                             <!-- Red Cursor Line Intersection -->
@@ -3952,11 +3991,10 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           </div>
         </div>
       ` : ''}
-
-          `;
+`;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.39-b303';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.41-b348';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
