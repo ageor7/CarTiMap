@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.15.0-b338-b301</title>
+    <title>CarTiMap v8.14.1-b301</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b338';
+const APP_VERSION = 'v8.15.0-b337';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1211,7 +1211,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
         const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationInspectionPayload({ item, overlappingEvents }); }}></div>`;
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); if (typeof setDurationInspectionPayload === 'function') setDurationInspectionPayload({ item, overlappingEvents }); }}></div>`;
       } else {
         const styleIdx = index % 4;
         const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
@@ -1220,7 +1220,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
         const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationInspectionPayload({ item, overlappingEvents }); }}>
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); if (typeof setDurationInspectionPayload === 'function') setDurationInspectionPayload({ item, overlappingEvents }); }}>
             <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}" title="${spanMarkerTooltip}"></div>
           </div>
         `;
@@ -2347,17 +2347,6 @@ const App = () => {
                     const [isTocOpen, setIsTocOpen] = useState(false);
           const [durationInspectionPayload, setDurationInspectionPayload] = useState(null);
 
-          useEffect(() => {
-            if (isTocOpen) {
-              setTimeout(() => {
-                const activeItem = document.querySelector('.toc-active-item');
-                if (activeItem) {
-                  activeItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                }
-              }, 60);
-            }
-          }, [isTocOpen]);
-
           const resetLayout = () => {
             const appNode = document.getElementById('app-layout') || document.documentElement;
             if (appNode) {
@@ -3340,7 +3329,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       activeIndex=${activeIndex}
                       setActiveIndex=${jumpToSlide}
                       maxPane=${maxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                       setMaxPane=${setMaxPane}
                       dateLocale=${dateLocale}
                       formatSmartDate=${formatSmartDate}
@@ -3366,7 +3354,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         minimapOffset=${minimapOffset}
                         setMinimapOffset=${setMinimapOffset}
                         maxPane=${maxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                         setMaxPane=${setMaxPane}
                         polygonOpacity=${polygonOpacity}
                         showButtonText=${showButtonText}
@@ -3382,7 +3369,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       <${MediaViewer}
                         activeSlide=${activeSlide}
                         maxPane=${maxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                         setMaxPane=${setMaxPane}
                       />
                     </div>
@@ -3494,12 +3480,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     data=${data}
                     activeIndex=${activeIndex}
                     setActiveIndex=${jumpToSlide}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     addLog=${addLog}
                     activeTags=${activeTags}
                     isTimelineExpanded=${isTimelineExpanded}
                     setIsTimelineExpanded=${setIsTimelineExpanded}
                     maxPane=${maxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     setMaxPane=${setMaxPane}
                     showButtonText=${showButtonText}
                     visibleTimeBounds=${visibleTimeBounds}
@@ -3647,6 +3633,84 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
             </div>
           `}
 
+              ${durationInspectionPayload && html`
+                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 4000; display: flex; align-items: center; justify-content: center; font-family: monospace;" onClick=${() => setDurationInspectionPayload(null)}>
+                  <div style="background: #ffffff; width: 85vw; max-width: 850px; max-height: 85vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; padding: 24px; position: relative;" onClick=${(e) => e.stopPropagation()}>
+                    <button onClick=${() => setDurationInspectionPayload(null)} style="position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #666; font-weight: bold;">✕</button>
+
+                    <!-- Header -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #007acc; padding-bottom: 12px; margin-bottom: 16px;">
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.3rem;">⏳</span>
+                        <h3 style="margin: 0; font-size: 1.2rem; color: #111; font-weight: 700;">Duration & Concurrent Event Inspector</h3>
+                      </div>
+                      <span style="font-size: 0.8rem; background: #e6f4ff; color: #007acc; padding: 4px 12px; border-radius: 12px; font-weight: 700; border: 1px solid #bae0ff;">
+                        ${durationInspectionPayload.overlappingEvents ? durationInspectionPayload.overlappingEvents.length : 0} Concurrent Actions
+                      </span>
+                    </div>
+
+                    <!-- Pointer Focus Header -->
+                    ${durationInspectionPayload.pointerTime ? html`
+                      <div style="font-size: 0.88rem; color: #007acc; font-weight: 700; background: #e6f4ff; padding: 8px 14px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #bae0ff;">
+                        🎯 Mouse Pointer Time Focus: ${formatSmartDate({ min: durationInspectionPayload.pointerTime }, null, dateLocale)}
+                      </div>
+                    ` : ''}
+
+                    <!-- Primary Target Event Summary -->
+                    ${durationInspectionPayload.item ? html`
+                      <div style="font-size: 0.88rem; color: #333; margin-bottom: 16px; background: #f4f8fb; padding: 12px 16px; border-radius: 6px; border-left: 4px solid #007acc;">
+                        <div style="margin-bottom: 4px;"><strong>Target Event:</strong> ${safeStripHTML(durationInspectionPayload.item.title || 'Duration Selection')}</div>
+                        <div><strong>Duration Interval:</strong> ${formatSmartDate(durationInspectionPayload.item.startDate, durationInspectionPayload.item.endDate, dateLocale)}</div>
+                      </div>
+                    ` : ''}
+
+                    <!-- Vertical Y-Axis Expanded Concurrent Event List -->
+                    <div style="font-size: 0.82rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+                      Vertical Y-Axis Expanded Duration View (${durationInspectionPayload.overlappingEvents ? durationInspectionPayload.overlappingEvents.length : 0} Events):
+                    </div>
+
+                    <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+                      ${(durationInspectionPayload.overlappingEvents || []).map((ev, i) => {
+                        const isSelected = durationInspectionPayload.item && ev.id === durationInspectionPayload.item.id;
+                        const oStart = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
+                        const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
+                        let durStr = '';
+                        if (oEnd > oStart) {
+                          const dMs = oEnd - oStart;
+                          const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
+                          if (dDays >= 365) durStr = `${(dDays / 365.25).toFixed(1)} yrs`;
+                          else if (dDays >= 30) durStr = `${Math.round(dDays / 30.43)} mos`;
+                          else if (dDays >= 1) durStr = `${dDays} days`;
+                          else durStr = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
+                        }
+                        return html`
+                          <div style="background: ${isSelected ? '#f0f7ff' : '#fafafa'}; border: 1.5px solid ${isSelected ? '#007acc' : '#e2e8f0'}; border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"
+                               onClick=${() => {
+                                 const idx = data.findIndex(d => d.id === ev.id);
+                                 if (idx >= 0) jumpToSlide(idx);
+                                 setDurationInspectionPayload(null);
+                               }}>
+                            <div style="display: flex; flex-direction: column; gap: 4px; max-width: 75%;">
+                              <div style="font-weight: 700; color: ${isSelected ? '#007acc' : '#1e293b'}; font-size: 0.92rem;">
+                                ${i + 1}. ${safeStripHTML(ev.title)}
+                              </div>
+                              <div style="font-size: 0.78rem; color: #64748b;">
+                                📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${ev.tags ? `• 🏷️ ${Array.isArray(ev.tags) ? ev.tags.join(', ') : ev.tags}` : ''}
+                              </div>
+                            </div>
+                            ${durStr ? html`
+                              <div style="font-size: 0.8rem; font-weight: 700; color: #007acc; background: #ffffff; border: 1px solid #70b8ff; padding: 4px 12px; border-radius: 12px; white-space: nowrap;">
+                                ⏳ ${durStr}
+                              </div>
+                            ` : ''}
+                          </div>
+                        `;
+                      })}
+                    </div>
+                  </div>
+                </div>
+              `}
+
               ${isTocOpen && html`
                 <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 3500; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
                   <div style="background: #ffffff; width: 80vw; height: 80vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
@@ -3780,149 +3844,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   </div>
                 </div>
               `}
-            
-      ${durationInspectionPayload ? html`
-        <div id="duration-inspection-root">
-          <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important; background: rgba(0,0,0,0.5);"></div>
-          <div id="duration-inspection-modal" class="tm-modal open" style="z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 10px; box-shadow: 0 12px 36px rgba(0,0,0,0.45); padding: 24px; font-family: monospace; width: 92%; max-width: 850px; max-height: 85vh; overflow-y: auto;">
-            <button class="modal-close" onClick=${() => setDurationInspectionPayload(null)} title="Close (Esc)">✕</button>
-            
-            <!-- Header -->
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #007acc; padding-bottom: 12px; margin-bottom: 16px;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <h3 style="margin: 0; font-size: 1.2rem; color: #111; font-weight: 700;">Concurrent Duration Inspection Window</h3>
-              </div>
-              <span style="font-size: 0.8rem; background: #e6f4ff; color: #007acc; padding: 4px 10px; border-radius: 12px; font-weight: 700; border: 1px solid #70b8ff;">
-                ${durationInspectionPayload.overlappingEvents ? durationInspectionPayload.overlappingEvents.length : 0} Concurrent Actions
-              </span>
             </div>
+          `;
+        };
 
-            <!-- Target Time Focus Coordinate Summary -->
-            ${durationInspectionPayload.pointerTime ? html`
-              <div style="font-size: 0.88rem; color: #007acc; font-weight: 700; background: #e6f4ff; padding: 8px 14px; border-radius: 6px; margin-bottom: 16px; border: 1px solid #bae0ff; display: flex; align-items: center; justify-content: space-between;">
-                <span>🎯 Target Time Focus Coordinate: ${formatSmartDate({ min: durationInspectionPayload.pointerTime }, null, dateLocale)}</span>
-                <span style="font-size: 0.75rem; color: #555; font-weight: 400;">(Temporal Pointer Slice)</span>
-              </div>
-            ` : ''}
-
-            <!-- Multi-Lane Comparative Gantt Visual Overview (Visual Epopteia) -->
-            ${(() => {
-              const events = durationInspectionPayload.overlappingEvents || [];
-              if (events.length === 0) return html`<div style="color: #666; padding: 12px;">No concurrent events at this time slice.</div>`;
-              
-              // Calculate unified local temporal bounding box [T_min, T_max]
-              let tMin = Infinity;
-              let tMax = -Infinity;
-              events.forEach(ev => {
-                const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
-                const e = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > s) ? ev.startDate.max : s);
-                if (s < tMin) tMin = s;
-                if (e > tMax) tMax = e;
-              });
-              if (durationInspectionPayload.pointerTime) {
-                if (durationInspectionPayload.pointerTime < tMin) tMin = durationInspectionPayload.pointerTime;
-                if (durationInspectionPayload.pointerTime > tMax) tMax = durationInspectionPayload.pointerTime;
-              }
-              const tRange = Math.max(1, tMax - tMin);
-              const cursorPct = durationInspectionPayload.pointerTime ? Math.max(0, Math.min(100, ((durationInspectionPayload.pointerTime - tMin) / tRange) * 100)) : null;
-
-              return html`
-                <div style="background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-                  <div style="font-size: 0.82rem; font-weight: 800; color: #333; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between;">
-                    <span>📊 Multi-Lane Visual Εποπτεία (Gantt Alignment)</span>
-                    <span style="font-size: 0.75rem; color: #666; font-weight: 400;">Span: ${formatSmartDate({ min: tMin }, { max: tMax }, dateLocale)}</span>
-                  </div>
-
-                  <!-- Stacked Mini Duration Lanes with Intersecting Cursor Line -->
-                  <div style="position: relative; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; padding-bottom: 4px;">
-                    ${cursorPct !== null ? html`
-                      <div style="position: absolute; top: 0; bottom: 0; left: ${cursorPct}%; width: 2px; background: #ff4d4f; z-index: 10; border-right: 1px dashed #ffffff; pointer-events: none;" title="Cursor Pointer Coordinate">
-                        <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; background: #ff4d4f; color: #fff; padding: 1px 4px; border-radius: 3px; white-space: nowrap; font-weight: bold;">📍 Pointer</div>
-                      </div>
-                    ` : ''}
-
-                    ${events.map((ev, i) => {
-                      const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
-                      const e = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > s) ? ev.startDate.max : s);
-                      const leftPct = Math.max(0, Math.min(100, ((s - tMin) / tRange) * 100));
-                      const widthPct = Math.max(1.5, Math.min(100 - leftPct, ((Math.max(1, e - s)) / tRange) * 100));
-                      const isSelected = durationInspectionPayload.item && ev.id === durationInspectionPayload.item.id;
-
-                      let durStr = '';
-                      if (e > s) {
-                        const dMs = e - s;
-                        const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
-                        if (dDays >= 365) durStr = `${(dDays / 365.25).toFixed(1)} yrs`;
-                        else if (dDays >= 30) durStr = `${Math.round(dDays / 30.43)} mos`;
-                        else if (dDays >= 1) durStr = `${dDays} days`;
-                        else durStr = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
-                      }
-
-                      return html`
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                          <div style="font-size: 0.78rem; font-weight: 700; color: ${isSelected ? '#007acc' : '#333'}; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">${i + 1}. ${safeStripHTML(ev.title)}</span>
-                            ${durStr ? html`<span style="font-size: 0.7rem; background: #e6f4ff; color: #007acc; padding: 1px 6px; border-radius: 8px; font-weight: 600;">⏳ ${durStr}</span>` : ''}
-                          </div>
-                          <!-- Proportional Mini Bar Track -->
-                          <div style="position: relative; width: 100%; height: 12px; background: #e2e8f0; border-radius: 4px; overflow: hidden; cursor: pointer;"
-                               onClick=${() => {
-                                 const idx = data.findIndex(d => d.id === ev.id);
-                                 if (idx >= 0) handleNodeClick(idx);
-                                 setDurationInspectionPayload(null);
-                               }}>
-                            <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; height: 100%; background: ${isSelected ? 'linear-gradient(90deg, #007acc, #005999)' : 'linear-gradient(90deg, #28a745, #1e7e34)'}; border-radius: 3px; box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);"
-                                 title="${safeStripHTML(ev.title)} (${formatSmartDate(ev.startDate, ev.endDate, dateLocale)})"></div>
-                          </div>
-                        </div>
-                      `;
-                    })}
-                  </div>
-                </div>
-              `;
-            })()}
-
-            <!-- Interactive Event Action Cards -->
-            <div style="font-size: 0.82rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
-              Concurrent Historical Actions (${(durationInspectionPayload.overlappingEvents || []).length}):
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 10px; max-height: 40vh; overflow-y: auto; padding-right: 4px;">
-              ${(durationInspectionPayload.overlappingEvents || []).map((ev, i) => {
-                const isSelected = durationInspectionPayload.item && ev.id === durationInspectionPayload.item.id;
-                return html`
-                  <div style="background: ${isSelected ? '#f0f7ff' : '#fafafa'}; border: 1.5px solid ${isSelected ? '#007acc' : '#e2e8f0'}; border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"
-                       onClick=${() => {
-                         const idx = data.findIndex(d => d.id === ev.id);
-                         if (idx >= 0) handleNodeClick(idx);
-                         setDurationInspectionPayload(null);
-                       }}>
-                    <div style="display: flex; flex-direction: column; gap: 4px; max-width: 80%;">
-                      <div style="font-weight: 700; color: ${isSelected ? '#007acc' : '#1e293b'}; font-size: 0.92rem;">
-                        ${i + 1}. ${safeStripHTML(ev.title)}
-                      </div>
-                      <div style="font-size: 0.78rem; color: #64748b;">
-                        📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${ev.tags ? `• 🏷️ ${Array.isArray(ev.tags) ? ev.tags.join(', ') : ev.tags}` : ''}
-                      </div>
-                    </div>
-                    <div style="font-size: 0.78rem; font-weight: 700; color: #007acc; background: #ffffff; border: 1px solid #70b8ff; padding: 4px 10px; border-radius: 10px; white-space: nowrap;">
-                      Jump ➔
-                    </div>
-                  </div>
-                `;
-              })}
-            </div>
-          </div>
-        </div>
-      ` : ''}
-
-            </div>
-          `;        };
-
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.39-b303';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.31-b337';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
