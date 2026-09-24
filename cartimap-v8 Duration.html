@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.15.0-b338-b301</title>
+    <title>CarTiMap v8.14.1-b301</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b338';
+const APP_VERSION = 'v8.15.0-b339';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -744,8 +744,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const [containerHeight, setContainerHeight] = useState(200);
   const [viewLeftEdge, setViewLeftEdge] = useState(0);
   const [caliperTooltip, setCaliperTooltip] = useState(null);
-  
-  const hoverTimeoutRef = useRef(null);
+    const hoverTimeoutRef = useRef(null);
   const lastMouseXRef = useRef(0);
 
   useEffect(() => {
@@ -1263,6 +1262,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
+      
       <div class="timeline-window-toolbar" style="position: absolute; top: 8px; right: 12px; z-index: 1000; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.95); padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
         <button class="status-btn" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -3340,7 +3340,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       activeIndex=${activeIndex}
                       setActiveIndex=${jumpToSlide}
                       maxPane=${maxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                       setMaxPane=${setMaxPane}
                       dateLocale=${dateLocale}
                       formatSmartDate=${formatSmartDate}
@@ -3366,7 +3365,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         minimapOffset=${minimapOffset}
                         setMinimapOffset=${setMinimapOffset}
                         maxPane=${maxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                         setMaxPane=${setMaxPane}
                         polygonOpacity=${polygonOpacity}
                         showButtonText=${showButtonText}
@@ -3382,7 +3380,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       <${MediaViewer}
                         activeSlide=${activeSlide}
                         maxPane=${maxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                         setMaxPane=${setMaxPane}
                       />
                     </div>
@@ -3494,12 +3491,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     data=${data}
                     activeIndex=${activeIndex}
                     setActiveIndex=${jumpToSlide}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     addLog=${addLog}
                     activeTags=${activeTags}
                     isTimelineExpanded=${isTimelineExpanded}
                     setIsTimelineExpanded=${setIsTimelineExpanded}
                     maxPane=${maxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     setMaxPane=${setMaxPane}
                     showButtonText=${showButtonText}
                     visibleTimeBounds=${visibleTimeBounds}
@@ -3783,9 +3780,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
             
       ${durationInspectionPayload ? html`
         <div id="duration-inspection-root">
-          <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important; background: rgba(0,0,0,0.5);"></div>
-          <div id="duration-inspection-modal" class="tm-modal open" style="z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 10px; box-shadow: 0 12px 36px rgba(0,0,0,0.45); padding: 24px; font-family: monospace; width: 92%; max-width: 850px; max-height: 85vh; overflow-y: auto;">
-            <button class="modal-close" onClick=${() => setDurationInspectionPayload(null)} title="Close (Esc)">✕</button>
+          <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important; background: rgba(0,0,0,0.55);"></div>
+          <div id="duration-inspection-modal" class="tm-modal open" style="z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 12px; box-shadow: 0 16px 48px rgba(0,0,0,0.45); padding: 24px; font-family: monospace; width: 92%; max-width: 880px; max-height: 85vh; overflow-y: auto; color: #1e293b;">
+            <button class="modal-close" onClick=${() => setDurationInspectionPayload(null)} title="Close (Esc)" style="position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #64748b; font-weight: bold;">✕</button>
             
             <!-- Header -->
             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #007acc; padding-bottom: 12px; margin-bottom: 16px;">
@@ -3794,27 +3791,37 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <h3 style="margin: 0; font-size: 1.2rem; color: #111; font-weight: 700;">Concurrent Duration Inspection Window</h3>
+                <h3 style="margin: 0; font-size: 1.15rem; color: #0f172a; font-weight: 700;">Duration Inspection Overview (Εποπτεία)</h3>
               </div>
-              <span style="font-size: 0.8rem; background: #e6f4ff; color: #007acc; padding: 4px 10px; border-radius: 12px; font-weight: 700; border: 1px solid #70b8ff;">
+              <span style="font-size: 0.8rem; background: #e6f4ff; color: #007acc; padding: 4px 12px; border-radius: 12px; font-weight: 700; border: 1px solid #bae0ff;">
                 ${durationInspectionPayload.overlappingEvents ? durationInspectionPayload.overlappingEvents.length : 0} Concurrent Actions
               </span>
             </div>
 
-            <!-- Target Time Focus Coordinate Summary -->
-            ${durationInspectionPayload.pointerTime ? html`
-              <div style="font-size: 0.88rem; color: #007acc; font-weight: 700; background: #e6f4ff; padding: 8px 14px; border-radius: 6px; margin-bottom: 16px; border: 1px solid #bae0ff; display: flex; align-items: center; justify-content: space-between;">
-                <span>🎯 Target Time Focus Coordinate: ${formatSmartDate({ min: durationInspectionPayload.pointerTime }, null, dateLocale)}</span>
-                <span style="font-size: 0.75rem; color: #555; font-weight: 400;">(Temporal Pointer Slice)</span>
-              </div>
-            ` : ''}
+            <!-- Cursor Time Focus Summary (No misleading 'Target Event' or 'SPAN: Invalid date') -->
+            ${(() => {
+              const pTime = durationInspectionPayload.pointerTime || (durationInspectionPayload.item && durationInspectionPayload.item.startDate ? durationInspectionPayload.item.startDate.min : null);
+              const pDateObj = pTime ? new Date(pTime) : null;
+              const formattedFocus = pDateObj && !isNaN(pDateObj.getTime()) ? pDateObj.toLocaleDateString(dateLocale || 'en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Temporal Cursor Slice';
+              return html`
+                <div style="font-size: 0.88rem; color: #0f172a; background: #f0f9ff; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #bae0ff; border-left: 5px solid #007acc; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <span style="font-weight: 700; color: #007acc;">🎯 Cursor Time Focus:</span>
+                    <span style="font-weight: 800; margin-left: 8px; color: #0f172a; font-size: 0.95rem;">${formattedFocus}</span>
+                  </div>
+                  <div style="font-size: 0.78rem; color: #64748b;">
+                    Slice Timestamp: <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; color: #334155;">${pTime ? Math.round(pTime) : 'N/A'}</code>
+                  </div>
+                </div>
+              `;
+            })()}
 
-            <!-- Multi-Lane Comparative Gantt Visual Overview (Visual Epopteia) -->
+            <!-- Multi-Lane Comparative Gantt Chart with Unified X-Axis Time Scale -->
             ${(() => {
               const events = durationInspectionPayload.overlappingEvents || [];
-              if (events.length === 0) return html`<div style="color: #666; padding: 12px;">No concurrent events at this time slice.</div>`;
-              
-              // Calculate unified local temporal bounding box [T_min, T_max]
+              if (events.length === 0) return html`<div style="color: #64748b; padding: 16px; text-align: center;">No concurrent events at this time focus.</div>`;
+
+              // Compute unified temporal bounds T_min and T_max
               let tMin = Infinity;
               let tMax = -Infinity;
               events.forEach(ev => {
@@ -3823,34 +3830,45 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 if (s < tMin) tMin = s;
                 if (e > tMax) tMax = e;
               });
-              if (durationInspectionPayload.pointerTime) {
-                if (durationInspectionPayload.pointerTime < tMin) tMin = durationInspectionPayload.pointerTime;
-                if (durationInspectionPayload.pointerTime > tMax) tMax = durationInspectionPayload.pointerTime;
-              }
-              const tRange = Math.max(1, tMax - tMin);
-              const cursorPct = durationInspectionPayload.pointerTime ? Math.max(0, Math.min(100, ((durationInspectionPayload.pointerTime - tMin) / tRange) * 100)) : null;
+
+              const pTime = durationInspectionPayload.pointerTime || tMin;
+              if (pTime < tMin) tMin = pTime;
+              if (pTime > tMax) tMax = pTime;
+              if (tMax <= tMin) tMax = tMin + 86400000; // default 1 day span fallback
+
+              const tRange = tMax - tMin;
+              const cursorPct = Math.max(0, Math.min(100, ((pTime - tMin) / tRange) * 100));
+
+              const minDateStr = new Date(tMin).toLocaleDateString(dateLocale || 'en-US', { year: 'numeric', month: 'short' });
+              const maxDateStr = new Date(tMax).toLocaleDateString(dateLocale || 'en-US', { year: 'numeric', month: 'short' });
 
               return html`
-                <div style="background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-                  <div style="font-size: 0.82rem; font-weight: 800; color: #333; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between;">
-                    <span>📊 Multi-Lane Visual Εποπτεία (Gantt Alignment)</span>
-                    <span style="font-size: 0.75rem; color: #666; font-weight: 400;">Span: ${formatSmartDate({ min: tMin }, { max: tMax }, dateLocale)}</span>
+                <div style="margin-bottom: 20px;">
+                  <div style="font-size: 0.8rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Comparative Multi-Lane Duration Scale (Gantt View)</span>
+                    <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">Span Envelope: ${minDateStr} – ${maxDateStr}</span>
                   </div>
 
-                  <!-- Stacked Mini Duration Lanes with Intersecting Cursor Line -->
-                  <div style="position: relative; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; padding-bottom: 4px;">
-                    ${cursorPct !== null ? html`
-                      <div style="position: absolute; top: 0; bottom: 0; left: ${cursorPct}%; width: 2px; background: #ff4d4f; z-index: 10; border-right: 1px dashed #ffffff; pointer-events: none;" title="Cursor Pointer Coordinate">
-                        <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; background: #ff4d4f; color: #fff; padding: 1px 4px; border-radius: 3px; white-space: nowrap; font-weight: bold;">📍 Pointer</div>
-                      </div>
-                    ` : ''}
+                  <!-- X-Axis Scale Header -->
+                  <div style="position: relative; height: 24px; background: #e2e8f0; border-radius: 4px; margin-bottom: 10px; font-size: 0.72rem; color: #475569; font-weight: 700; border: 1px solid #cbd5e1;">
+                    <div style="position: absolute; left: 8px; top: 4px;">${minDateStr}</div>
+                    <div style="position: absolute; right: 8px; top: 4px;">${maxDateStr}</div>
+                    <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 10; transform: translateX(-1px);" title="Cursor Focus Time">
+                      <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; padding: 1px 5px; border-radius: 3px; font-size: 0.68rem; font-weight: 800; white-space: nowrap;">🎯 Click Focus</div>
+                    </div>
+                  </div>
 
+                  <!-- Stacked Mini-Duration Lanes -->
+                  <div style="display: flex; flex-direction: column; gap: 10px; max-height: 48vh; overflow-y: auto; padding-right: 4px;">
                     ${events.map((ev, i) => {
-                      const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
+                      const curActiveSlideId = data[activeIndex] ? data[activeIndex].id : null;
+                      const isMainActiveSlide = ev.id === curActiveSlideId; // Highlight ONLY if it is the current slide in main app!
+
+                      const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : tMin);
                       const e = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > s) ? ev.startDate.max : s);
+
                       const leftPct = Math.max(0, Math.min(100, ((s - tMin) / tRange) * 100));
-                      const widthPct = Math.max(1.5, Math.min(100 - leftPct, ((Math.max(1, e - s)) / tRange) * 100));
-                      const isSelected = durationInspectionPayload.item && ev.id === durationInspectionPayload.item.id;
+                      const widthPct = Math.max(1.5, Math.min(100 - leftPct, ((e - s) / tRange) * 100));
 
                       let durStr = '';
                       if (e > s) {
@@ -3863,20 +3881,38 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       }
 
                       return html`
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                          <div style="font-size: 0.78rem; font-weight: 700; color: ${isSelected ? '#007acc' : '#333'}; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">${i + 1}. ${safeStripHTML(ev.title)}</span>
-                            ${durStr ? html`<span style="font-size: 0.7rem; background: #e6f4ff; color: #007acc; padding: 1px 6px; border-radius: 8px; font-weight: 600;">⏳ ${durStr}</span>` : ''}
+                        <div style="background: ${isMainActiveSlide ? '#f0fdf4' : '#ffffff'}; border: 1.5px solid ${isMainActiveSlide ? '#22c55e' : '#e2e8f0'}; border-radius: 8px; padding: 12px 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.04);"
+                             onClick=${() => {
+                               const idx = data.findIndex(d => d.id === ev.id);
+                               if (idx >= 0) setActiveIndex(idx);
+                               setDurationInspectionPayload(null);
+                             }}>
+                          <!-- Event Header Row -->
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#0f172a'}; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                              ${isMainActiveSlide ? html`<span style="color: #22c55e; font-size: 0.8rem;">▶ Active Slide</span>` : ''}
+                              <span>${i + 1}. ${safeStripHTML(ev.title)}</span>
+                            </div>
+                            ${durStr ? html`
+                              <span style="font-size: 0.75rem; font-weight: 700; color: #007acc; background: #f0f9ff; border: 1px solid #bae0ff; padding: 2px 8px; border-radius: 10px;">
+                                ⏳ ${durStr}
+                              </span>
+                            ` : ''}
                           </div>
-                          <!-- Proportional Mini Bar Track -->
-                          <div style="position: relative; width: 100%; height: 12px; background: #e2e8f0; border-radius: 4px; overflow: hidden; cursor: pointer;"
-                               onClick=${() => {
-                                 const idx = data.findIndex(d => d.id === ev.id);
-                                 if (idx >= 0) handleNodeClick(idx);
-                                 setDurationInspectionPayload(null);
-                               }}>
-                            <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; height: 100%; background: ${isSelected ? 'linear-gradient(90deg, #007acc, #005999)' : 'linear-gradient(90deg, #28a745, #1e7e34)'}; border-radius: 3px; box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);"
-                                 title="${safeStripHTML(ev.title)} (${formatSmartDate(ev.startDate, ev.endDate, dateLocale)})"></div>
+
+                          <!-- Mini-Gantt Duration Bar Track -->
+                          <div style="position: relative; width: 100%; height: 16px; background: #f1f5f9; border-radius: 4px; overflow: hidden; border: 1px solid #cbd5e1;">
+                            <!-- Cursor Indicator Intersecting Line -->
+                            <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 10; opacity: 0.85;"></div>
+                            
+                            <!-- Duration Span Fill -->
+                            <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${isMainActiveSlide ? 'linear-gradient(90deg, #22c55e, #16a34a)' : 'linear-gradient(90deg, #007acc, #0284c7)'}; border-radius: 3px; opacity: 0.9;" title="Duration Span: ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)}"></div>
+                          </div>
+
+                          <!-- Event Date Details Footer -->
+                          <div style="font-size: 0.76rem; color: #64748b; margin-top: 6px; display: flex; justify-content: space-between;">
+                            <span>📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)}</span>
+                            ${ev.tags ? html`<span>🏷️ ${Array.isArray(ev.tags) ? ev.tags.join(', ') : ev.tags}</span>` : ''}
                           </div>
                         </div>
                       `;
@@ -3885,42 +3921,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
               `;
             })()}
-
-            <!-- Interactive Event Action Cards -->
-            <div style="font-size: 0.82rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
-              Concurrent Historical Actions (${(durationInspectionPayload.overlappingEvents || []).length}):
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 10px; max-height: 40vh; overflow-y: auto; padding-right: 4px;">
-              ${(durationInspectionPayload.overlappingEvents || []).map((ev, i) => {
-                const isSelected = durationInspectionPayload.item && ev.id === durationInspectionPayload.item.id;
-                return html`
-                  <div style="background: ${isSelected ? '#f0f7ff' : '#fafafa'}; border: 1.5px solid ${isSelected ? '#007acc' : '#e2e8f0'}; border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"
-                       onClick=${() => {
-                         const idx = data.findIndex(d => d.id === ev.id);
-                         if (idx >= 0) handleNodeClick(idx);
-                         setDurationInspectionPayload(null);
-                       }}>
-                    <div style="display: flex; flex-direction: column; gap: 4px; max-width: 80%;">
-                      <div style="font-weight: 700; color: ${isSelected ? '#007acc' : '#1e293b'}; font-size: 0.92rem;">
-                        ${i + 1}. ${safeStripHTML(ev.title)}
-                      </div>
-                      <div style="font-size: 0.78rem; color: #64748b;">
-                        📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${ev.tags ? `• 🏷️ ${Array.isArray(ev.tags) ? ev.tags.join(', ') : ev.tags}` : ''}
-                      </div>
-                    </div>
-                    <div style="font-size: 0.78rem; font-weight: 700; color: #007acc; background: #ffffff; border: 1px solid #70b8ff; padding: 4px 10px; border-radius: 10px; white-space: nowrap;">
-                      Jump ➔
-                    </div>
-                  </div>
-                `;
-              })}
-            </div>
           </div>
         </div>
       ` : ''}
 
             </div>
-          `;        };
+          `;
+        };
 
 MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.39-b303';
 // === [ END MAJOR BLOCK ] ===
