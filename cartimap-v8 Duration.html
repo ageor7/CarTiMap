@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.15.0-b355</title>
+    <title>CarTiMap v8.15.0-b356</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b355';
+const APP_VERSION = 'v8.15.0-b356';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1369,7 +1369,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.48-b355';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.49-b356';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1385,6 +1385,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
           useEffect(() => {
             const handleMapEsc = (e) => {
               if (e.key === 'Escape') {
+                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; }
                 setShowLegendMenu(false);
                 setShowLayersMenu(false);
               }
@@ -2529,6 +2530,17 @@ const App = () => {
           };
 
           const formatSmartDate = (startInput, endInput, locale) => {
+            const checkApprox = (val) => {
+              if (!val) return false;
+              if (typeof val === 'object') {
+                if (val.isApprox || val.isEDTF || val.uncertain || val.approximate) return true;
+                if (val.type && val.type !== 'Exact') return true;
+                if (val.text && (val.text.includes('~') || val.text.includes('?'))) return true;
+              }
+              return false;
+            };
+            const isApprox = checkApprox(startInput) || checkApprox(endInput);
+            const approxPrefix = isApprox ? '~ ' : '';
             if (startInput === null || startInput === undefined) return 'Undated';
 
             const toValidDate = (val) => {
@@ -2554,10 +2566,10 @@ const App = () => {
             const opt = { day: '2-digit', month: 'short', year: 'numeric' };
 
             if (d2 && typeof d2 !== 'string') {
-              if (d2.getTime() === d1.getTime()) return d1.toLocaleDateString(loc, opt);
-              return `${d1.toLocaleDateString(loc, opt)} – ${d2.toLocaleDateString(loc, opt)}`;
+              if (d2.getTime() === d1.getTime()) return approxPrefix + d1.toLocaleDateString(loc, opt);
+              return approxPrefix + `${d1.toLocaleDateString(loc, opt)} – ${d2.toLocaleDateString(loc, opt)}`;
             }
-            return d1.toLocaleDateString(loc, opt);
+            return approxPrefix + d1.toLocaleDateString(loc, opt);
           };
 
           const formatPlaces = (placeStr) => {
@@ -3026,6 +3038,7 @@ const App = () => {
           useEffect(() => {
             const handleKeyDown = (e) => {
               if (e.key === 'Escape') {
+                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; }
                 if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
                 setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
                 return;
@@ -3487,6 +3500,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         }}
                         onKeyDown=${(e) => {
                           if (e.key === 'Escape') {
+                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; }
                             if (e.target) e.target.blur();
                             setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
                           } else {
@@ -3617,7 +3631,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <button class="modal-close" onClick=${() => setIsSearchOpen(false)} style="position: absolute; top: 16px; right: 16px; z-index: 101000; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #333; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1; transition: all 0.2s;" title="Close Search (Esc)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
-                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} onKeyDown=${(e) => { if (e.key === 'Escape') { e.target.blur(); setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false); } }} style="flex-shrink: 0; width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
+                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} onKeyDown=${(e) => { if (e.key === 'Escape') {
+                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; } e.target.blur(); setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false); } }} style="flex-shrink: 0; width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
                   <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
                     ${searchHistoryLayout}
                     ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
@@ -3844,12 +3859,14 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #007acc; padding-bottom: 12px; margin-bottom: 16px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6 18h8"></path>
-                  <path d="M3 22h18"></path>
-                  <path d="M14 22a7 7 0 1 0-14 0"></path>
-                  <path d="M9 14l2-2 4 4-2 2z"></path>
-                  <path d="M12 11l3-3"></path>
-                  <path d="M11 5l3 3"></path>
+                  <path d="M2 21h16"></path>
+                  <path d="M5 14h10"></path>
+                  <path d="M9 14v-2"></path>
+                  <path d="M14 21a6 6 0 0 0 6-6V9a4 4 0 0 0-4-4h-2"></path>
+                  <path d="M10 3l4 4"></path>
+                  <path d="M8 5l5 5"></path>
+                  <path d="M11 10l-2 2"></path>
+                  <circle cx="16" cy="12" r="1.5" fill="#007acc"></circle>
                 </svg>
                 <h3 style="margin: 0; font-size: 1.25rem; color: #111; font-weight: 700; letter-spacing: -0.2px;">Duration Inspection Overview</h3>
               </div>
@@ -3924,7 +3941,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
                     <div style="font-size: 0.9rem; color: #0f172a; font-weight: 700;">
                       🎯 Cursor Focus: <span style="color: #007acc;">${focusDateStr}</span>
-                      ${hasEventSpan ? html`<span style="color: #64748b; margin: 0 6px;">•</span><span style="color: #16a34a;">Duration Span: ${formatSmartDate(itemStart, itemEnd, dateLocale)}</span>` : ''}
+                      ${hasEventSpan ? html`<span style="color: #64748b; margin: 0 6px;">•</span><span style="color: #0f172a;">Duration Span: <span style="color: #007acc;">${formatSmartDate(itemStart, itemEnd, dateLocale)}</span></span>` : ''}
                     </div>
                   </div>
 
@@ -4026,7 +4043,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.48-b355';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.49-b356';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
