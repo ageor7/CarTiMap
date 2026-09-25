@@ -1369,7 +1369,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.43-b350';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.44-b351';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -3866,7 +3866,21 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               const selItem = durationInspectionPayload.item;
               const pTime = durationInspectionPayload.pointerTime || (selItem && selItem.startDate ? selItem.startDate.min : (events[0].startDate ? events[0].startDate.min : 0));
               
-              const focusDateStr = formatSmartDate(pTime, null, dateLocale);
+              const focusDateObj = new Date(pTime);
+              const focusTimeStr = (!isNaN(focusDateObj.getTime()) && (focusDateObj.getHours() !== 0 || focusDateObj.getMinutes() !== 0 || focusDateObj.getSeconds() !== 0))
+                ? focusDateObj.toLocaleTimeString(dateLocale || 'en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                : '';
+              const focusDateStr = formatSmartDate(pTime, null, dateLocale) + (focusTimeStr ? `, ${focusTimeStr}` : '');
+
+              const formatOverviewTickTime = (tMs, spanMs, loc) => {
+                const d = new Date(tMs);
+                if (isNaN(d.getTime())) return 'Undated';
+                const datePart = d.toLocaleDateString(loc || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const timePart = d.toLocaleTimeString(loc || 'en-GB', { hour: '2-digit', minute: '2-digit' });
+                if (spanMs <= 7 * 24 * 3600 * 1000) return `${datePart} ${timePart}`;
+                if (d.getHours() !== 0 || d.getMinutes() !== 0) return `${datePart} ${timePart}`;
+                return datePart;
+              };
 
               let hasEventSpan = false;
               let itemStart = pTime;
@@ -3900,7 +3914,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               const ticks = [];
               for (let i = 0; i < numTicks; i++) {
                 const tickTime = minT + (i / (numTicks - 1)) * tSpan;
-                const tickLabel = formatSmartDate(tickTime, null, dateLocale);
+                const tickLabel = formatOverviewTickTime(tickTime, tSpan, dateLocale);
                 ticks.push({ pct: (i / (numTicks - 1)) * 100, label: tickLabel });
               }
 
@@ -4002,7 +4016,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.43-b350';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.44-b351';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
