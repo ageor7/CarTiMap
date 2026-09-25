@@ -1255,7 +1255,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
         const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationInspectionPayload({ item, overlappingEvents }); }}></div>`;
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}></div>`;
       } else {
         const styleIdx = index % 4;
         const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
@@ -1264,7 +1264,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
         const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationInspectionPayload({ item, overlappingEvents }); }}>
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
             <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}" title="${spanMarkerTooltip}"></div>
           </div>
         `;
@@ -1369,7 +1369,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.44-b351';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.44-b352';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -4016,7 +4016,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.44-b351';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.44-b352';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
