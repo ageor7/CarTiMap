@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.15.0-b359</title>
+    <title>CarTiMap v8.15.0-b361</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b359';
+const APP_VERSION = 'v8.15.0-b361';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -222,7 +222,7 @@ class ErrorBoundary extends Component {
 // === [ END MAJOR BLOCK ] ===
 
 // === [ MAJOR BLOCK: TelemetryMonitor v2.1.16 ] ===
-const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVersion, moduleVersions, isTimelineExpanded, timelineRequiredHeight}) => {
+const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVersion, moduleVersions, isTimelineExpanded, timelineRequiredHeight, unfilteredData}) => {
   const logsEndRef = useRef(null);
   const monitorRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -329,6 +329,12 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
           })}
         </div>
       `}
+      <!-- Full Ingested Dataset Telemetry Registry -->
+      <div style="background: #111; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.73rem; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+        <span>📋 INGESTED DATASET REGISTRY (${activeSlide ? activeSlide.id : 1} of ${unfilteredData ? unfilteredData.length : 0} Records)</span>
+        <span style="font-size: 0.7rem; color: #4ade80;">100% Ingested</span>
+      </div>
+
       <div id="vibe-logs" style="flex-grow: 1; overflow-y: auto; padding: 8px 10px; font-size: 0.73rem; background: #111; display: flex; flex-direction: column; gap: 5px; height: 100%; min-height: 50px;">
         ${logs.map((log, i) => {
           const rawMsg = String(log.msg || log);
@@ -1201,7 +1207,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
     const colActive = 'var(--tm-active, #007acc)';
     const colInactive = 'rgba(var(--tm-inactive-rgb, 204, 0, 0), 0.6)';
-    const colApprox = 'var(--tm-approx, #ffb300)';
+    const colApprox = '#f59e0b';
 
     const isApproxStart = item.startDate && (item.startDate.isApprox || item.startDate.isEDTF || item.startDate.type === 'Approximate' || (item.startDate.text && (item.startDate.text.includes('~') || item.startDate.text.includes('?') || item.startDate.text.includes('c.'))));
     const isApproxEnd = item.endDate && (item.endDate.isApprox || item.endDate.isEDTF || item.endDate.type === 'Approximate' || (item.endDate.text && (item.endDate.text.includes('~') || item.endDate.text.includes('?') || item.endDate.text.includes('c.'))));
@@ -3619,7 +3625,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           return html`
             <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
-              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
+              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} unfilteredData=${unfilteredData} />
 
               ${loadingScreen}
               ${appLayout}
