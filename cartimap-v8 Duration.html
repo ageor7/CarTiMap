@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b349';
+const APP_VERSION = 'v8.14.1-b303';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -590,7 +590,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.14.42-b349';
+MODULE_VERSIONS['MediaViewer'] = 'v2.13.29-b303';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -725,7 +725,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.9.42-b349';
+MODULE_VERSIONS['ContentSlider'] = 'v5.8.58-b303';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1057,10 +1057,37 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
 
 
-        // 1. Dual-Scale Axis Ticks: Major Tick Labels spaced ~280px apart to prevent text collisions
+    // Dual-Scale Axis Ticks: Minor Ticks (~70px) + Scale-Tailored Major Tick Labels (~280px)
+    const targetMsPerMinorTick = Math.max((70 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 20);
     const targetMsPerMajorTick = Math.max((280 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 5);
+
+    let activeMinorScale = scaleConfigs.find(c => targetMsPerMinorTick > c.ms) || scaleConfigs.at(-1);
     let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
 
+    // Minor Ticks Generation (Rendered directly ON axis line, 5px height)
+    const minorTicksData = [];
+    let iterMinor = new Date(Math.max(renderMinTime, visibleLeftMs - (activeMinorScale.ms * 2)));
+    iterMinor.setMilliseconds(0);
+    if (activeMinorScale.type === 'year') { iterMinor.setMonth(0, 1); iterMinor.setHours(0, 0, 0, 0); iterMinor.setFullYear(Math.floor(iterMinor.getFullYear() / activeMinorScale.step) * activeMinorScale.step); }
+    else if (activeMinorScale.type === 'month') { iterMinor.setDate(1); iterMinor.setHours(0,0,0,0); iterMinor.setMonth(Math.floor(iterMinor.getMonth() / activeMinorScale.step) * activeMinorScale.step); }
+    else if (activeMinorScale.type === 'day') { iterMinor.setHours(0,0,0,0); }
+    else if (activeMinorScale.type === 'hour') { iterMinor.setMinutes(0,0,0); iterMinor.setHours(Math.floor(iterMinor.getHours() / activeMinorScale.step) * activeMinorScale.step); }
+    else if (activeMinorScale.type === 'minute') { iterMinor.setSeconds(0,0); iterMinor.setMinutes(Math.floor(iterMinor.getMinutes() / activeMinorScale.step) * activeMinorScale.step); }
+
+    let minorSafety = 0;
+    const stopMinorTime = Math.min(renderMaxTime, visibleRightMs + (activeMinorScale.ms * 2));
+    while (iterMinor.getTime() <= stopMinorTime && minorSafety < 1000) {
+      minorSafety++;
+      const t = iterMinor.getTime();
+      if (t >= renderMinTime) minorTicksData.push({ t, pctLeft: ((t - renderMinTime) / renderTimeRange) * 100 });
+      if (activeMinorScale.type === 'year') iterMinor.setFullYear(iterMinor.getFullYear() + activeMinorScale.step);
+      else if (activeMinorScale.type === 'month') iterMinor.setMonth(iterMinor.getMonth() + activeMinorScale.step);
+      else if (activeMinorScale.type === 'day') iterMinor.setDate(iterMinor.getDate() + activeMinorScale.step);
+      else if (activeMinorScale.type === 'hour') iterMinor.setHours(iterMinor.getHours() + activeMinorScale.step);
+      else if (activeMinorScale.type === 'minute') iterMinor.setMinutes(iterMinor.getMinutes() + activeMinorScale.step);
+    }
+
+    // Major Ticks Generation (Scale-Tailored Labels, 10px height)
     let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
     iterDate.setMilliseconds(0);
     if (activeScale.type === 'year') { iterDate.setMonth(0, 1); iterDate.setHours(0, 0, 0, 0); iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step); }
@@ -1083,27 +1110,6 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       else if (activeScale.type === 'minute') iterDate.setMinutes(iterDate.getMinutes() + activeScale.step);
     }
 
-    // 2. Generate Minor Tick Lines ON the Axis line between Major Ticks
-    const minorTicksData = [];
-    const minorCount = activeScale.minorCount || 4;
-    for (let i = 0; i < majorTicksData.length - 1; i++) {
-      const tA = majorTicksData[i].t;
-      const tB = majorTicksData[i + 1].t;
-      const stepMs = (tB - tA) / minorCount;
-      for (let j = 1; j < minorCount; j++) {
-        const tm = tA + j * stepMs;
-        if (tm >= renderMinTime && tm <= renderMaxTime) {
-          const pctLeft = ((tm - renderMinTime) / renderTimeRange) * 100;
-          minorTicksData.push({ t: tm, pctLeft });
-        }
-      }
-    }
-
-    const minorTicksHTML = minorTicksData.map(m => html`
-      <div style="position: absolute; left: ${m.pctLeft}%; top: 0; width: 1px; height: 5px; background: #94a3b8; z-index: 1;"></div>
-    `);
-
-    // 3. Format DISTINCT Major Tick Labels
     let minDist = Infinity;
     let centerTickIndex = -1;
     majorTicksData.forEach((d, i) => {
@@ -1113,35 +1119,29 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       }
     });
 
-    const formatTickLabel = (d, scale, loc) => {
-      const dt = d.date;
-      if (!dt || isNaN(dt.getTime())) return '';
-      const locStr = loc || 'en-GB';
-      if (scale.type === 'year') {
-        return String(dt.getFullYear());
-      } else if (scale.type === 'month') {
-        return dt.toLocaleDateString(locStr, { month: 'short', year: 'numeric' });
-      } else if (scale.type === 'day') {
-        return dt.toLocaleDateString(locStr, { day: '2-digit', month: 'short', year: 'numeric' });
-      } else if (scale.type === 'hour') {
-        const dateStr = dt.toLocaleDateString(locStr, { day: '2-digit', month: 'short' });
-        const timeStr = dt.toLocaleTimeString(locStr, { hour: '2-digit', minute: '2-digit' });
-        return `${dateStr} ${timeStr}`;
-      } else if (scale.type === 'minute' || scale.type === 'second') {
-        return dt.toLocaleTimeString(locStr, { hour: '2-digit', minute: '2-digit' });
-      }
-      return dt.toLocaleDateString(locStr, { day: '2-digit', month: 'short', year: 'numeric' });
+    const formatTickLabel = (dObj, type) => {
+      if (!dObj) return '';
+      if (type === 'year') return String(dObj.getFullYear());
+      if (type === 'month') return dObj.toLocaleDateString(dateLocale || 'en-GB', { month: 'short', year: 'numeric' });
+      if (type === 'day') return dObj.toLocaleDateString(dateLocale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      if (type === 'hour') return dObj.toLocaleDateString(dateLocale || 'en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+      if (type === 'minute') return dObj.toLocaleTimeString(dateLocale || 'en-GB', { hour: '2-digit', minute: '2-digit' });
+      return dObj.toLocaleDateString(dateLocale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     };
+
+    const minorTicksHTML = minorTicksData.map(m => html`
+      <div style="position: absolute; left: ${m.pctLeft}%; top: 0; width: 1px; height: 5px; background: #94a3b8; z-index: 1;"></div>
+    `);
 
     const rulerTicksHTML = html`
       ${minorTicksHTML}
       ${majorTicksData.map((d, i) => {
-        const labelText = formatTickLabel(d, activeScale, dateLocale);
+        const labelText = formatTickLabel(d.date, activeScale.type);
         const isCenter = i === centerTickIndex;
         return html`
-          <div class="timeline-ruler-tick" style="position: absolute; left: ${d.pctLeft}%; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 2;">
+          <div class="timeline-ruler-tick" style="left: ${d.pctLeft}%; z-index: 2;">
             <div style="height: 10px; width: 1.5px; background: #334155;"></div>
-            <span style="font-size: 0.72rem; font-family: monospace; color: ${isCenter ? '#007acc' : '#475569'}; font-weight: ${isCenter ? '700' : '500'}; margin-top: 2px; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis;">${labelText}</span>
+            <span style="font-size: 0.72rem; font-family: monospace; color: ${isCenter ? '#007acc' : '#475569'}; font-weight: ${isCenter ? '700' : '500'}; margin-top: 2px; white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis;">${labelText}</span>
           </div>
         `;
       })}
@@ -1307,7 +1307,6 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
-      
       <div class="timeline-window-toolbar" style="position: absolute; top: 8px; right: 12px; z-index: 1000; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.95); padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
         <button class="status-btn" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -1370,7 +1369,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.42-b349';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.43-b350';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1380,8 +1379,8 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.42-b349';
 
 
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.15.0-b349 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.15.0-b349 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           useEffect(() => {
             const handleMapEsc = (e) => {
@@ -2353,180 +2352,14 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               ${legendMenuNode}
               ${layersMenuNode}
             </div>
-      ${durationInspectionPayload ? html`
-        <div id="duration-inspection-root">
-          <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important; background: rgba(0,0,0,0.55);"></div>
-          <div id="duration-inspection-modal" class="tm-modal open" style="z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); padding: 24px 28px; font-family: monospace; width: 95vw; max-width: 1150px; max-height: 92vh; overflow-y: auto;">
-            <button class="modal-close" onClick=${() => setDurationInspectionPayload(null)} title="Close (Esc)" style="position: absolute; top: 18px; right: 20px; z-index: 10; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; color: #475569;">✕</button>
-            
-            <!-- Header with High-Precision Optical Microscope SVG Icon -->
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #007acc; padding-bottom: 12px; margin-bottom: 16px;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6 18h8"></path>
-                  <path d="M3 22h18"></path>
-                  <path d="M14 22a7 7 0 1 0-14 0"></path>
-                  <path d="M9 14l2-2 4 4-2 2z"></path>
-                  <path d="M12 11l3-3"></path>
-                  <path d="M11 5l3 3"></path>
-                </svg>
-                <h3 style="margin: 0; font-size: 1.25rem; color: #111; font-weight: 700; letter-spacing: -0.2px;">Duration Inspection Overview</h3>
-              </div>
-              <span style="font-size: 0.82rem; background: #e6f4ff; color: #007acc; padding: 4px 12px; border-radius: 12px; font-weight: 700; border: 1px solid #70b8ff; margin-right: 36px;">
-                ${durationInspectionPayload.overlappingEvents ? durationInspectionPayload.overlappingEvents.length : 0} Concurrent Actions
-              </span>
-            </div>
-
-            <!-- Single-Line Cursor Focus & Duration Span Summary Box -->
-            ${(() => {
-              const events = durationInspectionPayload.overlappingEvents || [];
-              if (events.length === 0) return html`<div style="color: #666; padding: 12px;">No concurrent events found at this time coordinate.</div>`;
-
-              const selItem = durationInspectionPayload.item;
-              const pTime = durationInspectionPayload.pointerTime || (selItem && selItem.startDate ? selItem.startDate.min : (events[0].startDate ? events[0].startDate.min : 0));
-              
-              const focusDateStr = formatSmartDate(pTime, null, dateLocale);
-
-              // Check if selected item has a multi-day duration range
-              let hasEventSpan = false;
-              let itemStart = pTime;
-              let itemEnd = pTime;
-              if (selItem && selItem.startDate && selItem.endDate && !isNaN(selItem.endDate.max) && selItem.endDate.max > selItem.startDate.min) {
-                hasEventSpan = true;
-                itemStart = selItem.startDate.min;
-                itemEnd = selItem.endDate.max;
-              }
-
-              // Compute Unified Envelope [minT, maxT] across all overlapping events
-              let minT = Infinity;
-              let maxT = -Infinity;
-              events.forEach(ev => {
-                const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
-                const e = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > s) ? ev.startDate.max : s);
-                if (s < minT) minT = s;
-                if (e > maxT) maxT = e;
-              });
-              if (minT === Infinity) minT = pTime;
-              if (maxT === -Infinity || maxT <= minT) maxT = minT + (1000 * 60 * 60 * 24 * 365); // 1 yr fallback
-
-              const tSpan = maxT - minT;
-              const cursorPct = Math.max(0, Math.min(100, ((pTime - minT) / tSpan) * 100));
-
-              // Compute event span overlay percentages relative to envelope
-              const spanLeftPct = hasEventSpan ? Math.max(0, Math.min(100, ((itemStart - minT) / tSpan) * 100)) : cursorPct;
-              const spanWidthPct = hasEventSpan ? Math.max(0.5, Math.min(100 - spanLeftPct, ((itemEnd - itemStart) / tSpan) * 100)) : 0;
-
-              // Generate 10 evenly spaced ticks along the X-Axis Ruler
-              const numTicks = 10;
-              const ticks = [];
-              for (let i = 0; i < numTicks; i++) {
-                const tickTime = minT + (i / (numTicks - 1)) * tSpan;
-                const tickLabel = formatSmartDate(tickTime, null, dateLocale);
-                ticks.push({ pct: (i / (numTicks - 1)) * 100, label: tickLabel });
-              }
-
-              return html`
-                <div>
-                  <!-- Simplified Single-Line Focus Summary Box -->
-                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center;">
-                    <div style="font-size: 0.9rem; color: #0f172a; font-weight: 700;">
-                      🎯 Cursor Focus: <span style="color: #007acc;">${focusDateStr}</span>
-                      ${hasEventSpan ? html`<span style="color: #475569; margin: 0 8px;">•</span><span style="color: #16a34a;">Duration Span: ${formatSmartDate(itemStart, itemEnd, dateLocale)}</span>` : ''}
-                    </div>
-                  </div>
-
-                  <!-- 10-Tick Aligned Top X-Axis Ruler Scale Header (Card Box with matching padding: 12px 16px) -->
-                  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; position: relative;">
-                    <div style="position: relative; width: 100%; height: 32px;">
-                      <!-- Horizontal Axis Line -->
-                      <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #cbd5e1;"></div>
-
-                      <!-- 10 Ticks -->
-                      ${ticks.map(t => html`
-                        <div style="position: absolute; left: ${t.pct}%; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 5;">
-                          <div style="font-size: 0.68rem; color: #475569; font-weight: 600; white-space: nowrap; margin-bottom: 2px;">${t.label}</div>
-                          <div style="width: 1px; height: 6px; background: #94a3b8;"></div>
-                        </div>
-                      `)}
-                      
-                      <!-- Event Span Highlight Overlay across Ruler -->
-                      ${hasEventSpan ? html`
-                        <div style="position: absolute; left: ${spanLeftPct}%; width: ${spanWidthPct}%; bottom: 0; height: 10px; background: rgba(34, 197, 94, 0.2); border-left: 2px solid #22c55e; border-right: 2px solid #22c55e; pointer-events: none; z-index: 10;"></div>
-                      ` : ''}
-
-                      <!-- Synchronized Vertical Red Dashed Cursor Line -->
-                      <div style="position: absolute; left: ${cursorPct}%; top: -4px; bottom: -12px; width: 2px; border-left: 2px dashed #ef4444; z-index: 20;" title="Cursor Focus: ${focusDateStr}"></div>
-                    </div>
-                  </div>
-
-                  <!-- Multi-Lane Gantt Cards Container (Expanded Geometry max-height: 65vh) -->
-                  <div style="display: flex; flex-direction: column; gap: 10px; max-height: 65vh; overflow-y: auto; padding-right: 4px;">
-                    ${events.map((ev, i) => {
-                      const isMainActiveSlide = data[activeIndex] && ev.id === data[activeIndex].id;
-                      const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
-                      const eTime = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > s) ? ev.startDate.max : s);
-
-                      const leftPct = Math.max(0, Math.min(100, ((s - minT) / tSpan) * 100));
-                      const widthPct = Math.max(1.5, Math.min(100 - leftPct, ((eTime - s) / tSpan) * 100));
-
-                      let durStr = '';
-                      if (eTime > s) {
-                        const dMs = eTime - s;
-                        const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
-                        if (dDays >= 365) durStr = `${(dDays / 365.25).toFixed(1)} yrs`;
-                        else if (dDays >= 30) durStr = `${Math.round(dDays / 30.43)} mos`;
-                        else if (dDays >= 1) durStr = `${dDays} days`;
-                        else durStr = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
-                      }
-
-                      return html`
-                        <div style="background: ${isMainActiveSlide ? '#f0fdf4' : '#ffffff'}; border: 1.5px solid ${isMainActiveSlide ? '#22c55e' : '#e2e8f0'}; border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);"
-                             onClick=${() => {
-                               const idx = data.findIndex(d => d.id === ev.id);
-                               if (idx >= 0) {
-                                 if (typeof setPreviousActiveIndex === 'function') {
-                                   setPreviousActiveIndex(activeIndex);
-                                 }
-                                 handleNodeClick(idx);
-                               }
-                               setDurationInspectionPayload(null);
-                             }}>
-                          
-                          <!-- Event Title & Metadata Header (No Active Slide Badge) -->
-                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#1e293b'}; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
-                              <span style="color: #64748b; font-family: monospace; font-size: 0.82rem;">#${i + 1}</span>
-                              <span>${safeStripHTML(ev.title)}</span>
-                            </div>
-                            <div style="font-size: 0.78rem; color: #475569; font-weight: 600;">
-                              📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? `(⏳ ${durStr})` : ''}
-                            </div>
-                          </div>
-
-                          <!-- Mini-Gantt Track (Exact Pixel Alignment with Ruler) -->
-                          <div style="position: relative; width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0;">
-                            <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${isMainActiveSlide ? '#22c55e' : '#007acc'}; border-radius: 4px; opacity: 0.85;"></div>
-                            <!-- Red Cursor Line Intersection -->
-                            <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;"></div>
-                          </div>
-                        </div>
-                      `;
-                    })}
-                  </div>
-                </div>
-              `;
-            })()}
-          </div>
-        </div>
-      ` : ''}
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.6.42-b349';
+MODULE_VERSIONS['MapViewer'] = 'v6.5.31-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.15.0-b349 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.15.0-b349 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b178 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b178 ] ===
 const App = () => {
           function safeStripHTML(str) { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); }
 
@@ -2714,7 +2547,7 @@ const App = () => {
 
             const d1 = toValidDate(startInput);
             if (typeof d1 === 'string') return d1;
-            if (!d1) return typeof startInput === 'string' ? startInput : 'Undated';
+            if (!d1) return (typeof startInput === 'string' ? startInput : 'Undated');
 
             const d2 = toValidDate(endInput);
             const loc = locale || 'en-GB';
@@ -3559,9 +3392,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       data=${data}
                       activeIndex=${activeIndex}
                       setActiveIndex=${jumpToSlide}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                       maxPane=${maxPane}
                       setMaxPane=${setMaxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                       dateLocale=${dateLocale}
                       formatSmartDate=${formatSmartDate}
                       onSelectAllFilters=${handleSelectAllFilters}
@@ -3580,6 +3413,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         data=${data}
                         activeIndex=${activeIndex}
                         setActiveIndex=${jumpToSlide}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                         addLog=${addLog}
                         basemapsRegistry=${basemapsRegistry}
                         maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
@@ -3587,7 +3421,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         setMinimapOffset=${setMinimapOffset}
                         maxPane=${maxPane}
                         setMaxPane=${setMaxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                         polygonOpacity=${polygonOpacity}
                         showButtonText=${showButtonText}
                         visibleTimeBounds=${visibleTimeBounds}
@@ -3603,7 +3436,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         activeSlide=${activeSlide}
                         maxPane=${maxPane}
                         setMaxPane=${setMaxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                       />
                     </div>
                   </div>
@@ -3714,13 +3546,13 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     data=${data}
                     activeIndex=${activeIndex}
                     setActiveIndex=${jumpToSlide}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     addLog=${addLog}
                     activeTags=${activeTags}
                     isTimelineExpanded=${isTimelineExpanded}
                     setIsTimelineExpanded=${setIsTimelineExpanded}
                     maxPane=${maxPane}
                     setMaxPane=${setMaxPane}
-                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     showButtonText=${showButtonText}
                     visibleTimeBounds=${visibleTimeBounds}
                     setVisibleTimeBounds=${setVisibleTimeBounds}
@@ -4001,6 +3833,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
               `}
             </div>
+          
       ${durationInspectionPayload ? html`
         <div id="duration-inspection-root">
           <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important; background: rgba(0,0,0,0.55);"></div>
@@ -4025,7 +3858,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               </span>
             </div>
 
-            <!-- Single-Line Cursor Focus & Duration Span Summary Box -->
+            <!-- Single-Line Focus & Span Summary Box -->
             ${(() => {
               const events = durationInspectionPayload.overlappingEvents || [];
               if (events.length === 0) return html`<div style="color: #666; padding: 12px;">No concurrent events found at this time coordinate.</div>`;
@@ -4035,7 +3868,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               
               const focusDateStr = formatSmartDate(pTime, null, dateLocale);
 
-              // Check if selected item has a multi-day duration range
               let hasEventSpan = false;
               let itemStart = pTime;
               let itemEnd = pTime;
@@ -4060,7 +3892,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               const tSpan = maxT - minT;
               const cursorPct = Math.max(0, Math.min(100, ((pTime - minT) / tSpan) * 100));
 
-              // Compute event span overlay percentages relative to envelope
               const spanLeftPct = hasEventSpan ? Math.max(0, Math.min(100, ((itemStart - minT) / tSpan) * 100)) : cursorPct;
               const spanWidthPct = hasEventSpan ? Math.max(0.5, Math.min(100 - spanLeftPct, ((itemEnd - itemStart) / tSpan) * 100)) : 0;
 
@@ -4075,21 +3906,21 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
               return html`
                 <div>
-                  <!-- Simplified Single-Line Focus Summary Box -->
-                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center;">
+                  <!-- Single-Line Focus & Span Summary Box -->
+                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
                     <div style="font-size: 0.9rem; color: #0f172a; font-weight: 700;">
                       🎯 Cursor Focus: <span style="color: #007acc;">${focusDateStr}</span>
-                      ${hasEventSpan ? html`<span style="color: #475569; margin: 0 8px;">•</span><span style="color: #16a34a;">Duration Span: ${formatSmartDate(itemStart, itemEnd, dateLocale)}</span>` : ''}
+                      ${hasEventSpan ? html`<span style="color: #64748b; margin: 0 6px;">•</span><span style="color: #16a34a;">Duration Span: ${formatSmartDate(itemStart, itemEnd, dateLocale)}</span>` : ''}
                     </div>
                   </div>
 
-                  <!-- 10-Tick Aligned Top X-Axis Ruler Scale Header (Card Box with matching padding: 12px 16px) -->
+                  <!-- 10-Tick Aligned Top X-Axis Ruler Scale Header (Card-Matched Geometry) -->
                   <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; position: relative;">
-                    <div style="position: relative; width: 100%; height: 32px;">
-                      <!-- Horizontal Axis Line -->
+                    <div style="position: relative; width: 100%; height: 32px; overflow: visible;">
+                      <!-- Horizontal Scale Line -->
                       <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #cbd5e1;"></div>
 
-                      <!-- 10 Ticks -->
+                      <!-- 10 Scale Ticks -->
                       ${ticks.map(t => html`
                         <div style="position: absolute; left: ${t.pct}%; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 5;">
                           <div style="font-size: 0.68rem; color: #475569; font-weight: 600; white-space: nowrap; margin-bottom: 2px;">${t.label}</div>
@@ -4097,7 +3928,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         </div>
                       `)}
                       
-                      <!-- Event Span Highlight Overlay across Ruler -->
+                      <!-- Event Span Highlight Overlay across Ruler Track -->
                       ${hasEventSpan ? html`
                         <div style="position: absolute; left: ${spanLeftPct}%; width: ${spanWidthPct}%; bottom: 0; height: 10px; background: rgba(34, 197, 94, 0.2); border-left: 2px solid #22c55e; border-right: 2px solid #22c55e; pointer-events: none; z-index: 10;"></div>
                       ` : ''}
@@ -4107,7 +3938,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     </div>
                   </div>
 
-                  <!-- Multi-Lane Gantt Cards Container (Expanded Geometry max-height: 65vh) -->
+                  <!-- Multi-Lane Gantt Cards Container (Expanded Height: max-height 65vh) -->
                   <div style="display: flex; flex-direction: column; gap: 10px; max-height: 65vh; overflow-y: auto; padding-right: 4px;">
                     ${events.map((ev, i) => {
                       const isMainActiveSlide = data[activeIndex] && ev.id === data[activeIndex].id;
@@ -4140,7 +3971,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                setDurationInspectionPayload(null);
                              }}>
                           
-                          <!-- Event Title & Metadata Header (No Active Slide Badge) -->
+                          <!-- Event Title & Metadata Header -->
                           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#1e293b'}; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
                               <span style="color: #64748b; font-family: monospace; font-size: 0.82rem;">#${i + 1}</span>
@@ -4151,7 +3982,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                             </div>
                           </div>
 
-                          <!-- Mini-Gantt Track (Exact Pixel Alignment with Ruler) -->
+                          <!-- Mini-Gantt Track -->
                           <div style="position: relative; width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0;">
                             <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${isMainActiveSlide ? '#22c55e' : '#007acc'}; border-radius: 4px; opacity: 0.85;"></div>
                             <!-- Red Cursor Line Intersection -->
@@ -4167,15 +3998,16 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           </div>
         </div>
       ` : ''}
-          `;
+
+`;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.42-b349';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.43-b350';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.15.0-b349 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.15.0-b349 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b178 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b178 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
@@ -4294,7 +4126,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.42-b349';
           return null;
         };
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.3.42-b349';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.96-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
