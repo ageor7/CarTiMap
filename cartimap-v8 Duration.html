@@ -3997,11 +3997,21 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           </div>
 
                           <!-- Mini-Gantt Track -->
-                          <div style="position: relative; width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0;">
-                            <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${isMainActiveSlide ? '#22c55e' : '#007acc'}; border-radius: 4px; opacity: 0.85;"></div>
-                            <!-- Red Cursor Line Intersection -->
-                            <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;"></div>
-                          </div>
+                          ${(() => {
+                            const isEvApproxStart = ev.startDate && (ev.startDate.isApprox || ev.startDate.isEDTF || (ev.startDate.type && ev.startDate.type !== 'Exact'));
+                            const isEvApproxEnd = ev.endDate && (ev.endDate.isApprox || ev.endDate.isEDTF || (ev.endDate.type && ev.endDate.type !== 'Exact'));
+                            const isEvApprox = isEvApproxStart || isEvApproxEnd || (ev.startDate && ev.startDate.text && (ev.startDate.text.includes('~') || ev.startDate.text.includes('?')));
+                            const barBg = isEvApprox ? 'repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.4) 4px, rgba(0, 122, 204, 0.85) 4px, rgba(0, 122, 204, 0.85) 8px)' : (isMainActiveSlide ? '#22c55e' : '#007acc');
+                            const barBorderL = isEvApproxStart ? '3px dashed #f59e0b' : 'none';
+                            const barBorderR = isEvApproxEnd ? '3px dashed #f59e0b' : 'none';
+                            return html`
+                              <div style="position: relative; width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0;">
+                                <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${barBg}; border-left: ${barBorderL}; border-right: ${barBorderR}; border-radius: 4px; opacity: 0.85;"></div>
+                                <!-- Red Cursor Line Intersection -->
+                                <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;" title="Focus: ${focusDateStr}"></div>
+                              </div>
+                            `;
+                          })()}
                         </div>
                       `;
                     })}
