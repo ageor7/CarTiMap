@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.15.0-b357</title>
+    <title>CarTiMap v8.15.0-b359</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -204,7 +204,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b357';
+const APP_VERSION = 'v8.15.0-b359';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1203,8 +1203,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const colInactive = 'rgba(var(--tm-inactive-rgb, 204, 0, 0), 0.6)';
     const colApprox = 'var(--tm-approx, #ffb300)';
 
-    const isApproxStart = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.approximate;
-    const isApproxEnd = item.endDate && item.endDate.isEDTF && item.endDate.obj && item.endDate.obj.approximate;
+    const isApproxStart = item.startDate && (item.startDate.isApprox || item.startDate.isEDTF || item.startDate.type === 'Approximate' || (item.startDate.text && (item.startDate.text.includes('~') || item.startDate.text.includes('?') || item.startDate.text.includes('c.'))));
+    const isApproxEnd = item.endDate && (item.endDate.isApprox || item.endDate.isEDTF || item.endDate.type === 'Approximate' || (item.endDate.text && (item.endDate.text.includes('~') || item.endDate.text.includes('?') || item.endDate.text.includes('c.'))));
 
     let xAxisMarker = '';
     if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
@@ -1255,21 +1255,22 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
         const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;">${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #d97706; z-index: 20;" title="Approximate Start Date (~)"></div>` : ''}${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: 4px; background: #d97706; z-index: 20;" title="Approximate End Date (~)"></div>` : ''} title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}></div>`;
+        const activeBg = (isApproxStart || isApproxEnd) ? 'rgba(245, 158, 11, 0.35)' : 'rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30)';
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: ${activeBg}; border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}></div>`;
       } else {
         const styleIdx = index % 4;
         const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
-        const borderL = isApproxStart ? `3px solid rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.6)` : `2px solid rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.6)`;
-        const borderR = isApproxEnd ? `3px solid rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.6)` : `2px solid rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.6)`;
-        const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
-        const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
+        const borderL = isApproxStart ? `3px solid ${colApprox}` : `1px solid ${colInactive}`;
+        const borderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
+        const hatchStyle = (isApproxStart || isApproxEnd)
+          ? `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(245, 158, 11, 0.45), rgba(245, 158, 11, 0.45) 3px, transparent 3px, transparent 6px);`
+          : `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.25), rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.25) 3px, transparent 3px, transparent 6px);`;
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
-            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}" title="${spanMarkerTooltip}"></div>
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-top: none; border-bottom: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%);"></div>
           </div>
         `;
-      }
-    }
+      }}
 
     let dropLine = '';
     if (isActive) {
@@ -1369,7 +1370,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.50-b357';
+MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.50-b359';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -3037,41 +3038,14 @@ const App = () => {
 
           useEffect(() => {
             const handleKeyDown = (e) => {
-              if (e.key === 'Escape') {
-                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; }
+              if (e.key === 'Escape' || e.keyCode === 27) {
                 if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
+                setDurationInspectionPayload(null);
                 setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
-                return;
-              }
-              if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
-              else if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
-              else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
-              else if (e.key === 'ArrowDown') {
-                const textPane = document.querySelector('.content-slider-pane');
-                if (textPane) textPane.scrollBy({ top: 120, behavior: 'smooth' });
-              }
-              else if (e.key === 'ArrowUp') {
-                const textPane = document.querySelector('.content-slider-pane');
-                if (textPane) textPane.scrollBy({ top: -120, behavior: 'smooth' });
               }
             };
-            window.addEventListener('keydown', handleKeyDown);
-            return () => window.removeEventListener('keydown', handleKeyDown);
-          }, [activeIndex, data.length]);
-
-          useEffect(() => {
-            updateAppHeight();
-            let wasDesktop = window.innerWidth >= 1024;
-            const handleResize = () => {
-              updateAppHeight();
-              const isDesktop = window.innerWidth >= 1024;
-              if (isDesktop !== wasDesktop) {
-                window.dispatchEvent(new Event('resize'));
-              }
-              wasDesktop = isDesktop;
-            };
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
+            window.addEventListener('keydown', handleKeyDown, true);
+            return () => window.removeEventListener('keydown', handleKeyDown, true);
           }, []);
 
           const handleResultClick = (id, qString) => {
@@ -4043,7 +4017,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b357';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
