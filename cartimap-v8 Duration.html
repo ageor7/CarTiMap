@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.16.0-b403</title>
+    <title>CarTiMap v8.16.0-b405</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -217,8 +217,29 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.16.0-b403';
+const APP_VERSION = 'v8.16.0-b405';
 document.title = 'CarTiMap - ' + APP_VERSION;
+
+            // Robust Base64 Favicon Injection for All Browsers
+            const injectFavicon = () => {
+              const faviconUri = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImJnR3JhZCIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzFlMjkzYiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZjE3MmEiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImN5YW5HcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM4YmRmOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMjg0YzciLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImFtYmVyR3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmYmJmMjQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZDk3NzA2Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjgiIHJlc3VsdD0iYmx1ciIgLz4KICAgICAgPGZlQ29tcG9zaXRlIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImJsdXIiIG9wZXJhdG9yPSJvdmVyIi8+CiAgICA8L2ZpbHRlcj4KICA8L2RlZnM+CiAgPCEtLSBCYWNrZ3JvdW5kIENpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjI0MCIgZmlsbD0idXJsKCNiZ0dyYWQpIiBzdHJva2U9IiMzMzQxNTUiIHN0cm9rZS13aWR0aD0iMTIiLz4KICA8IS0tIFRlbXBvcmFsIFNjYWxlIEFyYyAoQW1iZXIpIC0tPgogIDxwYXRoIGQ9Ik0gMTI4LDI1NiBBIDEyOCwxMjggMCAxLDEgMzg0LDI1NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2FtYmVyR3JhZCkiIHN0cm9rZS13aWR0aD0iMTYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iMTIsMTIiLz4KICA8IS0tIE1hcCBDb21wYXNzIFJpbmcgKEN5YW4pIC0tPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTYwIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjY3lhbkdyYWQpIiBzdHJva2Utd2lkdGg9IjEwIiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KICA8IS0tIENlbnRlciBNYXAgTm9kZSBQaW4gLS0+CiAgPHBhdGggZD0iTSAyNTYsMTI4IEMgMjEwLDEyOCAxNzIsMTY2IDE3MiwyMTIgQyAxNzIsMjc1IDI1NiwzNjggMjU2LDM2OCBDIDI1NiwzNjggMzQwLDI3NSAzNDAsMjEyIEMgMzQwLDE2NiAzMDIsMTI4IDI1NiwxMjggWiIgZmlsbD0idXJsKCNjeWFuR3JhZCkiIGZpbHRlcj0idXJsKCNnbG93KSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjIxMiIgcj0iNDQiIGZpbGw9IiMwZjE3MmEiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyMTIiIHI9IjI0IiBmaWxsPSJ1cmwoI2FtYmVyR3JhZCkiLz4KPC9zdmc+";
+              ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(relType => {
+                let link = document.querySelector(`link[rel="${relType}"]`);
+                if (!link) {
+                  link = document.createElement('link');
+                  link.rel = relType;
+                  document.head.appendChild(link);
+                }
+                link.type = 'image/svg+xml';
+                link.href = faviconUri;
+              });
+            };
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', injectFavicon);
+            } else {
+              injectFavicon();
+            }
+
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -2758,7 +2779,31 @@ const App = () => {
                             const parseChronoNode = (legacyStr, edtfStr, index, rowTitle, fieldName = 'Start') => {
                 const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
                 const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
-                const log = (msg, type = 'info') => { if (typeof window !== 'undefined' && typeof window.vibeLog === 'function') window.vibeLog(msg, type); };
+                const targetStr = cleanEdtf || cleanLegacy;
+
+                if (targetStr) {
+                  try {
+                    const parsed = compileCartiMapAST(targetStr);
+                    if (parsed && typeof parsed.min === 'number' && !isNaN(parsed.min)) {
+                      const isApproxFlag = !!(parsed.approximate || parsed.uncertain || parsed.unspecified || targetStr.includes('~') || targetStr.includes('?') || targetStr.includes('%') || targetStr.toLowerCase().includes('x') || targetStr.toLowerCase().startsWith('c.') || targetStr.toLowerCase().startsWith('ca.') || targetStr.toLowerCase().includes('approx'));
+                      const isEdtfFlag = !!cleanEdtf || !!(parsed && (parsed.isEDTF || parsed.approximate || parsed.uncertain || targetStr.includes('~') || targetStr.includes('?') || targetStr.includes('%') || targetStr.includes('X') || targetStr.includes('x') || targetStr.toLowerCase().startsWith('c.')));
+                      return {
+                        isEDTF: isEdtfFlag,
+                        isApprox: isApproxFlag,
+                        type: isApproxFlag ? 'Approximate' : 'Exact',
+                        min: parsed.min,
+                        max: (typeof parsed.max === 'number' && !isNaN(parsed.max) && parsed.max !== 0) ? parsed.max : parsed.min,
+                        obj: parsed,
+                        isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
+                        text: cleanEdtf || cleanLegacy,
+                        rawEdtf: cleanEdtf,
+                        parseSuccess: true
+                      };
+                    }
+                  } catch (e) {}
+                }
+                return { isEDTF: false, isApprox: false, type: 'Exact', min: 0, max: 0, text: cleanLegacy || 'Undated' };
+            };
 
                 if (cleanEdtf) {
                   try {
