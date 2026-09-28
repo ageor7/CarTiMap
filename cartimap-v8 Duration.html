@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.15.0-b393</title>
+    <title>CarTiMap v8.15.0-b394</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -217,7 +217,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b393';
+const APP_VERSION = 'v8.15.0-b394';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -721,7 +721,10 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
         <div style="flex-shrink: 0; position: sticky; top: 0; background: var(--paneBg, #ffffff); z-index: 10; padding-top: ${isScrolled ? '0.6rem' : '1.2rem'}; padding-bottom: ${isScrolled ? '0.4rem' : '0.5rem'}; border-bottom: 1px solid rgba(128,128,128,0.2); box-shadow: ${isScrolled ? '0 4px 12px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.04)'}; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 100%; padding-left: 1.5rem; padding-right: 55px; box-sizing: border-box;">
           <div style="max-width: 85ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column;">
             <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
-              ${isDateValid ? html`<div class="metadata-date" style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? html`<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.9); flex-shrink: 0;" title="Approximate / Uncertain Date (~)"></span>` : ''}<span>${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</span>${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? html`<span style="display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #b45309; border: 1.5px solid #f59e0b; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-family: monospace; font-size: 0.70rem; box-shadow: 0 1px 3px rgba(245, 158, 11, 0.25); margin-left: 4px;" title="Temporal Uncertainty / Approximate Date (~)">⚡ Approx</span>` : ''}</div>` : ''}
+              ${isDateValid ? html`<div class="metadata-date" style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? html`<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.9); flex-shrink: 0;" title="Approximate / Uncertain Date (~)"></span>` : ''}<span>${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</span>${(slide.startDate && slide.startDate.isEDTF) || (slide.endDate && slide.endDate.isEDTF) 
+                ? html`<span style="display: inline-flex; align-items: center; font-family: monospace; font-size: 0.68rem; font-weight: 700; color: #0284c7; background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.25); padding: 1px 5px; border-radius: 3px; letter-spacing: 0.5px; opacity: 0.9; margin-left: 4px;" title="Date Origin: Native ISO 8601-2 EDTF Field">EDTF</span>`
+                : html`<span style="display: inline-flex; align-items: center; font-family: monospace; font-size: 0.68rem; font-weight: 600; color: #64748b; background: rgba(100, 116, 139, 0.08); border: 1px solid rgba(100, 116, 139, 0.2); padding: 1px 5px; border-radius: 3px; letter-spacing: 0.5px; opacity: 0.85; margin-left: 4px;" title="Date Origin: Legacy Numeric/Slash Timestamp Field">Legacy</span>`
+              }${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? html`<span style="display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #b45309; border: 1.5px solid #f59e0b; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-family: monospace; font-size: 0.70rem; box-shadow: 0 1px 3px rgba(245, 158, 11, 0.25); margin-left: 4px;" title="Temporal Uncertainty / Approximate Date (~)">⚡ Approx</span>` : ''}</div>` : ''}
               <div class="metadata-pills-wrapper">
                 ${hasLocation ? html`<span class="place-pill"><span style="margin-right: 4px;">📍</span> ${formatPlaces(slide.place)}</span>` : ''}
                 ${tags.map(tag => html`<span class="tag-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span>${tag}</span></span>`)}
@@ -2603,6 +2606,9 @@ const App = () => {
             const timeStr = new Date().toTimeString().split(' ').at(0);
             setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
           };
+          window.vibeLog = (msg, type = 'info') => {
+            addLog(msg, type);
+          };
 
           const stripAndNormalize = (str) => {
             if (!str) return '';
@@ -2739,15 +2745,14 @@ const App = () => {
                             const parseChronoNode = (legacyStr, edtfStr, index, rowTitle, fieldName = 'Start') => {
                 const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
                 const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
+                const log = (msg, type = 'info') => { if (typeof window !== 'undefined' && typeof window.vibeLog === 'function') window.vibeLog(msg, type); };
 
                 if (cleanEdtf) {
                   try {
                     const parsed = compileCartiMapAST(cleanEdtf);
                     if (parsed && typeof parsed.min === 'number' && !isNaN(parsed.min)) {
                       const isApproxFlag = !!(parsed.approximate || parsed.uncertain || parsed.unspecified || cleanEdtf.includes('~') || cleanEdtf.includes('?') || cleanEdtf.includes('%') || cleanEdtf.toLowerCase().includes('x') || cleanEdtf.toLowerCase().startsWith('c.') || cleanEdtf.toLowerCase().startsWith('ca.') || cleanEdtf.toLowerCase().includes('approx'));
-                      if (typeof addLog === 'function') {
-                        addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Successfully parsed ${fieldName} EDTF "${cleanEdtf}" -> Epoch ${parsed.min} (${isApproxFlag ? 'Approximate' : 'Exact'})`, 'info');
-                      }
+                      log(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Successfully parsed ${fieldName} EDTF "${cleanEdtf}" -> Epoch ${parsed.min} (${isApproxFlag ? 'Approximate' : 'Exact'})`, 'info');
                       return {
                         isEDTF: true,
                         isApprox: isApproxFlag,
@@ -2759,17 +2764,13 @@ const App = () => {
                         text: cleanEdtf
                       };
                     } else {
-                      if (typeof addLog === 'function') {
-                        addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): ${fieldName} EDTF "${cleanEdtf}" AST Warning: Invalid timestamp -> Falling back to legacy ${fieldName} "${cleanLegacy || 'None'}"`, 'warning');
-                      }
+                      log(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): ${fieldName} EDTF "${cleanEdtf}" AST Warning: Invalid timestamp -> Falling back to legacy ${fieldName} "${cleanLegacy || 'None'}"`, 'warning');
                     }
                   } catch (e) {
-                    if (typeof addLog === 'function') {
-                      addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): ${fieldName} EDTF "${cleanEdtf}" AST Compilation Error: ${e.message}`, 'warning');
-                    }
+                    log(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): ${fieldName} EDTF "${cleanEdtf}" AST Compilation Error: ${e.message}`, 'warning');
                   }
-                } else if (cleanLegacy && typeof addLog === 'function') {
-                  addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): ${fieldName} EDTF field empty -> Using legacy date "${cleanLegacy}"`, 'info');
+                } else if (cleanLegacy) {
+                  log(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): ${fieldName} EDTF field empty -> Using legacy date "${cleanLegacy}"`, 'info');
                 }
 
                 // Legacy fallback parsing
