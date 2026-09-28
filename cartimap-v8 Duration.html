@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.15.0-b387</title>
+    <title>CarTiMap v8.15.0-b388</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/edtf@4.0.1/dist/edtf.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.8/wicket-leaflet.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://unpkg.com/preact@10.19.3/dist/preact.umd.js"></script>
@@ -216,7 +217,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b387';
+const APP_VERSION = 'v8.15.0-b388';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -4221,14 +4222,45 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             if (mathStr.includes("?")) { isUncertain = true; mathStr = mathStr.replace(/\?/g, ""); }
           }
 
-          // 6. Native AST Evaluation
+          
+          // 6. Native & Zero-Build Fallback AST Evaluation
           let parsed = null;
           try {
             const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
-            parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
+            if (edtfFn) {
+              parsed = typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 });
+            }
           } catch (e) {
-            return null;
+            parsed = null;
           }
+
+          // Zero-Build Embedded EDTF Fallback Parser when window.edtf is offline/unloaded
+          if (!parsed && mathStr) {
+            try {
+              const cleanStr = mathStr.trim();
+              const isApproxSyntax = cleanStr.includes('~') || cleanStr.includes('?') || cleanStr.includes('%') || /^c\./i.test(cleanStr) || /^ca\./i.test(cleanStr) || /approx/i.test(cleanStr);
+              const isoMatch = cleanStr.match(/^c?\s*([~?%])?(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?([~?%])?$/i);
+              if (isoMatch) {
+                const yr = parseInt(isoMatch[2], 10);
+                const mo = isoMatch[3] ? parseInt(isoMatch[3], 10) - 1 : 0;
+                const da = isoMatch[4] ? parseInt(isoMatch[4], 10) : 1;
+                const hr = isoMatch[5] ? parseInt(isoMatch[5], 10) : 0;
+                const mi = isoMatch[6] ? parseInt(isoMatch[6], 10) : 0;
+                const sc = isoMatch[7] ? parseInt(isoMatch[7], 10) : 0;
+                const dt = new Date(Date.UTC(yr, mo, da, hr, mi, sc));
+                if (!isNaN(dt.getTime())) {
+                  parsed = {
+                    type: 'Date',
+                    min: dt.getTime(),
+                    max: dt.getTime(),
+                    approximate: isApproxSyntax,
+                    uncertain: isApproxSyntax
+                  };
+                }
+              }
+            } catch(err) {}
+          }
+
 
           if (parsed && typeof parsed === "object") {
             let minMs = 0;
