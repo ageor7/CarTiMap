@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.15.0-b396</title>
+    <title>CarTiMap v8.15.0-b399</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -217,7 +217,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.15.0-b396';
+const APP_VERSION = 'v8.15.0-b399';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -4161,145 +4161,129 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
-          let clean = String(str).trim()
-            .replace(/[\r\n]+/g, ',')
-            .replace(/\s*\/\s*/g, '/')
-            .replace(/\s*,\s*/g, ',')
-            .replace(/,,+/g, ',');
+          let clean = String(str).trim();
+          if (!clean) return null;
 
-          // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
-          if (clean.startsWith(String.fromCharCode(91)) && clean.endsWith(String.fromCharCode(93))) {
+          // 1. Choice sets [] and inclusive lists {}
+          if ((clean.startsWith('[') && clean.endsWith(']')) || (clean.startsWith('{') && clean.endsWith('}'))) {
             const inner = clean.slice(1, -1);
-            const parts = inner.split(",");
+            const parts = inner.split(',');
             const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
             if (values.length === 0) return null;
-            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
-            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
+            const minVals = values.map(v => v.min).filter(n => typeof n === 'number' && !isNaN(n));
+            const maxVals = values.map(v => v.max).filter(n => typeof n === 'number' && !isNaN(n));
             return {
-              type: "Set",
+              type: 'Set',
               values: values,
               min: minVals.length > 0 ? Math.min(...minVals) : 0,
-              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
+              max: maxVals.length > 0 ? Math.max(...maxVals) : 0,
+              approximate: values.some(v => v.approximate)
             };
           }
 
-          // 2. Array Geometry: Inclusive Lists {}
-          if (clean.startsWith("{") && clean.endsWith("}")) {
-            const inner = clean.slice(1, -1);
-            const parts = inner.split(",");
-            const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
-            if (values.length === 0) return null;
-            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
-            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
-            return {
-              type: "List",
-              values: values,
-              min: minVals.length > 0 ? Math.min(...minVals) : 0,
-              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
-            };
+          // 2. EDTF Intervals (..) or (/)
+          if (clean.includes('..') || clean.includes('/')) {
+            const delim = clean.includes('..') ? '..' : '/';
+            const parts = clean.split(delim);
+            const part0 = parts.at(0) ? parts.at(0).trim() : '';
+            const part1 = parts.at(1) ? parts.at(1).trim() : '';
+            if (part0.includes('-') && part0.length >= 4 && part1.includes('-') && part1.length >= 4) {
+              const v1 = part0 ? compileCartiMapAST(part0) : null;
+              const v2 = part1 ? compileCartiMapAST(part1) : null;
+              if (v1 || v2) {
+                const min1 = v1 ? v1.min : (v2 ? v2.min : 0);
+                const max2 = v2 ? v2.max : (v1 ? v1.max : min1);
+                return {
+                  type: 'Interval',
+                  values: [v1, v2].filter(Boolean),
+                  min: min1,
+                  max: max2,
+                  approximate: (v1 && v1.approximate) || (v2 && v2.approximate)
+                };
+              }
+            }
           }
 
-          // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
-          if (clean.includes("..")) {
-            const parts = clean.split("..");
-            const part0 = parts.at(0) || '';
-            const part1 = parts.at(1) || '';
-            const v1 = compileCartiMapAST(part0);
-            const v2 = compileCartiMapAST(part1);
-            if (!v1 || !v2) return null;
-            const min1 = typeof v1.min === 'number' ? v1.min : Number(v1.min?.valueOf() || 0);
-            const min2 = typeof v2.min === 'number' ? v2.min : Number(v2.min?.valueOf() || 0);
-            const max1 = typeof v1.max === 'number' ? v1.max : Number(v1.max?.valueOf() || 0);
-            const max2 = typeof v2.max === 'number' ? v2.max : Number(v2.max?.valueOf() || 0);
-            return {
-              type: "Set",
-              values: Array.of(v1, v2),
-              min: Math.min(min1, min2),
-              max: Math.max(max1, max2)
-            };
-          }
-
-          // 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
-          let mathStr = clean;
           let isApprox = false;
           let isUncertain = false;
+          let mathStr = clean;
 
-          // Normalize short timezone offset: +02 or -05 -> +02:00 or -05:00
-          mathStr = mathStr.replace(/([+-]\d{2})(?!\:\d{2})(?=\s*|$)/g, '$1:00');
+          if (mathStr.includes('~')) { isApprox = true; mathStr = mathStr.replace(/~/g, ''); }
+          if (mathStr.includes('?')) { isUncertain = true; mathStr = mathStr.replace(/\?/g, ''); }
+          if (mathStr.includes('%')) { isApprox = true; isUncertain = true; mathStr = mathStr.replace(/%/g, ''); }
 
-          if (mathStr.includes("T")) {
-            mathStr = mathStr.replace(new RegExp("(T" + String.fromCharCode(91) + "0-9X:~.?%" + String.fromCharCode(93) + "+(?:" + String.fromCharCode(91) + "+\\-Z" + String.fromCharCode(93) + String.fromCharCode(91) + "0-9:" + String.fromCharCode(93) + "*)?)", "gi"), (match) => {
-              if (match.includes("~")) isApprox = true;
-              if (match.includes("?")) isUncertain = true;
-              if (match.includes("%")) { isApprox = true; isUncertain = true; }
-              return match.replace(/X/gi, "0").replace(/[~?%]/g, "");
-            });
-          }
+          // Strip prefixes c., ca., approx
+          mathStr = mathStr.replace(/^(c\.|ca\.|approx\s*)/i, () => { isApprox = true; return ''; }).trim();
 
-          // 5. Qualified Durations (PT30~M)
-          if (mathStr.startsWith("P") || mathStr.startsWith("-P")) {
-            if (mathStr.includes("~")) { isApprox = true; mathStr = mathStr.replace(/~/g, ""); }
-            if (mathStr.includes("?")) { isUncertain = true; mathStr = mathStr.replace(/\?/g, ""); }
-          }
+          // Native ISO/EDTF Date Parser
+          let minMs = NaN;
+          let maxMs = NaN;
 
-          
-          // 6. Native & Zero-Build Fallback AST Evaluation
-          let parsed = null;
-          try {
-            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
-            if (edtfFn) {
-              parsed = typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 });
-            }
-          } catch (e) {
-            parsed = null;
-          }
-
-          // Zero-Build Embedded EDTF Fallback Parser when window.edtf is offline/unloaded
-          if (!parsed && mathStr) {
-            try {
-              const cleanStr = mathStr.trim();
-              const isApproxSyntax = cleanStr.includes('~') || cleanStr.includes('?') || cleanStr.includes('%') || /^c\./i.test(cleanStr) || /^ca\./i.test(cleanStr) || /approx/i.test(cleanStr);
-              const isoMatch = cleanStr.match(/^c?\s*([~?%])?(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?([~?%])?$/i);
-              if (isoMatch) {
-                const yr = parseInt(isoMatch[2], 10);
-                const mo = isoMatch[3] ? parseInt(isoMatch[3], 10) - 1 : 0;
-                const da = isoMatch[4] ? parseInt(isoMatch[4], 10) : 1;
-                const hr = isoMatch[5] ? parseInt(isoMatch[5], 10) : 0;
-                const mi = isoMatch[6] ? parseInt(isoMatch[6], 10) : 0;
-                const sc = isoMatch[7] ? parseInt(isoMatch[7], 10) : 0;
-                const dt = new Date(Date.UTC(yr, mo, da, hr, mi, sc));
-                if (!isNaN(dt.getTime())) {
-                  parsed = {
-                    type: 'Date',
-                    min: dt.getTime(),
-                    max: dt.getTime(),
-                    approximate: isApproxSyntax,
-                    uncertain: isApproxSyntax
-                  };
+          // 1. Unspecified digit mask: 194X, 1944-XX, 1944-12-XX
+          if (/^\d{3}[Xx]$/.test(mathStr)) {
+            const decade = parseInt(mathStr.substring(0, 3) + '0', 10);
+            minMs = Date.UTC(decade, 0, 1);
+            maxMs = Date.UTC(decade + 9, 11, 31, 23, 59, 59, 999);
+            isApprox = true;
+          } else if (/^\d{4}-[Xx]{2}$/.test(mathStr)) {
+            const y = parseInt(mathStr.substring(0, 4), 10);
+            minMs = Date.UTC(y, 0, 1);
+            maxMs = Date.UTC(y, 11, 31, 23, 59, 59, 999);
+            isApprox = true;
+          } else if (/^\d{4}-\d{2}-[Xx]{2}$/.test(mathStr)) {
+            const y = parseInt(mathStr.substring(0, 4), 10);
+            const m = parseInt(mathStr.substring(5, 7), 10) - 1;
+            minMs = Date.UTC(y, m, 1);
+            const lastDay = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+            maxMs = Date.UTC(y, m, lastDay, 23, 59, 59, 999);
+            isApprox = true;
+          } else if (/^\d{4}$/.test(mathStr)) {
+            const y = parseInt(mathStr, 10);
+            minMs = Date.UTC(y, 0, 1);
+            maxMs = Date.UTC(y, 11, 31, 23, 59, 59, 999);
+          } else if (/^\d{4}-\d{2}$/.test(mathStr)) {
+            const y = parseInt(mathStr.substring(0, 4), 10);
+            const m = parseInt(mathStr.substring(5, 7), 10) - 1;
+            minMs = Date.UTC(y, m, 1);
+            const lastDay = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+            maxMs = Date.UTC(y, m, lastDay, 23, 59, 59, 999);
+          } else if (/^\d{4}-\d{2}-\d{2}$/.test(mathStr)) {
+            const y = parseInt(mathStr.substring(0, 4), 10);
+            const m = parseInt(mathStr.substring(5, 7), 10) - 1;
+            const day = parseInt(mathStr.substring(8, 10), 10);
+            minMs = Date.UTC(y, m, day);
+            maxMs = minMs + 86399999;
+          } else {
+            // ISO Date or Date-Time
+            let isoFormatted = mathStr.replace(/T(\d{2})([+-]\d{2}(?:\:\d{2})?|$)/, 'T$1:00:00$2');
+            isoFormatted = isoFormatted.replace(/([+-]\d{2})$/, '$1:00');
+            const d = new Date(isoFormatted);
+            if (!isNaN(d.getTime())) {
+              minMs = d.getTime();
+              maxMs = isoFormatted.includes('T') ? minMs : minMs + 86399999;
+            } else {
+              // Slash fallback DD/MM/YYYY
+              const parts = mathStr.split('/');
+              if (parts.length === 3) {
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                const year = parseInt(parts[2], 10);
+                const d2 = new Date(Date.UTC(year, month, day));
+                if (!isNaN(d2.getTime())) {
+                  minMs = d2.getTime();
+                  maxMs = minMs + 86399999;
                 }
               }
-            } catch(err) {}
+            }
           }
 
-
-          if (parsed && typeof parsed === "object") {
-            let minMs = 0;
-            let maxMs = 0;
-            try {
-              if (typeof parsed.min === 'number') minMs = parsed.min;
-              else if (parsed.min && typeof parsed.min.valueOf === 'function') minMs = Number(parsed.min.valueOf());
-
-              if (typeof parsed.max === 'number') maxMs = parsed.max;
-              else if (parsed.max && typeof parsed.max.valueOf === 'function') maxMs = Number(parsed.max.valueOf());
-            } catch(e) {}
-
+          if (!isNaN(minMs)) {
             return {
-              type: parsed.type || "Date",
-              values: parsed.values,
+              type: 'Date',
               min: minMs,
-              max: maxMs,
-              approximate: isApprox || !!parsed.approximate,
-              uncertain: isUncertain || !!parsed.uncertain,
+              max: isNaN(maxMs) ? minMs : maxMs,
+              approximate: isApprox || isUncertain,
+              uncertain: isUncertain,
               raw: str
             };
           }
