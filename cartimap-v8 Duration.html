@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b417</title>
+    <title>CarTiMap v8.17.0-b418</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b417';
+const APP_VERSION = 'v8.17.0-b418';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
             // Robust Base64 Favicon Injection for All Browsers
@@ -754,10 +754,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
         <div style="flex-shrink: 0; position: sticky; top: 0; background: var(--paneBg, #ffffff); z-index: 10; padding-top: ${isScrolled ? '0.6rem' : '1.2rem'}; padding-bottom: ${isScrolled ? '0.4rem' : '0.5rem'}; border-bottom: 1px solid rgba(128,128,128,0.2); box-shadow: ${isScrolled ? '0 4px 12px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.04)'}; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 100%; padding-left: 1.5rem; padding-right: 55px; box-sizing: border-box;">
           <div style="max-width: 85ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column;">
             <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
-              ${isDateValid ? html`<div class="metadata-date" style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? html`<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.9); flex-shrink: 0;" title="Approximate / Uncertain Date (~)"></span>` : ''}<span>${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</span>${(slide.startDate && slide.startDate.isEDTF) || (slide.endDate && slide.endDate.isEDTF) 
-                ? html`<sup style="font-size: 0.65rem; font-weight: 700; color: #007acc; margin-left: 2px; text-transform: uppercase;" title="Date Origin: Native ISO 8601-2 EDTF Standard">ISO</sup>`
-                : html`<span style="display: inline-flex; align-items: center; font-family: monospace; font-size: 0.68rem; font-weight: 600; color: #64748b; background: rgba(100, 116, 139, 0.08); border: 1px solid rgba(100, 116, 139, 0.2); padding: 1px 5px; border-radius: 3px; letter-spacing: 0.5px; opacity: 0.85; margin-left: 4px;" title="Date Origin: Legacy Numeric/Slash Timestamp Field">Legacy</span>`
-              }${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? html`<span style="display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #b45309; border: 1.5px solid #f59e0b; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-family: monospace; font-size: 0.70rem; box-shadow: 0 1px 3px rgba(245, 158, 11, 0.25); margin-left: 4px;" title="Temporal Uncertainty / Approximate Date (~)">⚡ Approx</span>` : ''}</div>` : ''}
+              ${isDateValid ? html`<div class="metadata-date" style="display: inline-flex; align-items: baseline; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 2px;"><span>${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</span>${((slide.startDate && slide.startDate.isEDTF) || (slide.endDate && slide.endDate.isEDTF)) ? html`<sup style="font-size: 0.65rem; font-weight: 700; color: ${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? '#f59e0b' : '#007acc'}; vertical-align: super; line-height: 0; margin-left: 1px; text-transform: uppercase;" title="ISO 8601-2 EDTF Standard">ISO</sup>` : ''}</div>` : ''}
               <div class="metadata-pills-wrapper">
                 ${hasLocation ? html`<span class="place-pill"><span style="margin-right: 4px;">📍</span> ${formatPlaces(slide.place)}</span>` : ''}
                 ${tags.map(tag => html`<span class="tag-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span>${tag}</span></span>`)}
@@ -1311,29 +1308,17 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       } else {
         spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
       }
-      if (isActive) {
-        const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
-        const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
-        const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        const activeBg = (isApproxStart || isApproxEnd) ? 'repeating-linear-gradient(-45deg, #f59e0b 0, #f59e0b 8px, #007acc 8px, #007acc 16px)' : 'rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30)';
-        xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; min-width: 4px; height: 10px; background: ${activeBg}; border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
-            ${isApproxStart ? html`<div style="position: absolute; left: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
-            ${isApproxEnd ? html`<div style="position: absolute; right: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
-          </div>
-        `;
-      } else {
-        const ribbonBg = isActive ? 'rgba(0, 122, 204, 0.28)' : 'rgba(0, 122, 204, 0.12)';
-        const ribbonBorder = isActive ? '1px solid #007acc' : '1px solid rgba(0, 122, 204, 0.35)';
-        const approxWidthPx = Math.max(6, Math.min(24, (laneHeight || 20) * 0.75));
+      const isApproxRibbon = isApproxStart || isApproxEnd;
+      const ribbonColor = isApproxRibbon ? '#f59e0b' : '#007acc';
+      const ribbonBg = isApproxRibbon ? 'rgba(245, 158, 11, 0.18)' : 'rgba(0, 122, 204, 0.15)';
+      const ribbonBorder = isActive ? `2px solid ${ribbonColor}` : `1.5px solid ${ribbonColor}`;
 
-        xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 10px; z-index: 900; pointer-events: auto; cursor: pointer; background: ${ribbonBg}; border: ${ribbonBorder}; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; overflow: hidden;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); handleNodeClick(index); }}>
-            ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${approxWidthPx}px; background: #f59e0b; opacity: 0.85; border-right: 1px solid #b45309;" title="Approximate Start Date (~)"></div>` : ''}
-            ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: ${approxWidthPx}px; background: #f59e0b; opacity: 0.85; border-left: 1px solid #b45309;" title="Approximate End Date (~)"></div>` : ''}
-          </div>
-        `;
-      }}
+      xAxisMarker = html`
+        <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 8px; background: ${ribbonBg}; border-top: ${ribbonBorder}; border-bottom: ${ribbonBorder}; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); handleNodeClick(index); }}>
+          ${isApproxStart ? html`<div style="position: absolute; left: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate Start Date (~)"></div>` : ''}
+          ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate End Date (~)"></div>` : ''}
+        </div>
+      `;}
 
     let dropLine = '';
     const dropColor = isActive ? colActive : (isApproxStart ? colApprox : colInactive);
@@ -1450,8 +1435,8 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.50-b359';
 
 
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.17.0-b417 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.17.0-b417 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.17.0-b418 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.17.0-b418 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           useEffect(() => {
             const handleMapEsc = (e) => {
@@ -2430,8 +2415,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.6.48-b355';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.17.0-b417 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.17.0-b417 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.17.0-b418 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.17.0-b418 ] ===
 const App = () => {
           
           const getParsedTags = (rawTags) => {
@@ -4223,8 +4208,8 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.17.0-b417 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.17.0-b417 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.17.0-b418 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.17.0-b418 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
