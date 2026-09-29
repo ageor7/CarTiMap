@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b423</title>
+    <title>CarTiMap v8.17.0-b424</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b423';
+const APP_VERSION = 'v8.17.0-b424';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
             // Robust Base64 Favicon Injection for All Browsers
@@ -753,28 +753,19 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
 
         <div style="flex-shrink: 0; position: sticky; top: 0; background: var(--paneBg, #ffffff); z-index: 10; padding-top: ${isScrolled ? '0.6rem' : '1.2rem'}; padding-bottom: ${isScrolled ? '0.4rem' : '0.5rem'}; border-bottom: 1px solid rgba(128,128,128,0.2); box-shadow: ${isScrolled ? '0 4px 12px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.04)'}; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 100%; padding-left: 1.5rem; padding-right: 55px; box-sizing: border-box;">
           <div style="max-width: 85ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column;">
-            <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px;">
+            <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box; display: flex; align-items: baseline; gap: 8px 12px; flex-wrap: wrap;">
               ${isDateValid ? html`
                 <div class="metadata-date" style="display: inline-flex; align-items: baseline; gap: 0px; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.78rem' : '0.92rem'}; transition: font-size 0.2s ease; flex: 0 1 auto; flex-wrap: wrap; word-break: break-word;">
                   <span>${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</span>${((slide.startDate && slide.startDate.isEDTF) || (slide.endDate && slide.endDate.isEDTF)) ? html`<sup style="font-size: 0.6em; font-weight: 700; color: ${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? '#f59e0b' : '#007acc'}; font-family: monospace; vertical-align: super; line-height: 0; position: relative; top: -0.45em;" title="ISO 8601-2 EDTF Standard">ISO</sup>` : ''}
                 </div>
               ` : ''}
-              
-              <!-- Tags & Extract Type Pills Wrapper -->
-              <div class="metadata-pills-wrapper" style="display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end; align-items: center;">
-                ${slide.extractType ? html`
-                  <span class="place-pill" style="background: rgba(0, 122, 204, 0.08); color: #007acc; font-weight: 700; border: 1px solid rgba(0, 122, 204, 0.25);">
-                    ${safeStripHTML(slide.extractType)}
-                  </span>
-                ` : ''}
-                ${(slide.tags || []).map(t => html`
-                  <span class="tag-pill" style="cursor: pointer;" onClick=${(e) => { e.stopPropagation(); if (typeof onToggleTag === 'function') onToggleTag(t); }}>
-                    #${safeStripHTML(t)}
-                  </span>
-                `)}
+              <div class="metadata-pills-wrapper" style="display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end; flex: 1 1 auto;">
+                ${slide.extractType ? html`<span class="place-pill" style="font-weight: 400; font-size: 0.75rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px;">${slide.extractType}</span>` : ''}
+                ${(slide.place || slide.location) ? html`<span class="place-pill" style="font-weight: 500; font-size: 0.75rem; background: #f1f5f9; color: #334155; padding: 2px 8px; border-radius: 12px; border: 1px solid #cbd5e1;">${safeStripHTML(formatPlaces(slide.place || slide.location))}</span>` : ''}
+                ${(slide.tags || []).map(t => html`<span class="tag-pill" style="font-weight: 500; font-size: 0.75rem; background: #f8fafc; color: #475569; padding: 2px 8px; border-radius: 12px; border: 1px solid #e2e8f0;">${safeStripHTML(String(t).replace(/^#/, ''))}</span>`)}
               </div>
             </div>
-            <div class="title-header-container" style="width: 100%; padding: 0; box-sizing: border-box;">
+            <div class="title-header-container"  style="width: 100%; padding: 0; box-sizing: border-box;">
               <h2 style="margin: 0; font-size: ${isScrolled ? '1.1rem' : '1.4rem'}; line-height: 1.2; transition: font-size 0.3s ease; color: #222;">
               ${slide.webPage && (slide.webPage.startsWith('http://') || slide.webPage.startsWith('https://'))
                 ? html`<a href=${slide.webPage} target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; text-decoration-color: rgba(0, 122, 204, 0.4); text-underline-offset: 4px; pointer-events: auto;" dangerouslySetInnerHTML=${{"__html": slide.title}}></a>`
@@ -799,9 +790,7 @@ MODULE_VERSIONS['ContentSlider'] = 'v5.9.48-b355';
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.10 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
 const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane, setDurationInspectionPayload }) => {
-  window.safeStripHTML = (str) => { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); };
-const safeStripHTML = window.safeStripHTML;
-const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? s.text : (s && s.date ? s.date.toLocaleDateString(loc || 'en-GB') : 'Undated')));
+  const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? s.text : (s && s.date ? s.date.toLocaleDateString(loc || 'en-GB') : 'Undated')));
   const wrapperRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const dragRef = useRef({ isDragging: false, startX: 0, scrollLeft: 0, hasDragged: false });
@@ -826,7 +815,7 @@ const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? 
     if (wrapperRef.current) ro.observe(wrapperRef.current);
   }, []);
 
-  
+  const safeStripHTML = window.safeStripHTML;
 
   const formatLabelSmart = (titleStr, maxPx = 180, hasMedia = false) => {
     if (!titleStr) return { lines: ['Untitled'], pxWidth: 50 };
@@ -998,33 +987,34 @@ const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? 
   }, [activeIndex]);
 
   useEffect(() => {
-    if (activeIndex !== prevActiveIndexRef.current) {
+    if (validData.length > 1 && wrapperRef.current && !dragRef.current.isDragging && activeIndex !== prevActiveIndexRef.current) {
       prevActiveIndexRef.current = activeIndex;
-      if (zoomLock === 'hard') {
-        scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
-        setZoomLevel(z => z);
-        return;
-      }
+      if (zoomLock === 'hard') return;
       const timeoutId = setTimeout(() => {
-        const activeSlide = data[activeIndex];
-        const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
+        const activeSlide = data[activeIndex]; const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
         if (activeDataIndex >= 0) {
-          let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
-          let clusterMax = validData.at(activeDataIndex).endDate && !isNaN(validData.at(activeDataIndex).endDate.max) ? validData.at(activeDataIndex).endDate.max : validData.at(activeDataIndex).startDate.min;
-          for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
-            const node = validData.at(i);
-            clusterMax = Math.max(clusterMax, node.startDate.min);
-            clusterMin = Math.min(clusterMin, node.startDate.min);
+          if (zoomLock === 'auto') {
+            let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
+            let clusterMax = validData.at(activeDataIndex).endDate && !isNaN(validData.at(activeDataIndex).endDate.max) ? validData.at(activeDataIndex).endDate.max : validData.at(activeDataIndex).startDate.min;
+            for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
+              const node = validData.at(i);
+              clusterMax = Math.max(clusterMax, node.startDate.min);
+              clusterMin = Math.min(clusterMin, node.startDate.min);
+            }
+            const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
+            const clampedZoom = Math.min(Math.max(1, idealZoom), 2000);
+            scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
+            setZoomLevel(clampedZoom);
+          } else {
+            if (zoomLock === 'soft') setZoomLock('auto');
+            scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
+            setZoomLevel(z => z + 0.000001);
           }
-          const idealZoom = (0.6 * renderTimeRange) / Math.max(clusterMax - clusterMin, 1800000);
-          const clampedZoom = Math.min(Math.max(1, idealZoom), 2000);
-          scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
-          setZoomLevel(clampedZoom);
         }
-      }, 150);
+      }, 500);
       return () => clearTimeout(timeoutId);
     }
-  }, [activeIndex, data, zoomLock, setZoomLock]);;
+  }, [activeIndex, data, zoomLock, setZoomLock]);
 
   useLayoutEffect(() => {
     if (scrollTargetPayloadRef.current !== null && wrapperRef.current) {
@@ -1281,57 +1271,78 @@ const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? 
     const isApproxEnd = checkIsApprox(item.endDate);
 
     let xAxisMarker = '';
-    if (item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List') && !hasDuration) {
+    if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
       const obj = item.startDate.obj;
-      const subHexagons = (obj.values || []).map(v => {
-        const vMinMs = v.min || itemStartMs;
-        const vPct = Number((((vMinMs - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-        const hexColor = isActive ? colActive : (isApproxStart ? colApprox : colInactive);
-        return html`
-          <div style="position: absolute; bottom: 0; left: ${vPct}%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 920;" title="Discrete Set Timestamp: ${formatSmartDate(v, null, dateLocale)}">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="${hexColor}" stroke="#ffffff" stroke-width="2">
-              <polygon points="12 2, 22 8.5, 22 15.5, 12 22, 2 15.5, 2 8.5" />
-            </svg>
-          </div>
-        `;
-      });
-      xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; right: 0; height: 12px; pointer-events: auto; z-index: 920;">${subHexagons}</div>`;
+      if (obj.type === 'Set') {
+        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 10px; background: rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.1); border: 1px dashed ${colApprox}; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
+      } else if (obj.type === 'List') {
+        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        const subDots = (obj.values || []).map(v => {
+          const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
+          return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: ${colInactive}; transform: translateX(-2px);"></div>`;
+        });
+        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 1px; background: rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.4); z-index: 900;">${subDots}</div>`;
+      }
     }
 
     if (!xAxisMarker && hasDuration) {
-      const isApproxStart = checkIsApprox(item.startDate);
-      const isApproxEnd = checkIsApprox(item.endDate);
-      const ribbonColor = (isApproxStart || isApproxEnd) ? '#f59e0b' : '#007acc';
-      const ribbonBg = (isApproxStart || isApproxEnd) 
-        ? 'rgba(245, 158, 11, 0.18)' 
-        : 'rgba(0, 122, 204, 0.15)';
-      
-      const spanMarkerTooltip = `${window.safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      const overlappingEvents = validData.filter(other => {
+        const oStart = other.startDate ? other.startDate.min : renderMinTime;
+        const oEnd = (other.endDate && !isNaN(other.endDate.max)) ? other.endDate.max : ((other.startDate && !isNaN(other.startDate.max) && other.startDate.max > oStart) ? other.startDate.max : oStart);
+        return (oStart <= endVal && oEnd >= itemStartMs);
+      });
 
-      xAxisMarker = html`
-        <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 8px; background: ${ribbonBg}; border-top: 1.5px solid ${ribbonColor}; border-bottom: 1.5px solid ${ribbonColor}; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); handleNodeClick(index); }}>
-          ${isApproxStart ? html`<div style="position: absolute; left: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate Start Date (~)"></div>` : ''}
-          ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate End Date (~)"></div>` : ''}
-        </div>
-      `;
-    }
+      let spanMarkerTooltip = '';
+      if (overlappingEvents.length > 1) {
+        const eventList = overlappingEvents.map((ev, i) => {
+          const oStart = ev.startDate ? ev.startDate.min : renderMinTime;
+          const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
+          let durText = '';
+          if (oEnd > oStart) {
+            const dMs = oEnd - oStart;
+            const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
+            if (dDays >= 365) durText = ` (${(dDays / 365.25).toFixed(1)} yrs)`;
+            else if (dDays >= 30) durText = ` (${Math.round(dDays / 30.43)} mos)`;
+            else if (dDays >= 1) durText = ` (${dDays} days)`;
+            else durText = ` (${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs)`;
+          }
+          const isCurrent = ev.id === item.id;
+          return `${i + 1}. ${isCurrent ? '▶ ' : ''}${safeStripHTML(ev.title)}${durText}`;
+        }).join('\n');
+
+        spanMarkerTooltip = `🔍 Concurrent Active Events (${overlappingEvents.length}) in Duration Span:\n${eventList}\n\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      } else {
+        spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      }
+      const ribbonColor = (isApproxStart || isApproxEnd) ? '#f59e0b' : '#007acc';
+        const ribbonBg = (isApproxStart || isApproxEnd) 
+          ? 'rgba(245, 158, 11, 0.18)' 
+          : 'rgba(0, 122, 204, 0.15)';
+        
+        xAxisMarker = html`
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 8px; background: ${ribbonBg}; border-top: 1.5px solid ${ribbonColor}; border-bottom: 1.5px solid ${ribbonColor}; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setActiveIndex(index); }}>
+            ${isApproxStart ? html`<div style="position: absolute; left: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate Start Date (~)"></div>` : ''}
+            ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate End Date (~)"></div>` : ''}
+          </div>
+        `;
+      }
 
     let dropLine = '';
-    const dropColor = isActive ? colActive : (isApproxStart ? colApprox : colInactive);
-    if (xOffset > 0) {
-      dropLine = html`
-        <svg style="position: absolute; left: -${xOffset}px; top: ${blockHeight / 2}px; bottom: 0; width: ${xOffset + 2}px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
-          <line x1="${xOffset}" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
-        </svg>
-      `;
-    } else if (isActive || !hasDuration) {
-      dropLine = html`
-        <svg style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
-          <line x1="0" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
-        </svg>
-      `;
-    }
-
+      const dropColor = isActive ? colActive : (isApproxStart ? colApprox : colInactive);
+      if (xOffset > 0) {
+        dropLine = html`
+          <svg style="position: absolute; left: -${xOffset}px; top: ${blockHeight / 2}px; bottom: 0; width: ${xOffset + 2}px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
+            <line x1="${xOffset}" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
+          </svg>
+        `;
+      } else if (isActive || !hasDuration) {
+        dropLine = html`
+          <svg style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
+            <line x1="0" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
+          </svg>
+        `;
+      }
     const fullNodeTooltip = `${safeStripHTML(item.title)}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick node to focus slide`;
 
     return html`
@@ -1432,8 +1443,8 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.50-b359';
 
 
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.17.0-b423 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.17.0-b423 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.17.0-b424 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.17.0-b424 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           useEffect(() => {
             const handleMapEsc = (e) => {
@@ -1605,7 +1616,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             return subs.length > 0 ? subs : [str];
           };
 
-          
+          const safeStripHTML = window.safeStripHTML;
 
           const formatPlaces = (placeStr) => {
             if (!placeStr) return '';
@@ -2409,8 +2420,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.6.48-b355';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.17.0-b423 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.17.0-b423 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.17.0-b424 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.17.0-b424 ] ===
 const App = () => {
           
           const getParsedTags = (rawTags) => {
@@ -2419,7 +2430,7 @@ const App = () => {
             return String(rawTags).split(/(?:\||·|;|·|\n|\-|,)/).map(s => s.trim()).filter(Boolean);
           };
 
-          
+          function safeStripHTML(str) { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); }
 
   // APP_VERSION bound to top-level HTML header per Directive I.3.c
           // =========================================================================
@@ -2556,40 +2567,32 @@ const App = () => {
           const isFilterInitializedRef = useRef(false);
           const [activeTags, setActiveTags] = useState(() => {
             try {
-              const saved = localStorage.getItem('cartimap_active_tags');
+              const saved = localStorage.getItem('tm_active_tags');
               return saved ? JSON.parse(saved) : null;
             } catch(e) { return null; }
           });
           const [activeExtractTypes, setActiveExtractTypes] = useState(() => {
             try {
-              const saved = localStorage.getItem('cartimap_active_extract_types');
-              return saved ? JSON.parse(saved) : null;
-            } catch(e) { return null; }
-          });
-          const [activePlaces, setActivePlaces] = useState(() => {
-            try {
-              const saved = localStorage.getItem('cartimap_active_places');
+              const saved = localStorage.getItem('tm_active_extract_types');
               return saved ? JSON.parse(saved) : null;
             } catch(e) { return null; }
           });
 
           useEffect(() => {
-            if (isFilterInitializedRef.current && activeTags) {
-              try { localStorage.setItem('cartimap_active_tags', JSON.stringify(activeTags)); } catch(e) {}
+            if (isFilterInitializedRef.current && activeTags.length > 0) {
+              try {
+                localStorage.setItem('tm_active_tags', JSON.stringify(activeTags));
+              } catch(e) {}
             }
           }, [activeTags]);
 
           useEffect(() => {
-            if (isFilterInitializedRef.current && activeExtractTypes) {
-              try { localStorage.setItem('cartimap_active_extract_types', JSON.stringify(activeExtractTypes)); } catch(e) {}
+            if (isFilterInitializedRef.current && activeExtractTypes.length > 0) {
+              try {
+                localStorage.setItem('tm_active_extract_types', JSON.stringify(activeExtractTypes));
+              } catch(e) {}
             }
           }, [activeExtractTypes]);
-
-          useEffect(() => {
-            if (isFilterInitializedRef.current && activePlaces) {
-              try { localStorage.setItem('cartimap_active_places', JSON.stringify(activePlaces)); } catch(e) {}
-            }
-          }, [activePlaces]);
 
 
           const [minimapOffset, setMinimapOffset] = useState(-4);
@@ -2617,7 +2620,8 @@ const App = () => {
             const timeStr = new Date().toTimeString().split(' ').at(0);
             setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
           };
-          window.vibeLog = (msg, type = 'info') => {
+          window.safeStripHTML = (str) => { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); };
+window.vibeLog = (msg, type = 'info') => {
             addLog(msg, type);
           };
 
@@ -2626,9 +2630,7 @@ const App = () => {
             return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim();
           };
 
-          window.safeStripHTML = (str) => { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); };
-const safeStripHTML = window.safeStripHTML;
-const formatSmartDate = (startInput, endInput, locale) => {
+          const formatSmartDate = (startInput, endInput, locale) => {
             if (!startInput && !endInput) return 'Undated';
 
             const checkApprox = (val) => {
@@ -2755,7 +2757,7 @@ const formatSmartDate = (startInput, endInput, locale) => {
               const omniSplitRegex = /\||\r?\n/;
               const rows = results.data;
 
-                            const parseChronoNode = (legacyStr, edtfStr, index, rowTitle, fieldName = 'Start', baseNode = null) => {
+                            const parseChronoNode = (legacyStr, edtfStr, index, rowTitle, fieldName = 'Start') => {
                 const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
                 const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
                 const targetStr = cleanEdtf || cleanLegacy;
@@ -2763,26 +2765,15 @@ const formatSmartDate = (startInput, endInput, locale) => {
                 if (targetStr) {
                   try {
                     const parsed = compileCartiMapAST(targetStr);
-                    if (parsed) {
+                    if (parsed && typeof parsed.min === 'number' && !isNaN(parsed.min)) {
                       const isApproxFlag = !!(parsed.approximate || parsed.uncertain || parsed.unspecified || targetStr.includes('~') || targetStr.includes('?') || targetStr.includes('%') || targetStr.toLowerCase().includes('x') || targetStr.toLowerCase().startsWith('c.') || targetStr.toLowerCase().startsWith('ca.') || targetStr.toLowerCase().includes('approx'));
                       const isEdtfFlag = !!cleanEdtf || !!(parsed && (parsed.isEDTF || parsed.approximate || parsed.uncertain || targetStr.includes('~') || targetStr.includes('?') || targetStr.includes('%') || targetStr.includes('X') || targetStr.includes('x') || targetStr.toLowerCase().startsWith('c.')));
-
-                      let minVal = typeof parsed.min === 'number' ? parsed.min : 0;
-                      let maxVal = (typeof parsed.max === 'number' && !isNaN(parsed.max) && parsed.max !== 0) ? parsed.max : minVal;
-
-                      if (parsed.isDuration) {
-                        const dur = parsed.durationMs || 0;
-                        const baseMs = (baseNode && typeof baseNode.min === 'number') ? baseNode.min : 0;
-                        minVal = baseMs;
-                        maxVal = baseMs + dur;
-                      }
-
+                      let maxVal = (typeof parsed.max === 'number' && !isNaN(parsed.max) && parsed.max !== 0) ? parsed.max : parsed.min;
                       return {
                         isEDTF: isEdtfFlag,
                         isApprox: isApproxFlag,
-                        isDuration: !!parsed.isDuration,
                         type: isApproxFlag ? 'Approximate' : 'Exact',
-                        min: minVal,
+                        min: parsed.min,
                         max: maxVal,
                         obj: parsed,
                         isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
@@ -2834,26 +2825,8 @@ const formatSmartDate = (startInput, endInput, locale) => {
                 const rawEndLegacy = exactGet(norm, 'end');
                 const rawEndEdtf = exactGet(norm, 'end edtf');
 
-                let startNode = null;
-                let endNode = null;
-
-                if (rawStartEdtf) {
-                  startNode = parseChronoNode('', rawStartEdtf, index, rowTitle, 'Start');
-                  if (rawEndEdtf) {
-                    endNode = parseChronoNode('', rawEndEdtf, index, rowTitle, 'End', startNode);
-                  } else {
-                    endNode = startNode;
-                  }
-                } else {
-                  startNode = parseChronoNode(rawStartLegacy, '', index, rowTitle, 'Start');
-                  if (rawEndEdtf) {
-                    endNode = parseChronoNode('', rawEndEdtf, index, rowTitle, 'End', startNode);
-                  } else if (rawEndLegacy) {
-                    endNode = parseChronoNode(rawEndLegacy, '', index, rowTitle, 'End', startNode);
-                  } else {
-                    endNode = startNode;
-                  }
-                }
+                const startNode = parseChronoNode(rawStartLegacy, rawStartEdtf, index, rowTitle, 'Start');
+                const endNode = parseChronoNode(rawEndLegacy, rawEndEdtf, index, rowTitle, 'End');
 
                 if (rawStartEdtf) {
                   startEdtfTotal++;
@@ -2895,7 +2868,7 @@ const formatSmartDate = (startInput, endInput, locale) => {
               }));
               setUnfilteredData(indexedData);
               const discoveredTypes = Array.from(new Set(indexedData.map(d => d.extractType).filter(Boolean)));
-              if (!activeExtractTypes || !Array.isArray(activeExtractTypes) || activeExtractTypes.length === 0) {
+              if (activeExtractTypes.length === 0) {
                 setActiveExtractTypes(discoveredTypes);
               }
 
@@ -2912,29 +2885,7 @@ const formatSmartDate = (startInput, endInput, locale) => {
 
               const uniqueTagsList = Array.from(tagsMap).sort();
               setAllTags(uniqueTagsList);
-              isFilterInitializedRef.current = true;
-
-              const savedTagsStr = localStorage.getItem('cartimap_active_tags');
-              if (savedTagsStr) {
-                try {
-                  const savedTagsArr = JSON.parse(savedTagsStr);
-                  if (Array.isArray(savedTagsArr) && savedTagsArr.length > 0) {
-                    const validSavedTags = savedTagsArr.filter(t => uniqueTagsList.includes(t));
-                    setActiveTags(validSavedTags.length > 0 ? validSavedTags : uniqueTagsList);
-                  } else { setActiveTags(uniqueTagsList); }
-                } catch(e) { setActiveTags(uniqueTagsList); }
-              } else { setActiveTags(uniqueTagsList); }
-
-              const savedTypesStr = localStorage.getItem('cartimap_active_extract_types');
-              if (savedTypesStr) {
-                try {
-                  const savedTypesArr = JSON.parse(savedTypesStr);
-                  if (Array.isArray(savedTypesArr) && savedTypesArr.length > 0) {
-                    const validSavedTypes = savedTypesArr.filter(t => discoveredTypes.includes(t));
-                    setActiveExtractTypes(validSavedTypes.length > 0 ? validSavedTypes : discoveredTypes);
-                  } else { setActiveExtractTypes(discoveredTypes); }
-                } catch(e) { setActiveExtractTypes(discoveredTypes); }
-              } else { setActiveExtractTypes(discoveredTypes); }
+              setActiveTags(uniqueTagsList);
 
               const parseLayersTRows = (rows) => {
                 return rows.map(row => {
@@ -3950,32 +3901,42 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
                         return groups.map(g => {
                           return html`
-                            <div style="margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                              <!-- Group Title Header -->
-                              <div style="background: #f8fafc; padding: 8px 14px; font-weight: 800; font-size: 0.9rem; color: #0f172a; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+                            <div style="margin-bottom: 14px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff;">
+                              <!-- Heading showing ONLY the normalized Group Title (no subtitle) -->
+                              <div style="background: #f1f3f5; padding: 10px 14px; font-weight: 800; font-size: 0.95rem; color: #111; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between;">
                                 <span>${g.title}</span>
-                                <span style="font-size: 0.72rem; color: #007acc; background: #e0f2fe; border: 1px solid #bae6fd; padding: 1px 8px; border-radius: 10px; font-weight: 700;">${g.items.length} ${g.items.length === 1 ? 'item' : 'items'}</span>
+                                <span style="font-size: 0.75rem; color: #007acc; background: #e6f4ff; border: 1px solid #bae0ff; padding: 2px 8px; border-radius: 10px;">${g.items.length} ${g.items.length === 1 ? 'item' : 'items'}</span>
                               </div>
                               <div style="display: flex; flex-direction: column;">
                                 ${g.items.map(child => {
                                   const isActive = child.idx === activeIndex;
-                                  const itemDateStr = (child.item.startDate || child.item.start) ? formatSmartDate(child.item.startDate, child.item.endDate, dateLocale) : '';
-                                  const itemPlaceStr = (child.item.place || child.item.location) ? safeStripHTML(formatPlaces(child.item.place || child.item.location)) : '';
                                   return html`
-                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 8px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; background: ${isActive ? '#f0f9ff' : '#ffffff'}; border-left: ${isActive ? '4px solid #007acc' : '4px solid transparent'}; transition: background 0.15s; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; width: 100%; box-sizing: border-box;">
-                                      
-                                      <!-- Title & Item Index (Takes maximum fluid width to minimize occupied vertical lines) -->
-                                      <div style="flex: 1 1 60%; font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#1e293b'}; display: flex; align-items: baseline; gap: 6px; word-break: break-word;">
-                                        <span style="color: #94a3b8; font-family: monospace; font-size: 0.8rem; flex-shrink: 0;">#${child.idx + 1}</span>
+                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
+<!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
+                                      <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
+                                        <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
                                         <span>${child.sub || child.mainTitle || g.title}</span>
                                       </div>
 
-                                      <!-- Dates, Places & Metadata (Compact right-aligned flex column/row that wraps tightly) -->
-                                      <div style="flex: 0 1 40%; text-align: right; display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; flex-wrap: wrap; font-size: 0.78rem; color: #475569; font-weight: 500;">
-                                        ${itemDateStr ? html`<span style="color: #007acc; font-weight: 600; white-space: nowrap;">📅 ${itemDateStr}</span>` : ''}
-                                        ${itemPlaceStr ? html`<span style="color: #64748b; white-space: nowrap;">📍 ${itemPlaceStr}</span>` : ''}
-                                        ${(child.tags && child.tags.length > 0) ? html`<span style="color: #94a3b8;">🏷️ ${child.tags.slice(0, 3).join(', ')}</span>` : ''}
-                                      </div>
+                                      <!-- Line 2: Metadata row displaying Dates, Places, and Tags -->
+                                      ${(() => {
+                                        const itemDateStr = (child.item.startDate || child.item.start) ? formatSmartDate(child.item.startDate, child.item.endDate, dateLocale) : '';
+                                        const itemPlaceStr = (child.item.place || child.item.location) ? safeStripHTML(formatPlaces(child.item.place || child.item.location)) : '';
+                                        if (!itemDateStr && !itemPlaceStr && (!child.tags || child.tags.length === 0)) return '';
+                                        return html`
+                                          <div style="display: flex; align-items: center; gap: 10px; margin-left: 28px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem;">
+                                            ${itemDateStr ? html`<span style="color: #007acc; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e5ff; font-weight: 500;">🕒 ${itemDateStr}</span>` : ''}
+                                            ${itemPlaceStr ? html`<span style="color: #28a745; background: #f2fcf5; padding: 2px 6px; border-radius: 4px; border: 1px solid #c3e6cb; font-weight: 500;">📍 ${itemPlaceStr}</span>` : ''}
+                                            ${child.tags && child.tags.length > 0 ? html`
+                                              <div style="display: flex; align-items: center; gap: 4px;">
+                                                <span style="color: #888;">🏷️</span>
+                                                ${child.tags.map(t => html`<span style="background: #f0f0f0; color: #444; padding: 1px 6px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.75rem;">${t}</span>`)}
+                                              </div>
+                                            ` : ''}
+                                          </div>
+                                        `;
+                                      })()}
+
                                     </div>
                                   `;
                                 })}
@@ -4144,12 +4105,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                              }}>
                           
                           <!-- Event Title & Metadata Header -->
-                          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 6px; width: 100%;">
-                            <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#1e293b'}; font-size: 0.9rem; display: flex; align-items: baseline; gap: 8px; flex-grow: 1; word-break: break-word;">
-                              <span style="color: #64748b; font-family: monospace; font-size: 0.82rem; flex-shrink: 0;">#${ev.id}</span>
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#1e293b'}; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                              <span style="color: #64748b; font-family: monospace; font-size: 0.82rem;">#${ev.id}</span>
                               <span>${safeStripHTML(ev.title)}</span>
                             </div>
-                            <div style="font-size: 0.78rem; color: #475569; font-weight: 600; text-align: right; flex-shrink: 0; white-space: nowrap;">
+                            <div style="font-size: 0.78rem; color: #475569; font-weight: 600;">
                               📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? `(⏳ ${durStr})` : ''}
                             </div>
                           </div>
@@ -4194,8 +4155,8 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.17.0-b423 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.17.0-b423 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.17.0-b424 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.17.0-b424 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
@@ -4205,17 +4166,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             .replace(/\s*,\s*/g, ',')
             .replace(/,,+/g, ',');
 
-          // 0. Unwrap Outer Complex Brackets if doubly wrapped ({[...]})
-          while ((clean.startsWith('{') && clean.endsWith('}')) || (clean.startsWith('[') && clean.endsWith(']'))) {
-            const inner = clean.slice(1, -1).trim();
-            if ((inner.startsWith('[') && inner.endsWith(']')) || (inner.startsWith('{') && inner.endsWith('}'))) {
-              clean = inner;
-            } else {
-              break;
-            }
-          }
-
-          // 1. Choice Sets [...] (Executes FIRST before element-level double-dash split)
+          // 1. Choice Sets [...]
           if (clean.startsWith('[') && clean.endsWith(']')) {
             const inner = clean.slice(1, -1);
             const parts = inner.split(',');
@@ -4232,7 +4183,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             };
           }
 
-          // 2. Inclusive Lists {} (Executes FIRST before element-level double-dash split)
+          // 2. Inclusive Lists {}
           if (clean.startsWith('{') && clean.endsWith('}')) {
             const inner = clean.slice(1, -1);
             const parts = inner.split(',');
@@ -4249,20 +4200,22 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             };
           }
 
-          // 3. Double-Dash Normalization on isolated elements (1944-12--~05 -> 1944-12/1944-12-~05)
-          if (clean.includes('--')) {
-            const parts = clean.split('--');
-            let p0 = parts[0].trim();
-            let p1 = parts[1].trim();
-            if (p0 && p1) {
-              if (!p1.includes('-') && /^~?\d{1,2}$/.test(p1.replace(/[~?%]/g, ''))) {
-                p1 = p0 + '-' + p1;
-              }
-              clean = p0 + '/' + p1;
-            }
+          // 3. Duration Range Expansion (..)
+          if (clean.includes('..')) {
+            const parts = clean.split('..');
+            const v1 = compileCartiMapAST(parts[0] || '');
+            const v2 = compileCartiMapAST(parts[1] || '');
+            if (!v1 || !v2) return null;
+            return {
+              type: 'Set',
+              values: [v1, v2],
+              min: Math.min(v1.min, v2.min),
+              max: Math.max(v1.max, v2.max),
+              approximate: v1.approximate || v2.approximate
+            };
           }
 
-          // 4. ISO Durations (PT45~M, PT2H, P3D) -> Relative Offsets
+          // 4. ISO Durations (PT45~M, PT2H)
           if (/^P/i.test(clean) || /^-P/i.test(clean)) {
             const isApprox = clean.includes('~') || clean.includes('?');
             const durClean = clean.replace(/[~?%]/g, '');
@@ -4274,18 +4227,17 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             if (hMatch) durMs += parseInt(hMatch[1], 10) * 3600 * 1000;
             if (dMatch) durMs += parseInt(dMatch[1], 10) * 86400 * 1000;
             if (durMs === 0) durMs = 3600 * 1000;
+            const nowMs = Date.now();
             return {
               type: 'Duration',
-              isDuration: true,
-              durationMs: durMs,
-              min: 0,
-              max: durMs,
+              min: nowMs,
+              max: nowMs + durMs,
               approximate: isApprox,
               raw: str
             };
           }
 
-          // 5. EDTF Intervals (1944-12/1944-12-~05)
+          // 5. EDTF Intervals (/)
           if (clean.includes('/') && !clean.startsWith('http')) {
             const parts = clean.split('/');
             const v1 = compileCartiMapAST(parts[0] || '');
@@ -4301,15 +4253,13 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             }
           }
 
-          // 6. Native EDTF & Month-Precision Evaluation
+          // 6. Native ISO & Masked Date Evaluation
           let cleanStr = clean.replace(/\s+/g, ' ');
           let isApproxSyntax = cleanStr.includes('~') || cleanStr.includes('?') || cleanStr.includes('%') || /^c\./i.test(cleanStr) || /^ca\./i.test(cleanStr) || /approx/i.test(cleanStr);
           cleanStr = cleanStr.replace(/^c\.\s*/i, '').replace(/^ca\.\s*/i, '').replace(/approx\s*/i, '').replace(/[~?%]/g, '');
 
-          // Normalize timezone offsets ONLY if string contains T or has full date/time
-          if (cleanStr.includes('T') || (cleanStr.match(/-/g) || []).length >= 2) {
-            cleanStr = cleanStr.replace(/([+-]\d{2})$/, '$1:00');
-          }
+          // Normalize timezone offsets: +02 -> +02:00
+          cleanStr = cleanStr.replace(/([+-]\d{2})$/, '$1:00');
 
           // Unspecified Digits (194X -> 1940-1949, 1944-XX -> 1944-01-01 to 1944-12-31)
           if (/\d{3}X/i.test(cleanStr)) {
@@ -4323,28 +4273,9 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             isApproxSyntax = true;
           }
 
-          // Month Precision (YYYY-MM -> 1st to Last Day of Month)
-          const ymMatch = cleanStr.match(/^(\d{4})-(\d{2})$/);
-          if (ymMatch) {
-            const yr = parseInt(ymMatch[1], 10);
-            const mo = parseInt(ymMatch[2], 10) - 1;
-            const dtMin = new Date(Date.UTC(yr, mo, 1, 0, 0, 0, 0)).getTime();
-            const lastDay = new Date(Date.UTC(yr, mo + 1, 0, 23, 59, 59, 999)).getUTCDate();
-            const dtMax = new Date(Date.UTC(yr, mo, lastDay, 23, 59, 59, 999)).getTime();
-            return { type: 'Date', min: dtMin, max: dtMax, approximate: isApproxSyntax, raw: str };
-          }
-
-          // Year Precision (YYYY -> Jan 1 to Dec 31)
-          const yMatch = cleanStr.match(/^(\d{4})$/);
-          if (yMatch) {
-            const yr = parseInt(yMatch[1], 10);
-            const dtMin = new Date(Date.UTC(yr, 0, 1, 0, 0, 0, 0)).getTime();
-            const dtMax = new Date(Date.UTC(yr, 11, 31, 23, 59, 59, 999)).getTime();
-            return { type: 'Date', min: dtMin, max: dtMax, approximate: isApproxSyntax, raw: str };
-          }
-
           let parsedMs = Date.parse(cleanStr);
           if (isNaN(parsedMs)) {
+            // ISO Fallback regex
             const isoMatch = cleanStr.match(/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?/);
             if (isoMatch) {
               const yr = parseInt(isoMatch[1], 10);
@@ -4353,22 +4284,30 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
               const hr = isoMatch[4] ? parseInt(isoMatch[4], 10) : 0;
               const mi = isoMatch[5] ? parseInt(isoMatch[5], 10) : 0;
               const sc = isoMatch[6] ? parseInt(isoMatch[6], 10) : 0;
-              const dt = new Date(Date.UTC(yr, mo, da, hr, mi, sc));
-              if (!isNaN(dt.getTime())) {
-                return {
-                  type: 'Date',
-                  min: dt.getTime(),
-                  max: dt.getTime() + 86399999,
-                  approximate: isApproxSyntax,
-                  raw: str
-                };
-              }
+              parsedMs = Date.UTC(yr, mo, da, hr, mi, sc);
             }
-          } else {
+          }
+
+          if (!isNaN(parsedMs)) {
+            // Span calculation based on granularity
+            let maxMs = parsedMs + 86399999;
+            if (/^\d{4}$/.test(cleanStr)) {
+              const yr = parseInt(cleanStr, 10);
+              parsedMs = Date.UTC(yr, 0, 1);
+              maxMs = Date.UTC(yr, 11, 31, 23, 59, 59, 999);
+            } else if (/^\d{4}-\d{2}$/.test(cleanStr)) {
+              const parts = cleanStr.split('-');
+              const yr = parseInt(parts[0], 10);
+              const mo = parseInt(parts[1], 10) - 1;
+              parsedMs = Date.UTC(yr, mo, 1);
+              const lastDay = new Date(Date.UTC(yr, mo + 1, 0)).getUTCDate();
+              maxMs = Date.UTC(yr, mo, lastDay, 23, 59, 59, 999);
+            }
+
             return {
               type: 'Date',
               min: parsedMs,
-              max: parsedMs + 86399999,
+              max: maxMs,
               approximate: isApproxSyntax,
               raw: str
             };
