@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b414</title>
+    <title>CarTiMap v8.17.0-b415</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b414';
+const APP_VERSION = 'v8.17.0-b415';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
             // Robust Base64 Favicon Injection for All Browsers
@@ -994,8 +994,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       const timeoutId = setTimeout(() => {
         const activeSlide = data[activeIndex]; const activeDataIndex = activeSlide ? validData.findIndex(d => d.id === activeSlide.id) : -1;
         if (activeDataIndex >= 0) {
-          if (zoomLock === 'auto') {
-            let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
+          let clusterMin = validData.at(Math.max(0, activeDataIndex - 2)).startDate.min;
             let clusterMax = validData.at(activeDataIndex).endDate && !isNaN(validData.at(activeDataIndex).endDate.max) ? validData.at(activeDataIndex).endDate.max : validData.at(activeDataIndex).startDate.min;
             for (let i = Math.max(0, activeDataIndex - 2); i <= Math.min(validData.length - 1, activeDataIndex + 2); i++) {
               const node = validData.at(i);
@@ -1006,11 +1005,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
             const clampedZoom = Math.min(Math.max(1, idealZoom), 2000);
             scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
             setZoomLevel(clampedZoom);
-          } else {
             if (zoomLock === 'soft') setZoomLock('auto');
-            scrollTargetPayloadRef.current = { type: 'node', value: activeIndex };
-            setZoomLevel(z => z + 0.000001);
-          }
         }
       }, 500);
       return () => clearTimeout(timeoutId);
@@ -1328,18 +1323,14 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           </div>
         `;
       } else {
-        const styleIdx = index % 4;
-        const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
-        const borderL = isApproxStart ? `3px solid ${colApprox}` : `1px solid ${colInactive}`;
-        const borderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
-        const hatchStyle = (isApproxStart || isApproxEnd)
-          ? `background: repeating-linear-gradient(-45deg, #f59e0b 0, #f59e0b 8px, #007acc 8px, #007acc 16px) !important;`
-          : `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.25), rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.25) 3px, transparent 3px, transparent 6px);`;
+        const ribbonBg = isActive ? 'rgba(0, 122, 204, 0.28)' : 'rgba(0, 122, 204, 0.12)';
+        const ribbonBorder = isActive ? '1px solid #007acc' : '1px solid rgba(0, 122, 204, 0.35)';
+        const approxWidthPx = Math.max(6, Math.min(24, (laneHeight || 20) * 0.75));
+
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 10px; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
-            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-top: none; border-bottom: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%);"></div>
-            ${isApproxStart ? html`<div style="position: absolute; left: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
-            ${isApproxEnd ? html`<div style="position: absolute; right: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 10px; z-index: 900; pointer-events: auto; cursor: pointer; background: ${ribbonBg}; border: ${ribbonBorder}; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; overflow: hidden;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); handleNodeClick(index); }}>
+            ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${approxWidthPx}px; background: #f59e0b; opacity: 0.85; border-right: 1px solid #b45309;" title="Approximate Start Date (~)"></div>` : ''}
+            ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: ${approxWidthPx}px; background: #f59e0b; opacity: 0.85; border-left: 1px solid #b45309;" title="Approximate End Date (~)"></div>` : ''}
           </div>
         `;
       }}
@@ -2586,32 +2577,40 @@ const App = () => {
           const isFilterInitializedRef = useRef(false);
           const [activeTags, setActiveTags] = useState(() => {
             try {
-              const saved = localStorage.getItem('tm_active_tags');
+              const saved = localStorage.getItem('cartimap_active_tags');
               return saved ? JSON.parse(saved) : null;
             } catch(e) { return null; }
           });
           const [activeExtractTypes, setActiveExtractTypes] = useState(() => {
             try {
-              const saved = localStorage.getItem('tm_active_extract_types');
+              const saved = localStorage.getItem('cartimap_active_extract_types');
+              return saved ? JSON.parse(saved) : null;
+            } catch(e) { return null; }
+          });
+          const [activePlaces, setActivePlaces] = useState(() => {
+            try {
+              const saved = localStorage.getItem('cartimap_active_places');
               return saved ? JSON.parse(saved) : null;
             } catch(e) { return null; }
           });
 
           useEffect(() => {
-            if (isFilterInitializedRef.current && activeTags.length > 0) {
-              try {
-                localStorage.setItem('tm_active_tags', JSON.stringify(activeTags));
-              } catch(e) {}
+            if (isFilterInitializedRef.current && activeTags) {
+              try { localStorage.setItem('cartimap_active_tags', JSON.stringify(activeTags)); } catch(e) {}
             }
           }, [activeTags]);
 
           useEffect(() => {
-            if (isFilterInitializedRef.current && activeExtractTypes.length > 0) {
-              try {
-                localStorage.setItem('tm_active_extract_types', JSON.stringify(activeExtractTypes));
-              } catch(e) {}
+            if (isFilterInitializedRef.current && activeExtractTypes) {
+              try { localStorage.setItem('cartimap_active_extract_types', JSON.stringify(activeExtractTypes)); } catch(e) {}
             }
           }, [activeExtractTypes]);
+
+          useEffect(() => {
+            if (isFilterInitializedRef.current && activePlaces) {
+              try { localStorage.setItem('cartimap_active_places', JSON.stringify(activePlaces)); } catch(e) {}
+            }
+          }, [activePlaces]);
 
 
           const [minimapOffset, setMinimapOffset] = useState(-4);
@@ -2932,7 +2931,29 @@ const App = () => {
 
               const uniqueTagsList = Array.from(tagsMap).sort();
               setAllTags(uniqueTagsList);
-              setActiveTags(uniqueTagsList);
+              isFilterInitializedRef.current = true;
+
+              const savedTagsStr = localStorage.getItem('cartimap_active_tags');
+              if (savedTagsStr) {
+                try {
+                  const savedTagsArr = JSON.parse(savedTagsStr);
+                  if (Array.isArray(savedTagsArr) && savedTagsArr.length > 0) {
+                    const validSavedTags = savedTagsArr.filter(t => uniqueTagsList.includes(t));
+                    setActiveTags(validSavedTags.length > 0 ? validSavedTags : uniqueTagsList);
+                  } else { setActiveTags(uniqueTagsList); }
+                } catch(e) { setActiveTags(uniqueTagsList); }
+              } else { setActiveTags(uniqueTagsList); }
+
+              const savedTypesStr = localStorage.getItem('cartimap_active_extract_types');
+              if (savedTypesStr) {
+                try {
+                  const savedTypesArr = JSON.parse(savedTypesStr);
+                  if (Array.isArray(savedTypesArr) && savedTypesArr.length > 0) {
+                    const validSavedTypes = savedTypesArr.filter(t => discoveredTypes.includes(t));
+                    setActiveExtractTypes(validSavedTypes.length > 0 ? validSavedTypes : discoveredTypes);
+                  } else { setActiveExtractTypes(discoveredTypes); }
+                } catch(e) { setActiveExtractTypes(discoveredTypes); }
+              } else { setActiveExtractTypes(discoveredTypes); }
 
               const parseLayersTRows = (rows) => {
                 return rows.map(row => {
