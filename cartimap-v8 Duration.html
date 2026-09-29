@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b416</title>
+    <title>CarTiMap v8.17.0-b417</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b416';
+const APP_VERSION = 'v8.17.0-b417';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
             // Robust Base64 Favicon Injection for All Browsers
@@ -755,7 +755,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
           <div style="max-width: 85ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column;">
             <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
               ${isDateValid ? html`<div class="metadata-date" style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? html`<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.9); flex-shrink: 0;" title="Approximate / Uncertain Date (~)"></span>` : ''}<span>${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</span>${(slide.startDate && slide.startDate.isEDTF) || (slide.endDate && slide.endDate.isEDTF) 
-                ? html`<span style="display: inline-flex; align-items: center; font-family: monospace; font-size: 0.68rem; font-weight: 700; color: #0284c7; background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.25); padding: 1px 5px; border-radius: 3px; letter-spacing: 0.5px; opacity: 0.9; margin-left: 4px;" title="Date Origin: Native ISO 8601-2 EDTF Field">EDTF</span>`
+                ? html`<sup style="font-size: 0.65rem; font-weight: 700; color: #007acc; margin-left: 2px; text-transform: uppercase;" title="Date Origin: Native ISO 8601-2 EDTF Standard">ISO</sup>`
                 : html`<span style="display: inline-flex; align-items: center; font-family: monospace; font-size: 0.68rem; font-weight: 600; color: #64748b; background: rgba(100, 116, 139, 0.08); border: 1px solid rgba(100, 116, 139, 0.2); padding: 1px 5px; border-radius: 3px; letter-spacing: 0.5px; opacity: 0.85; margin-left: 4px;" title="Date Origin: Legacy Numeric/Slash Timestamp Field">Legacy</span>`
               }${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? html`<span style="display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #b45309; border: 1.5px solid #f59e0b; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-family: monospace; font-size: 0.70rem; box-shadow: 0 1px 3px rgba(245, 158, 11, 0.25); margin-left: 4px;" title="Temporal Uncertainty / Approximate Date (~)">⚡ Approx</span>` : ''}</div>` : ''}
               <div class="metadata-pills-wrapper">
@@ -1450,8 +1450,8 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.50-b359';
 
 
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.17.0-b417 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.17.0-b417 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           useEffect(() => {
             const handleMapEsc = (e) => {
@@ -2430,8 +2430,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.6.48-b355';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b178 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b178 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.17.0-b417 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.17.0-b417 ] ===
 const App = () => {
           
           const getParsedTags = (rawTags) => {
@@ -4173,12 +4173,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                              }}>
                           
                           <!-- Event Title & Metadata Header -->
-                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#1e293b'}; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
-                              <span style="color: #64748b; font-family: monospace; font-size: 0.82rem;">#${ev.id}</span>
+                          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 6px; width: 100%;">
+                            <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#1e293b'}; font-size: 0.9rem; display: flex; align-items: baseline; gap: 8px; flex-grow: 1; word-break: break-word;">
+                              <span style="color: #64748b; font-family: monospace; font-size: 0.82rem; flex-shrink: 0;">#${ev.id}</span>
                               <span>${safeStripHTML(ev.title)}</span>
                             </div>
-                            <div style="font-size: 0.78rem; color: #475569; font-weight: 600;">
+                            <div style="font-size: 0.78rem; color: #475569; font-weight: 600; text-align: right; flex-shrink: 0; white-space: nowrap;">
                               📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? `(⏳ ${durStr})` : ''}
                             </div>
                           </div>
@@ -4223,8 +4223,8 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b178 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b178 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.17.0-b417 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.17.0-b417 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
