@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b442</title>
+    <title>CarTiMap v8.17.0-b446</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -223,7 +223,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b442';
+const APP_VERSION = 'v8.17.0-b446';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
             // Robust Base64 Favicon Injection for All Browsers
@@ -4217,58 +4217,39 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
           if (!str) return null;
           let rawStr = String(str).trim();
 
-          // Natural Language Duration ("25 years", "25 yrs", "6 months", "45 mins")
-          const natMatch = rawStr.match(/^(\d+)\s*(years?|yrs?|y|months?|mos?|weeks?|w|days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s)$/i);
-          if (natMatch) {
-            const val = parseInt(natMatch[1], 10);
-            const unit = natMatch[2].toLowerCase();
-            let durMs = 0;
-            if (/^y/i.test(unit)) durMs = val * 365.25 * 86400 * 1000;
-            else if (/^mo/i.test(unit)) durMs = val * 30.4375 * 86400 * 1000;
-            else if (/^w/i.test(unit)) durMs = val * 7 * 86400 * 1000;
-            else if (/^d/i.test(unit)) durMs = val * 86400 * 1000;
-            else if (/^h/i.test(unit)) durMs = val * 3600 * 1000;
-            else if (/^mi|^m$/i.test(unit)) durMs = val * 60 * 1000;
-            else if (/^s/i.test(unit)) durMs = val * 1000;
-
-            const startAnchorMs = (typeof baseStartMs === 'number' && !isNaN(baseStartMs)) ? baseStartMs : 0;
-            return {
-              type: 'Duration',
-              min: startAnchorMs,
-              max: startAnchorMs + durMs,
-              isEDTF: true,
-              approximate: false,
-              raw: str
-            };
-          }
-
-          // Combined Start Date + Duration Interval ("1944-12-22T~19:XX+02 – PT30~M", "1944-12-27T19:00+02 / P25Y", "1944-12-27T19:00+02 / 25 years")
-          const comboMatch = rawStr.match(/^(.+?)\s*(?:[\/–—]|\s-\s)\s*(P.*|\d+\s*(?:years?|yrs?|y|months?|mos?|days?|d|hours?|hrs?|h|mins?|m).*)$/i);
+          // 0. Combined Start Date + Duration Interval ("1944-12-22T~19:XX+02 – PT30~M" or "1944-12-22T~19:XX+02/PT30~M")
+          const comboMatch = rawStr.match(/^(.+?)\s*(?:[\/–—]|\s-\s)\s*(PT?[\d~?%]+[MHD].*)$/i);
           if (comboMatch) {
             const startObj = compileCartiMapAST(comboMatch[1].trim());
             const durStr = comboMatch[2].trim();
+            const durClean = durStr.replace(/[~?%]/g, '');
+            const mMatch = durClean.match(/PT?(\d+)M/i);
+            const hMatch = durClean.match(/PT?(\d+)H/i);
+            const dMatch = durClean.match(/P(\d+)D/i);
+            let durMs = 0;
+            if (mMatch) durMs += parseInt(mMatch[1], 10) * 60 * 1000;
+            if (hMatch) durMs += parseInt(hMatch[1], 10) * 3600 * 1000;
+            if (dMatch) durMs += parseInt(dMatch[1], 10) * 86400 * 1000;
+            if (durMs === 0) durMs = 30 * 60 * 1000;
             if (startObj && typeof startObj.min === 'number') {
-              const durObj = compileCartiMapAST(durStr, startObj.min);
-              if (durObj) {
-                return {
-                  type: 'Interval',
-                  min: startObj.min,
-                  max: durObj.max,
-                  isEDTF: true,
-                  approximate: startObj.approximate || durStr.includes('~'),
-                  raw: str
-                };
-              }
+              return {
+                type: 'Interval',
+                min: startObj.min,
+                max: startObj.min + durMs,
+                isEDTF: true,
+                approximate: startObj.approximate || durStr.includes('~'),
+                raw: str
+              };
             }
           }
-
-          let clean = rawStr
+          if (!str) return null;
+          let clean = String(str).trim()
             .replace(/[\r\n]+/g, ',')
             .replace(/\s*\/\s*/g, '/')
             .replace(/\s*,\s*/g, ',')
             .replace(/,,+/g, ',');
 
-          // Choice Sets [...]
+          // 1. Choice Sets [...]
           if (clean.startsWith('[') && clean.endsWith(']')) {
             const inner = clean.slice(1, -1);
             const parts = inner.split(',');
@@ -4285,7 +4266,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             };
           }
 
-          // Inclusive Lists {}
+          // 2. Inclusive Lists {}
           if (clean.startsWith('{') && clean.endsWith('}')) {
             const inner = clean.slice(1, -1);
             const parts = inner.split(',');
@@ -4302,7 +4283,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             };
           }
 
-          // Duration Range Expansion (..)
+          // 3. Duration Range Expansion (..)
           if (clean.includes('..')) {
             const parts = clean.split('..');
             const v1 = compileCartiMapAST(parts[0] || '');
@@ -4317,21 +4298,46 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             };
           }
 
-          // ISO 8601-2 / EDTF Durations ("P25Y", "P6M", "P2W", "P30D", "PT2H", "PT45~M", "PT30S")
+          // Natural Language Duration Grammar Regex [REF: CHRONO-AST15]
+          const natMatch = rawStr.match(/^(\d+)\s*(years?|yrs?|y|months?|mos?|weeks?|w|days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s)$/i);
+          if (natMatch) {
+            const num = parseInt(natMatch[1], 10);
+            const unit = natMatch[2].toLowerCase();
+            let durMs = 0;
+            if (/^y/i.test(unit)) durMs = num * 365.25 * 86400 * 1000;
+            else if (/^mo/i.test(unit)) durMs = num * 30.4375 * 86400 * 1000;
+            else if (/^w/i.test(unit)) durMs = num * 7 * 86400 * 1000;
+            else if (/^d/i.test(unit)) durMs = num * 86400 * 1000;
+            else if (/^h/i.test(unit)) durMs = num * 3600 * 1000;
+            else if (/^mi/i.test(unit) || /^m$/i.test(unit)) durMs = num * 60 * 1000;
+            else if (/^s/i.test(unit)) durMs = num * 1000;
+            
+            const startAnchorMs = (typeof baseStartMs === 'number' && !isNaN(baseStartMs)) ? baseStartMs : 0;
+            return {
+              type: 'Duration',
+              min: startAnchorMs,
+              max: startAnchorMs + durMs,
+              isEDTF: true,
+              approximate: false,
+              raw: str
+            };
+          }
+
+          // 4. ISO Durations (P25Y, P6M, P2W, P30D, PT2H, PT45~M, PT30S) [REF: CHRONO-AST15]
           if (/^P/i.test(clean) || /^-P/i.test(clean)) {
             const isApprox = clean.includes('~') || clean.includes('?');
             const durClean = clean.replace(/[~?%]/g, '');
-            const parts = durClean.split('T');
-            const datePart = parts[0] || '';
-            const timePart = parts[1] || '';
+            const tParts = durClean.split(/T/i);
+            const datePart = tParts[0] || '';
+            const timePart = tParts.length > 1 ? tParts[1] : '';
 
-            const yMatch = datePart.match(/(\d+)Y/i);
-            const moMatch = datePart.match(/(\d+)M/i);
-            const wMatch = datePart.match(/(\d+)W/i);
-            const dMatch = datePart.match(/(\d+)D/i);
+            const yMatch = datePart.match(/P.*?(\d+)Y/i);
+            const moMatch = datePart.match(/P.*?(\d+)M/i);
+            const wMatch = datePart.match(/P.*?(\d+)W/i);
+            const dMatch = datePart.match(/P.*?(\d+)D/i);
 
             const hMatch = timePart.match(/(\d+)H/i);
-            const minMatch = timePart.match(/(\d+)M/i);
+            const mMatch = timePart.match(/(\d+)M/i);
             const sMatch = timePart.match(/(\d+)S/i);
 
             let durMs = 0;
@@ -4340,7 +4346,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             if (wMatch) durMs += parseInt(wMatch[1], 10) * 7 * 86400 * 1000;
             if (dMatch) durMs += parseInt(dMatch[1], 10) * 86400 * 1000;
             if (hMatch) durMs += parseInt(hMatch[1], 10) * 3600 * 1000;
-            if (minMatch) durMs += parseInt(minMatch[1], 10) * 60 * 1000;
+            if (mMatch) durMs += parseInt(mMatch[1], 10) * 60 * 1000;
             if (sMatch) durMs += parseInt(sMatch[1], 10) * 1000;
 
             if (durMs === 0) durMs = 30 * 60 * 1000;
@@ -4356,7 +4362,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             };
           }
 
-          // EDTF Intervals (/)
+          // 5. EDTF Intervals (/)
           if (clean.includes('/') && !clean.startsWith('http')) {
             const parts = clean.split('/');
             const v1 = compileCartiMapAST(parts[0] || '');
@@ -4366,20 +4372,21 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
                 type: 'Interval',
                 min: v1.min,
                 max: v2.max,
-                isEDTF: true,
                 approximate: v1.approximate || v2.approximate,
                 raw: str
               };
             }
           }
 
-          // Native ISO & Masked Date Evaluation
+          // 6. Native ISO & Masked Date Evaluation
           let cleanStr = clean.replace(/\s+/g, ' ');
           let isApproxSyntax = cleanStr.includes('~') || cleanStr.includes('?') || cleanStr.includes('%') || /^c\./i.test(cleanStr) || /^ca\./i.test(cleanStr) || /approx/i.test(cleanStr);
           cleanStr = cleanStr.replace(/^c\.\s*/i, '').replace(/^ca\.\s*/i, '').replace(/approx\s*/i, '').replace(/[~?%]/g, '');
 
+          // Normalize timezone offsets: +02 -> +02:00
           cleanStr = cleanStr.replace(/([+-]\d{2})$/, '$1:00');
 
+          // Unspecified Digits (194X -> 1940-1949, 1944-XX -> 1944-01-01 to 1944-12-31)
           if (/\d{3}X/i.test(cleanStr)) {
             const yrPrefix = cleanStr.substring(0, 3);
             const dtMin = new Date(Date.UTC(parseInt(yrPrefix + '0', 10), 0, 1)).getTime();
@@ -4393,6 +4400,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 
           let parsedMs = Date.parse(cleanStr);
           if (isNaN(parsedMs)) {
+            // ISO Fallback regex
             const isoMatch = cleanStr.match(/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?/);
             if (isoMatch) {
               const yr = parseInt(isoMatch[1], 10);
@@ -4406,21 +4414,25 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
           }
 
           if (!isNaN(parsedMs)) {
+            // Span calculation based on granularity
             let maxMs = parsedMs + 86399999;
             if (/^\d{4}$/.test(cleanStr)) {
               const yr = parseInt(cleanStr, 10);
-              maxMs = new Date(Date.UTC(yr, 11, 31, 23, 59, 59, 999)).getTime();
+              parsedMs = Date.UTC(yr, 0, 1);
+              maxMs = Date.UTC(yr, 11, 31, 23, 59, 59, 999);
             } else if (/^\d{4}-\d{2}$/.test(cleanStr)) {
               const parts = cleanStr.split('-');
               const yr = parseInt(parts[0], 10);
-              const mo = parseInt(parts[1], 10);
-              maxMs = new Date(Date.UTC(yr, mo, 0, 23, 59, 59, 999)).getTime();
+              const mo = parseInt(parts[1], 10) - 1;
+              parsedMs = Date.UTC(yr, mo, 1);
+              const lastDay = new Date(Date.UTC(yr, mo + 1, 0)).getUTCDate();
+              maxMs = Date.UTC(yr, mo, lastDay, 23, 59, 59, 999);
             }
+
             return {
               type: 'Date',
               min: parsedMs,
               max: maxMs,
-              isEDTF: true,
               approximate: isApproxSyntax,
               raw: str
             };
@@ -4429,7 +4441,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
           return null;
         };
 
-          MODULE_VERSIONS['ASTCompiler'] = 'v1.2.96-b303';
+        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.96-b303';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
