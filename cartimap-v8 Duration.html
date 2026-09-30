@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b455</title>
+    <title>CarTiMap v8.17.0-b457</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -195,14 +195,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 </head>
 <body>
     <div id="root"></div>
-    
-<script type="module">
-window.safeStripHTML = function(str) {
-  if (!str) return '';
-  return String(str).replace(/<[^>]*>/g, '').trim();
-};
-var safeStripHTML = window.safeStripHTML;
-
+    <script type="module">
 // === [ MAJOR BLOCK: Imports & Globals v2.0.6 ] ===
 
 // === [ GLOBAL UTILITY: Temporal Approximation Evaluator ] ===
@@ -223,29 +216,8 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b455';
+const APP_VERSION = 'v8.17.0-b457';
 document.title = 'CarTiMap - ' + APP_VERSION;
-
-            // Robust Base64 Favicon Injection for All Browsers
-            const injectFavicon = () => {
-              const faviconUri = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImJnR3JhZCIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzFlMjkzYiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZjE3MmEiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImN5YW5HcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM4YmRmOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMjg0YzciLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImFtYmVyR3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmYmJmMjQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZDk3NzA2Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjgiIHJlc3VsdD0iYmx1ciIgLz4KICAgICAgPGZlQ29tcG9zaXRlIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImJsdXIiIG9wZXJhdG9yPSJvdmVyIi8+CiAgICA8L2ZpbHRlcj4KICA8L2RlZnM+CiAgPCEtLSBCYWNrZ3JvdW5kIENpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjI0MCIgZmlsbD0idXJsKCNiZ0dyYWQpIiBzdHJva2U9IiMzMzQxNTUiIHN0cm9rZS13aWR0aD0iMTIiLz4KICA8IS0tIFRlbXBvcmFsIFNjYWxlIEFyYyAoQW1iZXIpIC0tPgogIDxwYXRoIGQ9Ik0gMTI4LDI1NiBBIDEyOCwxMjggMCAxLDEgMzg0LDI1NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2FtYmVyR3JhZCkiIHN0cm9rZS13aWR0aD0iMTYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iMTIsMTIiLz4KICA8IS0tIE1hcCBDb21wYXNzIFJpbmcgKEN5YW4pIC0tPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTYwIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjY3lhbkdyYWQpIiBzdHJva2Utd2lkdGg9IjEwIiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KICA8IS0tIENlbnRlciBNYXAgTm9kZSBQaW4gLS0+CiAgPHBhdGggZD0iTSAyNTYsMTI4IEMgMjEwLDEyOCAxNzIsMTY2IDE3MiwyMTIgQyAxNzIsMjc1IDI1NiwzNjggMjU2LDM2OCBDIDI1NiwzNjggMzQwLDI3NSAzNDAsMjEyIEMgMzQwLDE2NiAzMDIsMTI4IDI1NiwxMjggWiIgZmlsbD0idXJsKCNjeWFuR3JhZCkiIGZpbHRlcj0idXJsKCNnbG93KSIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjIxMiIgcj0iNDQiIGZpbGw9IiMwZjE3MmEiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyMTIiIHI9IjI0IiBmaWxsPSJ1cmwoI2FtYmVyR3JhZCkiLz4KPC9zdmc+";
-              ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(relType => {
-                let link = document.querySelector(`link[rel="${relType}"]`);
-                if (!link) {
-                  link = document.createElement('link');
-                  link.rel = relType;
-                  document.head.appendChild(link);
-                }
-                link.type = 'image/svg+xml';
-                link.href = faviconUri;
-              });
-            };
-            if (document.readyState === 'loading') {
-              document.addEventListener('DOMContentLoaded', injectFavicon);
-            } else {
-              injectFavicon();
-            }
-
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -371,21 +343,8 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
       `}
       <!-- Full Ingested Dataset Telemetry Registry -->
       <div style="background: #111; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.73rem; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-        <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
-          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <span>📋 INGESTED DATASET REGISTRY (${unfilteredData ? unfilteredData.length : 0} Total Records Ingested • Active Slide: #${activeSlide ? activeSlide.id : 1})</span>
-            <span style="font-size: 0.7rem; color: #4ade80;">100% Ingested</span>
-          </div>
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 4px; padding: 6px 10px; font-family: monospace; font-size: 0.68rem; color: #e2e8f0; display: flex; flex-direction: column; gap: 2px;">
-            <div style="color: #38bdf8; font-weight: 700; margin-bottom: 2px;">⏳ EDTF & DATE HYDRATION DIAGNOSTIC MATRIX (STATIC HUD)</div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-              <span>• Start EDTF: <strong style="color: #4ade80;">${(unfilteredData || []).filter(d => d.startDate && d.startDate.isEDTF).length}</strong> / ${(unfilteredData || []).filter(d => d.startDate && d.startDate.rawEdtf).length} Parsed</span>
-              <span>• End EDTF: <strong style="color: #4ade80;">${(unfilteredData || []).filter(d => d.endDate && d.endDate.isEDTF).length}</strong> / ${(unfilteredData || []).filter(d => d.endDate && d.endDate.rawEdtf).length} Parsed</span>
-              <span>• Legacy Fallbacks: <strong style="color: #fbbf24;">${(unfilteredData || []).filter(d => d.startDate && !d.startDate.isEDTF).length}</strong> Rows</span>
-              <span>• Approximate Spans: <strong style="color: #f59e0b;">${(unfilteredData || []).filter(d => (d.startDate && d.startDate.isApprox) || (d.endDate && d.endDate.isApprox)).length}</strong> Events</span>
-            </div>
-          </div>
-        </div>
+        <span>📋 INGESTED DATASET REGISTRY (${activeSlide ? activeSlide.id : 1} of ${unfilteredData ? unfilteredData.length : 0} Records)</span>
+        <span style="font-size: 0.7rem; color: #4ade80;">100% Ingested</span>
       </div>
 
       <div id="vibe-logs" style="flex-grow: 1; overflow-y: auto; padding: 8px 10px; font-size: 0.73rem; background: #111; display: flex; flex-direction: column; gap: 5px; height: 100%; min-height: 50px;">
@@ -421,7 +380,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.3.97-b407';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.3.48-b355';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -760,16 +719,11 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
 
         <div style="flex-shrink: 0; position: sticky; top: 0; background: var(--paneBg, #ffffff); z-index: 10; padding-top: ${isScrolled ? '0.6rem' : '1.2rem'}; padding-bottom: ${isScrolled ? '0.4rem' : '0.5rem'}; border-bottom: 1px solid rgba(128,128,128,0.2); box-shadow: ${isScrolled ? '0 4px 12px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.04)'}; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 100%; padding-left: 1.5rem; padding-right: 55px; box-sizing: border-box;">
           <div style="max-width: 85ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column;">
-            <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box; display: flex; align-items: baseline; gap: 8px 12px; flex-wrap: wrap; padding-right: 42px;">
-              ${isDateValid ? html`
-                <div class="metadata-date" style="display: inline-flex; align-items: baseline; gap: 0px; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.78rem' : '0.92rem'}; transition: font-size 0.2s ease; flex: 0 1 auto; flex-wrap: wrap; word-break: break-word;">
-                  <span>${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</span>${((slide.startDate && slide.startDate.isEDTF) || (slide.endDate && slide.endDate.isEDTF)) ? html`<sup style="font-size: 0.6em; font-weight: 700; color: ${(slide.isApprox || (slide.startDate && slide.startDate.isApprox) || (slide.endDate && slide.endDate.isApprox)) ? '#f59e0b' : '#007acc'}; font-family: monospace; vertical-align: super; line-height: 0; position: relative; top: -0.45em;" title="ISO 8601-2 EDTF Standard">ISO</sup>` : ''}
-                </div>
-              ` : ''}
-              <div class="metadata-pills-wrapper" style="display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end; flex: 1 1 auto;">
-                ${slide.extractType ? html`<span class="place-pill" style="font-weight: 400; font-size: 0.75rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px;">${slide.extractType}</span>` : ''}
-                ${(slide.place || slide.location) ? html`<span class="place-pill" style="font-weight: 500; font-size: 0.75rem; background: #f1f5f9; color: #334155; padding: 2px 8px; border-radius: 12px; border: 1px solid #cbd5e1;">${safeStripHTML(formatPlaces(slide.place || slide.location))}</span>` : ''}
-                ${(slide.tags || []).map(t => html`<span class="tag-pill" style="font-weight: 500; font-size: 0.75rem; background: #f8fafc; color: #475569; padding: 2px 8px; border-radius: 12px; border: 1px solid #e2e8f0;">${safeStripHTML(String(t).replace(/^#\s*/, ''))}</span>`)}
+            <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
+              ${isDateValid ? html`<div class="metadata-date" style="font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</div>` : ''}
+              <div class="metadata-pills-wrapper">
+                ${hasLocation ? html`<span class="place-pill"><span style="margin-right: 4px;">📍</span> ${formatPlaces(slide.place)}</span>` : ''}
+                ${tags.map(tag => html`<span class="tag-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span>${tag}</span></span>`)}
               </div>
             </div>
             <div class="title-header-container" style="width: 100%; padding: 0; box-sizing: border-box;">
@@ -1297,41 +1251,78 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
 
     if (!xAxisMarker && hasDuration) {
-        const spanEndMsP = Number((((itemEndMs - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-        const widthPct = Number((spanEndMsP - startPct).toFixed(4));
-        const rawSpanPx = (widthPct / 100) * trackWidthPx;
-        const minRibbonPx = Math.max(16, rawSpanPx);
-        const xOffset = itemStartMs < renderMinTime ? Number((((renderMinTime - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2)) : 0;
+      const overlappingEvents = validData.filter(other => {
+        const oStart = other.startDate ? other.startDate.min : renderMinTime;
+        const oEnd = (other.endDate && !isNaN(other.endDate.max)) ? other.endDate.max : ((other.startDate && !isNaN(other.startDate.max) && other.startDate.max > oStart) ? other.startDate.max : oStart);
+        return (oStart <= endVal && oEnd >= itemStartMs);
+      });
 
-        const ribbonColor = (isApproxStart || isApproxEnd) ? '#f59e0b' : '#007acc';
-        const ribbonBg = (isApproxStart || isApproxEnd) 
-          ? 'rgba(245, 158, 11, 0.15)' 
-          : 'rgba(0, 122, 204, 0.12)';
-        const spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
-        
+      let spanMarkerTooltip = '';
+      if (overlappingEvents.length > 1) {
+        const eventList = overlappingEvents.map((ev, i) => {
+          const oStart = ev.startDate ? ev.startDate.min : renderMinTime;
+          const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
+          let durText = '';
+          if (oEnd > oStart) {
+            const dMs = oEnd - oStart;
+            const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
+            if (dDays >= 365) durText = ` (${(dDays / 365.25).toFixed(1)} yrs)`;
+            else if (dDays >= 30) durText = ` (${Math.round(dDays / 30.43)} mos)`;
+            else if (dDays >= 1) durText = ` (${dDays} days)`;
+            else durText = ` (${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs)`;
+          }
+          const isCurrent = ev.id === item.id;
+          return `${i + 1}. ${isCurrent ? '▶ ' : ''}${safeStripHTML(ev.title)}${durText}`;
+        }).join('\n');
+
+        spanMarkerTooltip = `🔍 Concurrent Active Events (${overlappingEvents.length}) in Duration Span:\n${eventList}\n\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      } else {
+        spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+      }
+      if (isActive) {
+        const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
+        const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
+        const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
+        const activeBg = (isApproxStart || isApproxEnd) ? 'repeating-linear-gradient(-45deg, #f59e0b 0, #f59e0b 8px, #007acc 8px, #007acc 16px)' : 'rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30)';
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${minRibbonPx}px; height: 6px; background: ${ribbonBg}; border-top: 1px solid ${ribbonColor}; border-bottom: 1px solid ${ribbonColor}; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setActiveIndex(index); }}>
-            ${isApproxStart ? html`<div style="position: absolute; left: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate Start Date (~)"></div>` : ''}
-            ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate End Date (~)"></div>` : ''}
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; min-width: 4px; height: 10px; background: ${activeBg}; border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+            ${isApproxStart ? html`<div style="position: absolute; left: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
+            ${isApproxEnd ? html`<div style="position: absolute; right: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
           </div>
         `;
-      }
-      let dropLine = '';
+      } else {
+        const styleIdx = index % 4;
+        const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
+        const borderL = isApproxStart ? `3px solid ${colApprox}` : `1px solid ${colInactive}`;
+        const borderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
+        const hatchStyle = (isApproxStart || isApproxEnd)
+          ? `background: repeating-linear-gradient(-45deg, #f59e0b 0, #f59e0b 8px, #007acc 8px, #007acc 16px) !important;`
+          : `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.25), rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.25) 3px, transparent 3px, transparent 6px);`;
+        xAxisMarker = html`
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 10px; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-top: none; border-bottom: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%);"></div>
+            ${isApproxStart ? html`<div style="position: absolute; left: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
+            ${isApproxEnd ? html`<div style="position: absolute; right: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
+          </div>
+        `;
+      }}
+
+    let dropLine = '';
     const dropColor = isActive ? colActive : (isApproxStart ? colApprox : colInactive);
     if (xOffset > 0) {
-        dropLine = html`
-          <svg style="position: absolute; left: -${xOffset}px; top: ${blockHeight / 2}px; bottom: 0; width: ${xOffset + 2}px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
-            <line x1="${xOffset}" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
-          </svg>
-        `;
-      } else if (isActive || !hasDuration) {
-        dropLine = html`
-          <svg style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
-            <line x1="0" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
-          </svg>
-        `;
-      }
-      const fullNodeTooltip = `${safeStripHTML(item.title)}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick node to focus slide`;
+      dropLine = html`
+        <svg style="position: absolute; left: -${xOffset}px; top: ${blockHeight / 2}px; bottom: 0; width: ${xOffset + 2}px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
+          <line x1="${xOffset}" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
+        </svg>
+      `;
+    } else if (isActive || !hasDuration) {
+      dropLine = html`
+        <svg style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
+          <line x1="0" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
+        </svg>
+      `;
+    }
+    const fullNodeTooltip = `${safeStripHTML(item.title)}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick node to focus slide`;
 
     return html`
       <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}; pointer-events: none;" onClick=${() => handleNodeClick(globalIndex)}>
@@ -1929,7 +1920,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                         wkt.read(sub);
                         const extracted = extractLayers(wkt.toObject());
                         featureLayers = featureLayers.concat(extracted);
-                        // Muted successful WKT GEOMETRYCOLLECTION info log to prevent log buffer flooding [REF: MAP-LOG01]
+                        if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): Parsed WKT GEOMETRYCOLLECTION sub-item ("${sub.substring(0, 40)}...") -> ${extracted.length} layers`, 'info');
                       } catch (err) {
                         if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): WKT Parse Failure on "${sub}": ${err.message}`, 'warning');
                       }
@@ -1942,7 +1933,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                         wkt.read(locStr);
                         const extracted = extractLayers(wkt.toObject());
                         featureLayers = featureLayers.concat(extracted);
-                        // Muted successful WKT string info log to prevent log buffer flooding [REF: MAP-LOG01]
+                        if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): Parsed WKT string ("${locStr.substring(0, 40)}...") -> ${extracted.length} layers`, 'info');
                       }
                     } catch (err) {
                       if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): [WKT SYNTAX ERR] Invalid WKT string "${locStr}": ${err.message}`, 'error');
@@ -2414,13 +2405,6 @@ MODULE_VERSIONS['MapViewer'] = 'v6.6.48-b355';
 // 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b178 ] ===
 const App = () => {
-          
-          const getParsedTags = (rawTags) => {
-            if (!rawTags) return [];
-            if (Array.isArray(rawTags)) return rawTags.map(t => String(t).trim()).filter(Boolean);
-            return String(rawTags).split(/(?:\||·|;|·|\n|\-|,)/).map(s => s.trim()).filter(Boolean);
-          };
-
           function safeStripHTML(str) { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); }
 
   // APP_VERSION bound to top-level HTML header per Directive I.3.c
@@ -2449,7 +2433,6 @@ const App = () => {
           };
           const [isSearchOpen, setIsSearchOpen] = useState(false);
                     const [isTocOpen, setIsTocOpen] = useState(false);
-          const [isOverviewOpen, setIsOverviewOpen] = useState(false);
           const [durationInspectionPayload, setDurationInspectionPayload] = useState(null);
 
           const resetLayout = () => {
@@ -2558,16 +2541,12 @@ const App = () => {
           const [allTags, setAllTags] = useState([]);
           const isFilterInitializedRef = useRef(false);
           const [activeTags, setActiveTags] = useState(() => {
-            try {
-              const saved = localStorage.getItem('tm_active_tags');
-              return saved ? JSON.parse(saved) : null;
-            } catch(e) { return null; }
+            try { return JSON.parse(localStorage.getItem('tm_active_tags')) || []; }
+            catch(e) { return []; }
           });
           const [activeExtractTypes, setActiveExtractTypes] = useState(() => {
-            try {
-              const saved = localStorage.getItem('tm_active_extract_types');
-              return saved ? JSON.parse(saved) : null;
-            } catch(e) { return null; }
+            try { return JSON.parse(localStorage.getItem('tm_active_extract_types')) || []; }
+            catch(e) { return []; }
           });
 
           useEffect(() => {
@@ -2612,9 +2591,6 @@ const App = () => {
             const timeStr = new Date().toTimeString().split(' ').at(0);
             setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
           };
-          window.vibeLog = (msg, type = 'info') => {
-            addLog(msg, type);
-          };
 
           const stripAndNormalize = (str) => {
             if (!str) return '';
@@ -2622,53 +2598,46 @@ const App = () => {
           };
 
           const formatSmartDate = (startInput, endInput, locale) => {
-            if (!startInput && !endInput) return 'Undated';
-
             const checkApprox = (val) => {
               if (!val) return false;
               if (typeof val === 'object') {
-                if (val.isApprox || val.uncertain || val.approximate) return true;
+                if (val.isApprox || val.isEDTF || val.uncertain || val.approximate) return true;
                 if (val.type && val.type !== 'Exact') return true;
-                if (val.text && (val.text.includes('~') || val.text.includes('?') || val.text.includes('%') || val.text.toLowerCase().includes('c.'))) return true;
-              }
-              if (typeof val === 'string') {
-                return val.includes('~') || val.includes('?') || val.includes('%') || val.toLowerCase().includes('c.');
+                if (val.text && (val.text.includes('~') || val.text.includes('?'))) return true;
               }
               return false;
             };
-
             const isApprox = checkApprox(startInput) || checkApprox(endInput);
+            const approxPrefix = isApprox ? '~ ' : '';
+            if (startInput === null || startInput === undefined) return 'Undated';
 
-            const extractDisplayString = (val) => {
-              if (!val) return null;
-              if (typeof val === 'string') return val.trim();
+            const toValidDate = (val) => {
+              if (val === null || val === undefined) return null;
+              if (typeof val === 'number') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
+              if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
               if (typeof val === 'object') {
-                if (val.isEDTF && val.text) return val.text.trim();
-                if (val.text && typeof val.text === 'string' && val.text.trim()) return val.text.trim();
-                const d = val.date || (typeof val.min === 'number' ? new Date(val.min) : null);
-                if (d && d instanceof Date && !isNaN(d.getTime())) {
-                  return d.toLocaleDateString(locale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                }
+                if (val.isEDTF && val.text) return val.text;
+                if (val.date && val.date instanceof Date && !isNaN(val.date.getTime())) return val.date;
+                if (typeof val.min === 'number') { const d = new Date(val.min); return isNaN(d.getTime()) ? null : d; }
+                if (typeof val.start === 'number') { const d = new Date(val.start); return isNaN(d.getTime()) ? null : d; }
               }
-              if (typeof val === 'number') {
-                const d = new Date(val);
-                if (!isNaN(d.getTime())) {
-                  return d.toLocaleDateString(locale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                }
-              }
+              if (typeof val === 'string') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
               return null;
             };
 
-            const str1 = extractDisplayString(startInput);
-            const str2 = extractDisplayString(endInput);
+            const d1 = toValidDate(startInput);
+            if (typeof d1 === 'string') return d1;
+            if (!d1) return (typeof startInput === 'string' ? startInput : 'Undated');
 
-            if (!str1 && !str2) return 'Undated';
-            if (str1 && !str2) return str1;
-            if (!str1 && str2) return str2;
+            const d2 = toValidDate(endInput);
+            const loc = locale || 'en-GB';
+            const opt = { day: '2-digit', month: 'short', year: 'numeric' };
 
-            if (str1 === str2) return str1;
-
-            return `${str1} – ${str2}`;
+            if (d2 && typeof d2 !== 'string') {
+              if (d2.getTime() === d1.getTime()) return approxPrefix + d1.toLocaleDateString(loc, opt);
+              return approxPrefix + `${d1.toLocaleDateString(loc, opt)} – ${d2.toLocaleDateString(loc, opt)}`;
+            }
+            return approxPrefix + d1.toLocaleDateString(loc, opt);
           };
 
           const formatPlaces = (placeStr) => {
@@ -2710,17 +2679,10 @@ const App = () => {
                 results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
               }
 
-              const flexGet = (normObj, keys) => {
-                const arr = Array.isArray(keys) ? keys : [keys];
-                for (const k of arr) {
-                  const val = normObj[k];
-                  if (val !== undefined && val !== null && String(val).trim() !== "") {
-                    return String(val).trim();
-                  }
-                }
-                return "";
+              const exactGet = (normObj, key) => {
+                const val = normObj[key];
+                return val !== undefined && val !== null ? String(val).trim() : "";
               };
-              const exactGet = (normObj, key) => flexGet(normObj, [key]);
 
               const firstRowNorm = {};
               if (results.data.length > 0) {
@@ -2748,137 +2710,124 @@ const App = () => {
               const omniSplitRegex = /\||\r?\n/;
               const rows = results.data;
 
-                            const parseChronoNode = (legacyStr, edtfStr, index, rowTitle, fieldName = 'Start') => {
-                const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
+                            const parseChronoNode = (legacyStr, edtfStr, index, rowTitle) => {
                 const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
+                const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
+                const targetStr = cleanEdtf || cleanLegacy;
 
-                // Directive: If EDTF is provided, parse via EDTF AST ONLY. Invalid EDTFs NEVER go to fallback.
-                if (cleanEdtf) {
+                if (targetStr) {
                   try {
-                    const parsed = compileCartiMapAST(cleanEdtf);
+                    const parsed = compileCartiMapAST(targetStr);
                     if (parsed && typeof parsed.min === 'number' && !isNaN(parsed.min)) {
-                      const isApproxFlag = !!(parsed.approximate || parsed.uncertain || parsed.unspecified || cleanEdtf.includes('~') || cleanEdtf.includes('?') || cleanEdtf.includes('%') || cleanEdtf.toLowerCase().includes('x') || cleanEdtf.toLowerCase().startsWith('c.') || cleanEdtf.toLowerCase().startsWith('ca.') || cleanEdtf.toLowerCase().includes('approx'));
-                      let maxVal = (typeof parsed.max === 'number' && !isNaN(parsed.max) && parsed.max !== 0) ? parsed.max : parsed.min;
+                      const isApproxFlag = !!(parsed.approximate || parsed.uncertain || targetStr.includes('~') || targetStr.includes('?') || targetStr.includes('%') || targetStr.toLowerCase().includes('x') || targetStr.toLowerCase().startsWith('c.'));
                       return {
-                        isEDTF: true,
+                        isEDTF: !!cleanEdtf,
                         isApprox: isApproxFlag,
                         type: isApproxFlag ? 'Approximate' : 'Exact',
                         min: parsed.min,
-                        max: maxVal,
+                        max: parsed.max,
                         obj: parsed,
                         isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
-                        text: cleanEdtf,
-                        rawEdtf: cleanEdtf,
-                        parseSuccess: true
+                        text: targetStr
                       };
-                    } else {
-                      // Invalid EDTF string - NEVER go to fallback; report in Telemetry per Directive
-                      if (typeof addLog === 'function') {
-                        addLog(`[EDTF Engine] Invalid ${fieldName} EDTF string on Row #${index + 1} ("${rowTitle || 'Untitled'}"): "${cleanEdtf}"`, 'warn');
-                      }
-                      return null;
                     }
                   } catch (e) {
-                    if (typeof addLog === 'function') {
-                      addLog(`[EDTF Engine] Exception parsing ${fieldName} EDTF on Row #${index + 1} ("${rowTitle || 'Untitled'}"): "${cleanEdtf}" - ${e.message}`, 'warn');
-                    }
-                    return null;
+                    addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): AST Parsing warning for "${targetStr}": ${e.message}`, 'warning');
                   }
                 }
 
-                // Fallback Legacy parsing ONLY if cleanEdtf was omitted/blank
-                if (cleanLegacy) {
-                  try {
-                    const parsedLegacy = compileCartiMapAST(cleanLegacy);
-                    if (parsedLegacy && typeof parsedLegacy.min === 'number' && !isNaN(parsedLegacy.min)) {
-                      return {
-                        isEDTF: false,
-                        isApprox: !!parsedLegacy.approximate,
-                        min: parsedLegacy.min,
-                        max: parsedLegacy.max || parsedLegacy.min,
-                        obj: parsedLegacy,
-                        text: cleanLegacy,
-                        parseSuccess: true
+if (!cleanLegacy) {
+                  if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
+                  return null;
+                }
+
+                if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
+                  const serialVal = parseFloat(cleanLegacy);
+                  const ts = (serialVal - 25569) * 86400 * 1000;
+                  return { 
+                    isEDTF: false, 
+                    min: ts, 
+                    max: ts, 
+                    date: new Date(ts), 
+                    text: cleanLegacy 
+                  };
+                }
+
+                const parts = cleanLegacy.split(' ');
+                if (parts.length >= 1) {
+                  const [ dateStr = '', timeStr = '' ] = parts;
+                  const dParts = dateStr.split(/(?:\/|\.|\-)/);
+                  if (dParts.length >= 3) {
+                    const [ dp0 = '', dp1 = '', dp2 = '' ] = dParts;
+                    const [ tHourStr = '0', tMinStr = '0', tSecFullStr = '0' ] = timeStr ? timeStr.split(':') : [];
+                    const [ tSecStr = '0', tMsStr = '0' ] = tSecFullStr.split('.');
+                    const dYear = parseInt(dp2, 10);
+                    const dMonth = parseInt(isUS ? dp0 : dp1, 10) - 1;
+                    const dDay = parseInt(isUS ? dp1 : dp0, 10);
+                    const tHour = parseInt(tHourStr, 10);
+                    const tMin = parseInt(tMinStr, 10);
+                    const tSec = parseInt(tSecStr, 10);
+                    const tMs = parseInt(tMsStr, 10);
+                    const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
+                    const ts = dateObj.getTime();
+                    if (!isNaN(ts)) {
+                      return { 
+                        isEDTF: false, 
+                        min: ts, 
+                        max: ts, 
+                        date: dateObj, 
+                        text: cleanLegacy 
                       };
                     }
-                  } catch(e) {}
-
-                  if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
-                    const serialVal = parseFloat(cleanLegacy);
-                    const ts = (serialVal - 25569) * 86400 * 1000;
-                    return { isEDTF: false, isApprox: false, min: ts, max: ts, date: new Date(ts), text: cleanLegacy, parseSuccess: true };
                   }
-                  const parts = cleanLegacy.split(' ');
-                  if (parts.length >= 1) {
-                    const [ dateStr = '', timeStr = '' ] = parts;
-                    const dParts = dateStr.split(/(?:\/|\.|\-)/);
-                    if (dParts.length >= 3) {
-                      const [ dp0 = '', dp1 = '', dp2 = '' ] = dParts;
-                      const [ tHourStr = '0', tMinStr = '0', tSecFullStr = '0' ] = timeStr ? timeStr.split(':') : [];
-                      const [ tSecStr = '0', tMsStr = '0' ] = tSecFullStr.split('.');
-                      const dYear = parseInt(dp2, 10);
-                      const dMonth = parseInt(dp1, 10) - 1;
-                      const dDay = parseInt(dp0, 10);
-                      const dateObj = new Date(dYear, dMonth, dDay, parseInt(tHourStr, 10), parseInt(tMinStr, 10), parseInt(tSecStr, 10), parseInt(tMsStr, 10));
-                      const ts = dateObj.getTime();
-                      if (!isNaN(ts)) return { isEDTF: false, isApprox: false, min: ts, max: ts, date: dateObj, text: cleanLegacy, parseSuccess: true };
-                    }
-                  }
-                  return { isEDTF: false, isApprox: false, min: new Date(cleanLegacy).getTime() || 0, max: new Date(cleanLegacy).getTime() || 0, text: cleanLegacy, parseSuccess: true };
                 }
 
-                return null;
+                const rawFailStr = cleanEdtf || cleanLegacy || 'Blank Date Cell';
+                addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Could not parse date "${rawFailStr}". Logging as Undated event in Telemetry.`, 'warning');
+                return {
+                  isEDTF: false,
+                  isApprox: true,
+                  type: 'Undated',
+                  min: 0,
+                  max: 0,
+                  text: rawFailStr
+                };
               };
 
-              let startEdtfTotal = 0, startEdtfSuccess = 0, endEdtfTotal = 0, endEdtfSuccess = 0, approxTotal = 0;
               const cleaned = rows.map((row, index) => {
                 const norm = {};
                 for (let k in row) norm[k.toLowerCase().trim()] = row[k];
                 const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
 
-                const rawStartLegacy = exactGet(norm, 'start');
-                const rawStartEdtf = exactGet(norm, 'start edtf');
-                const rawEndLegacy = exactGet(norm, 'end');
-                const rawEndEdtf = exactGet(norm, 'end edtf');
-
-                const startNode = parseChronoNode(rawStartLegacy, rawStartEdtf, index, rowTitle, 'Start');
-                const endNode = parseChronoNode(rawEndLegacy, rawEndEdtf, index, rowTitle, 'End');
-
-                if (rawStartEdtf) {
-                  startEdtfTotal++;
-                  if (startNode && startNode.isEDTF) startEdtfSuccess++;
-                }
-                if (rawEndEdtf) {
-                  endEdtfTotal++;
-                  if (endNode && endNode.isEDTF) endEdtfSuccess++;
-                }
-                if ((startNode && startNode.isApprox) || (endNode && endNode.isApprox)) {
-                  approxTotal++;
-                }
-
                 return {
                   id: index + 1,
                   title: rowTitle,
-                  startDate: startNode,
-                  endDate: endNode,
+                  startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf'), index, rowTitle),
+                  endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf'), index, rowTitle),
                   description: exactGet(norm, 'description'),
                   place: exactGet(norm, 'place'),
                   location: exactGet(norm, 'location') || exactGet(norm, 'location (wkt)') || exactGet(norm, 'location wkt') || exactGet(norm, 'wkt') || exactGet(norm, 'coordinates') || exactGet(norm, 'geo') || exactGet(norm, 'wkt location'),
                   subLabels: exactGet(norm, 'sublabels') || exactGet(norm, 'sub-labels') || exactGet(norm, 'sub labels') || '',
                   priority: exactGet(norm, 'priority'),
                   media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
-                  mediaCaption: exactGet(norm, 'media caption') || exactGet(norm, 'caption'),
-                  mediaCredit: exactGet(norm, 'media credit') || exactGet(norm, 'credit'),
-                  extractType: exactGet(norm, 'extract type') || exactGet(norm, 'type') || 'Default',
-                  tags: exactGet(norm, 'tags') ? getParsedTags(exactGet(norm, 'tags')) : []
+                  mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
+                  mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
+                  tags: exactGet(norm, 'tags') ? Array.from(new Set(exactGet(norm, 'tags').split(/[,|;·\r\n]+/).map(t => t.trim()).filter(Boolean))) : [],
+                  extractType: exactGet(norm, 'extract type') || 'Storyline'
                 };
               });
 
-              if (typeof addLog === 'function') {
-                addLog(`[Chrono-Engine] EDTF Ingestion Summary: Start EDTF (${startEdtfSuccess}/${startEdtfTotal} successful), End EDTF (${endEdtfSuccess}/${endEdtfTotal} successful), Total Approximate Spans: ${approxTotal}`, 'info');
-              }
+              const valid = cleaned.sort((a, b) => {
+                const aMin = a.startDate ? a.startDate.min : 0;
+                const bMin = b.startDate ? b.startDate.min : 0;
+                if (aMin !== bMin) return aMin - bMin;
+                return a.id - b.id;
+              });
 
-              const indexedData = cleaned.map((d, i) => ({
+              // =========================================================================
+              // === [ APP_ORCHESTRATOR SUBBLOCK 3: VECTOR SEARCH INDEXING ] ===
+              // =========================================================================
+              const indexedData = valid.map(d => ({
                 ...d,
                 _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
               }));
@@ -3593,10 +3542,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative; max-width: calc(50vw - 100px); overflow: visible;">
                     ${logoCommandHub}
                     ${!hideToc ? tocBtn : ''}
-                    <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsOverviewOpen(true)} title="Dataset & Chronology Overview" style="display: flex; align-items: center; gap: 4px;">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-                      ${showButtonText ? html`<span>Overview</span>` : ''}
-                    </button>
                     ${!hideSettings ? settingsBtn : ''}
                     ${!hideReset ? resetLayoutBtn : ''}
                     ${!hideTelemetry ? telemetryBtn : ''}
@@ -3836,49 +3781,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
             </div>
           `}
 
-              ${isOverviewOpen && html`
-                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100000; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
-                  <div style="background: #ffffff; width: 85vw; max-width: 900px; height: 82vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
-                    <div style="padding: 16px 20px; border-bottom: 1px solid #e0e0e0; background: #f8f9fa; display: flex; align-items: center; justify-content: space-between;">
-                      <div style="display: flex; align-items: center; gap: 10px;">
-                        <h3 style="margin: 0; font-size: 1.2rem; color: #111; font-weight: 700;">📊 Dataset & Chronology Overview</h3>
-                        <span style="font-size: 0.8rem; background: #007acc; color: #fff; padding: 2px 8px; border-radius: 10px;">${(data || unfilteredData || []).length} Events</span>
-                      </div>
-                      <button onClick=${() => setIsOverviewOpen(false)} style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #666; font-weight: bold;">✕</button>
-                    </div>
-                    <div style="flex: 1; overflow-y: auto; padding: 20px;">
-                      ${(() => {
-                        const targetList = (data && data.length > 0) ? data : (unfilteredData || []);
-                        if (targetList.length === 0) return html`<div style="color: #888; padding: 20px;">No dataset items loaded.</div>`;
-                        return html`
-                          <div style="display: flex; flex-direction: column; gap: 8px;">
-                            ${targetList.map((ev, i) => {
-                              const isActive = i === activeIndex;
-                              const durMs = (ev.endDate && ev.startDate) ? (ev.endDate.max - ev.startDate.min) : 0;
-                              const durDays = durMs > 0 ? Math.round(durMs / (1000 * 60 * 60 * 24)) : 0;
-                              return html`
-                                <div onClick=${() => { jumpToSlide(i); setIsOverviewOpen(false); }} style="padding: 10px 14px; border: 1px solid ${isActive ? '#007acc' : '#e2e8f0'}; border-radius: 8px; background: ${isActive ? '#f0f9ff' : '#ffffff'}; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: all 0.15s ease;">
-                                  <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-                                    <span style="font-weight: 700; color: #007acc; font-size: 0.85rem; width: 32px; flex-shrink: 0;">#${i + 1}</span>
-                                    <span style="font-weight: 600; color: #1e293b; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">${safeStripHTML(ev.title)}</span>
-                                  </div>
-                                  <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0; font-size: 0.82rem; color: #64748b;">
-                                    <span>📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)}</span>
-                                    ${durDays > 0 ? html`<span style="background: #e2e8f0; color: #334155; padding: 1px 6px; border-radius: 6px; font-weight: 600;">⏳ ${durDays}d</span>` : ''}
-                                    ${(ev.place || ev.location) ? html`<span style="background: #f1f5f9; color: #475569; padding: 1px 6px; border-radius: 6px;">📍 ${safeStripHTML(formatPlaces(ev.place || ev.location))}</span>` : ''}
-                                  </div>
-                                </div>
-                              `;
-                            })}
-                          </div>
-                        `;
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              `}
               ${isTocOpen && html`
-                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); z-index: 100000; backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
+                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 3500; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
                   <div style="background: #ffffff; width: 80vw; height: 80vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                     <div style="padding: 16px 20px; border-bottom: 1px solid #e0e0e0; background: #f8f9fa; display: flex; align-items: center; justify-content: space-between;">
                       <h3 style="margin: 0; font-size: 1.2rem; color: #111; display: flex; align-items: center; gap: 8px; font-weight: 700;">📖 Table of Contents</h3>
@@ -4219,35 +4123,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 // 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b178 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
-        const compileCartiMapAST = (str, baseStartMs = null) => {
-          if (!str) return null;
-          let rawStr = String(str).trim();
-
-          // 0. Combined Start Date + Duration Interval ("1944-12-22T~19:XX+02 – PT30~M" or "1944-12-22T~19:XX+02/PT30~M")
-          const comboMatch = rawStr.match(/^(.+?)\s*(?:[\/–—]|\s-\s)\s*(PT?[\d~?%]+[MHD].*)$/i);
-          if (comboMatch) {
-            const startObj = compileCartiMapAST(comboMatch[1].trim());
-            const durStr = comboMatch[2].trim();
-            const durClean = durStr.replace(/[~?%]/g, '');
-            const mMatch = durClean.match(/PT?(\d+)M/i);
-            const hMatch = durClean.match(/PT?(\d+)H/i);
-            const dMatch = durClean.match(/P(\d+)D/i);
-            let durMs = 0;
-            if (mMatch) durMs += parseInt(mMatch[1], 10) * 60 * 1000;
-            if (hMatch) durMs += parseInt(hMatch[1], 10) * 3600 * 1000;
-            if (dMatch) durMs += parseInt(dMatch[1], 10) * 86400 * 1000;
-            if (durMs === 0) durMs = 30 * 60 * 1000;
-            if (startObj && typeof startObj.min === 'number') {
-              return {
-                type: 'Interval',
-                min: startObj.min,
-                max: startObj.min + durMs,
-                isEDTF: true,
-                approximate: startObj.approximate || durStr.includes('~'),
-                raw: str
-              };
-            }
-          }
+        const compileCartiMapAST = (str) => {
           if (!str) return null;
           let clean = String(str).trim()
             .replace(/[\r\n]+/g, ',')
@@ -4255,191 +4131,108 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
             .replace(/\s*,\s*/g, ',')
             .replace(/,,+/g, ',');
 
-          // 1. Choice Sets [...]
-          if (clean.startsWith('[') && clean.endsWith(']')) {
+          // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
+          if (clean.startsWith(String.fromCharCode(91)) && clean.endsWith(String.fromCharCode(93))) {
             const inner = clean.slice(1, -1);
-            const parts = inner.split(',');
+            const parts = inner.split(",");
             const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
             if (values.length === 0) return null;
-            const minVals = values.map(v => v.min).filter(n => typeof n === 'number' && !isNaN(n));
-            const maxVals = values.map(v => v.max).filter(n => typeof n === 'number' && !isNaN(n));
+            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
+            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
             return {
-              type: 'Set',
+              type: "Set",
               values: values,
               min: minVals.length > 0 ? Math.min(...minVals) : 0,
-              max: maxVals.length > 0 ? Math.max(...maxVals) : 0,
-              approximate: true
+              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
             };
           }
 
-          // 2. Inclusive Lists {}
-          if (clean.startsWith('{') && clean.endsWith('}')) {
+          // 2. Array Geometry: Inclusive Lists {}
+          if (clean.startsWith("{") && clean.endsWith("}")) {
             const inner = clean.slice(1, -1);
-            const parts = inner.split(',');
+            const parts = inner.split(",");
             const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
             if (values.length === 0) return null;
-            const minVals = values.map(v => v.min).filter(n => typeof n === 'number' && !isNaN(n));
-            const maxVals = values.map(v => v.max).filter(n => typeof n === 'number' && !isNaN(n));
+            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
+            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
             return {
-              type: 'List',
+              type: "List",
               values: values,
               min: minVals.length > 0 ? Math.min(...minVals) : 0,
-              max: maxVals.length > 0 ? Math.max(...maxVals) : 0,
-              approximate: true
+              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
             };
           }
 
-          // 3. Duration Range Expansion (..)
-          if (clean.includes('..')) {
-            const parts = clean.split('..');
-            const v1 = compileCartiMapAST(parts[0] || '');
-            const v2 = compileCartiMapAST(parts[1] || '');
+          // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
+          if (clean.includes("..")) {
+            const parts = clean.split("..");
+            const part0 = parts.at(0) || '';
+            const part1 = parts.at(1) || '';
+            const v1 = compileCartiMapAST(part0);
+            const v2 = compileCartiMapAST(part1);
             if (!v1 || !v2) return null;
+            const min1 = typeof v1.min === 'number' ? v1.min : Number(v1.min?.valueOf() || 0);
+            const min2 = typeof v2.min === 'number' ? v2.min : Number(v2.min?.valueOf() || 0);
+            const max1 = typeof v1.max === 'number' ? v1.max : Number(v1.max?.valueOf() || 0);
+            const max2 = typeof v2.max === 'number' ? v2.max : Number(v2.max?.valueOf() || 0);
             return {
-              type: 'Set',
-              values: [v1, v2],
-              min: Math.min(v1.min, v2.min),
-              max: Math.max(v1.max, v2.max),
-              approximate: v1.approximate || v2.approximate
+              type: "Set",
+              values: Array.of(v1, v2),
+              min: Math.min(min1, min2),
+              max: Math.max(max1, max2)
             };
           }
 
-          // Natural Language Duration Grammar Regex [REF: CHRONO-AST15]
-          const natMatch = rawStr.match(/^(\d+)\s*(years?|yrs?|y|months?|mos?|weeks?|w|days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s)$/i);
-          if (natMatch) {
-            const num = parseInt(natMatch[1], 10);
-            const unit = natMatch[2].toLowerCase();
-            let durMs = 0;
-            if (/^y/i.test(unit)) durMs = num * 365.25 * 86400 * 1000;
-            else if (/^mo/i.test(unit)) durMs = num * 30.4375 * 86400 * 1000;
-            else if (/^w/i.test(unit)) durMs = num * 7 * 86400 * 1000;
-            else if (/^d/i.test(unit)) durMs = num * 86400 * 1000;
-            else if (/^h/i.test(unit)) durMs = num * 3600 * 1000;
-            else if (/^mi/i.test(unit) || /^m$/i.test(unit)) durMs = num * 60 * 1000;
-            else if (/^s/i.test(unit)) durMs = num * 1000;
-            
-            const startAnchorMs = (typeof baseStartMs === 'number' && !isNaN(baseStartMs)) ? baseStartMs : 0;
-            return {
-              type: 'Duration',
-              min: startAnchorMs,
-              max: startAnchorMs + durMs,
-              isEDTF: true,
-              approximate: false,
-              raw: str
-            };
+          // 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
+          let mathStr = clean;
+          let isApprox = false;
+          let isUncertain = false;
+
+          // Normalize short timezone offset: +02 or -05 -> +02:00 or -05:00
+          mathStr = mathStr.replace(/([+-]\d{2})(?!\:\d{2})(?=\s*|$)/g, '$1:00');
+
+          if (mathStr.includes("T")) {
+            mathStr = mathStr.replace(new RegExp("(T" + String.fromCharCode(91) + "0-9X:~.?%" + String.fromCharCode(93) + "+(?:" + String.fromCharCode(91) + "+\\-Z" + String.fromCharCode(93) + String.fromCharCode(91) + "0-9:" + String.fromCharCode(93) + "*)?)", "gi"), (match) => {
+              if (match.includes("~")) isApprox = true;
+              if (match.includes("?")) isUncertain = true;
+              if (match.includes("%")) { isApprox = true; isUncertain = true; }
+              return match.replace(/X/gi, "0").replace(/[~?%]/g, "");
+            });
           }
 
-          // 4. ISO Durations (P25Y, P6M, P2W, P30D, PT2H, PT45~M, PT30S) [REF: CHRONO-AST15]
-          if (/^P/i.test(clean) || /^-P/i.test(clean)) {
-            const isApprox = clean.includes('~') || clean.includes('?');
-            const durClean = clean.replace(/[~?%]/g, '');
-            const tParts = durClean.split(/T/i);
-            const datePart = tParts[0] || '';
-            const timePart = tParts.length > 1 ? tParts[1] : '';
-
-            const yMatch = datePart.match(/P.*?(\d+)Y/i);
-            const moMatch = datePart.match(/P.*?(\d+)M/i);
-            const wMatch = datePart.match(/P.*?(\d+)W/i);
-            const dMatch = datePart.match(/P.*?(\d+)D/i);
-
-            const hMatch = timePart.match(/(\d+)H/i);
-            const mMatch = timePart.match(/(\d+)M/i);
-            const sMatch = timePart.match(/(\d+)S/i);
-
-            let durMs = 0;
-            if (yMatch) durMs += parseInt(yMatch[1], 10) * 365.25 * 86400 * 1000;
-            if (moMatch) durMs += parseInt(moMatch[1], 10) * 30.4375 * 86400 * 1000;
-            if (wMatch) durMs += parseInt(wMatch[1], 10) * 7 * 86400 * 1000;
-            if (dMatch) durMs += parseInt(dMatch[1], 10) * 86400 * 1000;
-            if (hMatch) durMs += parseInt(hMatch[1], 10) * 3600 * 1000;
-            if (mMatch) durMs += parseInt(mMatch[1], 10) * 60 * 1000;
-            if (sMatch) durMs += parseInt(sMatch[1], 10) * 1000;
-
-            if (durMs === 0) durMs = 30 * 60 * 1000;
-
-            const startAnchorMs = (typeof baseStartMs === 'number' && !isNaN(baseStartMs)) ? baseStartMs : 0;
-            return {
-              type: 'Duration',
-              min: startAnchorMs,
-              max: startAnchorMs + durMs,
-              isEDTF: true,
-              approximate: isApprox,
-              raw: str
-            };
+          // 5. Qualified Durations (PT30~M)
+          if (mathStr.startsWith("P") || mathStr.startsWith("-P")) {
+            if (mathStr.includes("~")) { isApprox = true; mathStr = mathStr.replace(/~/g, ""); }
+            if (mathStr.includes("?")) { isUncertain = true; mathStr = mathStr.replace(/\?/g, ""); }
           }
 
-          // 5. EDTF Intervals (/)
-          if (clean.includes('/') && !clean.startsWith('http')) {
-            const parts = clean.split('/');
-            const v1 = compileCartiMapAST(parts[0] || '');
-            const v2 = compileCartiMapAST(parts[1] || '');
-            if (v1 && v2) {
-              return {
-                type: 'Interval',
-                min: v1.min,
-                max: v2.max,
-                approximate: v1.approximate || v2.approximate,
-                raw: str
-              };
-            }
+          // 6. Native AST Evaluation
+          let parsed = null;
+          try {
+            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
+            parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
+          } catch (e) {
+            return null;
           }
 
-          // 6. Native ISO & Masked Date Evaluation
-          let cleanStr = clean.replace(/\s+/g, ' ');
-          let isApproxSyntax = cleanStr.includes('~') || cleanStr.includes('?') || cleanStr.includes('%') || /^c\./i.test(cleanStr) || /^ca\./i.test(cleanStr) || /approx/i.test(cleanStr);
-          cleanStr = cleanStr.replace(/^c\.\s*/i, '').replace(/^ca\.\s*/i, '').replace(/approx\s*/i, '').replace(/[~?%]/g, '');
+          if (parsed && typeof parsed === "object") {
+            let minMs = 0;
+            let maxMs = 0;
+            try {
+              if (typeof parsed.min === 'number') minMs = parsed.min;
+              else if (parsed.min && typeof parsed.min.valueOf === 'function') minMs = Number(parsed.min.valueOf());
 
-          // Normalize timezone offsets: +02 -> +02:00
-          cleanStr = cleanStr.replace(/([+-]\d{2})$/, '$1:00');
-
-          // Unspecified Digits (194X -> 1940-1949, 1944-XX -> 1944-01-01 to 1944-12-31)
-          if (/\d{3}X/i.test(cleanStr)) {
-            const yrPrefix = cleanStr.substring(0, 3);
-            const dtMin = new Date(Date.UTC(parseInt(yrPrefix + '0', 10), 0, 1)).getTime();
-            const dtMax = new Date(Date.UTC(parseInt(yrPrefix + '9', 10), 11, 31, 23, 59, 59, 999)).getTime();
-            return { type: 'Date', min: dtMin, max: dtMax, approximate: true, raw: str };
-          }
-          if (cleanStr.includes('-XX')) {
-            cleanStr = cleanStr.replace(/-XX/g, '-01');
-            isApproxSyntax = true;
-          }
-
-          let parsedMs = Date.parse(cleanStr);
-          if (isNaN(parsedMs)) {
-            // ISO Fallback regex
-            const isoMatch = cleanStr.match(/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?/);
-            if (isoMatch) {
-              const yr = parseInt(isoMatch[1], 10);
-              const mo = isoMatch[2] ? parseInt(isoMatch[2], 10) - 1 : 0;
-              const da = isoMatch[3] ? parseInt(isoMatch[3], 10) : 1;
-              const hr = isoMatch[4] ? parseInt(isoMatch[4], 10) : 0;
-              const mi = isoMatch[5] ? parseInt(isoMatch[5], 10) : 0;
-              const sc = isoMatch[6] ? parseInt(isoMatch[6], 10) : 0;
-              parsedMs = Date.UTC(yr, mo, da, hr, mi, sc);
-            }
-          }
-
-          if (!isNaN(parsedMs)) {
-            // Span calculation based on granularity
-            let maxMs = parsedMs + 86399999;
-            if (/^\d{4}$/.test(cleanStr)) {
-              const yr = parseInt(cleanStr, 10);
-              parsedMs = Date.UTC(yr, 0, 1);
-              maxMs = Date.UTC(yr, 11, 31, 23, 59, 59, 999);
-            } else if (/^\d{4}-\d{2}$/.test(cleanStr)) {
-              const parts = cleanStr.split('-');
-              const yr = parseInt(parts[0], 10);
-              const mo = parseInt(parts[1], 10) - 1;
-              parsedMs = Date.UTC(yr, mo, 1);
-              const lastDay = new Date(Date.UTC(yr, mo + 1, 0)).getUTCDate();
-              maxMs = Date.UTC(yr, mo, lastDay, 23, 59, 59, 999);
-            }
+              if (typeof parsed.max === 'number') maxMs = parsed.max;
+              else if (parsed.max && typeof parsed.max.valueOf === 'function') maxMs = Number(parsed.max.valueOf());
+            } catch(e) {}
 
             return {
-              type: 'Date',
-              min: parsedMs,
+              type: parsed.type || "Date",
+              values: parsed.values,
+              min: minMs,
               max: maxMs,
-              approximate: isApproxSyntax,
+              approximate: isApprox || !!parsed.approximate,
+              uncertain: isUncertain || !!parsed.uncertain,
               raw: str
             };
           }
