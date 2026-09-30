@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b459';
+const APP_VERSION = 'v8.17.0-b460';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -4121,126 +4121,229 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b178 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b178 ] ===
-// [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
-        const compileCartiMapAST = (str) => {
-          if (!str) return null;
-          let clean = String(str).trim()
-            .replace(/[\r\n]+/g, ',')
-            .replace(/\s*\/\s*/g, '/')
-            .replace(/\s*,\s*/g, ',')
-            .replace(/,,+/g, ',');
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v2.0.42-b460 ] ===
+// [REF: ETL-08 / ETL-09] Native ECMAScript AST Decorator running complementary to edtf.js
 
-          // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
-          if (clean.startsWith(String.fromCharCode(91)) && clean.endsWith(String.fromCharCode(93))) {
-            const inner = clean.slice(1, -1);
-            const parts = inner.split(",");
-            const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
-            if (values.length === 0) return null;
-            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
-            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
-            return {
-              type: "Set",
-              values: values,
-              min: minVals.length > 0 ? Math.min(...minVals) : 0,
-              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
-            };
-          }
+const compileCartiMapAST = (str, baseStartMs = null) => {
+  if (!str) return null;
+  let rawStr = String(str).trim();
+  if (!rawStr) return null;
 
-          // 2. Array Geometry: Inclusive Lists {}
-          if (clean.startsWith("{") && clean.endsWith("}")) {
-            const inner = clean.slice(1, -1);
-            const parts = inner.split(",");
-            const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
-            if (values.length === 0) return null;
-            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
-            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
-            return {
-              type: "List",
-              values: values,
-              min: minVals.length > 0 ? Math.min(...minVals) : 0,
-              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
-            };
-          }
+  // Intercept uncertainty flags in raw string
+  const hasApproxChar = rawStr.includes('~') || rawStr.includes('?');
+  const hasUncertainChar = rawStr.includes('?') || rawStr.includes('%');
 
-          // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
-          if (clean.includes("..")) {
-            const parts = clean.split("..");
-            const part0 = parts.at(0) || '';
-            const part1 = parts.at(1) || '';
-            const v1 = compileCartiMapAST(part0);
-            const v2 = compileCartiMapAST(part1);
-            if (!v1 || !v2) return null;
-            const min1 = typeof v1.min === 'number' ? v1.min : Number(v1.min?.valueOf() || 0);
-            const min2 = typeof v2.min === 'number' ? v2.min : Number(v2.min?.valueOf() || 0);
-            const max1 = typeof v1.max === 'number' ? v1.max : Number(v1.max?.valueOf() || 0);
-            const max2 = typeof v2.max === 'number' ? v2.max : Number(v2.max?.valueOf() || 0);
-            return {
-              type: "Set",
-              values: Array.of(v1, v2),
-              min: Math.min(min1, min2),
-              max: Math.max(max1, max2)
-            };
-          }
+  // 0. Combined Start Date + Duration Interval ("1944-12-22T~19:XX+02 – PT30~M" or "1944-12-22T~19:XX+02/PT30~M")
+  const comboMatch = rawStr.match(/^(.+?)\s*(?:[\/–—]|\s-\s)\s*(PT?[\d~?%]+[YMWDHMS].*)$/i);
+  if (comboMatch) {
+    const startPart = comboMatch[1].trim();
+    const durPart = comboMatch[2].trim();
+    const startObj = compileCartiMapAST(startPart, baseStartMs);
+    const durObj = compileCartiMapAST(durPart, startObj ? startObj.min : baseStartMs);
+    if (startObj && durObj) {
+      return {
+        type: 'Interval',
+        min: startObj.min,
+        max: (typeof durObj.max === 'number' && !isNaN(durObj.max)) ? durObj.max : (startObj.min + (durObj.durMs || 1800000)),
+        isEDTF: true,
+        sourceType: 'EDTF',
+        approximate: startObj.approximate || durObj.approximate || hasApproxChar,
+        uncertain: startObj.uncertain || durObj.uncertain || hasUncertainChar,
+        raw: str
+      };
+    }
+  }
 
-          // 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
-          let mathStr = clean;
-          let isApprox = false;
-          let isUncertain = false;
+  let clean = rawStr
+    .replace(/[\r\n]+/g, ',')
+    .replace(/\s*\/\s*/g, '/')
+    .replace(/\s*,\s*/g, ',')
+    .replace(/,,+/g, ',');
 
-          // Normalize short timezone offset: +02 or -05 -> +02:00 or -05:00
-          mathStr = mathStr.replace(/([+-]\d{2})(?!\:\d{2})(?=\s*|$)/g, '$1:00');
+  // 1. Choice Sets [...] - Evaluated FIRST per [REF: ETL-09]
+  if (clean.startsWith('[') && clean.endsWith(']')) {
+    const inner = clean.slice(1, -1);
+    const parts = inner.split(',');
+    const values = parts.map(p => compileCartiMapAST(p.trim(), baseStartMs)).filter(Boolean);
+    if (values.length === 0) return null;
+    const minVals = values.map(v => v.min).filter(n => typeof n === 'number' && !isNaN(n));
+    const maxVals = values.map(v => v.max).filter(n => typeof n === 'number' && !isNaN(n));
+    return {
+      type: 'Set',
+      values: values,
+      min: minVals.length > 0 ? Math.min(...minVals) : 0,
+      max: maxVals.length > 0 ? Math.max(...maxVals) : 0,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      approximate: true,
+      raw: str
+    };
+  }
 
-          if (mathStr.includes("T")) {
-            mathStr = mathStr.replace(new RegExp("(T" + String.fromCharCode(91) + "0-9X:~.?%" + String.fromCharCode(93) + "+(?:" + String.fromCharCode(91) + "+\\-Z" + String.fromCharCode(93) + String.fromCharCode(91) + "0-9:" + String.fromCharCode(93) + "*)?)", "gi"), (match) => {
-              if (match.includes("~")) isApprox = true;
-              if (match.includes("?")) isUncertain = true;
-              if (match.includes("%")) { isApprox = true; isUncertain = true; }
-              return match.replace(/X/gi, "0").replace(/[~?%]/g, "");
-            });
-          }
+  // 2. Inclusive Lists {} - Evaluated FIRST per [REF: ETL-09]
+  if (clean.startsWith('{') && clean.endsWith('}')) {
+    const inner = clean.slice(1, -1);
+    const parts = inner.split(',');
+    const values = parts.map(p => compileCartiMapAST(p.trim(), baseStartMs)).filter(Boolean);
+    if (values.length === 0) return null;
+    const minVals = values.map(v => v.min).filter(n => typeof n === 'number' && !isNaN(n));
+    const maxVals = values.map(v => v.max).filter(n => typeof n === 'number' && !isNaN(n));
+    return {
+      type: 'List',
+      values: values,
+      min: minVals.length > 0 ? Math.min(...minVals) : 0,
+      max: maxVals.length > 0 ? Math.max(...maxVals) : 0,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      approximate: true,
+      raw: str
+    };
+  }
 
-          // 5. Qualified Durations (PT30~M)
-          if (mathStr.startsWith("P") || mathStr.startsWith("-P")) {
-            if (mathStr.includes("~")) { isApprox = true; mathStr = mathStr.replace(/~/g, ""); }
-            if (mathStr.includes("?")) { isUncertain = true; mathStr = mathStr.replace(/\?/g, ""); }
-          }
+  // 3. Duration Range Expansion (..) - Evaluated SECOND per [REF: ETL-09]
+  if (clean.includes('..')) {
+    const parts = clean.split('..');
+    const v1 = compileCartiMapAST(parts[0] || '', baseStartMs);
+    const v2 = compileCartiMapAST(parts[1] || '', baseStartMs);
+    if (!v1 || !v2) return null;
+    return {
+      type: 'Set',
+      values: [v1, v2],
+      min: Math.min(v1.min, v2.min),
+      max: Math.max(v1.max, v2.max),
+      isEDTF: true,
+      sourceType: 'EDTF',
+      approximate: true,
+      raw: str
+    };
+  }
 
-          // 6. Native AST Evaluation
-          let parsed = null;
-          try {
-            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
-            parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
-          } catch (e) {
-            return null;
-          }
+  // 4. ISO 8601-2 Durations (PT45~M, P25Y, P6M, P2W, P30D, PT2H)
+  if (/^P/i.test(clean) || /^-P/i.test(clean)) {
+    const isApprox = clean.includes('~') || clean.includes('?') || hasApproxChar;
+    const durClean = clean.replace(/[~?%]/g, '');
 
-          if (parsed && typeof parsed === "object") {
-            let minMs = 0;
-            let maxMs = 0;
-            try {
-              if (typeof parsed.min === 'number') minMs = parsed.min;
-              else if (parsed.min && typeof parsed.min.valueOf === 'function') minMs = Number(parsed.min.valueOf());
+    let durMs = 0;
+    const tSplit = durClean.split(/T/i);
+    const datePart = tSplit[0] || '';
+    const timePart = tSplit.length > 1 ? tSplit[1] : '';
 
-              if (typeof parsed.max === 'number') maxMs = parsed.max;
-              else if (parsed.max && typeof parsed.max.valueOf === 'function') maxMs = Number(parsed.max.valueOf());
-            } catch(e) {}
+    // Date designators
+    const yMatch = datePart.match(/P.*?(\d+)Y/i);
+    const monthMatch = datePart.match(/P.*?(\d+)M/i);
+    const wMatch = datePart.match(/P.*?(\d+)W/i);
+    const dMatch = datePart.match(/P.*?(\d+)D/i);
 
-            return {
-              type: parsed.type || "Date",
-              values: parsed.values,
-              min: minMs,
-              max: maxMs,
-              approximate: isApprox || !!parsed.approximate,
-              uncertain: isUncertain || !!parsed.uncertain,
-              raw: str
-            };
-          }
+    if (yMatch) durMs += parseInt(yMatch[1], 10) * 365.25 * 86400 * 1000;
+    if (monthMatch) durMs += parseInt(monthMatch[1], 10) * 30.4375 * 86400 * 1000;
+    if (wMatch) durMs += parseInt(wMatch[1], 10) * 7 * 86400 * 1000;
+    if (dMatch) durMs += parseInt(dMatch[1], 10) * 86400 * 1000;
 
-          return null;
-        };
+    // Time designators
+    if (timePart) {
+      const hMatch = timePart.match(/(\d+)H/i);
+      const minMatch = timePart.match(/(\d+)M/i);
+      const sMatch = timePart.match(/(\d+)S/i);
+      if (hMatch) durMs += parseInt(hMatch[1], 10) * 3600 * 1000;
+      if (minMatch) durMs += parseInt(minMatch[1], 10) * 60 * 1000;
+      if (sMatch) durMs += parseInt(sMatch[1], 10) * 1000;
+    }
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.96-b303';
+    if (durMs === 0) durMs = 1800000; // 30 min default fallback
+
+    const startAnchorMs = (typeof baseStartMs === 'number' && !isNaN(baseStartMs)) ? baseStartMs : null;
+    const minVal = startAnchorMs !== null ? startAnchorMs : 0;
+    const maxVal = startAnchorMs !== null ? (startAnchorMs + durMs) : durMs;
+
+    return {
+      type: 'Duration',
+      min: minVal,
+      max: maxVal,
+      durMs: durMs,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      isRelativeDuration: startAnchorMs === null,
+      approximate: isApprox,
+      raw: str
+    };
+  }
+
+  // 5. EDTF Intervals (/)
+  if (clean.includes('/') && !clean.startsWith('http')) {
+    const parts = clean.split('/');
+    const v1 = compileCartiMapAST(parts[0] || '', baseStartMs);
+    const v2 = compileCartiMapAST(parts[1] || '', baseStartMs);
+    if (v1 && v2) {
+      return {
+        type: 'Interval',
+        min: v1.min,
+        max: v2.max,
+        isEDTF: true,
+        sourceType: 'EDTF',
+        approximate: v1.approximate || v2.approximate || hasApproxChar,
+        uncertain: v1.uncertain || v2.uncertain || hasUncertainChar,
+        raw: str
+      };
+    }
+  }
+
+  // 6. edtf.js Core Level 3 Primitive Evaluator
+  let mathStr = clean;
+  // Clock-X Proxy [REF: ETL-08]: Replace T..:XX with T..:00 for edtf.js parsing
+  if (mathStr.includes('T')) {
+    mathStr = mathStr.replace(/(T[0-9X:~.?%]+(?:[+\-Z][0-9:]*)?)/gi, (m) => {
+      return m.replace(/X/gi, '0');
+    });
+  }
+
+  const cleanForEdtf = mathStr.replace(/[~?%]/g, '');
+
+  try {
+    const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
+    if (edtfFn) {
+      const res = (typeof edtfFn === 'function') ? edtfFn(cleanForEdtf, { level: 3 }) : edtfFn.parse(cleanForEdtf, { level: 3 });
+      if (res) {
+        const minMs = res.min ? new Date(res.min).getTime() : null;
+        const maxMs = res.max ? new Date(res.max).getTime() : null;
+        if (typeof minMs === 'number' && !isNaN(minMs)) {
+          return {
+            type: 'EDTF',
+            min: minMs,
+            max: (typeof maxMs === 'number' && !isNaN(maxMs)) ? maxMs : minMs,
+            isEDTF: true,
+            sourceType: 'EDTF',
+            approximate: clean.includes('~') || clean.includes('?') || hasApproxChar,
+            uncertain: clean.includes('?') || clean.includes('%') || hasUncertainChar,
+            raw: str,
+            edtfObj: res
+          };
+        }
+      }
+    }
+  } catch (e) {
+    // Fallback to Native ISO Date.parse
+  }
+
+  // 7. Native ISO Fallback Parser
+  const cleanIso = clean.replace(/[~?%]/g, '');
+  const parsedTs = Date.parse(cleanIso);
+  if (!isNaN(parsedTs)) {
+    return {
+      type: 'EDTF',
+      min: parsedTs,
+      max: parsedTs,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      approximate: hasApproxChar,
+      uncertain: hasUncertainChar,
+      raw: str
+    };
+  }
+
+  return null;
+};
+MODULE_VERSIONS['ASTCompiler'] = 'v2.0.42-b460';
+
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
