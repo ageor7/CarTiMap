@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b426</title>
+    <title>CarTiMap v8.17.0-b427</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b426';
+const APP_VERSION = 'v8.17.0-b427';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
             // Robust Base64 Favicon Injection for All Browsers
@@ -761,8 +761,8 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
               ` : ''}
               <div class="metadata-pills-wrapper" style="display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end; flex: 1 1 auto;">
                 ${slide.extractType ? html`<span class="place-pill" style="font-weight: 400; font-size: 0.75rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px;">${slide.extractType}</span>` : ''}
-                ${(slide.place || slide.location) ? html`<span class="place-pill" style="font-weight: 500; font-size: 0.75rem; background: #f1f5f9; color: #334155; padding: 2px 8px; border-radius: 12px; border: 1px solid #cbd5e1;">${window.safeStripHTML ? window.safeStripHTML(formatPlaces(slide.place || slide.location)) : ''}</span>` : ''}
-                ${(slide.tags || []).map(t => html`<span class="tag-pill" style="font-weight: 500; font-size: 0.75rem; background: #f8fafc; color: #475569; padding: 2px 8px; border-radius: 12px; border: 1px solid #e2e8f0;">${window.safeStripHTML ? window.safeStripHTML(String(t).replace(/^#\s*/, '')) : String(t).replace(/^#\s*/, '')}</span>`)}
+                ${(slide.place || slide.location) ? html`<span class="place-pill" style="font-weight: 500; font-size: 0.75rem; background: #f1f5f9; color: #334155; padding: 2px 8px; border-radius: 12px; border: 1px solid #cbd5e1;">${window.safeStripHTML(formatPlaces(slide.place || slide.location))}</span>` : ''}
+                ${(slide.tags || []).map(t => html`<span class="tag-pill" style="font-weight: 500; font-size: 0.75rem; background: #f8fafc; color: #475569; padding: 2px 8px; border-radius: 12px; border: 1px solid #e2e8f0;">${window.safeStripHTML(String(t).replace(/^#\s*/, ''))}</span>`)}
               </div>
             </div>
             <div class="title-header-container" style="width: 100%; padding: 0; box-sizing: border-box;">
@@ -815,10 +815,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     if (wrapperRef.current) ro.observe(wrapperRef.current);
   }, []);
 
-  window.safeStripHTML = (str) => {
-    if (!str) return '';
-    return String(str).replace(/<[^>]*>/g, '').trim();
-  };
+  window.safeStripHTML = (str) => { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); };
+  const safeStripHTML = window.safeStripHTML;
 
   const formatLabelSmart = (titleStr, maxPx = 180, hasMedia = false) => {
     if (!titleStr) return { lines: ['Untitled'], pxWidth: 50 };
@@ -1289,12 +1287,17 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       }
     }
 
-          if (!xAxisMarker && hasDuration) {
+    if (!xAxisMarker && hasDuration) {
         const ribbonColor = (isApproxStart || isApproxEnd) ? '#f59e0b' : '#007acc';
         const ribbonBg = (isApproxStart || isApproxEnd) 
           ? 'rgba(245, 158, 11, 0.18)' 
           : 'rgba(0, 122, 204, 0.15)';
         
+        const durationStr = (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs)
+          ? formatSmartDate(item.startDate, item.endDate, dateLocale)
+          : '';
+        const spanMarkerTooltip = `${window.safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+
         xAxisMarker = html`
           <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 8px; background: ${ribbonBg}; border-top: 1.5px solid ${ribbonColor}; border-bottom: 1.5px solid ${ribbonColor}; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setActiveIndex(index); }}>
             ${isApproxStart ? html`<div style="position: absolute; left: 0; top: -2px; bottom: -2px; width: 4px; background: #f59e0b; border-radius: 2px;" title="Approximate Start Date (~)"></div>` : ''}
@@ -1303,7 +1306,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         `;
       }
 
-      let dropLine = '';
+    let dropLine = '';
       const dropColor = isActive ? colActive : (isApproxStart ? colApprox : colInactive);
       if (xOffset > 0) {
         dropLine = html`
@@ -1318,6 +1321,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           </svg>
         `;
       }
+
     const fullNodeTooltip = `${safeStripHTML(item.title)}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick node to focus slide`;
 
     return html`
@@ -1418,8 +1422,8 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.50-b359';
 
 
 
-// 🔽🔽🔽 [ START_INJECT: MapViewer v8.17.0-b426 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: MapViewer v8.17.0-b426 ] ===
+// 🔽🔽🔽 [ START_INJECT: MapViewer v8.17.0-b427 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: MapViewer v8.17.0-b427 ] ===
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
           useEffect(() => {
             const handleMapEsc = (e) => {
@@ -2398,8 +2402,8 @@ MODULE_VERSIONS['MapViewer'] = 'v6.6.48-b355';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.17.0-b426 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: AppOrchestrator v8.17.0-b426 ] ===
+// 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.17.0-b427 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: AppOrchestrator v8.17.0-b427 ] ===
 const App = () => {
           
           const getParsedTags = (rawTags) => {
@@ -4132,8 +4136,8 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
-// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.17.0-b426 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.17.0-b426 ] ===
+// 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.17.0-b427 ] 🔽🔽🔽
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.17.0-b427 ] ===
 // [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
         const compileCartiMapAST = (str) => {
           if (!str) return null;
@@ -4267,7 +4271,7 @@ MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.50-b359';
 
           if (!isNaN(parsedMs)) {
             // Span calculation based on granularity
-            let maxMs = parsedMs; // Point date max == min per CHRONO-AST06
+            let maxMs = parsedMs; // Point event isolation (max = min)
             if (/^\d{4}$/.test(cleanStr)) {
               const yr = parseInt(cleanStr, 10);
               parsedMs = Date.UTC(yr, 0, 1);
