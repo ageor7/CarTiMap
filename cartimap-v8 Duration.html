@@ -2673,69 +2673,6 @@ const App = () => {
             return html`<span>${mainDateStr}${suffixVNode}</span>`;
           };
 
-            const checkIsEDTF = (val) => {
-              if (!val) return false;
-              if (typeof val === 'object' && (val.isEDTF || val.sourceType === 'EDTF_AST')) return true;
-              if (typeof val === 'string' && /^[P\d~?%\{\[\/\.]/i.test(val.trim())) return true;
-              return false;
-            };
-
-            const isApprox = checkApprox(startInput) || checkApprox(endInput);
-            const isEDTF = checkIsEDTF(startInput) || checkIsEDTF(endInput);
-            const approxPrefix = isApprox ? '~ ' : '';
-
-            if (startInput === null || startInput === undefined) return 'Undated';
-
-            const toValidDate = (val) => {
-              if (val === null || val === undefined) return null;
-              if (typeof val === 'number') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
-              if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
-              if (typeof val === 'object') {
-                if (val.isEDTF && val.text) return val.text;
-                if (val.date && val.date instanceof Date && !isNaN(val.date.getTime())) return val.date;
-                if (typeof val.min === 'number') { const d = new Date(val.min); return isNaN(d.getTime()) ? null : d; }
-                if (typeof val.start === 'number') { const d = new Date(val.start); return isNaN(d.getTime()) ? null : d; }
-              }
-              if (typeof val === 'string') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
-              return null;
-            };
-
-            const d1 = toValidDate(startInput);
-            const d2 = toValidDate(endInput);
-            const loc = locale || 'en-GB';
-            const opt = { day: '2-digit', month: 'short', year: 'numeric' };
-
-            let mainDateStr = 'Undated';
-            if (typeof d1 === 'string') {
-              mainDateStr = d1;
-            } else if (d1) {
-              if (d2 && typeof d2 !== 'string') {
-                if (d2.getTime() === d1.getTime()) mainDateStr = approxPrefix + d1.toLocaleDateString(loc, opt);
-                else mainDateStr = approxPrefix + `${d1.toLocaleDateString(loc, opt)} – ${d2.toLocaleDateString(loc, opt)}`;
-              } else {
-                mainDateStr = approxPrefix + d1.toLocaleDateString(loc, opt);
-              }
-            } else if (typeof startInput === 'string') {
-              mainDateStr = startInput;
-            }
-
-            if (!includeSuffix) return mainDateStr;
-
-            let badgeText = 'Num';
-            let badgeColor = '#777777';
-            if (isEDTF && isApprox) {
-              badgeText = 'ISO~';
-              badgeColor = '#f59e0b';
-            } else if (isEDTF) {
-              badgeText = 'ISO';
-              badgeColor = '#007acc';
-            }
-
-            const suffixVNode = html`<sup style="font-size: 0.68em; font-family: monospace; color: ${badgeColor}; vertical-align: super; font-weight: 700;">${badgeText}</sup>`;
-
-            return html`<span>${mainDateStr}${suffixVNode}</span>`;
-          };
-
           const formatPlaces = (placeStr) => {
             if (!placeStr) return '';
             const stripped = placeStr.replace(new RegExp("^\\s*\\\\x5b.*?\\\\x5d\\s*", ""), '');
