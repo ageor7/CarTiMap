@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b493</title>
+    <title>CarTiMap v8.17.0-b495</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b493';
+const APP_VERSION = 'v8.17.0-b495';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1213,7 +1213,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
       endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
     }
-    const hasDuration = (endPct - startPct) > 0.001;
+    const isChoiceSet = item.startDate && item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List');
+    const hasDuration = !isChoiceSet && (endPct - startPct) > 0.001;
     const isActive = globalIndex === activeIndex;
     const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
     const colActive = 'var(--tm-active, #007acc)';
@@ -1237,15 +1238,32 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
       const obj = item.startDate.obj;
       if (obj.type === 'Set') {
-        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 10px; background: rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.1); border: 1px dashed ${colApprox}; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
-      } else if (obj.type === 'List') {
+        // Choice Set ([...]): Dotted connector lines (2,3) in amber gold (#f59e0b)
         const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
         const subDots = (obj.values || []).map(v => {
           const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
-          return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: ${colInactive}; transform: translateX(-2px);"></div>`;
+          return html`<div style="position: absolute; bottom: 0px; left: ${vPct}px; width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid #f59e0b; background: #ffffff; transform: translateX(-3px); z-index: 910;" title="Choice Candidate Date"></div>`;
         });
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 1px; background: rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.4); z-index: 900;">${subDots}</div>`;
+        xAxisMarker = html`
+          <div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 2px; border-bottom: 2px dotted #f59e0b; z-index: 900;">
+            ${subDots}
+          </div>
+        `;
+      } else if (obj.type === 'List') {
+        // Inclusive List ({...}): Dash-dot connector lines (6,3,2,3) in royal cyan (#007acc)
+        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        const subDots = (obj.values || []).map(v => {
+          const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
+          return html`<div style="position: absolute; bottom: 0px; left: ${vPct}px; width: 6px; height: 6px; border-radius: 50%; background: #007acc; transform: translateX(-3px); z-index: 910;" title="Inclusive Occurrence Date"></div>`;
+        });
+        xAxisMarker = html`
+          <svg style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 4px; overflow: visible; z-index: 900;">
+            <line x1="0" y1="2" x2="100%" y2="2" stroke="#007acc" stroke-width="2" stroke-dasharray="6,3,2,3" />
+          </svg>
+          <div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 4px; z-index: 905;">
+            ${subDots}
+          </div>
+        `;
       }
     }
 
