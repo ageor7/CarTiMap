@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.0-b514</title>
+    <title>CarTiMap v8.17.0-b515</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b514';
+const APP_VERSION = 'v8.17.0-b515';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -1346,7 +1346,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const fullNodeTooltip = `${safeStripHTML(item.title)}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale, false)}\nClick node to focus slide`;
 
     return html`
-      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? "active" : ""}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}; pointer-events: none;" onClick=${() => handleNodeClick(globalIndex)}>
+      <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}; pointer-events: none;" onClick=${() => handleNodeClick(globalIndex)}>
         ${dropLine}
         ${xAxisMarker}
         <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --half-lane: ${laneHeight / 2}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25}; pointer-events: auto;" title="${fullNodeTooltip}">
@@ -3863,7 +3863,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
             </div>
           `}
 
-              ${isTocOpen ? html`
+              ${isTocOpen && html`
                 <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 3500; display: flex; align-items: center; justify-content: center;" onClick=${(e) => e.stopPropagation()}>
                   <div style="background: #ffffff; width: 80vw; height: 80vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; font-family: monospace;" onClick=${(e) => e.stopPropagation()}>
                     <div style="padding: 16px 20px; border-bottom: 1px solid #e0e0e0; background: #f8f9fa; display: flex; align-items: center; justify-content: space-between;">
@@ -3884,6 +3884,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           let mainTitle = '';
                           let subTitle = '';
 
+                          // Split via <p*> tag inside Title field per Directive 5
                           const pMatch = rawTitleField.match(/<p[^>]*>/i);
                           if (pMatch) {
                             const pIdx = pMatch.index;
@@ -3898,6 +3899,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
                           if (!mainTitle) mainTitle = 'Untitled';
 
+                          // Strip leading number, fullstop, space ('<number>. ')
                           const normGroupTitle = mainTitle.replace(/^\d+[\.\)\-]?\s*/, '').trim();
                           const parseAndDedupeTags = (tagsInput) => {
                             if (!tagsInput) return [];
@@ -3944,49 +3946,59 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
                         const groups = groupOrder.map(key => groupMap.get(key));
 
-                        return groups.map(g => html`
-                          <div style="margin-bottom: 14px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff;">
-                            <div style="background: #f1f3f5; padding: 10px 14px; font-weight: 800; font-size: 0.95rem; color: #111; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between;">
-                              <span>${g.title}</span>
-                              <span style="font-size: 0.75rem; color: #007acc; background: #e6f4ff; border: 1px solid #bae0ff; padding: 2px 8px; border-radius: 10px;">${g.items.length} ${g.items.length === 1 ? 'item' : 'items'}</span>
-                            </div>
-                            <div style="display: flex; flex-direction: column;">
-                              ${g.items.map(child => {
-                                const isActive = child.idx === activeIndex;
-                                const itemDateStr = (child.item.startDate || child.item.start) ? formatSmartDate(child.item.startDate, child.item.endDate, dateLocale) : '';
-                                const itemPlaceStr = (child.item.place || child.item.location) ? safeStripHTML(formatPlaces(child.item.place || child.item.location)) : '';
-                                const hasMeta = itemDateStr || itemPlaceStr || (child.tags && child.tags.length > 0);
-
-                                return html`
-                                  <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
-                                    <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
-                                      <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
-                                      <span>${child.sub || child.mainTitle || g.title}</span>
-                                    </div>
-                                    ${hasMeta ? html`
-                                      <div style="display: flex; align-items: center; gap: 10px; margin-left: 28px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem;">
-                                        ${itemDateStr ? html`<span style="color: #007acc; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e5ff; font-weight: 500;">🕒 ${itemDateStr}</span>` : ''}
-                                        ${itemPlaceStr ? html`<span style="color: #28a745; background: #f2fcf5; padding: 2px 6px; border-radius: 4px; border: 1px solid #c3e6cb; font-weight: 500;">📍 ${itemPlaceStr}</span>` : ''}
-                                        ${child.tags && child.tags.length > 0 ? html`
-                                          <div style="display: flex; align-items: center; gap: 4px;">
-                                            <span style="color: #888;">🏷️</span>
-                                            ${child.tags.map(t => html`<span style="background: #f0f0f0; color: #444; padding: 1px 6px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.75rem;">${t}</span>`)}
-                                          </div>
-                                        ` : ''}
+                        return groups.map(g => {
+                          return html`
+                            <div style="margin-bottom: 14px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff;">
+                              <!-- Heading showing ONLY the normalized Group Title (no subtitle) -->
+                              <div style="background: #f1f3f5; padding: 10px 14px; font-weight: 800; font-size: 0.95rem; color: #111; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between;">
+                                <span>${g.title}</span>
+                                <span style="font-size: 0.75rem; color: #007acc; background: #e6f4ff; border: 1px solid #bae0ff; padding: 2px 8px; border-radius: 10px;">${g.items.length} ${g.items.length === 1 ? 'item' : 'items'}</span>
+                              </div>
+                              <div style="display: flex; flex-direction: column;">
+                                ${g.items.map(child => {
+                                  const isActive = child.idx === activeIndex;
+                                  return html`
+                                    <div onClick=${() => { setActiveIndex(child.idx); setIsTocOpen(false); }} style="padding: 10px 14px; border-bottom: 1px solid #f0f0f0; cursor: pointer; background: ${isActive ? '#e6f4ff' : '#fff'}; border-left: ${isActive ? '5px solid #28a745' : '5px solid transparent'}; transition: background 0.15s; display: flex; flex-direction: column; gap: 4px;">
+<!-- Body Entry showing Index & Subtitle (NO title in body entry) -->
+                                      <div style="font-size: 0.88rem; font-weight: ${isActive ? '700' : '600'}; color: ${isActive ? '#007acc' : '#333'}; display: flex; align-items: center; gap: 8px;">
+                                        <span style="color: #888; font-family: monospace; font-size: 0.82rem;">#${child.idx + 1}</span>
+                                        <span>${child.sub || child.mainTitle || g.title}</span>
                                       </div>
-                                    ` : ''}
-                                  </div>
-                                `;
-                              })}
+
+                                      <!-- Line 2: Metadata row displaying Dates, Places, and Tags -->
+                                      ${(() => {
+                                        const itemDateStr = (child.item.startDate || child.item.start) ? formatSmartDate(child.item.startDate, child.item.endDate, dateLocale) : '';
+                                        const itemPlaceStr = (child.item.place || child.item.location) ? safeStripHTML(formatPlaces(child.item.place || child.item.location)) : '';
+                                        if (!itemDateStr && !itemPlaceStr && (!child.tags || child.tags.length === 0)) return '';
+                                        return html`
+                                          <div style="display: flex; align-items: center; gap: 10px; margin-left: 28px; margin-top: 2px; flex-wrap: wrap; font-size: 0.78rem;">
+                                            ${itemDateStr ? html`<span style="color: #007acc; background: #f0f7ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #d0e5ff; font-weight: 500;">🕒 ${itemDateStr}</span>` : ''}
+                                            ${itemPlaceStr ? html`<span style="color: #28a745; background: #f2fcf5; padding: 2px 6px; border-radius: 4px; border: 1px solid #c3e6cb; font-weight: 500;">📍 ${itemPlaceStr}</span>` : ''}
+                                            ${child.tags && child.tags.length > 0 ? html`
+                                              <div style="display: flex; align-items: center; gap: 4px;">
+                                                <span style="color: #888;">🏷️</span>
+                                                ${child.tags.map(t => html`<span style="background: #f0f0f0; color: #444; padding: 1px 6px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.75rem;">${t}</span>`)}
+                                              </div>
+                                            ` : ''}
+                                          </div>
+                                        `;
+                                      })()}
+
+                                    </div>
+                                  `;
+                                })}
+                              </div>
                             </div>
-                          </div>
-                        `);
+                          `;
+                        });
                       })()}
                     </div>
                   </div>
                 </div>
-              ` : ''}
-      durationInspectionPayload ? html`
+              `}
+            </div>
+          
+      ${durationInspectionPayload ? html`
         <div id="duration-inspection-root">
           <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important; background: rgba(0,0,0,0.55);"></div>
           <div id="duration-inspection-modal" class="tm-modal open" style="z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); padding: 24px 28px; font-family: monospace; width: 95vw; max-width: 1150px; max-height: 92vh; overflow-y: auto;">
@@ -4194,15 +4206,15 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                 <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;" title="Focus: ${focusDateStr}"></div>
                               </div>
                             `;
-                          
-                          
+                          })()}
+                          })()}
                         </div>
                       `;
                     })}
                   </div>
                 </div>
               `;
-            
+            })()}
           </div>
         </div>
       ` : ''}
@@ -4210,12 +4222,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.103-b514';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.76-b487';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b178 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v2.0.83-b511 ] ===
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v2.0.68-b487 ] ===
 // [REF: ETL-08 / ETL-09] Native ECMAScript AST Decorator running complementary to edtf.js
 
 const compileCartiMapAST = (str, baseStartMs = null) => {
@@ -4474,7 +4486,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
 
   return null;
 };
-MODULE_VERSIONS['ASTCompiler'] = 'v2.0.83-b511';
+MODULE_VERSIONS['ASTCompiler'] = 'v2.0.68-b487';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
