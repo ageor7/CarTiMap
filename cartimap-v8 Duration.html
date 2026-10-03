@@ -1,24 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CarTiMap v8.17.0-b518</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-    <script src="https://unpkg.com/wicket@1.3.8/wicket.js"></script>
-    <script src="https://unpkg.com/htm@3.1.1/dist/htm.js"></script>
-    <script src="https://unpkg.com/preact@10.19.3/dist/preact.min.js"></script>
-    <script src="https://unpkg.com/preact@10.19.3/hooks/dist/hooks.umd.js"></script>
-</head>
-<body style="margin: 0; padding: 0; overflow: hidden; background: #0f172a;">
-    <div id="root"></div>
-    <script>
 
 // === [ MAJOR BLOCK: Imports & Globals v2.0.6 ] ===
 
 // === [ GLOBAL UTILITY: Temporal Approximation Evaluator ] ===
+import { h, render, Component } from 'https://esm.sh/preact';
+import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
+import htm from 'https://esm.sh/htm';
+import Papa from 'https://esm.sh/papaparse';
+import edtf from 'https://esm.sh/edtf@4.11.0';
+
 window.checkIsApprox = (node) => {
   if (!node) return false;
   if (node.isApprox) return true;
@@ -29,14 +18,9 @@ window.checkIsApprox = (node) => {
 };
 const checkIsApprox = window.checkIsApprox;
 
-import { h, render, Component } from 'https://esm.sh/preact';
-import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
-import htm from 'https://esm.sh/htm';
-import Papa from 'https://esm.sh/papaparse';
-import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.0-b518';
+const APP_VERSION = 'v8.17.0-b519';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
@@ -4351,6 +4335,3 @@ MODULE_VERSIONS['ASTCompiler'] = 'v2.0.68-b487';
         // === [ END MAJOR BLOCK: IgnitionSwitch v1.0.0 ] ===
 
     
-    </script>
-</body>
-</html>
