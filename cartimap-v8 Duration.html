@@ -216,16 +216,16 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b549';
+const APP_VERSION = 'v8.17.1-b534';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.125-b539',
+  'AppOrchestrator': 'v3.9.125-b538',
   'MapViewer': 'v7.2.77-b535',
   'ContentSlider': 'v6.2.77-b535',
   'MediaViewer': 'v3.2.76-b535',
-  'TimelineScrubber': 'v27.2.119-b539',
+  'TimelineScrubber': 'v27.2.119-b538',
   'OverviewGantt': 'v2.1.42-b535',
-  'ASTCompiler': 'v2.1.7-b539',
+  'ASTCompiler': 'v2.1.7-b538',
   'VibeMonitor': 'v2.5.6-b535',
   'SymbologyLegend': 'v1.2.20-b535',
   'Globals': 'v2.1.5-b535',
@@ -1530,64 +1530,6 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.14.50-b359';
 
 // 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
-const SymbologyLegend = ({ isOpen, setIsOpen }) => {
-  if (!isOpen) return null;
-  return html`
-    <div id="symbology-legend-modal" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); padding: 16px; font-family: monospace; font-size: 0.78rem; width: 340px; max-width: 90vw;">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px;">
-        <strong style="color: #111; font-size: 0.85rem;">🎨 Symbology & Color Legend</strong>
-        <button onClick=${() => setIsOpen(false)} style="background: transparent; border: none; font-size: 1rem; cursor: pointer; color: #888;">✕</button>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 10px; color: #333;">
-        <div style="font-weight: 700; color: #28a745; font-size: 0.75rem; text-transform: uppercase;">Unified Feature Palette</div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="width: 14px; height: 14px; background: #28a745; border-radius: 50%; display: inline-block; border: 2px solid #fff; box-shadow: 0 0 0 1px #28a745;"></span>
-          <span><strong>Active Feature / Slide</strong> (Emerald Green #28a745)</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="width: 14px; height: 14px; background: #007acc; border-radius: 50%; display: inline-block;"></span>
-          <span><strong>Standard / Inactive Feature</strong> (Royal Cyan #007acc)</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="width: 14px; height: 14px; background: #ffb300; border-radius: 50%; display: inline-block;"></span>
-          <span><strong>VIP Priority Event</strong> (Amber Gold #ffb300)</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="width: 14px; height: 14px; background: #fff; border: 2px dashed #f59e0b; border-radius: 50%; display: inline-block;"></span>
-          <span><strong>Approximate Event (~)</strong> (Burnt Amber Dashed)</span>
-        </div>
-
-        <div style="font-weight: 700; color: #007acc; font-size: 0.75rem; text-transform: uppercase; margin-top: 6px;">Temporal Drop-Lines & Legs</div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <svg width="32" height="18" viewBox="0 0 32 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
-            <circle cx="2" cy="2" r="2" fill="#28a745" />
-            <line x1="2" y1="2" x2="2" y2="16" stroke="#28a745" stroke-width="2" />
-          </svg>
-          <span><strong>Single-Date Point Leg</strong> (Active Solid Green)</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <svg width="32" height="18" viewBox="0 0 32 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
-            <circle cx="2" cy="2" r="2" fill="#007acc" />
-            <line x1="2" y1="2" x2="2" y2="16" stroke="#007acc" stroke-width="1.5" />
-            <line x1="2" y1="2" x2="16" y2="16" stroke="#007acc" stroke-width="1.5" />
-            <line x1="2" y1="2" x2="30" y2="16" stroke="#007acc" stroke-width="1.5" />
-          </svg>
-          <span><strong>Multi-Date Legs {...}</strong> (Solid Cyan Radiating)</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <svg width="32" height="18" viewBox="0 0 32 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
-            <circle cx="2" cy="2" r="2" fill="#f59e0b" />
-            <line x1="2" y1="2" x2="2" y2="16" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2,2" />
-            <line x1="2" y1="2" x2="16" y2="16" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2,2" />
-            <line x1="2" y1="2" x2="30" y2="16" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2,2" />
-          </svg>
-          <span><strong>Choice Set Legs [...]</strong> (Dashed Amber Radiating)</span>
-        </div>
-      </div>
-    </div>
-  `;
-};
-
 const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds, setSpatialEngineSummary }) => {
           const [isMapReady, setIsMapReady] = useState(false);
           useEffect(() => {
@@ -3414,6 +3356,34 @@ const App = () => {
           // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
           // =========================================================================
           
+const SymbologyLegend = () => html`
+  <div class="symbology-legend-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; font-size: 0.82rem; color: #333;">
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #28a745; border-radius: 50%; display: inline-block;"></span> Active Feature</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #ffb300; border-radius: 50%; display: inline-block;"></span> VIP Priority</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #007acc; border-radius: 50%; display: inline-block;"></span> Standard Feature</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: bold; color: #007acc; font-size: 1rem;">›››</span> Directional Polyline</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: rgba(0,122,204,0.35); border: 1px solid #007acc; display: inline-block;"></span> Spatial Polygon</div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <svg width="28" height="18" viewBox="0 0 28 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
+        <circle cx="2" cy="2" r="2" fill="#007acc" />
+        <line x1="2" y1="2" x2="2" y2="16" stroke="#007acc" stroke-width="1.5" />
+        <line x1="2" y1="2" x2="14" y2="16" stroke="#007acc" stroke-width="1.5" />
+        <line x1="2" y1="2" x2="26" y2="16" stroke="#007acc" stroke-width="1.5" />
+      </svg>
+      <span>Multi-Date Occurrence Legs {...}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <svg width="28" height="18" viewBox="0 0 28 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
+        <circle cx="2" cy="2" r="2" fill="#ffb300" />
+        <line x1="2" y1="2" x2="2" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
+        <line x1="2" y1="2" x2="14" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
+        <line x1="2" y1="2" x2="26" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
+      </svg>
+      <span>Choice Set Candidate Legs [...]</span>
+    </div>
+  </div>
+`;
+
 const CarTiMapperLogo = ({ context, appVersion }) => {
             const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
@@ -3880,9 +3850,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 <!-- Symmetrically styled Modals utilizing flex-direction and sticky closures [REF: UI-176b] -->
                 <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
                 <div class="tm-backdrop ${isAboutOpen ? 'open' : ''}" onClick=${() => setIsAboutOpen(false)} style="z-index: 99999 !important;"></div>
-                <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow: hidden; position: fixed; z-index: 100000 !important; padding: 0; background: #fff; border-radius: 12px; border: 1px solid #ccc; box-shadow: 0 20px 50px rgba(0,0,0,0.4); font-family: monospace; box-sizing: border-box;">
-                  <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close (Esc)" style="position: absolute; top: 15px; right: 20px; z-index: 101000; font-size: 1.5rem; border: none; background: rgba(255,255,255,0.9); width: 36px; height: 36px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; color: #444; display: flex; align-items: center; justify-content: center;">✕</button>
-                  <div style="padding: 30px; max-height: 85vh; overflow-y: auto; box-sizing: border-box;">
+                <div id="about-modal" class="tm-modal ${isAboutOpen ? 'open' : ''}" style="display: ${isAboutOpen ? 'block' : 'none'}; width: 85%; max-width: 800px; max-height: 85vh; overflow-y: auto; position: fixed; z-index: 100000 !important; padding: 30px; background: #fff; border-radius: 12px; border: 1px solid #ccc; box-shadow: 0 20px 50px rgba(0,0,0,0.4); font-family: monospace; box-sizing: border-box;">
+                  <button class="modal-close" onClick=${() => setIsAboutOpen(false)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; z-index: 101000; font-size: 1.5rem; border: none; background: none; cursor: pointer; color: #888; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">✕</button>
                   <div style="margin-bottom: 25px;">
                     <${CarTiMapperLogo} context="about" appVersion=${APP_VERSION} />
                     <h2 style="margin: 0 0 10px 0; font-size: 1.6rem; color: #2c3e50; font-family: monospace;" dangerouslySetInnerHTML=${{ __html: aboutData ? aboutData.title : 'Dataset Specifications' }}></h2>
@@ -4351,6 +4320,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                 <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;" title="Focus: ${focusDateStr}"></div>
                               </div>
                             `;
+                          })()}
                           })()}
                         </div>
                       `;
