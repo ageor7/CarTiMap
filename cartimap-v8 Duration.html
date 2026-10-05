@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b559';
+const APP_VERSION = 'v8.17.1-b560';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v8.17.1-b559',
-  'MapViewer': 'v8.17.1-b559',
-  'ContentSlider': 'v8.17.1-b559',
-  'MediaViewer': 'v8.17.1-b559',
-  'TimelineScrubber': 'v8.17.1-b559',
-  'OverviewGantt': 'v8.17.1-b559',
-  'ASTCompiler': 'v8.17.1-b559',
-  'VibeMonitor': 'v8.17.1-b559',
-  'SymbologyLegend': 'v8.17.1-b559',
-  'Globals': 'v8.17.1-b559',
-  'Styles': 'v8.17.1-b559'
+  'AppOrchestrator': 'v8.17.1-b560',
+  'MapViewer': 'v8.17.1-b560',
+  'ContentSlider': 'v8.17.1-b560',
+  'MediaViewer': 'v8.17.1-b560',
+  'TimelineScrubber': 'v8.17.1-b560',
+  'OverviewGantt': 'v8.17.1-b560',
+  'ASTCompiler': 'v8.17.1-b560',
+  'VibeMonitor': 'v8.17.1-b560',
+  'SymbologyLegend': 'v8.17.1-b560',
+  'Globals': 'v8.17.1-b560',
+  'Styles': 'v8.17.1-b560'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -442,7 +442,7 @@ const TelemetryMonitor = ({logs = [], status, isOpen, setIsOpen, activeSlide, ap
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b559';
+MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b560';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -670,7 +670,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b559';
+MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b560';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -805,7 +805,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b559';
+MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b560';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1474,7 +1474,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b559';
+MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b560';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2486,7 +2486,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b559';
+MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b560';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -4292,7 +4292,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b559';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b560';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -4611,7 +4611,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   return null;
 };
 
-MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b559';
+MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b560';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
