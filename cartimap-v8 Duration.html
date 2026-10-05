@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b551';
+const APP_VERSION = 'v8.17.1-b552';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.140-b551',
-  'MapViewer': 'v7.2.93-b551',
-  'ContentSlider': 'v6.2.93-b551',
-  'MediaViewer': 'v3.2.92-b551',
-  'TimelineScrubber': 'v27.2.134-b551',
-  'OverviewGantt': 'v2.1.58-b551',
-  'ASTCompiler': 'v2.1.22-b551',
-  'VibeMonitor': 'v2.5.22-b551',
-  'SymbologyLegend': 'v1.2.36-b551',
-  'Globals': 'v2.1.21-b551',
-  'Styles': 'v6.1.27-b551'
+  'AppOrchestrator': 'v3.9.140-b552',
+  'MapViewer': 'v7.2.93-b552',
+  'ContentSlider': 'v6.2.93-b552',
+  'MediaViewer': 'v3.2.92-b552',
+  'TimelineScrubber': 'v27.2.134-b552',
+  'OverviewGantt': 'v2.1.58-b552',
+  'ASTCompiler': 'v2.1.22-b552',
+  'VibeMonitor': 'v2.5.22-b552',
+  'SymbologyLegend': 'v1.2.36-b552',
+  'Globals': 'v2.1.21-b552',
+  'Styles': 'v6.1.27-b552'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -1293,7 +1293,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       const isList = item.startDate.obj.type === 'List';
       const subColor = isList ? (isActive ? colActive : colInactive) : colApprox;
       const subDash = isList ? 'none' : '3,3';
-      const leftMs = timeMin + (leftPct / 100) * renderTimeRange;
+      const leftMs = renderMinTime + (leftPct / 100) * renderTimeRange;
       const groupSpanMs = Math.max(1, renderTimeRange * (widthPct / 100));
       const x1RelPct = Number((((itemStartMs - leftMs) / groupSpanMs) * 100).toFixed(4));
       subDropLines = html`
