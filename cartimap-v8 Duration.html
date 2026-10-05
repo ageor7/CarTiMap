@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b553';
+const APP_VERSION = 'v8.17.1-b554';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.140-b552',
@@ -1303,7 +1303,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           ${item.startDate.obj.values.map(v => {
             if (typeof v.min !== 'number' || isNaN(v.min)) return null;
             const x2RelPct = Number((((v.min - leftMs) / groupSpanMs) * 100).toFixed(4));
-            if (x2RelPct < -50 || x2RelPct > 150) return null;
+            if (v.min < renderMinTime || v.min > renderMaxTime) return null;
             return html`
               <line x1="${x1RelPct}%" y1="0" x2="${x2RelPct}%" y2="100%" stroke="${subColor}" stroke-width="1.5" stroke-dasharray="${subDash}" />
             `;
