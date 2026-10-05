@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b561';
+const APP_VERSION = 'v8.17.1-b562';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v8.17.1-b561',
-  'MapViewer': 'v8.17.1-b561',
-  'ContentSlider': 'v8.17.1-b561',
-  'MediaViewer': 'v8.17.1-b561',
-  'TimelineScrubber': 'v8.17.1-b561',
-  'OverviewGantt': 'v8.17.1-b561',
-  'ASTCompiler': 'v8.17.1-b561',
-  'VibeMonitor': 'v8.17.1-b561',
-  'SymbologyLegend': 'v8.17.1-b561',
-  'Globals': 'v8.17.1-b561',
-  'Styles': 'v8.17.1-b561'
+  'AppOrchestrator': 'v8.17.1-b562',
+  'MapViewer': 'v8.17.1-b562',
+  'ContentSlider': 'v8.17.1-b562',
+  'MediaViewer': 'v8.17.1-b562',
+  'TimelineScrubber': 'v8.17.1-b562',
+  'OverviewGantt': 'v8.17.1-b562',
+  'ASTCompiler': 'v8.17.1-b562',
+  'VibeMonitor': 'v8.17.1-b562',
+  'SymbologyLegend': 'v8.17.1-b562',
+  'Globals': 'v8.17.1-b562',
+  'Styles': 'v8.17.1-b562'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -442,7 +442,7 @@ const TelemetryMonitor = ({logs = [], status, isOpen, setIsOpen, activeSlide, ap
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b561';
+MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b562';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -670,7 +670,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b561';
+MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b562';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -805,7 +805,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b561';
+MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b562';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1313,6 +1313,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       `;
     }
 
+    let xAxisMarker = '';
     if (!xAxisMarker && hasDuration) {
       const overlappingEvents = validData.filter(other => {
         const oStart = other.startDate ? other.startDate.min : renderMinTime;
@@ -1476,7 +1477,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b561';
+MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b562';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2488,7 +2489,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b561';
+MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b562';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -4294,7 +4295,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b561';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b562';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -4613,7 +4614,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   return null;
 };
 
-MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b561';
+MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b562';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
