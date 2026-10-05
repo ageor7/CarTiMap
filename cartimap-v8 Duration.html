@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b562';
+const APP_VERSION = 'v8.17.1-b563';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v8.17.1-b562',
-  'MapViewer': 'v8.17.1-b562',
-  'ContentSlider': 'v8.17.1-b562',
-  'MediaViewer': 'v8.17.1-b562',
-  'TimelineScrubber': 'v8.17.1-b562',
-  'OverviewGantt': 'v8.17.1-b562',
-  'ASTCompiler': 'v8.17.1-b562',
-  'VibeMonitor': 'v8.17.1-b562',
-  'SymbologyLegend': 'v8.17.1-b562',
-  'Globals': 'v8.17.1-b562',
-  'Styles': 'v8.17.1-b562'
+  'AppOrchestrator': 'v8.17.1-b563',
+  'MapViewer': 'v8.17.1-b563',
+  'ContentSlider': 'v8.17.1-b563',
+  'MediaViewer': 'v8.17.1-b563',
+  'TimelineScrubber': 'v8.17.1-b563',
+  'OverviewGantt': 'v8.17.1-b563',
+  'ASTCompiler': 'v8.17.1-b563',
+  'VibeMonitor': 'v8.17.1-b563',
+  'SymbologyLegend': 'v8.17.1-b563',
+  'Globals': 'v8.17.1-b563',
+  'Styles': 'v8.17.1-b563'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -442,7 +442,7 @@ const TelemetryMonitor = ({logs = [], status, isOpen, setIsOpen, activeSlide, ap
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b562';
+MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b563';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -670,7 +670,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b562';
+MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b563';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -805,7 +805,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b562';
+MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b563';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1313,6 +1313,19 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       `;
     }
 
+    
+    const checkIsApprox = (node) => {
+      if (!node) return false;
+      if (node.isApprox) return true;
+      if (node.obj && (node.obj.approximate || node.obj.uncertain || node.obj.unspecified || node.obj.type === 'Approximate')) return true;
+      const txt = (node.text || '').toLowerCase().trim();
+      if (!txt) return false;
+      return txt.includes('~') || txt.includes('?') || txt.includes('%') || txt.includes('x') || txt.startsWith('c.') || txt.startsWith('ca.') || txt.includes('approx');
+    };
+
+    const isApproxStart = checkIsApprox(item.startDate);
+    const isApproxEnd = checkIsApprox(item.endDate);
+
     let xAxisMarker = '';
     if (!xAxisMarker && hasDuration) {
       const overlappingEvents = validData.filter(other => {
@@ -1477,7 +1490,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b562';
+MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b563';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2489,7 +2502,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b562';
+MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b563';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -4295,7 +4308,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b562';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b563';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -4315,7 +4328,7 @@ const splitTopLevel = (str) => {
     else if (char === '{') depthCurly++;
     else if (char === '}') depthCurly--;
 
-    if (char === ',' && depthSquare === 0 && depthCurly === 0) {
+    if ((char === ',' || char === '\n' || char === '\r') && depthSquare === 0 && depthCurly === 0) {
       const s = curr.join('').trim();
       if (s) parts.push(s);
       curr = [];
@@ -4341,7 +4354,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   rawStr = rawStr.replace(/[\u03A7\u03C7]/g, 'X');
 
   // Handle multi-line / compound multi-expression strings
-  if (rawStr.includes('\n') || (rawStr.includes(',') && !rawStr.startsWith('[') && !rawStr.startsWith('{'))) {
+  if (rawStr.includes('\n') || rawStr.includes('\r') || (rawStr.includes(',') && !rawStr.startsWith('[') && !rawStr.startsWith('{'))) {
     const parts = splitTopLevel(rawStr);
     if (parts.length > 1) {
       const compiledParts = parts.map(p => compileCartiMapAST(p, baseStartMs)).filter(Boolean);
@@ -4614,7 +4627,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   return null;
 };
 
-MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b562';
+MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b563';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
