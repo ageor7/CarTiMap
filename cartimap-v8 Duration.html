@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b572';
+const APP_VERSION = 'v8.17.1-b574';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.160-b572',
-  'MapViewer': 'v7.2.107-b572',
-  'ContentSlider': 'v6.2.107-b572',
-  'MediaViewer': 'v3.2.106-b572',
-  'TimelineScrubber': 'v27.2.154-b572',
-  'OverviewGantt': 'v2.1.78-b572',
-  'ASTCompiler': 'v2.1.42-b572',
-  'VibeMonitor': 'v2.5.42-b572',
-  'SymbologyLegend': 'v1.2.50-b572',
-  'Globals': 'v2.1.35-b572',
-  'Styles': 'v6.1.41-b572'
+  'AppOrchestrator': 'v3.9.162-b574',
+  'MapViewer': 'v7.2.109-b574',
+  'ContentSlider': 'v6.2.109-b574',
+  'MediaViewer': 'v3.2.108-b574',
+  'TimelineScrubber': 'v27.2.156-b574',
+  'OverviewGantt': 'v2.1.80-b574',
+  'ASTCompiler': 'v2.1.44-b574',
+  'VibeMonitor': 'v2.5.44-b574',
+  'SymbologyLegend': 'v1.2.52-b574',
+  'Globals': 'v2.1.37-b574',
+  'Styles': 'v6.1.43-b574'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -442,7 +442,7 @@ const TelemetryMonitor = ({logs = [], status, isOpen, setIsOpen, activeSlide, ap
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.5.42-b572';
+MODULE_VERSIONS['VibeMonitor'] = 'v2.5.44-b574';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -670,7 +670,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v3.2.106-b572';
+MODULE_VERSIONS['MediaViewer'] = 'v3.2.108-b574';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -805,7 +805,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v6.2.107-b572';
+MODULE_VERSIONS['ContentSlider'] = 'v6.2.109-b574';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1365,11 +1365,14 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
         const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        const activeBg = (isApproxStart || isApproxEnd) ? 'repeating-linear-gradient(-45deg, #f59e0b 0, #f59e0b 8px, #007acc 8px, #007acc 16px)' : 'rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30)';
+        const ribbonBg = isActive ? 'rgba(40, 167, 69, 0.35)' : 'rgba(0, 122, 204, 0.22)';
+        const approxHatchBg = (isApproxStart || isApproxEnd)
+          ? 'repeating-linear-gradient(-45deg, rgba(245, 158, 11, 0.40) 0, rgba(245, 158, 11, 0.40) 8px, rgba(0, 122, 204, 0.25) 8px, rgba(0, 122, 204, 0.25) 16px)'
+          : ribbonBg;
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; min-width: 4px; height: 10px; background: ${activeBg}; border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} opacity: 0.85; border-radius: 3px 3px 0 0; z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
-            ${isApproxStart ? html`<div style="position: absolute; left: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
-            ${isApproxEnd ? html`<div style="position: absolute; right: -2px; top: -2px; bottom: -2px; width: 8px; background: #f59e0b; border: 1px solid #b45309; border-radius: 3px; box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
+          <div style="position: absolute; top: ${blockHeight / 2}px; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; min-width: 4px; background: ${approxHatchBg}; clip-path: polygon(0% 0%, 100% 0%, 92% 100%, 8% 100%); border-left: ${activeBorderL}; border-right: ${activeBorderR}; opacity: 0.85; z-index: ${isActive ? 950 : 900}; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+            ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #f59e0b; z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
+            ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: 6px; background: #f59e0b; z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
           </div>
         `;
       } else {
@@ -1495,7 +1498,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v27.2.154-b572';
+MODULE_VERSIONS['TimelineScrubber'] = 'v27.2.156-b574';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2507,7 +2510,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v7.2.107-b572';
+MODULE_VERSIONS['MapViewer'] = 'v7.2.109-b574';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -4313,7 +4316,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.160-b572';
+MODULE_VERSIONS['AppOrchestrator'] = 'v3.9.162-b574';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -4632,7 +4635,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   return null;
 };
 
-MODULE_VERSIONS['ASTCompiler'] = 'v2.1.42-b572';
+MODULE_VERSIONS['ASTCompiler'] = 'v2.1.44-b574';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
