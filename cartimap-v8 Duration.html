@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b552';
+const APP_VERSION = 'v8.17.1-b553';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.140-b552',
@@ -1279,6 +1279,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
       endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
     }
+    const leftPct = Math.max(0, startPct);
+    const widthPct = Math.max(0.2, endPct - startPct);
     const isChoiceSet = item.startDate && item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List');
     const hasDuration = (endPct - startPct) > 0.001;
 
