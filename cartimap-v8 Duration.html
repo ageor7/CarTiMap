@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b546';
+const APP_VERSION = 'v8.17.1-b547';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.135-b546',
-  'MapViewer': 'v7.2.88-b546',
-  'ContentSlider': 'v6.2.88-b546',
-  'MediaViewer': 'v3.2.87-b546',
-  'TimelineScrubber': 'v27.2.129-b546',
-  'OverviewGantt': 'v2.1.53-b546',
-  'ASTCompiler': 'v2.1.17-b546',
-  'VibeMonitor': 'v2.5.17-b546',
-  'SymbologyLegend': 'v1.2.31-b546',
-  'Globals': 'v2.1.16-b546',
-  'Styles': 'v6.1.22-b546'
+  'AppOrchestrator': 'v3.9.136-b547',
+  'MapViewer': 'v7.2.89-b547',
+  'ContentSlider': 'v6.2.89-b547',
+  'MediaViewer': 'v3.2.88-b547',
+  'TimelineScrubber': 'v27.2.130-b547',
+  'OverviewGantt': 'v2.1.54-b547',
+  'ASTCompiler': 'v2.1.18-b547',
+  'VibeMonitor': 'v2.5.18-b547',
+  'SymbologyLegend': 'v1.2.32-b547',
+  'Globals': 'v2.1.17-b547',
+  'Styles': 'v6.1.23-b547'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -2608,827 +2608,6 @@ MODULE_VERSIONS['MapViewer'] = 'v7.2.86-b544';
 
 // 🔽🔽🔽 [ START_INJECT: AppOrchestrator v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: AppOrchestrator v8.13.68-b178 ] ===
-const App = () => {
-          function safeStripHTML(str) { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); }
-
-  // APP_VERSION bound to top-level HTML header per Directive I.3.c
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
-          // =========================================================================
-          const [logs, setLogs] = useState([]);
-          const [rawCsvRows, setRawCsvRows] = useState([]);
-          const [unfilteredData, setUnfilteredData] = useState([]);
-          const [data, setData] = useState([]);
-          const [aboutData, setAboutData] = useState(null);
-          const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
-          const [activeIndex, setActiveIndex] = useState(0);
-          const [slideHistory, setSlideHistory] = useState([]);
-          const [forwardHistory, setForwardHistory] = useState([]);
-          const [isMonitorOpen, setIsMonitorOpen] = useState(false);
-          const [isAboutOpen, setIsAboutOpen] = useState(false);
-          const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-          const [isMenuOpen, setIsMenuOpen] = useState(false);
-          const [isFilterOpen, setIsFilterOpen] = useState(false);
-          const [filterFlashMsg, setFilterFlashMsg] = useState(null);
-          const [connectionSummary, setConnectionSummary] = useState(null);
-          const [chronoIngestionSummary, setChronoIngestionSummary] = useState(null);
-          const [spatialEngineSummary, setSpatialEngineSummary] = useState(null);
-          const [layersTRegistrySummary, setLayersTRegistrySummary] = useState(null);
-
-          const triggerFilterFlash = (msg) => {
-            setFilterFlashMsg(msg);
-            addLog(msg, 'warning');
-          };
-          const [isSearchOpen, setIsSearchOpen] = useState(false);
-                    const [isTocOpen, setIsTocOpen] = useState(false);
-          const [durationInspectionPayload, setDurationInspectionPayload] = useState(null);
-
-          const resetLayout = () => {
-            const appNode = document.getElementById('app-layout') || document.documentElement;
-            if (appNode) {
-              appNode.style.setProperty('--primary-split', '50%');
-              appNode.style.setProperty('--secondary-split', '50%');
-            }
-            document.documentElement.style.setProperty('--primary-split', '50%');
-            document.documentElement.style.setProperty('--secondary-split', '50%');
-            if (typeof setMinimapOffset === 'function') setMinimapOffset(-4);
-            const reqH = Math.max(185, (allTags.length || 1) * 28 + 55);
-            if (typeof setTimelineRequiredHeight === 'function') setTimelineRequiredHeight(reqH);
-            if (typeof setIsTimelineExpanded === 'function') setIsTimelineExpanded(false);
-            if (typeof setIsTimelineMinimized === 'function') setIsTimelineMinimized(false);
-            if (typeof setMaxPane === 'function') setMaxPane(null);
-            window.dispatchEvent(new Event('resize'));
-          };
-          const [maxAutoZoom, setMaxAutoZoom] = useState(() => parseInt(localStorage.getItem('tm_max_auto_zoom'), 10) || 18);
-          const [statusWidth, setStatusWidth] = useState(300);
-          const statusBrandRef = useRef(null);
-
-          useEffect(() => {
-            const handleResize = () => {
-              if (statusBrandRef.current) {
-                const w = statusBrandRef.current.clientWidth || statusBrandRef.current.offsetWidth || window.innerWidth;
-                if (w > 0) setStatusWidth(w);
-              } else {
-                setStatusWidth(window.innerWidth);
-              }
-            };
-            handleResize();
-            window.addEventListener('resize', handleResize);
-            let ro = null;
-            if (window.ResizeObserver) {
-              ro = new ResizeObserver(entries => {
-                for (let entry of entries) {
-                  if (entry.contentRect && entry.contentRect.width > 0) {
-                    setStatusWidth(entry.contentRect.width);
-                  }
-                }
-              });
-              const checkAndObserve = () => {
-                if (statusBrandRef.current) {
-                  ro.observe(statusBrandRef.current);
-                  handleResize();
-                } else {
-                  setTimeout(checkAndObserve, 100);
-                }
-              };
-              checkAndObserve();
-            }
-            return () => {
-              window.removeEventListener('resize', handleResize);
-              if (ro) ro.disconnect();
-            };
-          }, [status.active]);
-
-          const getFluidVersionString = (width) => {
-            if (width >= 240) return APP_VERSION;
-            if (width >= 180) return APP_VERSION.replace(/\.\d+(?=-b)/, '');
-            if (width >= 130) return APP_VERSION.replace(/\.\d+\.\d+(?=-b)/, '');
-            if (width >= 80) return APP_VERSION.replace(/^v\d+\.\d+\.\d+-/, '');
-            return '';
-          };
-          const [searchQuery, setSearchQuery] = useState('');
-  const searchInputRef = useRef(null);
-
-  useEffect(() => {
-    if (isSearchOpen && searchInputRef.current) {
-      setTimeout(() => searchInputRef.current && searchInputRef.current.focus(), 50);
-    }
-  }, [isSearchOpen]);
-          useEffect(() => { if (isSearchOpen) { setTimeout(() => { const el = document.querySelector('.search-input'); if (el) el.focus(); }, 50); } }, [isSearchOpen]);
-          const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-          const [searchHistory, setSearchHistory] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; }
-            catch (e) { return []; }
-          });
-          const [maxPane, setMaxPane] = useState(null);
-          const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
-          const [isTimelineMinimized, setIsTimelineMinimized] = useState(false);
-          const [timelineRequiredHeight, setTimelineRequiredHeight] = useState(140);
-          const [zoomLevel, setZoomLevel] = useState(1.0);
-          const [visibleTimeSpan, setVisibleTimeSpan] = useState('');
-          const [visibleTimeBounds, setVisibleTimeBounds] = useState([0, Infinity]);
-          const [basemapOpacity, setBasemapOpacity] = useState(1.0);
-          const [polygonOpacity, setPolygonOpacity] = useState(() => {
-            try { return parseFloat(localStorage.getItem('tm_polygon_opacity')) || 0.4; }
-            catch (e) { return 0.4; }
-          });
-          const [dateLocale, setDateLocale] = useState(() => {
-            try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
-            catch (e) { return 'en-GB'; }
-          });
-          const [showButtonText, setShowButtonText] = useState(() => {
-            try {
-              const stored = localStorage.getItem('tm_show_button_text');
-              return stored === 'true';
-            } catch(e) { return false; }
-          });
-          const [dateEngineMode, setDateEngineMode] = useState(() => {
-            try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
-            catch (e) { return 'auto'; }
-          });
-          const [allTags, setAllTags] = useState([]);
-          // isFilterInitializedRef purged for direct sync
-          const [activeTags, setActiveTags] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_active_tags')) || []; }
-            catch(e) { return []; }
-          });
-          const [activeExtractTypes, setActiveExtractTypes] = useState(() => {
-            try { return JSON.parse(localStorage.getItem('tm_active_extract_types')) || []; }
-            catch(e) { return []; }
-          });
-
-          useEffect(() => {
-            if (activeTags.length > 0) {
-              try {
-                localStorage.setItem('tm_active_tags', JSON.stringify(activeTags));
-              } catch(e) {}
-            }
-          }, [activeTags]);
-
-          useEffect(() => {
-            if (activeExtractTypes.length > 0) {
-              try {
-                localStorage.setItem('tm_active_extract_types', JSON.stringify(activeExtractTypes));
-              } catch(e) {}
-            }
-          }, [activeExtractTypes]);
-
-
-          const [minimapOffset, setMinimapOffset] = useState(-4);
-          const [basemapsRegistry, setBasemapsRegistry] = useState([
-            { id: 'carto-light', label: 'CartoDB Positron (Light)', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: true, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
-            { id: 'carto-dark', label: 'CartoDB Dark Matter', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: false, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
-            { id: 'osm', label: 'OpenStreetMap Standard', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: false, attrText: 'OpenStreetMap contributors', attrLink: 'https://openstreetmap.org' },
-            { id: 'esri-sat', label: 'Esri World Imagery', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', format: 'png', maxZoom: 19, active: false, attrText: 'Esri', attrLink: 'https://www.esri.com' },
-            { id: 'opentopo', label: 'OpenTopoMap', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 17, active: false, attrText: 'OpenTopoMap', attrLink: 'https://opentopomap.org' },
-            { id: 'protomaps-light', label: 'Protomaps Vector Light', type: 'base', url: 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt', format: 'vector', maxZoom: 18, active: false, attrText: 'Protomaps / OSM', attrLink: 'https://protomaps.com' },
-            { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '' }
-          ]);
-          const [zoomLock, setZoomLock] = useState(() => {
-            try {
-              const stored = localStorage.getItem('tm_zoom_lock');
-              if (stored === 'hard') return 'hard';
-              if (stored === 'soft') return 'soft';
-              return 'auto';
-            } catch(e) { return 'auto'; }
-          });
-          const appRef = useRef(null);
-          const hasInitializedRef = useRef(false);
-
-          const addLog = (msg, type = 'info') => {
-            const timeStr = new Date().toTimeString().split(' ').at(0);
-            setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 500));
-          };
-
-          const stripAndNormalize = (str) => {
-            if (!str) return '';
-            return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim();
-          };
-
-          const formatSmartDate = (startInput, endInput, locale, includeSuffix = true) => {
-            const checkApprox = (val) => {
-              if (!val) return false;
-              if (typeof val === 'object') {
-                if (val.isApprox || val.uncertain || val.approximate) return true;
-                if (val.type && val.type === 'Approximate') return true;
-                if (val.text && (val.text.includes('~') || val.text.includes('?'))) return true;
-              }
-              return false;
-            };
-            const checkIsEDTF = (val) => {
-              if (!val) return false;
-              if (typeof val === 'object' && (val.isEDTF || val.sourceType === 'EDTF_AST')) return true;
-              if (typeof val === 'string' && /^[P\d~?%\{\[\/\.]/i.test(val.trim())) return true;
-              return false;
-            };
-
-            const isApprox = checkApprox(startInput) || checkApprox(endInput);
-            const isEDTF = checkIsEDTF(startInput) || checkIsEDTF(endInput);
-            const approxPrefix = isApprox ? '~ ' : '';
-
-            if (startInput === null || startInput === undefined) return 'Undated';
-
-            const toValidDate = (val) => {
-              if (val === null || val === undefined) return null;
-              if (typeof val === 'number') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
-              if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
-              if (typeof val === 'object') {
-                if (val.isEDTF && val.text) return val.text;
-                if (val.date && val.date instanceof Date && !isNaN(val.date.getTime())) return val.date;
-                if (typeof val.min === 'number') { const d = new Date(val.min); return isNaN(d.getTime()) ? null : d; }
-                if (typeof val.start === 'number') { const d = new Date(val.start); return isNaN(d.getTime()) ? null : d; }
-              }
-              if (typeof val === 'string') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
-              return null;
-            };
-
-            const d1 = toValidDate(startInput);
-            const d2 = toValidDate(endInput);
-            const loc = locale || 'en-GB';
-            const opt = { day: '2-digit', month: 'short', year: 'numeric' };
-
-            let mainDateStr = 'Undated';
-            if (typeof d1 === 'string') {
-              mainDateStr = d1;
-            } else if (d1) {
-              if (d2 && typeof d2 !== 'string') {
-                if (d2.getTime() === d1.getTime()) mainDateStr = approxPrefix + d1.toLocaleDateString(loc, opt);
-                else mainDateStr = approxPrefix + `${d1.toLocaleDateString(loc, opt)} – ${d2.toLocaleDateString(loc, opt)}`;
-              } else {
-                mainDateStr = approxPrefix + d1.toLocaleDateString(loc, opt);
-              }
-            } else if (typeof startInput === 'string') {
-              mainDateStr = startInput;
-            }
-
-            if (!includeSuffix) return mainDateStr;
-
-            let badgeText = 'Num';
-            let badgeColor = '#777777';
-            if (isEDTF && isApprox) {
-              badgeText = 'ISO~';
-              badgeColor = '#f59e0b';
-            } else if (isEDTF) {
-              badgeText = 'ISO';
-              badgeColor = '#007acc';
-            } else if (isApprox) {
-              badgeText = 'Num~';
-              badgeColor = '#f59e0b';
-            }
-
-            const suffixVNode = html`<sup style="font-size: 0.68em; font-family: monospace; color: ${badgeColor}; vertical-align: super; font-weight: 700;">${badgeText}</sup>`;
-
-            return html`<span>${mainDateStr}${suffixVNode}</span>`;
-          };
-
-          const formatPlaces = (placeStr) => {
-            if (!placeStr) return '';
-            const stripped = placeStr.replace(new RegExp("^\\s*\\\\x5b.*?\\\\x5d\\s*", ""), '');
-            return stripped.split(/(?:\||·|;|·|\n|\-)/).map(s => s.trim()).filter(Boolean).join(' · ');
-          };
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 2: CHRONO ENGINE - DATAFRAME PARSING ] ===
-          // =========================================================================
-          useEffect(() => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
-            let source = urlParams.get('source') || urlParams.get('amp;source') || '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE';
-            const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
-            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
-
-            setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
-            setConnectionSummary({ source, gid });
-
-            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
-            const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
-
-            Promise.all([
-              fetch(fetchUrlPrimary).then(res => {
-                if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
-                return res.text();
-              }),
-              fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
-                if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status ${res.status})`);
-                return res.text();
-              }) : Promise.resolve(null)
-            ]).then(([primaryCsv, basemapsCsv]) => {
-              setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
-
-              const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
-              if (results.errors.length > 0) {
-                results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
-              }
-
-              const exactGet = (normObj, key) => {
-                const val = normObj[key];
-                return val !== undefined && val !== null ? String(val).trim() : "";
-              };
-
-              const firstRowNorm = {};
-              if (results.data.length > 0) {
-                const [ firstRow ] = results.data; for (let k in firstRow) firstRowNorm[k.toLowerCase().trim()] = firstRow[k];
-              }
-
-              const aboutDataObj = {
-                title: exactGet(firstRowNorm, 'title') || 'Dataset Overview',
-                description: exactGet(firstRowNorm, 'description') || 'No project description provided.',
-                rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source,
-                downloadUrl: fetchUrlPrimary
-              };
-              setAboutData(aboutDataObj);
-
-              let activeMode = dateEngineMode;
-              if (activeMode === 'auto') {
-                const hasEDTF = results.data.some(row => {
-                  const norm = {};
-                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                  return exactGet(norm, 'start edtf') !== '';
-                });
-                activeMode = hasEDTF ? 'edtf' : 'legacy';
-              }
-              const isUS = dateLocale === 'en-US';
-              const omniSplitRegex = /\||\r?\n/;
-              const rows = results.data;
-
-                            const parseChronoNode = (legacyStr, edtfStr, index, rowTitle, isRequired = true) => {
-                const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
-
-                if (cleanEdtf) {
-                  try {
-                    const parsed = compileCartiMapAST(cleanEdtf);
-                    if (parsed && typeof parsed.min === 'number' && !isNaN(parsed.min)) {
-                      const isApproxFlag = !!(parsed.approximate || parsed.uncertain || cleanEdtf.includes('~') || cleanEdtf.includes('?') || cleanEdtf.includes('%') || cleanEdtf.toLowerCase().includes('x') || cleanEdtf.toLowerCase().startsWith('c.'));
-                      return {
-                        isEDTF: true,
-                        isApprox: isApproxFlag,
-                        type: isApproxFlag ? 'Approximate' : 'Exact',
-                        min: parsed.min,
-                        max: parsed.max,
-                        obj: parsed,
-                        isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
-                        text: cleanEdtf
-                      };
-                    }
-                  } catch (e) {
-                    addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): AST Parsing exception for EDTF "${cleanEdtf}": ${e.message}`, 'error');
-                  }
-                  addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Could not parse EDTF "${cleanEdtf}". Classified as Malformed EDTF.`, 'error');
-                  return {
-                    isEDTF: false,
-                    isApprox: true,
-                    type: 'Malformed',
-                    min: 0,
-                    max: 0,
-                    text: cleanEdtf
-                  };
-                }
-
-                if (isRequired) {
-                  addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Start EDTF cell is blank. Classified as Missing EDTF.`, 'warning');
-                  return {
-                    isEDTF: false,
-                    isApprox: true,
-                    type: 'Missing',
-                    min: 0,
-                    max: 0,
-                    text: 'Missing Start EDTF'
-                  };
-                }
-
-                return null;
-              };
-
-              const cleaned = rows.map((row, index) => {
-                const norm = {};
-                for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
-
-                return {
-                  id: index + 1,
-                  title: rowTitle,
-                  startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf'), index, rowTitle, true),
-                  endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf'), index, rowTitle, false),
-                  description: exactGet(norm, 'description'),
-                  place: exactGet(norm, 'place'),
-                  location: exactGet(norm, 'location') || exactGet(norm, 'location (wkt)') || exactGet(norm, 'location wkt') || exactGet(norm, 'wkt') || exactGet(norm, 'coordinates') || exactGet(norm, 'geo') || exactGet(norm, 'wkt location'),
-                  subLabels: exactGet(norm, 'sublabels') || exactGet(norm, 'sub-labels') || exactGet(norm, 'sub labels') || '',
-                  priority: exactGet(norm, 'priority'),
-                  media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
-                  mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
-                  mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
-                  tags: exactGet(norm, 'tags') ? Array.from(new Set(exactGet(norm, 'tags').split(/[,|;·\r\n]+/).map(t => t.trim()).filter(Boolean))) : [],
-                  extractType: exactGet(norm, 'extract type') || 'Storyline'
-                };
-              });
-
-              const valid = cleaned.sort((a, b) => {
-                const aMin = a.startDate ? a.startDate.min : 0;
-                const bMin = b.startDate ? b.startDate.min : 0;
-                if (aMin !== bMin) return aMin - bMin;
-                return a.id - b.id;
-              });
-
-              // =========================================================================
-              // === [ APP_ORCHESTRATOR SUBBLOCK 3: VECTOR SEARCH INDEXING ] ===
-              // =========================================================================
-              const indexedData = valid.map(d => ({
-                ...d,
-                _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale, false)}`)
-              }));
-              setUnfilteredData(indexedData);
-              const discoveredTypes = Array.from(new Set(indexedData.map(d => d.extractType).filter(Boolean)));
-              if (activeExtractTypes.length === 0) {
-                setActiveExtractTypes(discoveredTypes);
-              }
-
-              const tagsMap = new Set();
-              indexedData.forEach(d => {
-                let rawTags = d.tags || [];
-                let arr = [];
-                (Array.isArray(rawTags) ? rawTags : [rawTags]).forEach(t => {
-                  if (typeof t === 'string') arr.push(...t.split(omniSplitRegex));
-                  else arr.push(t);
-                });
-                arr.map(s => String(s).trim()).filter(Boolean).forEach(t => tagsMap.add(t));
-              });
-
-              const validEdtfCount = cleaned.filter(d => (d.startDate && d.startDate.isEDTF && d.startDate.type !== 'Undated')).length;
-              const missingEdtfCount = cleaned.filter(d => (!d.startDate || !d.startDate.text || d.startDate.text === 'Undated')).length;
-              const malformedEdtfCount = cleaned.length - validEdtfCount - missingEdtfCount;
-              addLog(`[Dataset Ingestion] Parsed ${rows.length} records: ${validEdtfCount} Valid EDTF, ${missingEdtfCount} Missing EDTF, ${malformedEdtfCount} Malformed EDTF.`, 'info');
-              setChronoIngestionSummary({
-                total: rows.length,
-                valid: validEdtfCount,
-                missing: missingEdtfCount,
-                malformed: malformedEdtfCount
-              });
-
-              const uniqueTagsList = Array.from(tagsMap).sort();
-              setAllTags(uniqueTagsList);
-              
-              // 1. Read defaults first, read locally stored settings second
-              let tagsToApply = uniqueTagsList;
-              try {
-                const stored = localStorage.getItem('tm_active_tags');
-                if (stored) {
-                  const parsed = JSON.parse(stored);
-                  if (Array.isArray(parsed) && parsed.length > 0) {
-                    const valid = parsed.filter(t => uniqueTagsList.includes(t));
-                    if (valid.length > 0) tagsToApply = valid;
-                  }
-                }
-              } catch(e) {}
-              setActiveTags(tagsToApply);
-
-              let typesToApply = discoveredTypes;
-              try {
-                const storedTypes = localStorage.getItem('tm_active_extract_types');
-                if (storedTypes) {
-                  const parsedTypes = JSON.parse(storedTypes);
-                  if (Array.isArray(parsedTypes) && parsedTypes.length > 0) {
-                    const validTypes = parsedTypes.filter(t => discoveredTypes.includes(t));
-                    if (validTypes.length > 0) typesToApply = validTypes;
-                  }
-                }
-              } catch(e) {}
-              setActiveExtractTypes(typesToApply);
-
-              const parseLayersTRows = (rows) => {
-                return rows.map(row => {
-                  const norm = {};
-                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
-                  const isActive = /^(true|yes)$/i.test(String(norm.active || norm.isdefault || norm.default || '').trim());
-                  const rawOpac = parseFloat(norm.defaultopacity || norm.opacity);
-                  const rawType = String(norm.type || norm.layertype || '').toLowerCase().trim();
-                  return {
-                    id: norm.id || norm.name || '',
-                    label: norm.label || norm.title || norm.name || '',
-                    type: (rawType === 'overlay' || rawType === 'wms') ? 'overlay' : 'base',
-                    url: norm.url || norm.tileurl || norm.link || norm.wmsurl || norm.templateurl || norm.source || '',
-                    maxZoom: parseInt(norm.maxzoom || norm.maxzoomlevel, 10) || 19,
-                    active: isActive,
-                    attrText: norm.attrtext || norm.attribution || norm.credit || norm['attribution text'] || '',
-                    attrLink: norm.attrlink || norm.attributionlink || norm['attribution link'] || '',
-                    defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac,
-                    format: norm.format || norm.tileformat || 'xyz',
-                    wmsLayer: norm.wmslayer ? decodeURIComponent(String(norm.wmslayer).trim()) : (norm['wms layer'] ? decodeURIComponent(String(norm['wms layer']).trim()) : 'default')
-                  };
-                }).filter(b => b.id && b.url);
-              };
-
-              const rawLayersRows = (typeof sheetsData !== 'undefined' && sheetsData && (sheetsData.LayersT || sheetsData.Layers)) ? (sheetsData.LayersT || sheetsData.Layers) : ((typeof window !== 'undefined' && window.sheetsData && (window.sheetsData.LayersT || window.sheetsData.Layers)) ? (window.sheetsData.LayersT || window.sheetsData.Layers) : null);
-              let parsedBMs = [];
-              if (rawLayersRows && Array.isArray(rawLayersRows) && rawLayersRows.length > 0) {
-                parsedBMs = parseLayersTRows(rawLayersRows);
-              } else if (basemapsCsv) {
-                const baseResult = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
-                parsedBMs = parseLayersTRows(baseResult.data);
-              }
-
-              if (parsedBMs.length > 0) {
-                setBasemapsRegistry(prev => {
-                  const merged = [...prev];
-                  parsedBMs.forEach(bm => {
-                    const existIdx = merged.findIndex(m => m.id === bm.id);
-                    if (existIdx >= 0) merged[existIdx] = bm;
-                    else merged.push(bm);
-                  });
-                  return merged;
-                });
-                if (typeof setLayersTRegistrySummary === 'function') {
-                  setLayersTRegistrySummary({
-                    services: parsedBMs.length,
-                    total: basemapsRegistry ? basemapsRegistry.length : parsedBMs.length
-                  });
-                }
-              }
-
-              if (!hasInitializedRef.current) {
-                const paramSlide = getOmniParam('slide');
-                const paramDate = getOmniParam('date');
-                let initialIdx = 0;
-                if (paramSlide) {
-                  const sVal = parseInt(paramSlide, 10);
-                  if (!isNaN(sVal) && sVal >= 0 && sVal < indexedData.length) initialIdx = sVal;
-                } else if (paramDate) {
-                  const targetTime = new Date(paramDate).getTime();
-                  if (!isNaN(targetTime)) {
-                    let closestIdx = 0; let minDiff = Infinity;
-                    indexedData.forEach((d, i) => {
-                      if (d.startDate) {
-                        const diff = Math.abs(d.startDate.min - targetTime);
-                        if (diff < minDiff) { minDiff = diff; closestIdx = i; }
-                      }
-                    });
-                    initialIdx = closestIdx;
-                  }
-                }
-                setActiveIndex(initialIdx);
-                hasInitializedRef.current = true;
-              }
-              setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
-              setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
-            }).catch(err => {
-              console.error("Fatal CMS Connection Failure:", err);
-              setStatus({ text: 'Database Sync Failure', progress: 100, isFading: false, active: false });
-              addLog(`Database Sync Error: ${err.message}`, 'error');
-            });
-          }, [rawCsvRows, dateEngineMode, dateLocale]);
-
-          // --- [ Active filtering of datasets by swimlanes and streams ] ---
-          useEffect(() => {
-            if (unfilteredData.length === 0) return;
-            if (true) {
-              try {
-                if (activeTags.length > 0) localStorage.setItem('tm_active_tags', JSON.stringify(activeTags));
-                if (activeExtractTypes.length > 0) localStorage.setItem('tm_active_extract_types', JSON.stringify(activeExtractTypes));
-              } catch(e) {}
-            }
-
-            const curEventId = data[activeIndex] ? data[activeIndex].id : null;
-
-            const filtered = unfilteredData.filter(d => {
-              const tagMatch = (!activeTags || activeTags.length === 0) || ((d.tags || []).length === 0) || d.tags.some(t => activeTags.includes(t));
-              const extractMatch = (!activeExtractTypes || activeExtractTypes.length === 0) || activeExtractTypes.includes(d.extractType);
-              return tagMatch && extractMatch;
-            });
-            setData(filtered);
-
-            if (curEventId !== null) {
-              const keepIdx = filtered.findIndex(d => d.id === curEventId);
-              if (keepIdx >= 0) {
-                setActiveIndex(keepIdx);
-              } else if (activeIndex >= filtered.length) {
-                setActiveIndex(Math.max(0, filtered.length - 1));
-              }
-            } else if (activeIndex >= filtered.length) {
-              setActiveIndex(Math.max(0, filtered.length - 1));
-            }
-
-            const tagsMap = new Set();
-            filtered.forEach(d => {
-              (d.tags || []).forEach(t => tagsMap.add(t));
-            });
-            const laneCount = tagsMap.size > 0 ? tagsMap.size : 1;
-            setTimelineRequiredHeight((laneCount * 24) + 55);
-          }, [unfilteredData, activeTags, activeExtractTypes]);
-
-          const handleToggleTag = (tag) => {
-            if (activeTags.includes(tag)) {
-              if (activeTags.length > 1) {
-                setActiveTags(activeTags.filter(t => t !== tag));
-                setFilterFlashMsg(null);
-              } else {
-                triggerFilterFlash(`To keep at least one category active, filtered to ${activeTags.join(', ')}`);
-              }
-            } else {
-              setActiveTags([...activeTags, tag]);
-              setFilterFlashMsg(null);
-            }
-          };
-
-          const handleToggleExtractType = (type) => {
-            if (activeExtractTypes.includes(type)) {
-              if (activeExtractTypes.length > 1) {
-                setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
-                setFilterFlashMsg(null);
-              } else {
-                triggerFilterFlash(`To keep at least one category active, filtered to ${activeExtractTypes.join(', ')}`);
-              }
-            } else {
-              setActiveExtractTypes([...activeExtractTypes, type]);
-              setFilterFlashMsg(null);
-            }
-          };
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 4: RESIZER EVENT LISTENERS ] ===
-          // =========================================================================
-          const startPrimaryResize = (e) => {
-            e.preventDefault();
-            const isDesktop = window.innerWidth >= 1024;
-            const appNode = document.getElementById('app-layout') || document.documentElement;
-            const startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
-            const startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
-            const startSplit = parseFloat(getComputedStyle(appNode).getPropertyValue('--primary-split')) || (isDesktop ? 50 : 55);
-            const containerDim = isDesktop ? (appNode.clientWidth || window.innerWidth) : (appNode.clientHeight || window.innerHeight);
-
-            const doDrag = (moveEvent) => {
-              const currentX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientX);
-              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientY);
-              if (isDesktop ? currentX === undefined : currentY === undefined) return;
-              const diff = isDesktop ? (currentX - startX) : (startY - currentY);
-              const pctDiff = (diff / containerDim) * 100;
-              const newSplit = Math.max(15, Math.min(85, startSplit + pctDiff));
-              appNode.style.setProperty('--primary-split', `${newSplit}%`);
-              document.documentElement.style.setProperty('--primary-split', `${newSplit}%`);
-              window.dispatchEvent(new Event('resize'));
-            };
-
-            const stopDrag = () => {
-              window.removeEventListener('mousemove', doDrag);
-              window.removeEventListener('mouseup', stopDrag);
-              window.removeEventListener('touchmove', doDrag);
-              window.removeEventListener('touchend', stopDrag);
-            };
-
-            window.addEventListener('mousemove', doDrag);
-            window.addEventListener('mouseup', stopDrag);
-            window.addEventListener('touchmove', doDrag, { passive: true });
-            window.addEventListener('touchend', stopDrag);
-          };
-
-          const startSecondaryResize = (e) => {
-            e.preventDefault();
-            const isDesktop = window.innerWidth >= 1024;
-            const visualNode = appRef.current ? appRef.current.querySelector('.visual-pane') : null;
-            const appNode = document.getElementById('app-layout') || document.documentElement;
-            const startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
-            const startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
-            const startSplit = parseFloat(getComputedStyle(appNode).getPropertyValue('--secondary-split')) || 50;
-            const containerDim = visualNode 
-              ? (isDesktop ? visualNode.clientHeight : visualNode.clientWidth) 
-              : (isDesktop ? (window.innerHeight * 0.5) : (window.innerWidth * 0.5));
-
-            const doDrag = (moveEvent) => {
-              const currentX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientX);
-              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientY);
-              if (isDesktop ? currentY === undefined : currentX === undefined) return;
-              const diff = isDesktop ? (currentY - startY) : (currentX - startX);
-              const pctDiff = (diff / containerDim) * 100;
-              const newSplit = Math.max(15, Math.min(85, startSplit + pctDiff));
-              appNode.style.setProperty('--secondary-split', `${newSplit}%`);
-              document.documentElement.style.setProperty('--secondary-split', `${newSplit}%`);
-              window.dispatchEvent(new Event('resize'));
-            };
-
-            const stopDrag = () => {
-              window.removeEventListener('mousemove', doDrag);
-              window.removeEventListener('mouseup', stopDrag);
-              window.removeEventListener('touchmove', doDrag);
-              window.removeEventListener('touchend', stopDrag);
-            };
-
-            window.addEventListener('mousemove', doDrag);
-            window.addEventListener('mouseup', stopDrag);
-            window.addEventListener('touchmove', doDrag, { passive: true });
-            window.addEventListener('touchend', stopDrag);
-          };
-
-          const startTimelineResize = (e) => {
-            e.preventDefault();
-            const [ touchY0 ] = e.touches || []; const startY = e.clientY || (touchY0 && touchY0.clientY);
-            const startHeight = timelineRequiredHeight;
-
-            const doDrag = (moveEvent) => {
-              const [ mTouchY0 ] = moveEvent.touches || []; const currentY = moveEvent.clientY || (mTouchY0 && mTouchY0.clientY);
-              const diffY = startY - currentY;
-              const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
-              setTimelineRequiredHeight(newHeight);
-            };
-
-            const stopDrag = () => {
-              window.removeEventListener('mousemove', doDrag);
-              window.removeEventListener('mouseup', stopDrag);
-              window.removeEventListener('touchmove', doDrag);
-              window.removeEventListener('touchend', stopDrag);
-            };
-
-            window.addEventListener('mousemove', doDrag);
-            window.addEventListener('mouseup', stopDrag);
-            window.addEventListener('touchmove', doDrag, { passive: true });
-            window.addEventListener('touchend', stopDrag);
-          };
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 5: CHRONOLOGICALLY REALIGNED SEARCH ] ===
-          // =========================================================================
-          
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 4.1: SLIDE NAVIGATION & VIEWPORT LISTENERS ] ===
-          // =========================================================================
-          const jumpToSlide = (newIdx, isSequential = false) => {
-            if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
-              if (!isSequential) {
-                setSlideHistory(prev => [...prev, activeIndex]);
-                setForwardHistory([]);
-              }
-              setActiveIndex(newIdx);
-            }
-          };
-
-          const goBack = () => {
-            if (slideHistory.length > 0) {
-              const prev = slideHistory.at(-1);
-              setSlideHistory(h => h.slice(0, -1));
-              setForwardHistory(f => [...f, activeIndex]);
-              setActiveIndex(prev);
-            }
-          };
-
-          const goForward = () => {
-            if (forwardHistory.length > 0) {
-              const next = forwardHistory.at(-1);
-              setForwardHistory(f => f.slice(0, -1));
-              setSlideHistory(h => [...h, activeIndex]);
-              setActiveIndex(next);
-            }
-          };
-
-          const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-
-          useEffect(() => {
-            const handleKeyDown = (e) => {
-              if (e.key === 'Escape' || e.keyCode === 27) {
-                if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
-                setDurationInspectionPayload(null);
-                setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
-              }
-            };
-            window.addEventListener('keydown', handleKeyDown, true);
-            return () => window.removeEventListener('keydown', handleKeyDown, true);
-          }, []);
-
-          const handleResultClick = (id, qString) => {
-            const sortedIdx = data.findIndex(d => d.id === id);
-            if (sortedIdx >= 0) jumpToSlide(sortedIdx);
-            setIsSearchOpen(false);
-            if (qString && !searchHistory.includes(qString)) {
-              const newH = [qString, ...searchHistory].slice(0, 8);
-              setSearchHistory(newH);
-              localStorage.setItem('tm_search_history', JSON.stringify(newH));
-            }
-          };
-
-          const executeSearch = (query) => {
-            if (!query || !query.trim()) return [];
-            const normalized = stripAndNormalize(query);
-            const terms = normalized.split(/\s+/).filter(Boolean);
-            if (terms.length === 0) return [];
-
-            const searchPool = (unfilteredData && unfilteredData.length > 0) ? unfilteredData : data;
-            return searchPool.filter(d => {
-              if (terms.length === 1 && d.id && String(d.id) === terms[0].replace(/\.$/, '')) return true;
-              const titleNorm = d.title ? stripAndNormalize(d.title) : '';
-              const descNorm = d.description ? stripAndNormalize(d.description) : '';
-              const placeNorm = d.place ? stripAndNormalize(d.place) : '';
-              const tagsNorm = Array.isArray(d.tags) ? d.tags.map(t => stripAndNormalize(t)).join(' ') : (d.tags ? stripAndNormalize(d.tags) : '');
-              const idNorm = d.id ? String(d.id) : '';
-              const composite = `${idNorm} ${titleNorm} ${descNorm} ${placeNorm} ${tagsNorm}`;
-              return terms.every(term => composite.includes(term));
-            });
-          };
-
-          const searchResults = executeSearch(searchQuery);
-          const activeSlide = data.at(activeIndex);
-          const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
-
-          // =========================================================================
-          // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
-          // =========================================================================
-          
-
 const CarTiMapperLogo = ({ context, appVersion }) => {
             const svgIcon = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 165 100" style="width: 100%; height: 100%; display: block;"><defs><filter id="dot-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs><path d="M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z" fill="#2c3e50" stroke="#007acc" stroke-width="2.5" stroke-linejoin="round"></path><g fill="#fff" opacity="0.9"><rect x="55" y="19" width="4" height="6" rx="1"></rect><rect x="71" y="19" width="4" height="6" rx="1"></rect><rect x="87" y="19" width="4" height="6" rx="1"></rect><rect x="103" y="19" width="4" height="6" rx="1"></rect><rect x="119" y="19" width="4" height="6" rx="1"></rect><rect x="135" y="19" width="4" height="6" rx="1"></rect><rect x="151" y="19" width="4" height="6" rx="1"></rect><rect x="167" y="19" width="4" height="6" rx="1"></rect><rect x="55" y="75" width="4" height="6" rx="1"></rect><rect x="71" y="75" width="4" height="6" rx="1"></rect><rect x="87" y="75" width="4" height="6" rx="1"></rect><rect x="103" y="75" width="4" height="6" rx="1"></rect><rect x="119" y="75" width="4" height="6" rx="1"></rect><rect x="135" y="75" width="4" height="6" rx="1"></rect><rect x="151" y="75" width="4" height="6" rx="1"></rect><rect x="167" y="75" width="4" height="6" rx="1"></rect></g><g transform="translate(112, 50)"><path d="M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z" fill="#546e7a" opacity="0.8"></path><g fill="#fcfcfc" font-family="Arial, sans-serif" font-size="7" font-weight="normal" text-anchor="middle"><text x="0" y="-21">N</text><text x="24" y="2.5">E</text><text x="0" y="27">S</text><text x="-24" y="2.5">W</text></g><g fill="#8be9fd" filter="url(#dot-glow)"><circle cx="12.5" cy="-21.6" r="1.2"></circle><circle cx="21.6" cy="-12.5" r="1.2"></circle><circle cx="21.6" cy="12.5" r="1.2"></circle><circle cx="12.5" cy="21.6" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle><circle cx="-21.6" cy="12.5" r="1.2"></circle><circle cx="-21.6" cy="-12.5" r="1.2"></circle><circle cx="-12.5" cy="-21.6" r="1.2"></circle></g><g transform="rotate(60)"><path d="M0,0 L-1,-16 L1,-16 Z" fill="#999"></path><circle cx="0" cy="-20" r="2.8" fill="#007acc"></circle></g><g transform="rotate(270)"><path d="M0,0 L-1.2,-9 L1.2,-9 Z" fill="#999"></path><circle cx="0" cy="-13" r="2.8" fill="#28a745"></circle></g><circle cx="0" cy="0" r="1.5" fill="#fff"></circle></g></svg>`;
             if (context === 'splash') return html`<div class="logo-stack-splash"><div class="splash-icon-wrapper">${svgIcon}</div><div class="splash-text">CarTiMap</div><div class="splash-version">${appVersion}</div></div>`;
@@ -4415,6 +3594,829 @@ const splitTopLevel = (str) => {
   }
   return parts;
 };
+
+const App = () => {
+          function safeStripHTML(str) { if (!str) return ''; return String(str).replace(/<[^>]*>/g, '').trim(); }
+
+  // APP_VERSION bound to top-level HTML header per Directive I.3.c
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 1: STATE ORCHESTRATION & LOCAL CONTEXT ] ===
+          // =========================================================================
+          const [logs, setLogs] = useState([]);
+          const [rawCsvRows, setRawCsvRows] = useState([]);
+          const [unfilteredData, setUnfilteredData] = useState([]);
+          const [data, setData] = useState([]);
+          const [aboutData, setAboutData] = useState(null);
+          const [status, setStatus] = useState({ text: 'Initializing Engine...', progress: 10, isFading: false, active: false });
+          const [activeIndex, setActiveIndex] = useState(0);
+          const [slideHistory, setSlideHistory] = useState([]);
+          const [forwardHistory, setForwardHistory] = useState([]);
+          const [isMonitorOpen, setIsMonitorOpen] = useState(false);
+          const [isAboutOpen, setIsAboutOpen] = useState(false);
+          const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+          const [isMenuOpen, setIsMenuOpen] = useState(false);
+          const [isFilterOpen, setIsFilterOpen] = useState(false);
+          const [filterFlashMsg, setFilterFlashMsg] = useState(null);
+          const [connectionSummary, setConnectionSummary] = useState(null);
+          const [chronoIngestionSummary, setChronoIngestionSummary] = useState(null);
+          const [spatialEngineSummary, setSpatialEngineSummary] = useState(null);
+          const [layersTRegistrySummary, setLayersTRegistrySummary] = useState(null);
+
+          const triggerFilterFlash = (msg) => {
+            setFilterFlashMsg(msg);
+            addLog(msg, 'warning');
+          };
+          const [isSearchOpen, setIsSearchOpen] = useState(false);
+                    const [isTocOpen, setIsTocOpen] = useState(false);
+          const [durationInspectionPayload, setDurationInspectionPayload] = useState(null);
+
+          const resetLayout = () => {
+            const appNode = document.getElementById('app-layout') || document.documentElement;
+            if (appNode) {
+              appNode.style.setProperty('--primary-split', '50%');
+              appNode.style.setProperty('--secondary-split', '50%');
+            }
+            document.documentElement.style.setProperty('--primary-split', '50%');
+            document.documentElement.style.setProperty('--secondary-split', '50%');
+            if (typeof setMinimapOffset === 'function') setMinimapOffset(-4);
+            const reqH = Math.max(185, (allTags.length || 1) * 28 + 55);
+            if (typeof setTimelineRequiredHeight === 'function') setTimelineRequiredHeight(reqH);
+            if (typeof setIsTimelineExpanded === 'function') setIsTimelineExpanded(false);
+            if (typeof setIsTimelineMinimized === 'function') setIsTimelineMinimized(false);
+            if (typeof setMaxPane === 'function') setMaxPane(null);
+            window.dispatchEvent(new Event('resize'));
+          };
+          const [maxAutoZoom, setMaxAutoZoom] = useState(() => parseInt(localStorage.getItem('tm_max_auto_zoom'), 10) || 18);
+          const [statusWidth, setStatusWidth] = useState(300);
+          const statusBrandRef = useRef(null);
+
+          useEffect(() => {
+            const handleResize = () => {
+              if (statusBrandRef.current) {
+                const w = statusBrandRef.current.clientWidth || statusBrandRef.current.offsetWidth || window.innerWidth;
+                if (w > 0) setStatusWidth(w);
+              } else {
+                setStatusWidth(window.innerWidth);
+              }
+            };
+            handleResize();
+            window.addEventListener('resize', handleResize);
+            let ro = null;
+            if (window.ResizeObserver) {
+              ro = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                  if (entry.contentRect && entry.contentRect.width > 0) {
+                    setStatusWidth(entry.contentRect.width);
+                  }
+                }
+              });
+              const checkAndObserve = () => {
+                if (statusBrandRef.current) {
+                  ro.observe(statusBrandRef.current);
+                  handleResize();
+                } else {
+                  setTimeout(checkAndObserve, 100);
+                }
+              };
+              checkAndObserve();
+            }
+            return () => {
+              window.removeEventListener('resize', handleResize);
+              if (ro) ro.disconnect();
+            };
+          }, [status.active]);
+
+          const getFluidVersionString = (width) => {
+            if (width >= 240) return APP_VERSION;
+            if (width >= 180) return APP_VERSION.replace(/\.\d+(?=-b)/, '');
+            if (width >= 130) return APP_VERSION.replace(/\.\d+\.\d+(?=-b)/, '');
+            if (width >= 80) return APP_VERSION.replace(/^v\d+\.\d+\.\d+-/, '');
+            return '';
+          };
+          const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      setTimeout(() => searchInputRef.current && searchInputRef.current.focus(), 50);
+    }
+  }, [isSearchOpen]);
+          useEffect(() => { if (isSearchOpen) { setTimeout(() => { const el = document.querySelector('.search-input'); if (el) el.focus(); }, 50); } }, [isSearchOpen]);
+          const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+          const [searchHistory, setSearchHistory] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('tm_search_history')) || []; }
+            catch (e) { return []; }
+          });
+          const [maxPane, setMaxPane] = useState(null);
+          const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
+          const [isTimelineMinimized, setIsTimelineMinimized] = useState(false);
+          const [timelineRequiredHeight, setTimelineRequiredHeight] = useState(140);
+          const [zoomLevel, setZoomLevel] = useState(1.0);
+          const [visibleTimeSpan, setVisibleTimeSpan] = useState('');
+          const [visibleTimeBounds, setVisibleTimeBounds] = useState([0, Infinity]);
+          const [basemapOpacity, setBasemapOpacity] = useState(1.0);
+          const [polygonOpacity, setPolygonOpacity] = useState(() => {
+            try { return parseFloat(localStorage.getItem('tm_polygon_opacity')) || 0.4; }
+            catch (e) { return 0.4; }
+          });
+          const [dateLocale, setDateLocale] = useState(() => {
+            try { return localStorage.getItem('tm_date_locale') || 'en-GB'; }
+            catch (e) { return 'en-GB'; }
+          });
+          const [showButtonText, setShowButtonText] = useState(() => {
+            try {
+              const stored = localStorage.getItem('tm_show_button_text');
+              return stored === 'true';
+            } catch(e) { return false; }
+          });
+          const [dateEngineMode, setDateEngineMode] = useState(() => {
+            try { return localStorage.getItem('tm_date_engine_mode') || 'auto'; }
+            catch (e) { return 'auto'; }
+          });
+          const [allTags, setAllTags] = useState([]);
+          // isFilterInitializedRef purged for direct sync
+          const [activeTags, setActiveTags] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('tm_active_tags')) || []; }
+            catch(e) { return []; }
+          });
+          const [activeExtractTypes, setActiveExtractTypes] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('tm_active_extract_types')) || []; }
+            catch(e) { return []; }
+          });
+
+          useEffect(() => {
+            if (activeTags.length > 0) {
+              try {
+                localStorage.setItem('tm_active_tags', JSON.stringify(activeTags));
+              } catch(e) {}
+            }
+          }, [activeTags]);
+
+          useEffect(() => {
+            if (activeExtractTypes.length > 0) {
+              try {
+                localStorage.setItem('tm_active_extract_types', JSON.stringify(activeExtractTypes));
+              } catch(e) {}
+            }
+          }, [activeExtractTypes]);
+
+
+          const [minimapOffset, setMinimapOffset] = useState(-4);
+          const [basemapsRegistry, setBasemapsRegistry] = useState([
+            { id: 'carto-light', label: 'CartoDB Positron (Light)', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: true, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
+            { id: 'carto-dark', label: 'CartoDB Dark Matter', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: false, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
+            { id: 'osm', label: 'OpenStreetMap Standard', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: false, attrText: 'OpenStreetMap contributors', attrLink: 'https://openstreetmap.org' },
+            { id: 'esri-sat', label: 'Esri World Imagery', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', format: 'png', maxZoom: 19, active: false, attrText: 'Esri', attrLink: 'https://www.esri.com' },
+            { id: 'opentopo', label: 'OpenTopoMap', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 17, active: false, attrText: 'OpenTopoMap', attrLink: 'https://opentopomap.org' },
+            { id: 'protomaps-light', label: 'Protomaps Vector Light', type: 'base', url: 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt', format: 'vector', maxZoom: 18, active: false, attrText: 'Protomaps / OSM', attrLink: 'https://protomaps.com' },
+            { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '' }
+          ]);
+          const [zoomLock, setZoomLock] = useState(() => {
+            try {
+              const stored = localStorage.getItem('tm_zoom_lock');
+              if (stored === 'hard') return 'hard';
+              if (stored === 'soft') return 'soft';
+              return 'auto';
+            } catch(e) { return 'auto'; }
+          });
+          const appRef = useRef(null);
+          const hasInitializedRef = useRef(false);
+
+          const addLog = (msg, type = 'info') => {
+            const timeStr = new Date().toTimeString().split(' ').at(0);
+            setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 500));
+          };
+
+          const stripAndNormalize = (str) => {
+            if (!str) return '';
+            return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim();
+          };
+
+          const formatSmartDate = (startInput, endInput, locale, includeSuffix = true) => {
+            const checkApprox = (val) => {
+              if (!val) return false;
+              if (typeof val === 'object') {
+                if (val.isApprox || val.uncertain || val.approximate) return true;
+                if (val.type && val.type === 'Approximate') return true;
+                if (val.text && (val.text.includes('~') || val.text.includes('?'))) return true;
+              }
+              return false;
+            };
+            const checkIsEDTF = (val) => {
+              if (!val) return false;
+              if (typeof val === 'object' && (val.isEDTF || val.sourceType === 'EDTF_AST')) return true;
+              if (typeof val === 'string' && /^[P\d~?%\{\[\/\.]/i.test(val.trim())) return true;
+              return false;
+            };
+
+            const isApprox = checkApprox(startInput) || checkApprox(endInput);
+            const isEDTF = checkIsEDTF(startInput) || checkIsEDTF(endInput);
+            const approxPrefix = isApprox ? '~ ' : '';
+
+            if (startInput === null || startInput === undefined) return 'Undated';
+
+            const toValidDate = (val) => {
+              if (val === null || val === undefined) return null;
+              if (typeof val === 'number') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
+              if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+              if (typeof val === 'object') {
+                if (val.isEDTF && val.text) return val.text;
+                if (val.date && val.date instanceof Date && !isNaN(val.date.getTime())) return val.date;
+                if (typeof val.min === 'number') { const d = new Date(val.min); return isNaN(d.getTime()) ? null : d; }
+                if (typeof val.start === 'number') { const d = new Date(val.start); return isNaN(d.getTime()) ? null : d; }
+              }
+              if (typeof val === 'string') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
+              return null;
+            };
+
+            const d1 = toValidDate(startInput);
+            const d2 = toValidDate(endInput);
+            const loc = locale || 'en-GB';
+            const opt = { day: '2-digit', month: 'short', year: 'numeric' };
+
+            let mainDateStr = 'Undated';
+            if (typeof d1 === 'string') {
+              mainDateStr = d1;
+            } else if (d1) {
+              if (d2 && typeof d2 !== 'string') {
+                if (d2.getTime() === d1.getTime()) mainDateStr = approxPrefix + d1.toLocaleDateString(loc, opt);
+                else mainDateStr = approxPrefix + `${d1.toLocaleDateString(loc, opt)} – ${d2.toLocaleDateString(loc, opt)}`;
+              } else {
+                mainDateStr = approxPrefix + d1.toLocaleDateString(loc, opt);
+              }
+            } else if (typeof startInput === 'string') {
+              mainDateStr = startInput;
+            }
+
+            if (!includeSuffix) return mainDateStr;
+
+            let badgeText = 'Num';
+            let badgeColor = '#777777';
+            if (isEDTF && isApprox) {
+              badgeText = 'ISO~';
+              badgeColor = '#f59e0b';
+            } else if (isEDTF) {
+              badgeText = 'ISO';
+              badgeColor = '#007acc';
+            } else if (isApprox) {
+              badgeText = 'Num~';
+              badgeColor = '#f59e0b';
+            }
+
+            const suffixVNode = html`<sup style="font-size: 0.68em; font-family: monospace; color: ${badgeColor}; vertical-align: super; font-weight: 700;">${badgeText}</sup>`;
+
+            return html`<span>${mainDateStr}${suffixVNode}</span>`;
+          };
+
+          const formatPlaces = (placeStr) => {
+            if (!placeStr) return '';
+            const stripped = placeStr.replace(new RegExp("^\\s*\\\\x5b.*?\\\\x5d\\s*", ""), '');
+            return stripped.split(/(?:\||·|;|·|\n|\-)/).map(s => s.trim()).filter(Boolean).join(' · ');
+          };
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 2: CHRONO ENGINE - DATAFRAME PARSING ] ===
+          // =========================================================================
+          useEffect(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
+            let source = urlParams.get('source') || urlParams.get('amp;source') || '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE';
+            const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
+            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
+
+            setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
+            setConnectionSummary({ source, gid });
+
+            const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
+            const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
+
+            Promise.all([
+              fetch(fetchUrlPrimary).then(res => {
+                if (!res.ok) throw new Error(`HTTP network failure fetching primary dataset (status ${res.status})`);
+                return res.text();
+              }),
+              fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
+                if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status ${res.status})`);
+                return res.text();
+              }) : Promise.resolve(null)
+            ]).then(([primaryCsv, basemapsCsv]) => {
+              setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
+
+              const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
+              if (results.errors.length > 0) {
+                results.errors.forEach(e => addLog(`CSV Parse warning (row ${e.row}): ${e.message}`, 'warning'));
+              }
+
+              const exactGet = (normObj, key) => {
+                const val = normObj[key];
+                return val !== undefined && val !== null ? String(val).trim() : "";
+              };
+
+              const firstRowNorm = {};
+              if (results.data.length > 0) {
+                const [ firstRow ] = results.data; for (let k in firstRow) firstRowNorm[k.toLowerCase().trim()] = firstRow[k];
+              }
+
+              const aboutDataObj = {
+                title: exactGet(firstRowNorm, 'title') || 'Dataset Overview',
+                description: exactGet(firstRowNorm, 'description') || 'No project description provided.',
+                rawSource: source === '1kdgGiHNDsIZrn8Z1aqWXrEEYKMGxLAqFiwATx3aqbJI' ? 'Default Master DB' : source,
+                downloadUrl: fetchUrlPrimary
+              };
+              setAboutData(aboutDataObj);
+
+              let activeMode = dateEngineMode;
+              if (activeMode === 'auto') {
+                const hasEDTF = results.data.some(row => {
+                  const norm = {};
+                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                  return exactGet(norm, 'start edtf') !== '';
+                });
+                activeMode = hasEDTF ? 'edtf' : 'legacy';
+              }
+              const isUS = dateLocale === 'en-US';
+              const omniSplitRegex = /\||\r?\n/;
+              const rows = results.data;
+
+                            const parseChronoNode = (legacyStr, edtfStr, index, rowTitle, isRequired = true) => {
+                const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
+
+                if (cleanEdtf) {
+                  try {
+                    const parsed = compileCartiMapAST(cleanEdtf);
+                    if (parsed && typeof parsed.min === 'number' && !isNaN(parsed.min)) {
+                      const isApproxFlag = !!(parsed.approximate || parsed.uncertain || cleanEdtf.includes('~') || cleanEdtf.includes('?') || cleanEdtf.includes('%') || cleanEdtf.toLowerCase().includes('x') || cleanEdtf.toLowerCase().startsWith('c.'));
+                      return {
+                        isEDTF: true,
+                        isApprox: isApproxFlag,
+                        type: isApproxFlag ? 'Approximate' : 'Exact',
+                        min: parsed.min,
+                        max: parsed.max,
+                        obj: parsed,
+                        isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
+                        text: cleanEdtf
+                      };
+                    }
+                  } catch (e) {
+                    addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): AST Parsing exception for EDTF "${cleanEdtf}": ${e.message}`, 'error');
+                  }
+                  addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Could not parse EDTF "${cleanEdtf}". Classified as Malformed EDTF.`, 'error');
+                  return {
+                    isEDTF: false,
+                    isApprox: true,
+                    type: 'Malformed',
+                    min: 0,
+                    max: 0,
+                    text: cleanEdtf
+                  };
+                }
+
+                if (isRequired) {
+                  addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Start EDTF cell is blank. Classified as Missing EDTF.`, 'warning');
+                  return {
+                    isEDTF: false,
+                    isApprox: true,
+                    type: 'Missing',
+                    min: 0,
+                    max: 0,
+                    text: 'Missing Start EDTF'
+                  };
+                }
+
+                return null;
+              };
+
+              const cleaned = rows.map((row, index) => {
+                const norm = {};
+                for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                const rowTitle = exactGet(norm, 'title') || 'Untitled Event';
+
+                return {
+                  id: index + 1,
+                  title: rowTitle,
+                  startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf'), index, rowTitle, true),
+                  endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf'), index, rowTitle, false),
+                  description: exactGet(norm, 'description'),
+                  place: exactGet(norm, 'place'),
+                  location: exactGet(norm, 'location') || exactGet(norm, 'location (wkt)') || exactGet(norm, 'location wkt') || exactGet(norm, 'wkt') || exactGet(norm, 'coordinates') || exactGet(norm, 'geo') || exactGet(norm, 'wkt location'),
+                  subLabels: exactGet(norm, 'sublabels') || exactGet(norm, 'sub-labels') || exactGet(norm, 'sub labels') || '',
+                  priority: exactGet(norm, 'priority'),
+                  media: exactGet(norm, 'media') ? exactGet(norm, 'media').split(omniSplitRegex).map(m => m.trim()).filter(Boolean) : [],
+                  mediaCaption: exactGet(norm, 'media caption') ? exactGet(norm, 'media caption').split(omniSplitRegex).map(c => c.trim()) : [],
+                  mediaCredit: exactGet(norm, 'media credit') ? exactGet(norm, 'media credit').split(omniSplitRegex).map(c => c.trim()) : [],
+                  tags: exactGet(norm, 'tags') ? Array.from(new Set(exactGet(norm, 'tags').split(/[,|;·\r\n]+/).map(t => t.trim()).filter(Boolean))) : [],
+                  extractType: exactGet(norm, 'extract type') || 'Storyline'
+                };
+              });
+
+              const valid = cleaned.sort((a, b) => {
+                const aMin = a.startDate ? a.startDate.min : 0;
+                const bMin = b.startDate ? b.startDate.min : 0;
+                if (aMin !== bMin) return aMin - bMin;
+                return a.id - b.id;
+              });
+
+              // =========================================================================
+              // === [ APP_ORCHESTRATOR SUBBLOCK 3: VECTOR SEARCH INDEXING ] ===
+              // =========================================================================
+              const indexedData = valid.map(d => ({
+                ...d,
+                _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale, false)}`)
+              }));
+              setUnfilteredData(indexedData);
+              const discoveredTypes = Array.from(new Set(indexedData.map(d => d.extractType).filter(Boolean)));
+              if (activeExtractTypes.length === 0) {
+                setActiveExtractTypes(discoveredTypes);
+              }
+
+              const tagsMap = new Set();
+              indexedData.forEach(d => {
+                let rawTags = d.tags || [];
+                let arr = [];
+                (Array.isArray(rawTags) ? rawTags : [rawTags]).forEach(t => {
+                  if (typeof t === 'string') arr.push(...t.split(omniSplitRegex));
+                  else arr.push(t);
+                });
+                arr.map(s => String(s).trim()).filter(Boolean).forEach(t => tagsMap.add(t));
+              });
+
+              const validEdtfCount = cleaned.filter(d => (d.startDate && d.startDate.isEDTF && d.startDate.type !== 'Undated')).length;
+              const missingEdtfCount = cleaned.filter(d => (!d.startDate || !d.startDate.text || d.startDate.text === 'Undated')).length;
+              const malformedEdtfCount = cleaned.length - validEdtfCount - missingEdtfCount;
+              addLog(`[Dataset Ingestion] Parsed ${rows.length} records: ${validEdtfCount} Valid EDTF, ${missingEdtfCount} Missing EDTF, ${malformedEdtfCount} Malformed EDTF.`, 'info');
+              setChronoIngestionSummary({
+                total: rows.length,
+                valid: validEdtfCount,
+                missing: missingEdtfCount,
+                malformed: malformedEdtfCount
+              });
+
+              const uniqueTagsList = Array.from(tagsMap).sort();
+              setAllTags(uniqueTagsList);
+              
+              // 1. Read defaults first, read locally stored settings second
+              let tagsToApply = uniqueTagsList;
+              try {
+                const stored = localStorage.getItem('tm_active_tags');
+                if (stored) {
+                  const parsed = JSON.parse(stored);
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    const valid = parsed.filter(t => uniqueTagsList.includes(t));
+                    if (valid.length > 0) tagsToApply = valid;
+                  }
+                }
+              } catch(e) {}
+              setActiveTags(tagsToApply);
+
+              let typesToApply = discoveredTypes;
+              try {
+                const storedTypes = localStorage.getItem('tm_active_extract_types');
+                if (storedTypes) {
+                  const parsedTypes = JSON.parse(storedTypes);
+                  if (Array.isArray(parsedTypes) && parsedTypes.length > 0) {
+                    const validTypes = parsedTypes.filter(t => discoveredTypes.includes(t));
+                    if (validTypes.length > 0) typesToApply = validTypes;
+                  }
+                }
+              } catch(e) {}
+              setActiveExtractTypes(typesToApply);
+
+              const parseLayersTRows = (rows) => {
+                return rows.map(row => {
+                  const norm = {};
+                  for (let k in row) norm[k.toLowerCase().trim()] = row[k];
+                  const isActive = /^(true|yes)$/i.test(String(norm.active || norm.isdefault || norm.default || '').trim());
+                  const rawOpac = parseFloat(norm.defaultopacity || norm.opacity);
+                  const rawType = String(norm.type || norm.layertype || '').toLowerCase().trim();
+                  return {
+                    id: norm.id || norm.name || '',
+                    label: norm.label || norm.title || norm.name || '',
+                    type: (rawType === 'overlay' || rawType === 'wms') ? 'overlay' : 'base',
+                    url: norm.url || norm.tileurl || norm.link || norm.wmsurl || norm.templateurl || norm.source || '',
+                    maxZoom: parseInt(norm.maxzoom || norm.maxzoomlevel, 10) || 19,
+                    active: isActive,
+                    attrText: norm.attrtext || norm.attribution || norm.credit || norm['attribution text'] || '',
+                    attrLink: norm.attrlink || norm.attributionlink || norm['attribution link'] || '',
+                    defaultOpacity: isNaN(rawOpac) ? 1.0 : rawOpac,
+                    format: norm.format || norm.tileformat || 'xyz',
+                    wmsLayer: norm.wmslayer ? decodeURIComponent(String(norm.wmslayer).trim()) : (norm['wms layer'] ? decodeURIComponent(String(norm['wms layer']).trim()) : 'default')
+                  };
+                }).filter(b => b.id && b.url);
+              };
+
+              const rawLayersRows = (typeof sheetsData !== 'undefined' && sheetsData && (sheetsData.LayersT || sheetsData.Layers)) ? (sheetsData.LayersT || sheetsData.Layers) : ((typeof window !== 'undefined' && window.sheetsData && (window.sheetsData.LayersT || window.sheetsData.Layers)) ? (window.sheetsData.LayersT || window.sheetsData.Layers) : null);
+              let parsedBMs = [];
+              if (rawLayersRows && Array.isArray(rawLayersRows) && rawLayersRows.length > 0) {
+                parsedBMs = parseLayersTRows(rawLayersRows);
+              } else if (basemapsCsv) {
+                const baseResult = Papa.parse(basemapsCsv, { header: true, skipEmptyLines: true });
+                parsedBMs = parseLayersTRows(baseResult.data);
+              }
+
+              if (parsedBMs.length > 0) {
+                setBasemapsRegistry(prev => {
+                  const merged = [...prev];
+                  parsedBMs.forEach(bm => {
+                    const existIdx = merged.findIndex(m => m.id === bm.id);
+                    if (existIdx >= 0) merged[existIdx] = bm;
+                    else merged.push(bm);
+                  });
+                  return merged;
+                });
+                if (typeof setLayersTRegistrySummary === 'function') {
+                  setLayersTRegistrySummary({
+                    services: parsedBMs.length,
+                    total: basemapsRegistry ? basemapsRegistry.length : parsedBMs.length
+                  });
+                }
+              }
+
+              if (!hasInitializedRef.current) {
+                const paramSlide = getOmniParam('slide');
+                const paramDate = getOmniParam('date');
+                let initialIdx = 0;
+                if (paramSlide) {
+                  const sVal = parseInt(paramSlide, 10);
+                  if (!isNaN(sVal) && sVal >= 0 && sVal < indexedData.length) initialIdx = sVal;
+                } else if (paramDate) {
+                  const targetTime = new Date(paramDate).getTime();
+                  if (!isNaN(targetTime)) {
+                    let closestIdx = 0; let minDiff = Infinity;
+                    indexedData.forEach((d, i) => {
+                      if (d.startDate) {
+                        const diff = Math.abs(d.startDate.min - targetTime);
+                        if (diff < minDiff) { minDiff = diff; closestIdx = i; }
+                      }
+                    });
+                    initialIdx = closestIdx;
+                  }
+                }
+                setActiveIndex(initialIdx);
+                hasInitializedRef.current = true;
+              }
+              setStatus({ text: 'Engine Ready', progress: 100, isFading: true, active: false });
+              setTimeout(() => { setStatus({ text: '', progress: 100, isFading: true, active: true }); }, 500);
+            }).catch(err => {
+              console.error("Fatal CMS Connection Failure:", err);
+              setStatus({ text: 'Database Sync Failure', progress: 100, isFading: false, active: false });
+              addLog(`Database Sync Error: ${err.message}`, 'error');
+            });
+          }, [rawCsvRows, dateEngineMode, dateLocale]);
+
+          // --- [ Active filtering of datasets by swimlanes and streams ] ---
+          useEffect(() => {
+            if (unfilteredData.length === 0) return;
+            if (true) {
+              try {
+                if (activeTags.length > 0) localStorage.setItem('tm_active_tags', JSON.stringify(activeTags));
+                if (activeExtractTypes.length > 0) localStorage.setItem('tm_active_extract_types', JSON.stringify(activeExtractTypes));
+              } catch(e) {}
+            }
+
+            const curEventId = data[activeIndex] ? data[activeIndex].id : null;
+
+            const filtered = unfilteredData.filter(d => {
+              const tagMatch = (!activeTags || activeTags.length === 0) || ((d.tags || []).length === 0) || d.tags.some(t => activeTags.includes(t));
+              const extractMatch = (!activeExtractTypes || activeExtractTypes.length === 0) || activeExtractTypes.includes(d.extractType);
+              return tagMatch && extractMatch;
+            });
+            setData(filtered);
+
+            if (curEventId !== null) {
+              const keepIdx = filtered.findIndex(d => d.id === curEventId);
+              if (keepIdx >= 0) {
+                setActiveIndex(keepIdx);
+              } else if (activeIndex >= filtered.length) {
+                setActiveIndex(Math.max(0, filtered.length - 1));
+              }
+            } else if (activeIndex >= filtered.length) {
+              setActiveIndex(Math.max(0, filtered.length - 1));
+            }
+
+            const tagsMap = new Set();
+            filtered.forEach(d => {
+              (d.tags || []).forEach(t => tagsMap.add(t));
+            });
+            const laneCount = tagsMap.size > 0 ? tagsMap.size : 1;
+            setTimelineRequiredHeight((laneCount * 24) + 55);
+          }, [unfilteredData, activeTags, activeExtractTypes]);
+
+          const handleToggleTag = (tag) => {
+            if (activeTags.includes(tag)) {
+              if (activeTags.length > 1) {
+                setActiveTags(activeTags.filter(t => t !== tag));
+                setFilterFlashMsg(null);
+              } else {
+                triggerFilterFlash(`To keep at least one category active, filtered to ${activeTags.join(', ')}`);
+              }
+            } else {
+              setActiveTags([...activeTags, tag]);
+              setFilterFlashMsg(null);
+            }
+          };
+
+          const handleToggleExtractType = (type) => {
+            if (activeExtractTypes.includes(type)) {
+              if (activeExtractTypes.length > 1) {
+                setActiveExtractTypes(activeExtractTypes.filter(t => t !== type));
+                setFilterFlashMsg(null);
+              } else {
+                triggerFilterFlash(`To keep at least one category active, filtered to ${activeExtractTypes.join(', ')}`);
+              }
+            } else {
+              setActiveExtractTypes([...activeExtractTypes, type]);
+              setFilterFlashMsg(null);
+            }
+          };
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 4: RESIZER EVENT LISTENERS ] ===
+          // =========================================================================
+          const startPrimaryResize = (e) => {
+            e.preventDefault();
+            const isDesktop = window.innerWidth >= 1024;
+            const appNode = document.getElementById('app-layout') || document.documentElement;
+            const startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
+            const startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
+            const startSplit = parseFloat(getComputedStyle(appNode).getPropertyValue('--primary-split')) || (isDesktop ? 50 : 55);
+            const containerDim = isDesktop ? (appNode.clientWidth || window.innerWidth) : (appNode.clientHeight || window.innerHeight);
+
+            const doDrag = (moveEvent) => {
+              const currentX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientX);
+              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientY);
+              if (isDesktop ? currentX === undefined : currentY === undefined) return;
+              const diff = isDesktop ? (currentX - startX) : (startY - currentY);
+              const pctDiff = (diff / containerDim) * 100;
+              const newSplit = Math.max(15, Math.min(85, startSplit + pctDiff));
+              appNode.style.setProperty('--primary-split', `${newSplit}%`);
+              document.documentElement.style.setProperty('--primary-split', `${newSplit}%`);
+              window.dispatchEvent(new Event('resize'));
+            };
+
+            const stopDrag = () => {
+              window.removeEventListener('mousemove', doDrag);
+              window.removeEventListener('mouseup', stopDrag);
+              window.removeEventListener('touchmove', doDrag);
+              window.removeEventListener('touchend', stopDrag);
+            };
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('touchmove', doDrag, { passive: true });
+            window.addEventListener('touchend', stopDrag);
+          };
+
+          const startSecondaryResize = (e) => {
+            e.preventDefault();
+            const isDesktop = window.innerWidth >= 1024;
+            const visualNode = appRef.current ? appRef.current.querySelector('.visual-pane') : null;
+            const appNode = document.getElementById('app-layout') || document.documentElement;
+            const startX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
+            const startY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
+            const startSplit = parseFloat(getComputedStyle(appNode).getPropertyValue('--secondary-split')) || 50;
+            const containerDim = visualNode 
+              ? (isDesktop ? visualNode.clientHeight : visualNode.clientWidth) 
+              : (isDesktop ? (window.innerHeight * 0.5) : (window.innerWidth * 0.5));
+
+            const doDrag = (moveEvent) => {
+              const currentX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientX);
+              const currentY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientY);
+              if (isDesktop ? currentY === undefined : currentX === undefined) return;
+              const diff = isDesktop ? (currentY - startY) : (currentX - startX);
+              const pctDiff = (diff / containerDim) * 100;
+              const newSplit = Math.max(15, Math.min(85, startSplit + pctDiff));
+              appNode.style.setProperty('--secondary-split', `${newSplit}%`);
+              document.documentElement.style.setProperty('--secondary-split', `${newSplit}%`);
+              window.dispatchEvent(new Event('resize'));
+            };
+
+            const stopDrag = () => {
+              window.removeEventListener('mousemove', doDrag);
+              window.removeEventListener('mouseup', stopDrag);
+              window.removeEventListener('touchmove', doDrag);
+              window.removeEventListener('touchend', stopDrag);
+            };
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('touchmove', doDrag, { passive: true });
+            window.addEventListener('touchend', stopDrag);
+          };
+
+          const startTimelineResize = (e) => {
+            e.preventDefault();
+            const [ touchY0 ] = e.touches || []; const startY = e.clientY || (touchY0 && touchY0.clientY);
+            const startHeight = timelineRequiredHeight;
+
+            const doDrag = (moveEvent) => {
+              const [ mTouchY0 ] = moveEvent.touches || []; const currentY = moveEvent.clientY || (mTouchY0 && mTouchY0.clientY);
+              const diffY = startY - currentY;
+              const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + diffY));
+              setTimelineRequiredHeight(newHeight);
+            };
+
+            const stopDrag = () => {
+              window.removeEventListener('mousemove', doDrag);
+              window.removeEventListener('mouseup', stopDrag);
+              window.removeEventListener('touchmove', doDrag);
+              window.removeEventListener('touchend', stopDrag);
+            };
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('touchmove', doDrag, { passive: true });
+            window.addEventListener('touchend', stopDrag);
+          };
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 5: CHRONOLOGICALLY REALIGNED SEARCH ] ===
+          // =========================================================================
+          
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 4.1: SLIDE NAVIGATION & VIEWPORT LISTENERS ] ===
+          // =========================================================================
+          const jumpToSlide = (newIdx, isSequential = false) => {
+            if (newIdx !== activeIndex && newIdx >= 0 && newIdx < data.length) {
+              if (!isSequential) {
+                setSlideHistory(prev => [...prev, activeIndex]);
+                setForwardHistory([]);
+              }
+              setActiveIndex(newIdx);
+            }
+          };
+
+          const goBack = () => {
+            if (slideHistory.length > 0) {
+              const prev = slideHistory.at(-1);
+              setSlideHistory(h => h.slice(0, -1));
+              setForwardHistory(f => [...f, activeIndex]);
+              setActiveIndex(prev);
+            }
+          };
+
+          const goForward = () => {
+            if (forwardHistory.length > 0) {
+              const next = forwardHistory.at(-1);
+              setForwardHistory(f => f.slice(0, -1));
+              setSlideHistory(h => [...h, activeIndex]);
+              setActiveIndex(next);
+            }
+          };
+
+          const updateAppHeight = () => document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+
+          useEffect(() => {
+            const handleKeyDown = (e) => {
+              if (e.key === 'Escape' || e.keyCode === 27) {
+                if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
+                setDurationInspectionPayload(null);
+                setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
+              }
+            };
+            window.addEventListener('keydown', handleKeyDown, true);
+            return () => window.removeEventListener('keydown', handleKeyDown, true);
+          }, []);
+
+          const handleResultClick = (id, qString) => {
+            const sortedIdx = data.findIndex(d => d.id === id);
+            if (sortedIdx >= 0) jumpToSlide(sortedIdx);
+            setIsSearchOpen(false);
+            if (qString && !searchHistory.includes(qString)) {
+              const newH = [qString, ...searchHistory].slice(0, 8);
+              setSearchHistory(newH);
+              localStorage.setItem('tm_search_history', JSON.stringify(newH));
+            }
+          };
+
+          const executeSearch = (query) => {
+            if (!query || !query.trim()) return [];
+            const normalized = stripAndNormalize(query);
+            const terms = normalized.split(/\s+/).filter(Boolean);
+            if (terms.length === 0) return [];
+
+            const searchPool = (unfilteredData && unfilteredData.length > 0) ? unfilteredData : data;
+            return searchPool.filter(d => {
+              if (terms.length === 1 && d.id && String(d.id) === terms[0].replace(/\.$/, '')) return true;
+              const titleNorm = d.title ? stripAndNormalize(d.title) : '';
+              const descNorm = d.description ? stripAndNormalize(d.description) : '';
+              const placeNorm = d.place ? stripAndNormalize(d.place) : '';
+              const tagsNorm = Array.isArray(d.tags) ? d.tags.map(t => stripAndNormalize(t)).join(' ') : (d.tags ? stripAndNormalize(d.tags) : '');
+              const idNorm = d.id ? String(d.id) : '';
+              const composite = `${idNorm} ${titleNorm} ${descNorm} ${placeNorm} ${tagsNorm}`;
+              return terms.every(term => composite.includes(term));
+            });
+          };
+
+          const searchResults = executeSearch(searchQuery);
+          const activeSlide = data.at(activeIndex);
+          const hasMedia = activeSlide && activeSlide.media && activeSlide.media.length > 0;
+
+          // =========================================================================
+          // === [ APP_ORCHESTRATOR SUBBLOCK 9: SUBCOMPONENT SVG VECTOR LOGOS ] ===
+          // =========================================================================
+          
+
+
 
 
 
