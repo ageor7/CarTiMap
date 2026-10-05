@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b534';
+const APP_VERSION = 'v8.17.1-b554';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.144-b555',
-  'MapViewer': 'v7.2.77-b535',
-  'ContentSlider': 'v6.2.77-b535',
-  'MediaViewer': 'v3.2.76-b535',
-  'TimelineScrubber': 'v27.2.138-b555',
-  'OverviewGantt': 'v2.1.42-b535',
-  'ASTCompiler': 'v2.1.26-b555',
-  'VibeMonitor': 'v2.5.6-b535',
-  'SymbologyLegend': 'v1.2.20-b535',
-  'Globals': 'v2.1.5-b535',
-  'Styles': 'v6.1.11-b535'
+  'AppOrchestrator': 'v3.9.140-b552',
+  'MapViewer': 'v7.2.93-b552',
+  'ContentSlider': 'v6.2.93-b552',
+  'MediaViewer': 'v3.2.92-b552',
+  'TimelineScrubber': 'v27.2.134-b552',
+  'OverviewGantt': 'v2.1.58-b552',
+  'ASTCompiler': 'v2.1.22-b552',
+  'VibeMonitor': 'v2.5.22-b552',
+  'SymbologyLegend': 'v1.2.36-b552',
+  'Globals': 'v2.1.21-b552',
+  'Styles': 'v6.1.27-b552'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -1279,29 +1279,30 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
       endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
     }
+    const leftPct = Math.max(0, startPct);
+    const widthPct = Math.max(0.2, endPct - startPct);
     const isChoiceSet = item.startDate && item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List');
     const hasDuration = (endPct - startPct) > 0.001;
 
     const isActive = globalIndex === activeIndex;
     const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
-    const colActive = 'var(--tm-active, #007acc)';
+    const colActive = 'var(--tm-active, #28a745)';
     const colInactive = 'rgba(var(--tm-inactive-rgb, 204, 0, 0), 0.6)';
     const colApprox = '#f59e0b';
-
-        const groupLeftMs = renderMinTime + (leftPct / 100) * renderTimeRange;
-    const groupSpanMs = Math.max(1, renderTimeRange * (widthPct / 100));
-    const x1RelPct = Number((((itemStartMs - groupLeftMs) / groupSpanMs) * 100).toFixed(4));
 
     let subDropLines = '';
     if (isChoiceSet && item.startDate.obj.values && item.startDate.obj.values.length > 1) {
       const isList = item.startDate.obj.type === 'List';
       const subColor = isList ? (isActive ? colActive : colInactive) : colApprox;
       const subDash = isList ? 'none' : '3,3';
+      const leftMs = renderMinTime + (leftPct / 100) * renderTimeRange;
+      const groupSpanMs = Math.max(1, renderTimeRange * (widthPct / 100));
+      const x1RelPct = Number((((itemStartMs - leftMs) / groupSpanMs) * 100).toFixed(4));
       subDropLines = html`
         <svg style="position: absolute; left: 0; right: 0; top: ${blockHeight / 2}px; bottom: 0; width: 100%; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: 880;">
           ${item.startDate.obj.values.map(v => {
             if (typeof v.min !== 'number' || isNaN(v.min)) return null;
-            const x2RelPct = Number((((v.min - groupLeftMs) / groupSpanMs) * 100).toFixed(4));
+            const x2RelPct = Number((((v.min - leftMs) / groupSpanMs) * 100).toFixed(4));
             if (v.min < renderMinTime || v.min > renderMaxTime) return null;
             return html`
               <line x1="${x1RelPct}%" y1="0" x2="${x2RelPct}%" y2="100%" stroke="${subColor}" stroke-width="1.5" stroke-dasharray="${subDash}" />
@@ -1309,6 +1310,52 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           }).filter(Boolean)}
         </svg>
       `;
+    }
+
+    
+     (node) => {
+      if (!node) return false;
+      if (node.isApprox) return true;
+      if (node.obj && (node.obj.approximate || node.obj.uncertain || node.obj.unspecified || node.obj.type === 'Approximate')) return true;
+      const txt = (node.text || '').toLowerCase().trim();
+      if (!txt) return false;
+      return txt.includes('~') || txt.includes('?') || txt.includes('%') || txt.includes('x') || txt.startsWith('c.') || txt.startsWith('ca.') || txt.includes('approx');
+    };
+
+    const isApproxStart = checkIsApprox(item.startDate);
+    const isApproxEnd = checkIsApprox(item.endDate);
+
+    let xAxisMarker = '';
+    if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
+      const obj = item.startDate.obj;
+      if (obj.type === 'Set') {
+        // Choice Set ([...]): Dotted connector lines (2,3) in amber gold (#f59e0b)
+        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        const subDots = (obj.values || []).map(v => {
+          const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
+          return html`<div style="position: absolute; bottom: 0px; left: ${vPct}px; width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid #f59e0b; background: #ffffff; transform: translateX(-3px); z-index: 910;" title="Choice Candidate Date"></div>`;
+        });
+        xAxisMarker = html`
+          <div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 2px; border-bottom: 2px dotted #f59e0b; z-index: 900;">
+            ${subDots}
+          </div>
+        `;
+      } else if (obj.type === 'List') {
+        // Inclusive List ({...}): Dash-dot connector lines (6,3,2,3) in royal cyan (#007acc)
+        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
+        const subDots = (obj.values || []).map(v => {
+          const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
+          return html`<div style="position: absolute; bottom: 0px; left: ${vPct}px; width: 6px; height: 6px; border-radius: 50%; background: #007acc; transform: translateX(-3px); z-index: 910;" title="Inclusive Occurrence Date"></div>`;
+        });
+        xAxisMarker = html`
+          <svg style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 4px; overflow: visible; z-index: 900;">
+            <line x1="0" y1="2" x2="100%" y2="2" stroke="#007acc" stroke-width="2" stroke-dasharray="6,3,2,3" />
+          </svg>
+          <div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 4px; z-index: 905;">
+            ${subDots}
+          </div>
+        `;
+      }
     }
 
     if (!xAxisMarker && hasDuration) {
@@ -4277,7 +4324,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                               </div>
                             `;
                           })()}
-                          })()}
                         </div>
                       `;
                     })}
@@ -4307,12 +4353,12 @@ const splitTopLevel = (str) => {
   let depthSquare = 0, depthCurly = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str[i];
-    if (char === '[') depthSquare++;
-    else if (char === ']') depthSquare--;
+    if (char === '[' || char === '(') depthSquare++;
+    else if (char === ']' || char === ')') depthSquare--;
     else if (char === '{') depthCurly++;
     else if (char === '}') depthCurly--;
 
-    if (char === ',' && depthSquare === 0 && depthCurly === 0) {
+    if ((char === ',' || char === '\n' || char === '\r') && depthSquare === 0 && depthCurly === 0) {
       const s = curr.join('').trim();
       if (s) parts.push(s);
       curr = [];
