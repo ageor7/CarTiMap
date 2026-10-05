@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.17.1-b536</title>
+    <title>CarTiMap v8.17.1-b537</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -219,13 +219,13 @@ const html = htm.bind(h);
 const APP_VERSION = 'v8.17.1-b534';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.125-b536',
+  'AppOrchestrator': 'v3.9.125-b537',
   'MapViewer': 'v7.2.77-b535',
   'ContentSlider': 'v6.2.77-b535',
   'MediaViewer': 'v3.2.76-b535',
-  'TimelineScrubber': 'v27.2.119-b536',
+  'TimelineScrubber': 'v27.2.119-b537',
   'OverviewGantt': 'v2.1.42-b535',
-  'ASTCompiler': 'v2.1.7-b536',
+  'ASTCompiler': 'v2.1.7-b537',
   'VibeMonitor': 'v2.5.6-b535',
   'SymbologyLegend': 'v1.2.20-b535',
   'Globals': 'v2.1.5-b535',
@@ -4372,6 +4372,32 @@ const splitTopLevel = (str) => {
 };
 
 
+const splitTopLevel = (str) => {
+  const parts = [];
+  let curr = [];
+  let depthSquare = 0, depthCurly = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    if (char === '[') depthSquare++;
+    else if (char === ']') depthSquare--;
+    else if (char === '{') depthCurly++;
+    else if (char === '}') depthCurly--;
+
+    if ((char === ',' || char === '\n') && depthSquare === 0 && depthCurly === 0) {
+      const s = curr.join('').trim();
+      if (s) parts.push(s);
+      curr = [];
+    } else {
+      curr.push(char);
+    }
+  }
+  if (curr.length > 0) {
+    const s = curr.join('').trim();
+    if (s) parts.push(s);
+  }
+  return parts;
+};
+
 const compileCartiMapAST = (str, baseStartMs = null) => {
   if (!str) return null;
   let rawStr = String(str).trim();
@@ -4380,7 +4406,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   // Pre-normalize Greek Chi (Χ/χ) -> Latin X
   rawStr = rawStr.replace(/[\u03A7\u03C7]/g, 'X');
 
-  // Handle multi-line / compound multi-expression strings via bracket-aware top-level splitting
+  // Handle multi-line / compound multi-expression strings
   if (rawStr.includes('\n') || (rawStr.includes(',') && !rawStr.startsWith('[') && !rawStr.startsWith('{'))) {
     const parts = splitTopLevel(rawStr);
     if (parts.length > 1) {
@@ -4404,7 +4430,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
 
   // Normalize hour-only clock components (T~22+02 -> T~22:00+02:00) and timezone offsets
   if (/T[0-9X:~.?%]+/i.test(rawStr)) {
-    rawStr = rawStr.replace(/T([~?%]*\d{1,2})(?::(\d{2}))?(?::(\d{2}))?([+-]\d{1,2}|Z|$|\s)/gi, (match, h, m, s, tz) => {
+    rawStr = rawStr.replace(/T([~?%]*\d{1,2})(?::(\d{2}))?(?::(\d{2}))?([+-]\d{1,2}(?::?\d{2})?|Z|$|\s)/gi, (match, h, m, s, tz) => {
       let cleanH = h.replace(/[~?%]/g, '').padStart(2, '0');
       let hDecor = h.replace(/\d+/g, cleanH);
       let minStr = m !== undefined ? m : '00';
@@ -4424,11 +4450,11 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   }
 
   // Intercept uncertainty flags in raw string
-  const hasApproxChar = rawStr.includes('~') || rawStr.includes('?') || rawStr.toLowerCase().includes('x') || rawStr.toLowerCase().startsWith('c.');
+  const hasApproxChar = rawStr.includes('~') || rawStr.includes('?');
   const hasUncertainChar = rawStr.includes('?') || rawStr.includes('%');
 
   // 0. Combined Start Date + Duration Interval ("1944-12-22T~19:XX+02 – PT30~M" or "1944-12-22T~19:XX+02/PT30~M")
-  const comboMatch = rawStr.match(/^(.+?)\s*(?:[\/–—]|\\s-\\s)\\s*(PT?[\d~?%]+[YMWDHMS].*)\$/i);
+  const comboMatch = rawStr.match(/^(.+?)\s*(?:[\/–—]|\s-\s)\s*(PT?[\d~?%]+[YMWDHMS].*)$/i);
   if (comboMatch) {
     const startPart = comboMatch[1].trim();
     const durPart = comboMatch[2].trim();
@@ -4539,6 +4565,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
     const datePart = tSplit[0] || '';
     const timePart = tSplit.length > 1 ? tSplit[1] : '';
 
+    // Date designators
     const yMatch = datePart.match(/P.*?(\d+)Y/i);
     const monthMatch = datePart.match(/P.*?(\d+)M/i);
     const wMatch = datePart.match(/P.*?(\d+)W/i);
@@ -4549,6 +4576,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
     if (wMatch) durMs += parseInt(wMatch[1], 10) * 7 * 86400 * 1000;
     if (dMatch) durMs += parseInt(dMatch[1], 10) * 86400 * 1000;
 
+    // Time designators
     if (timePart) {
       const hMatch = timePart.match(/(\d+)H/i);
       const minMatch = timePart.match(/(\d+)M/i);
@@ -4558,7 +4586,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
       if (sMatch) durMs += parseInt(sMatch[1], 10) * 1000;
     }
 
-    if (durMs === 0) durMs = 1800000;
+    if (durMs === 0) durMs = 1800000; // 30 min default fallback
 
     const startAnchorMs = (typeof baseStartMs === 'number' && !isNaN(baseStartMs)) ? baseStartMs : null;
     const minVal = startAnchorMs !== null ? startAnchorMs : 0;
@@ -4598,6 +4626,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
 
   // 6. edtf.js Core Level 3 Primitive Evaluator
   let mathStr = clean;
+  // Clock-X Proxy [REF: ETL-08]: Replace T..:XX with T..:00 for edtf.js parsing
   if (mathStr.includes('T')) {
     mathStr = mathStr.replace(/(T[0-9X:~.?%]+(?:[+\-Z][0-9:]*)?)/gi, (m) => {
       return m.replace(/X/gi, '0');
@@ -4629,7 +4658,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
       }
     }
   } catch (e) {
-    // Fallback
+    // Fallback to Native ISO Date.parse
   }
 
   // 7. Native ISO Fallback Parser
