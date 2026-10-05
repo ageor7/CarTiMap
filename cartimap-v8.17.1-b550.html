@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b551';
+const APP_VERSION = 'v8.17.1-b534';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.140-b551',
-  'MapViewer': 'v7.2.93-b551',
-  'ContentSlider': 'v6.2.93-b551',
-  'MediaViewer': 'v3.2.92-b551',
-  'TimelineScrubber': 'v27.2.134-b551',
-  'OverviewGantt': 'v2.1.58-b551',
-  'ASTCompiler': 'v2.1.22-b551',
-  'VibeMonitor': 'v2.5.22-b551',
-  'SymbologyLegend': 'v1.2.36-b551',
-  'Globals': 'v2.1.21-b551',
-  'Styles': 'v6.1.27-b551'
+  'AppOrchestrator': 'v3.9.125-b538',
+  'MapViewer': 'v7.2.77-b535',
+  'ContentSlider': 'v6.2.77-b535',
+  'MediaViewer': 'v3.2.76-b535',
+  'TimelineScrubber': 'v27.2.119-b538',
+  'OverviewGantt': 'v2.1.42-b535',
+  'ASTCompiler': 'v2.1.7-b538',
+  'VibeMonitor': 'v2.5.6-b535',
+  'SymbologyLegend': 'v1.2.20-b535',
+  'Globals': 'v2.1.5-b535',
+  'Styles': 'v6.1.11-b535'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -1293,17 +1293,16 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       const isList = item.startDate.obj.type === 'List';
       const subColor = isList ? (isActive ? colActive : colInactive) : colApprox;
       const subDash = isList ? 'none' : '3,3';
-      const leftMs = timeMin + (leftPct / 100) * renderTimeRange;
-      const groupSpanMs = Math.max(1, renderTimeRange * (widthPct / 100));
-      const x1RelPct = Number((((itemStartMs - leftMs) / groupSpanMs) * 100).toFixed(4));
+      const totalSpanMs = Math.max(1, endVal - itemStartMs);
       subDropLines = html`
         <svg style="position: absolute; left: 0; right: 0; top: ${blockHeight / 2}px; bottom: 0; width: 100%; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: 880;">
           ${item.startDate.obj.values.map(v => {
             if (typeof v.min !== 'number' || isNaN(v.min)) return null;
-            const x2RelPct = Number((((v.min - leftMs) / groupSpanMs) * 100).toFixed(4));
-            if (x2RelPct < -50 || x2RelPct > 150) return null;
+            const subOffsetMs = v.min - itemStartMs;
+            const relPct = Number(((subOffsetMs / totalSpanMs) * 100).toFixed(4));
+            if (relPct < 0 || relPct > 100) return null;
             return html`
-              <line x1="${x1RelPct}%" y1="0" x2="${x2RelPct}%" y2="100%" stroke="${subColor}" stroke-width="1.5" stroke-dasharray="${subDash}" />
+              <line x1="0" y1="0" x2="${relPct}%" y2="100%" stroke="${subColor}" stroke-width="1.5" stroke-dasharray="${subDash}" />
             `;
           }).filter(Boolean)}
         </svg>
@@ -4321,6 +4320,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                 <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;" title="Focus: ${focusDateStr}"></div>
                               </div>
                             `;
+                          })()}
                           })()}
                         </div>
                       `;
