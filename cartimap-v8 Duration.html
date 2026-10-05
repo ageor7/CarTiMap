@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b563';
+const APP_VERSION = 'v8.17.1-b564';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v8.17.1-b563',
@@ -1288,11 +1288,15 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const colInactive = 'rgba(var(--tm-inactive-rgb, 204, 0, 0), 0.6)';
     const colApprox = '#f59e0b';
 
-    const leftPct = Math.max(0, startPct);
-    const widthPct = Math.max(0.2, endPct - startPct);
-    const groupLeftMs = renderMinTime + (leftPct / 100) * renderTimeRange;
-    const groupSpanMs = Math.max(1, renderTimeRange * (widthPct / 100));
-    const x1RelPct = Number((((itemStartMs - groupLeftMs) / groupSpanMs) * 100).toFixed(4));
+    // Exact track-canvas vector alignment accounting for xOffset pixels, card width (pxWidth/hasDuration), and zoomLevel:
+    const xOffsetPct = (xOffset / trackWidthPx) * 100;
+    const groupLeftTrackPct = startPct + xOffsetPct;
+    const groupWidthTrackPct = hasDuration 
+      ? Math.max(0.0001, (endPct - startPct) - xOffsetPct)
+      : (pxWidth / trackWidthPx) * 100;
+
+    const itemStartTrackPct = (((itemStartMs - renderMinTime) / renderTimeRange) * 100);
+    const x1RelPct = Number((((itemStartTrackPct - groupLeftTrackPct) / groupWidthTrackPct) * 100).toFixed(4));
 
     let subDropLines = '';
     if (isChoiceSet && item.startDate.obj.values && item.startDate.obj.values.length > 1) {
@@ -1303,7 +1307,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         <svg style="position: absolute; left: 0; right: 0; top: ${blockHeight / 2}px; bottom: 0; width: 100%; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: 880;">
           ${item.startDate.obj.values.map(v => {
             if (typeof v.min !== 'number' || isNaN(v.min)) return null;
-            const x2RelPct = Number((((v.min - groupLeftMs) / groupSpanMs) * 100).toFixed(4));
+            const vTrackPct = (((v.min - renderMinTime) / renderTimeRange) * 100);
+            const x2RelPct = Number((((vTrackPct - groupLeftTrackPct) / groupWidthTrackPct) * 100).toFixed(4));
             if (v.min < renderMinTime || v.min > renderMaxTime) return null;
             return html`
               <line x1="${x1RelPct}%" y1="0" x2="${x2RelPct}%" y2="100%" stroke="${subColor}" stroke-width="1.5" stroke-dasharray="${subDash}" />
