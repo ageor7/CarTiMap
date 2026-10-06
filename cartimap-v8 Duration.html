@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b576';
+const APP_VERSION = 'v8.17.1-b577';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v8.17.1-b576',
-  'MapViewer': 'v8.17.1-b576',
-  'ContentSlider': 'v8.17.1-b576',
-  'MediaViewer': 'v8.17.1-b576',
-  'TimelineScrubber': 'v8.17.1-b576',
-  'OverviewGantt': 'v8.17.1-b576',
-  'ASTCompiler': 'v8.17.1-b576',
-  'VibeMonitor': 'v8.17.1-b576',
-  'SymbologyLegend': 'v8.17.1-b576',
-  'Globals': 'v8.17.1-b576',
-  'Styles': 'v8.17.1-b576'
+  'AppOrchestrator': 'v3.9.163-b577',
+  'MapViewer': 'v7.2.110-b577',
+  'ContentSlider': 'v6.2.110-b577',
+  'MediaViewer': 'v3.2.109-b577',
+  'TimelineScrubber': 'v27.2.157-b577',
+  'OverviewGantt': 'v2.1.81-b577',
+  'ASTCompiler': 'v2.1.45-b577',
+  'VibeMonitor': 'v2.5.45-b577',
+  'SymbologyLegend': 'v1.2.54-b577',
+  'Globals': 'v2.1.38-b577',
+  'Styles': 'v6.1.44-b577'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -442,7 +442,7 @@ const TelemetryMonitor = ({logs = [], status, isOpen, setIsOpen, activeSlide, ap
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b576';
+MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b577';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -670,7 +670,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b576';
+MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b577';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -805,7 +805,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b576';
+MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b577';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1391,7 +1391,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const trapezoidClip = 'polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%)';
 
     xAxisMarker = html`
-      <div style="position: absolute; top: ${blockHeight / 2}px; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; min-width: 4px; background: ${durationBg}; clip-path: ${trapezoidClip}; border-left: ${isActive ? '2px solid #007acc' : '1px solid rgba(0,122,204,0.4)'}; border-right: ${isActive ? '2px solid #007acc' : '1px solid rgba(0,122,204,0.4)'}; opacity: 0.88; z-index: ${isActive ? 950 : 900}; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+      <div style="position: absolute; bottom: 0; height: 16px; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; min-width: 4px; background: ${durationBg}; clip-path: ${trapezoidClip}; border-left: ${isActive ? '2px solid #007acc' : '1px solid rgba(0,122,204,0.4)'}; border-right: ${isActive ? '2px solid #007acc' : '1px solid rgba(0,122,204,0.4)'}; opacity: 0.88; z-index: ${isActive ? 950 : 900}; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
         ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${sApproxPct}%; background: rgba(245, 158, 11, 0.75); box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate Start (~)"></div>` : ''}
         ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: ${eApproxPct}%; background: rgba(245, 158, 11, 0.75); box-shadow: 0 0 6px rgba(245, 158, 11, 0.8); z-index: 999;" title="Approximate End (~)"></div>` : ''}
       </div>
@@ -1402,7 +1402,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const borderL = isApproxStart ? `3px solid ${colApprox}` : `1px solid ${colInactive}`;
         const borderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const hatchStyle = (isApproxStart || isApproxEnd)
-          ? `background: repeating-linear-gradient(-45deg, #f59e0b 0, #f59e0b 8px, #007acc 8px, #007acc 16px) !important;`
+          ? `background: rgba(0, 122, 204, 0.38) !important;`
           : `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.35), rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.35) 3px, transparent 3px, transparent 6px); border-top: 1.5px solid #007acc; border-bottom: 1.5px solid #007acc;`;
         xAxisMarker = html`
           <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 10px; z-index: 900; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
@@ -1519,7 +1519,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b576';
+MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b577';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2531,7 +2531,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b576';
+MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b577';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -3358,21 +3358,32 @@ const App = () => {
           // =========================================================================
           
 const SymbologyLegend = () => html`
-  <div class="symbology-legend-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 0.82rem; color: #333;">
+  <div class="symbology-legend-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; font-size: 0.82rem; color: #333;">
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #28a745; border-radius: 50%; display: inline-block;"></span> Active Feature</div>
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #ffb300; border-radius: 50%; display: inline-block;"></span> VIP Priority</div>
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #007acc; border-radius: 50%; display: inline-block;"></span> Standard Feature</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: bold; color: #007acc; font-size: 1rem;">›››</span> Directional Polyline</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: rgba(0,122,204,0.35); border: 1px solid #007acc; display: inline-block;"></span> Spatial Polygon</div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 24px; height: 14px; background: rgba(0,122,204,0.38); clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%); border: 1px solid #007acc; flex-shrink: 0;"></div>
+      <svg width="32" height="16" viewBox="0 0 32 16" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
+        <polygon points="0 0, 32 0, 27 16, 5 16" fill="rgba(0, 122, 204, 0.42)" stroke="#007acc" stroke-width="1" />
+      </svg>
       <span>Active Duration Ribbon (Blue)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 24px; height: 14px; background: linear-gradient(to right, rgba(245,158,11,0.7) 0%, rgba(0,122,204,0.38) 40%); clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%); border: 1px solid #ffb300; flex-shrink: 0;"></div>
-      <span>Approximate Duration Edge Blend</span>
+      <svg width="32" height="16" viewBox="0 0 32 16" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
+        <polygon points="0 0, 32 0, 27 16, 5 16" fill="rgba(0, 122, 204, 0.25)" stroke="rgba(0,122,204,0.4)" stroke-width="1" />
+        <line x1="8" y1="0" x2="16" y2="16" stroke="#007acc" stroke-width="1" />
+        <line x1="24" y1="0" x2="16" y2="16" stroke="#007acc" stroke-width="1" />
+      </svg>
+      <span>Inactive Ribbon (/|\ Mask)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 24px; height: 14px; background: repeating-linear-gradient(90deg, rgba(0,122,204,0.2) 0px, rgba(0,122,204,0.2) 2px, transparent 2px, transparent 4px); clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%); border: 1px solid rgba(0,122,204,0.5); flex-shrink: 0;"></div>
-      <span>Inactive Duration Ribbon (/|\ Mask)</span>
+      <svg width="32" height="16" viewBox="0 0 32 16" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
+        <polygon points="0 0, 32 0, 27 16, 5 16" fill="rgba(0, 122, 204, 0.35)" stroke="#007acc" stroke-width="1" />
+        <rect x="0" y="0" width="8" height="16" fill="rgba(245, 158, 11, 0.80)" />
+      </svg>
+      <span>Approximate Edge Blend (~)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
       <svg width="28" height="18" viewBox="0 0 28 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
@@ -3382,15 +3393,6 @@ const SymbologyLegend = () => html`
         <line x1="2" y1="2" x2="26" y2="16" stroke="#007acc" stroke-width="1.5" />
       </svg>
       <span>Multi-Date Occurrence Legs {...}</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <svg width="28" height="18" viewBox="0 0 28 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
-        <circle cx="2" cy="2" r="2" fill="#ffb300" />
-        <line x1="2" y1="2" x2="2" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
-        <line x1="2" y1="2" x2="14" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
-        <line x1="2" y1="2" x2="26" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
-      </svg>
-      <span>Choice Set Candidate Legs [...]</span>
     </div>
   </div>
 `;
@@ -4347,7 +4349,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b576';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b577';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -4666,7 +4668,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   return null;
 };
 
-MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b576';
+MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b577';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
