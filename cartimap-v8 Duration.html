@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b585';
+const APP_VERSION = 'v8.17.1-b586';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.167-b584',
-  'MapViewer': 'v7.2.112-b581',
-  'ContentSlider': 'v6.2.112-b581',
-  'MediaViewer': 'v3.2.111-b581',
-  'TimelineScrubber': 'v27.2.161-b584',
-  'OverviewGantt': 'v2.1.83-b581',
-  'ASTCompiler': 'v2.1.47-b581',
-  'VibeMonitor': 'v2.5.47-b581',
-  'SymbologyLegend': 'v1.2.56-b581',
-  'Globals': 'v2.1.40-b581',
-  'Styles': 'v6.1.46-b581'
+  'AppOrchestrator': 'v3.9.168-b586',
+  'MapViewer': 'v7.2.115-b586',
+  'ContentSlider': 'v6.2.115-b586',
+  'MediaViewer': 'v3.2.114-b586',
+  'TimelineScrubber': 'v27.2.162-b586',
+  'OverviewGantt': 'v2.1.86-b586',
+  'ASTCompiler': 'v2.1.50-b586',
+  'VibeMonitor': 'v2.5.50-b586',
+  'SymbologyLegend': 'v1.2.59-b586',
+  'Globals': 'v2.1.43-b586',
+  'Styles': 'v6.1.49-b586'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -918,7 +918,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       else { orderedTags.unshift(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
     }
   const laneCount = Math.max(1, orderedTags.length);
-  const availableHeight = Math.max(40, containerHeight - 53);
+  const availableHeight = Math.max(40, containerHeight - 34);
   const laneHeight = Math.max(16, Math.min(36, availableHeight / laneCount));
 
   const validData = (data || []).filter(d => {
@@ -1274,7 +1274,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
     const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
     const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
-    const topPos = (laneIdx * laneHeight) + 15;
+    const topPos = (laneIdx * laneHeight) + 3;
     const blockHeight = Math.max(24, ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight);
     const hasMedia = item.media && item.media.length > 0;
     const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title), 180, hasMedia);
@@ -1483,7 +1483,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box; background: #ffffff;">
           <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 38px; pointer-events: none; z-index: 0;">
             ${orderedTags.map((tag, i) => html`
-              <div class="tag-lane" style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.04)' : 'transparent'}; border-bottom: 1px solid rgba(0,0,0,0.05);"></div>
+              <div class="tag-lane" style="position: absolute; top: ${i * laneHeight + 3}px; height: ${laneHeight}px; left: 0; right: 0; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.04)' : 'transparent'}; border-bottom: 1px solid rgba(0,0,0,0.05);"></div>
             `)}
           </div>
 
@@ -1495,7 +1495,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
           <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 38px; pointer-events: none; z-index: 45;">
             ${orderedTags.map((tag, i) => html`
-              <div style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; pointer-events: none;">
+              <div style="position: absolute; top: ${i * laneHeight + 3}px; height: ${laneHeight}px; left: 0; right: 0; pointer-events: none;">
                 <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05); pointer-events: auto; position: sticky; left: 0; height: 100%; display: inline-flex; align-items: center; padding: 0 10px; font-size: 0.75rem; color: #555;">${tag}</div>
               </div>
             `)}
