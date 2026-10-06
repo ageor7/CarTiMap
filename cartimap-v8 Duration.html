@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b584';
+const APP_VERSION = 'v8.17.1-b585';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.167-b584',
@@ -442,7 +442,7 @@ const TelemetryMonitor = ({logs = [], status, isOpen, setIsOpen, activeSlide, ap
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b584';
+MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b585';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -670,7 +670,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b584';
+MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b585';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -805,7 +805,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b584';
+MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b585';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -925,6 +925,16 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     if (!d.startDate || isNaN(d.startDate.min)) return false;
     const yr = new Date(d.startDate.min).getUTCFullYear();
     return yr >= 1800 && yr <= 2050;
+  }).sort((a, b) => {
+    const aStart = a.startDate ? a.startDate.min : 0;
+    const bStart = b.startDate ? b.startDate.min : 0;
+    if (aStart !== bStart) return aStart - bStart;
+    const aEnd = (a.endDate && !isNaN(a.endDate.max)) ? a.endDate.max : aStart;
+    const bEnd = (b.endDate && !isNaN(b.endDate.max)) ? b.endDate.max : bStart;
+    const aDur = aEnd - aStart;
+    const bDur = bEnd - bStart;
+    if (aDur !== bDur) return bDur - aDur;
+    return (a.title || '').localeCompare(b.title || '');
   });
   const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
   let maxTimeRaw = minTimeRaw;
@@ -1382,7 +1392,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
         const currentAngle = hatchAngles[globalIndex % 3];
         
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: ${laneHeight}px; background: repeating-linear-gradient(${currentAngle}, rgba(0, 122, 204, 0.45) 0, rgba(0, 122, 204, 0.45) 1.5px, transparent 1.5px, transparent 18px); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); border: none !important; z-index: 900; pointer-events: auto; cursor: pointer; overflow: hidden;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: ${laneHeight}px; background: repeating-linear-gradient(${currentAngle}, rgba(0, 122, 204, 0.45) 0, rgba(0, 122, 204, 0.45) 1.2px, transparent 1.2px, transparent 24px); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); border: none !important; z-index: 900; pointer-events: auto; cursor: pointer; overflow: hidden;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
             ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: rgba(245, 158, 11, 0.35); z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
             ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: 6px; background: rgba(245, 158, 11, 0.35); z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
           </div>
@@ -1495,7 +1505,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b584';
+MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b585';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2507,7 +2517,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b584';
+MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b585';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -3339,7 +3349,7 @@ const SymbologyLegend = () => html`
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #ffb300; border-radius: 50%; display: inline-block;"></span> VIP Priority</div>
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #007acc; border-radius: 50%; display: inline-block;"></span> Standard Feature</div>
     <div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: bold; color: #007acc; font-size: 1rem;">›››</span> Directional Polyline</div>
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: rgba(0,122,204,0.35); border: 1px solid #007acc; display: inline-block;"></span> Spatial Polygon</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: rgba(0,122,204,0.35); border: none; display: inline-block;"></span> Spatial Polygon</div>
     <div style="display: flex; align-items: center; gap: 8px;">
       <div style="width: 28px; height: 12px; background: rgba(0, 122, 204, 0.35); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
       <span>Active Duration Ribbon (Blue)</span>
@@ -3349,7 +3359,7 @@ const SymbologyLegend = () => html`
       <span>Approximate Edge Blend (~)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 28px; height: 12px; background: repeating-linear-gradient(135deg, rgba(0, 122, 204, 0.45) 0, rgba(0, 122, 204, 0.45) 1.5px, transparent 1.5px, transparent 18px); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
+      <div style="width: 28px; height: 12px; background: repeating-linear-gradient(135deg, rgba(0, 122, 204, 0.45) 0, rgba(0, 122, 204, 0.45) 1.2px, transparent 1.2px, transparent 24px); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
       <span>Inactive Ribbon (/ | \ Rotate)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
@@ -4325,7 +4335,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b584';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b585';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -4644,7 +4654,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   return null;
 };
 
-MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b584';
+MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b585';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
