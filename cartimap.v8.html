@@ -152,9 +152,9 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .click-zone { position: absolute; top: 0; bottom: 0; width: 15%; z-index: 10; cursor: pointer; }
 .click-zone-left { left: 0; }
 .click-zone-right { right: 0; }
-.metadata-ribbon { display: flex; gap: 12px; align-items: baseline; justify-content: space-between; flex-wrap: nowrap; margin-bottom: 0.4rem; width: 100%; box-sizing: border-box; }
-.metadata-date { font-weight: 600; color: #007acc; font-size: 0.9rem; flex: 1 1 50%; max-width: 50%; min-width: 0; white-space: normal; word-break: break-word; overflow-wrap: anywhere; margin-top: 4px; line-height: 1.35; }
-.metadata-pills-wrapper { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 50%; max-width: 50%; min-width: 0; margin-left: auto; justify-content: flex-end; }
+.metadata-ribbon { display: flex; gap: 12px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; margin-bottom: 0.4rem; width: 100%; box-sizing: border-box; }
+.metadata-date { font-weight: 600; color: #007acc; font-size: 0.9rem; flex: 1 1 auto; max-width: 75%; min-width: 0; white-space: normal; word-break: break-word; overflow-wrap: anywhere; margin-top: 4px; line-height: 1.35; }
+.metadata-pills-wrapper { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; max-width: 75%; min-width: 0; margin-left: auto; justify-content: flex-end; }
 .place-pill, .tag-pill { display: inline-flex; align-items: center; background: rgba(128,128,128,0.06); color: #444; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; border: 1px solid rgba(128,128,128,0.15); word-break: break-word; overflow-wrap: anywhere; max-width: 100%; line-height: 1.2; text-align: left; }
 
 /* --- [ SubBlock: Status Bar & Modals ] --- */
@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.3-b609';
+const APP_VERSION = 'v8.17.3-b610';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -781,9 +781,9 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
 
         <div style="flex-shrink: 0; position: sticky; top: 0; background: var(--paneBg, #ffffff); z-index: 10; padding-top: ${isScrolled ? '0.6rem' : '1.2rem'}; padding-bottom: ${isScrolled ? '0.4rem' : '0.5rem'}; border-bottom: 1px solid rgba(128,128,128,0.2); box-shadow: ${isScrolled ? '0 4px 12px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.04)'}; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 100%; padding-left: 1.5rem; padding-right: 55px; box-sizing: border-box;">
           <div style="max-width: 85ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column;">
-            <div class="metadata-ribbon" style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; flex-wrap: nowrap; gap: 12px; width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
-              ${isDateValid ? html`<div class="metadata-date" style="flex: 1 1 50%; max-width: 50%; min-width: 0; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; margin-top: 4px; line-height: 1.35; white-space: normal; word-break: break-word; overflow-wrap: anywhere;">📅 ${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</div>` : ''}
-              <div class="metadata-pills-wrapper" style="flex: 1 1 50%; max-width: 50%; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end;">
+            <div class="metadata-ribbon" style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
+              ${isDateValid ? html`<div class="metadata-date" style="flex: 1 1 auto; max-width: 75%; min-width: 0; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; margin-top: 4px; line-height: 1.35; white-space: normal; word-break: break-word; overflow-wrap: anywhere;">📅 ${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</div>` : ''}
+              <div class="metadata-pills-wrapper" style="flex: 1 1 auto; max-width: 75%; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end;">
                 ${hasLocation ? html`<span class="place-pill"><span style="margin-right: 4px;">📍</span> ${formatPlaces(slide.place)}</span>` : ''}
                 ${tags.map(tag => html`<span class="tag-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span>${tag}</span></span>`)}
               </div>
@@ -4298,11 +4298,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           
                           <!-- Event Title & Metadata Header (Strategy A: Balanced Side-by-Side Flex with Comma-Breakable Date) -->
                           <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
-                            <div style="flex: 1 1 50%; max-width: 50%; min-width: 0; font-weight: 600; color: ${isMainActiveSlide ? "#15803d" : "#1e293b"}; font-size: 0.88rem; display: flex; align-items: baseline; gap: 8px; line-height: 1.35;">
+                            <div style="flex: 1 1 auto; max-width: 75%; min-width: 0; font-weight: 600; color: ${isMainActiveSlide ? "#15803d" : "#1e293b"}; font-size: 0.88rem; display: flex; align-items: baseline; gap: 8px; line-height: 1.35;">
                               <span style="color: #64748b; font-family: monospace; font-size: 0.80rem; flex-shrink: 0;">#${ev.id}</span>
                               <span style="overflow-wrap: break-word;">${safeStripHTML(ev.title)}</span>
                             </div>
-                            <div style="flex: 1 1 50%; max-width: 50%; min-width: 0; font-size: 0.78rem; color: ${isMainActiveSlide ? "#15803d" : "#007acc"}; font-weight: 600; line-height: 1.35; margin-left: auto; text-align: right; overflow-wrap: anywhere; word-break: break-word;">
+                            <div style="flex: 1 1 auto; max-width: 75%; min-width: 0; font-size: 0.78rem; color: ${isMainActiveSlide ? "#15803d" : "#007acc"}; font-weight: 600; line-height: 1.35; margin-left: auto; text-align: right; overflow-wrap: anywhere; word-break: break-word;">
                               📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? html`<span style="color: #64748b; font-weight: 500; margin-left: 4px; display: inline-block;">• ⏳ ${durStr}</span>` : ""}
                             </div>
                           </div>
@@ -4329,7 +4329,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.3-b609';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.3-b610';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
