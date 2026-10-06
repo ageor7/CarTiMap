@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.2-b596';
+const APP_VERSION = 'v8.17.2-b597';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -2779,7 +2779,9 @@ const App = () => {
               mainDateStr = startInput;
             }
 
-            if (!includeSuffix) return mainDateStr;
+            const cleanMainDateStr = String(mainDateStr).replace(/,/g, ',\u200B');
+
+            if (!includeSuffix) return cleanMainDateStr;
 
             let badgeText = 'Num';
             let badgeColor = '#777777';
@@ -2796,7 +2798,7 @@ const App = () => {
 
             const suffixVNode = html`<sup style="font-size: 0.68em; font-family: monospace; color: ${badgeColor}; vertical-align: super; font-weight: 700;">${badgeText}</sup>`;
 
-            return html`<span>${mainDateStr}${suffixVNode}</span>`;
+            return html`<span>${cleanMainDateStr}${suffixVNode}</span>`;
           };
 
           const formatPlaces = (placeStr) => {
@@ -4295,7 +4297,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                               <span style="overflow-wrap: break-word;">${safeStripHTML(ev.title)}</span>
                             </div>
                             <div style="flex: 0 1 45%; max-width: 48%; min-width: 0; font-size: 0.78rem; color: ${isMainActiveSlide ? "#15803d" : "#007acc"}; font-weight: 600; line-height: 1.35; margin-left: auto; text-align: right; overflow-wrap: anywhere; word-break: break-word;">
-                              📅 ${String(formatSmartDate(ev.startDate, ev.endDate, dateLocale)).replace(/,/g, ',\u200B')} ${durStr ? html`<span style="color: #64748b; font-weight: 500; margin-left: 4px; display: inline-block;">• ⏳ ${durStr}</span>` : ""}
+                              📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? html`<span style="color: #64748b; font-weight: 500; margin-left: 4px; display: inline-block;">• ⏳ ${durStr}</span>` : ""}
                             </div>
                           </div>
 
