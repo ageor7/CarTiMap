@@ -216,20 +216,20 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.1-b580';
+const APP_VERSION = 'v8.17.1-b581';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
-  'AppOrchestrator': 'v3.9.165-b580',
-  'MapViewer': 'v7.2.112-b580',
-  'ContentSlider': 'v6.2.112-b580',
-  'MediaViewer': 'v3.2.111-b580',
-  'TimelineScrubber': 'v27.2.159-b580',
-  'OverviewGantt': 'v2.1.83-b580',
-  'ASTCompiler': 'v2.1.47-b580',
-  'VibeMonitor': 'v2.5.47-b580',
-  'SymbologyLegend': 'v1.2.56-b580',
-  'Globals': 'v2.1.40-b580',
-  'Styles': 'v6.1.46-b580'
+  'AppOrchestrator': 'v3.9.165-b581',
+  'MapViewer': 'v7.2.112-b581',
+  'ContentSlider': 'v6.2.112-b581',
+  'MediaViewer': 'v3.2.111-b581',
+  'TimelineScrubber': 'v27.2.159-b581',
+  'OverviewGantt': 'v2.1.83-b581',
+  'ASTCompiler': 'v2.1.47-b581',
+  'VibeMonitor': 'v2.5.47-b581',
+  'SymbologyLegend': 'v1.2.56-b581',
+  'Globals': 'v2.1.40-b581',
+  'Styles': 'v6.1.46-b581'
 };
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
@@ -442,7 +442,7 @@ const TelemetryMonitor = ({logs = [], status, isOpen, setIsOpen, activeSlide, ap
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b580';
+MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b581';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -670,7 +670,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b580';
+MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b581';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -805,7 +805,7 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b580';
+MODULE_VERSIONS['ContentSlider'] = 'v8.17.1-b581';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
@@ -1374,27 +1374,19 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
               : 'rgba(0, 122, 204, 0.35)';
 
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 12px; background: ${bgGrad}; clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%); border-left: ${activeBorderL}; border-right: ${activeBorderR}; ${cStyle} opacity: 0.90; z-index: 950; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 12px; background: ${bgGrad}; clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); border-left: ${activeBorderL}; border-right: ${activeBorderR}; ${cStyle} opacity: 0.90; z-index: 950; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
             ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #f59e0b; z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
             ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: 6px; background: #f59e0b; z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
           </div>
         `;
       } else {
+        const hatchAngles = ['-45deg', '0deg', '45deg'];
+        const currentAngle = hatchAngles[globalIndex % 3];
         const borderL = isApproxStart ? `3px solid #f59e0b` : `1px solid ${colInactive}`;
         const borderR = isApproxEnd ? `3px solid #f59e0b` : 'none';
         
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 12px; background: transparent; clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%); border-left: ${borderL}; border-right: ${borderR}; z-index: 900; pointer-events: auto; cursor: pointer; overflow: hidden;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
-            <svg width="100%" height="100%" style="position: absolute; inset: 0; overflow: visible;">
-              <defs>
-                <pattern id="inactive-fan-pattern-${globalIndex}" width="16" height="12" patternUnits="userSpaceOnUse">
-                  <line x1="8" y1="0" x2="8" y2="12" stroke="#007acc" stroke-width="1.2" stroke-opacity="0.65" />
-                  <line x1="8" y1="0" x2="1" y2="12" stroke="#007acc" stroke-width="1.2" stroke-opacity="0.65" />
-                  <line x1="8" y1="0" x2="15" y2="12" stroke="#007acc" stroke-width="1.2" stroke-opacity="0.65" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#inactive-fan-pattern-${globalIndex})" />
-            </svg>
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: 12px; background: repeating-linear-gradient(${currentAngle}, rgba(0, 122, 204, 0.45) 0, rgba(0, 122, 204, 0.45) 2px, transparent 2px, transparent 6px); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); border-left: ${borderL}; border-right: ${borderR}; z-index: 900; pointer-events: auto; cursor: pointer; overflow: hidden;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
             ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #f59e0b; z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
             ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: 6px; background: #f59e0b; z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
           </div>
@@ -1507,7 +1499,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b580';
+MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b581';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -2519,7 +2511,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b580';
+MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b581';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -3346,21 +3338,23 @@ const App = () => {
           // =========================================================================
           
 const SymbologyLegend = () => html`
-  <div class="symbology-legend-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 0.82rem; color: #333;">
+  <div class="symbology-legend-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; font-size: 0.82rem; color: #333;">
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #28a745; border-radius: 50%; display: inline-block;"></span> Active Feature</div>
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #ffb300; border-radius: 50%; display: inline-block;"></span> VIP Priority</div>
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #007acc; border-radius: 50%; display: inline-block;"></span> Standard Feature</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: bold; color: #007acc; font-size: 1rem;">›››</span> Directional Polyline</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: rgba(0,122,204,0.35); border: 1px solid #007acc; display: inline-block;"></span> Spatial Polygon</div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 24px; height: 14px; background: rgba(0,122,204,0.38); clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%); border: 1px solid #007acc; flex-shrink: 0;"></div>
+      <div style="width: 28px; height: 12px; background: rgba(0, 122, 204, 0.35); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
       <span>Active Duration Ribbon (Blue)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 24px; height: 14px; background: linear-gradient(to right, rgba(245,158,11,0.7) 0%, rgba(0,122,204,0.38) 40%); clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%); border: 1px solid #ffb300; flex-shrink: 0;"></div>
-      <span>Approximate Duration Edge Blend</span>
+      <div style="width: 28px; height: 12px; background: linear-gradient(90deg, #f59e0b 0%, rgba(0, 122, 204, 0.35) 40%, #f59e0b 100%); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
+      <span>Approximate Edge Blend (~)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="width: 24px; height: 14px; background: repeating-linear-gradient(90deg, rgba(0,122,204,0.2) 0px, rgba(0,122,204,0.2) 2px, transparent 2px, transparent 4px); clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%); border: 1px solid rgba(0,122,204,0.5); flex-shrink: 0;"></div>
-      <span>Inactive Duration Ribbon (/|\ Mask)</span>
+      <div style="width: 28px; height: 12px; background: repeating-linear-gradient(-45deg, rgba(0, 122, 204, 0.45) 0, rgba(0, 122, 204, 0.45) 2px, transparent 2px, transparent 6px); clip-path: polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
+      <span>Inactive Ribbon (/ | \ Rotate)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
       <svg width="28" height="18" viewBox="0 0 28 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
@@ -4335,7 +4329,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b580';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.1-b581';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
@@ -4654,7 +4648,7 @@ const compileCartiMapAST = (str, baseStartMs = null) => {
   return null;
 };
 
-MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b580';
+MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b581';
 
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
