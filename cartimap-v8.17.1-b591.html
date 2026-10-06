@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.2-b592';
+const APP_VERSION = 'v8.17.1-b591';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -4211,7 +4211,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   </div>
 
                   <!-- 10-Tick Aligned Top X-Axis Ruler Scale Header (Card-Matched Geometry) -->
-                  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 47px 12px 16px; margin-bottom: 14px; position: relative;">
+                  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 28px 12px 16px; margin-bottom: 14px; position: relative;">
                     <div style="position: relative; width: 100%; height: 32px; overflow: visible;">
                       <!-- Horizontal Scale Line -->
                       <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #cbd5e1;"></div>
@@ -4241,19 +4241,10 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
                       const eTime = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > s) ? ev.startDate.max : s);
 
-                      const isEvApproxStart = checkIsApprox(ev.startDate);
-                      const isEvApproxEnd = checkIsApprox(ev.endDate);
+                      const leftPct = Math.max(0, Math.min(100, ((s - minT) / tSpan) * 100));
+                      const widthPct = Math.max(1.5, Math.min(100 - leftPct, ((eTime - s) / tSpan) * 100));
 
-                      const sMin = (isEvApproxStart && ev.startDate && typeof ev.startDate.min === "number") ? ev.startDate.min : s;
-                      const eMax = (isEvApproxEnd && ev.endDate && typeof ev.endDate.max === "number") ? ev.endDate.max : eTime;
-
-                      const fullStart = Math.min(s, sMin);
-                      const fullEnd = Math.max(eTime, eMax);
-
-                      const leftPct = Math.max(0, Math.min(100, ((fullStart - minT) / tSpan) * 100));
-                      const widthPct = Math.max(1.5, Math.min(100 - leftPct, ((fullEnd - fullStart) / tSpan) * 100));
-
-                      let durStr = "";
+                      let durStr = '';
                       if (eTime > s) {
                         const dMs = eTime - s;
                         const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
@@ -4263,24 +4254,12 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         else durStr = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
                       }
 
-                      const mainCol = isMainActiveSlide ? "#22c55e" : "#007acc";
-                      const approxCol = "#f59e0b";
-
-                      let ganttBarGrad = mainCol;
-                      if (isEvApproxStart && isEvApproxEnd) {
-                        ganttBarGrad = `linear-gradient(90deg, ${approxCol} 0%, ${mainCol} 20%, ${mainCol} 80%, ${approxCol} 100%)`;
-                      } else if (isEvApproxStart) {
-                        ganttBarGrad = `linear-gradient(90deg, ${approxCol} 0%, ${mainCol} 25%, ${mainCol} 100%)`;
-                      } else if (isEvApproxEnd) {
-                        ganttBarGrad = `linear-gradient(90deg, ${mainCol} 0%, ${mainCol} 75%, ${approxCol} 100%)`;
-                      }
-
                       return html`
-                        <div style="background: ${isMainActiveSlide ? "#f0fdf4" : "#ffffff"}; border: 1.5px solid ${isMainActiveSlide ? "#22c55e" : "#e2e8f0"}; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);"
+                        <div style="background: ${isMainActiveSlide ? '#f0fdf4' : '#ffffff'}; border: 1.5px solid ${isMainActiveSlide ? '#22c55e' : '#e2e8f0'}; border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);"
                              onClick=${() => {
                                const idx = data.findIndex(d => d.id === ev.id);
                                if (idx >= 0) {
-                                 if (typeof setPreviousActiveIndex === "function") {
+                                 if (typeof setPreviousActiveIndex === 'function') {
                                    setPreviousActiveIndex(activeIndex);
                                  }
                                  jumpToSlide(idx);
@@ -4288,25 +4267,63 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                setDurationInspectionPayload(null);
                              }}>
                           
-                          <!-- Event Title & Metadata Header (Single Compact Row with Dynamic Wrapping) -->
-                          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
-                            <div style="flex: 1 1 280px; min-width: 0; font-weight: 600; color: ${isMainActiveSlide ? "#15803d" : "#1e293b"}; font-size: 0.88rem; display: flex; align-items: baseline; gap: 8px; line-height: 1.35;">
-                              <span style="color: #64748b; font-family: monospace; font-size: 0.80rem; flex-shrink: 0;">#${ev.id}</span>
-                              <span style="overflow-wrap: break-word;">${safeStripHTML(ev.title)}</span>
+                          <!-- Event Title & Metadata Header -->
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div style="font-weight: 700; color: ${isMainActiveSlide ? '#15803d' : '#1e293b'}; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                              <span style="color: #64748b; font-family: monospace; font-size: 0.82rem;">#${ev.id}</span>
+                              <span>${safeStripHTML(ev.title)}</span>
                             </div>
-                            <div style="flex: 0 0 auto; font-size: 0.76rem; color: ${isMainActiveSlide ? "#15803d" : "#007acc"}; background: ${isMainActiveSlide ? "rgba(34, 197, 94, 0.12)" : "rgba(0, 122, 204, 0.08)"}; padding: 2px 8px; border-radius: 4px; border: 1px solid ${isMainActiveSlide ? "rgba(34, 197, 94, 0.25)" : "rgba(0, 122, 204, 0.20)"}; font-weight: 600; white-space: nowrap; margin-left: auto;">
-                              📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? `(⏳ ${durStr})` : ""}
+                            <div style="font-size: 0.78rem; color: #475569; font-weight: 600;">
+                              📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? `(⏳ ${durStr})` : ''}
                             </div>
                           </div>
 
-                          <!-- Mini-Gantt Track (Card-Matched Margin Scale Alignment & Gradient Approximation Blending) -->
-                          <div style="position: relative; width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0;">
-                            <!-- Unified Gradient-Blended Gantt Bar -->
-                            <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${ganttBarGrad}; border-radius: 4px; opacity: 0.88; z-index: 2; ${isEvApproxStart ? "border-left: 2px dashed #f59e0b;" : ""} ${isEvApproxEnd ? "border-right: 2px dashed #f59e0b;" : ""}" title="${safeStripHTML(ev.title)} (${formatSmartDate(ev.startDate, ev.endDate, dateLocale)})"></div>
+                          <!-- Mini-Gantt Track (Card-Matched Margin Scale Alignment & Proportional Approximation Width) -->
+                          ${(() => {
+                            const isEvApproxStart = checkIsApprox(ev.startDate);
+                            const isEvApproxEnd = checkIsApprox(ev.endDate);
+                            const isEvApprox = isEvApproxStart || isEvApproxEnd;
+                            
+                            // Proportional Approximation Uncertainty Width Calculation
+                            let sApproxPct = 0;
+                            if (isEvApproxStart && ev.startDate) {
+                              const sMin = typeof ev.startDate.min === 'number' ? ev.startDate.min : s;
+                              const sMax = typeof ev.startDate.max === 'number' ? ev.startDate.max : s;
+                              const dur = Math.max(1000 * 60 * 60 * 24, sMax - sMin);
+                              sApproxPct = Math.max(3, Math.min(30, (dur / tSpan) * 100));
+                            }
 
-                            <!-- Red Cursor Line Intersection -->
-                            <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;" title="Focus: ${focusDateStr}"></div>
-                          </div>
+                            let eApproxPct = 0;
+                            if (isEvApproxEnd && ev.endDate) {
+                              const eMin = typeof ev.endDate.min === 'number' ? ev.endDate.min : eTime;
+                              const eMax = typeof ev.endDate.max === 'number' ? ev.endDate.max : eTime;
+                              const dur = Math.max(1000 * 60 * 60 * 24, eMax - eMin);
+                              eApproxPct = Math.max(3, Math.min(30, (dur / tSpan) * 100));
+                            }
+
+                            const barBg = isMainActiveSlide ? '#22c55e' : '#007acc';
+
+                            return html`
+                              <div style="position: relative; width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0;">
+                                <!-- Main Confirmed Span Bar -->
+                                <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${barBg}; border-radius: 4px; opacity: 0.88; z-index: 2;"></div>
+                                
+                                <!-- Proportional Start Approximation Uncertainty Region -->
+                                ${isEvApproxStart ? html`
+                                  <div style="position: absolute; left: ${Math.max(0, leftPct - sApproxPct)}%; width: ${sApproxPct}%; top: 0; bottom: 0; background: rgba(245, 158, 11, 0.45); border-left: 2px dashed #f59e0b; border-radius: 4px 0 0 4px; z-index: 3;" title="Approximate Start (~)"></div>
+                                ` : ''}
+
+                                <!-- Proportional End Approximation Uncertainty Region -->
+                                ${isEvApproxEnd ? html`
+                                  <div style="position: absolute; left: ${leftPct + widthPct}%; width: ${eApproxPct}%; top: 0; bottom: 0; background: rgba(245, 158, 11, 0.45); border-right: 2px dashed #f59e0b; border-radius: 0 4px 4px 0; z-index: 3;" title="Approximate End (~)"></div>
+                                ` : ''}
+
+                                <!-- Red Cursor Line Intersection -->
+                                <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;" title="Focus: ${focusDateStr}"></div>
+                              </div>
+                            `;
+                          })()}
+                          })()}
                         </div>
                       `;
                     })}
