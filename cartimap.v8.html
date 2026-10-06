@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.2-b595';
+const APP_VERSION = 'v8.17.2-b596';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -4288,14 +4288,14 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                                setDurationInspectionPayload(null);
                              }}>
                           
-                          <!-- Event Title & Metadata Header (Single Compact Row with Dynamic Wrapping) -->
+                          <!-- Event Title & Metadata Header (Strategy A: Balanced Side-by-Side Flex with Comma-Breakable Date) -->
                           <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
-                            <div style="flex: 1 1 240px; min-width: 0; font-weight: 600; color: ${isMainActiveSlide ? "#15803d" : "#1e293b"}; font-size: 0.88rem; display: flex; align-items: baseline; gap: 8px; line-height: 1.35;">
+                            <div style="flex: 1 1 220px; min-width: 0; font-weight: 600; color: ${isMainActiveSlide ? "#15803d" : "#1e293b"}; font-size: 0.88rem; display: flex; align-items: baseline; gap: 8px; line-height: 1.35;">
                               <span style="color: #64748b; font-family: monospace; font-size: 0.80rem; flex-shrink: 0;">#${ev.id}</span>
                               <span style="overflow-wrap: break-word;">${safeStripHTML(ev.title)}</span>
                             </div>
-                            <div style="flex: 0 0 auto; font-size: 0.78rem; color: ${isMainActiveSlide ? "#15803d" : "#007acc"}; font-weight: 600; line-height: 1.35; margin-left: auto; text-align: right;">
-                              📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? html`<span style="color: #64748b; font-weight: 500; margin-left: 4px;">• ⏳ ${durStr}</span>` : ""}
+                            <div style="flex: 0 1 45%; max-width: 48%; min-width: 0; font-size: 0.78rem; color: ${isMainActiveSlide ? "#15803d" : "#007acc"}; font-weight: 600; line-height: 1.35; margin-left: auto; text-align: right; overflow-wrap: anywhere; word-break: break-word;">
+                              📅 ${String(formatSmartDate(ev.startDate, ev.endDate, dateLocale)).replace(/,/g, ',\u200B')} ${durStr ? html`<span style="color: #64748b; font-weight: 500; margin-left: 4px; display: inline-block;">• ⏳ ${durStr}</span>` : ""}
                             </div>
                           </div>
 
