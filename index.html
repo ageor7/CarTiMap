@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CarTiMap v8.14.1-b301</title>
+    <title>CarTiMap</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='1.2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cpath d='M28,38 L45,15 L180,15 L180,85 L45,85 L28,62 Z' fill='%23222' stroke='%23007acc' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Crect x='55' y='19' width='4' height='6' rx='1'/%3E%3Crect x='71' y='19' width='4' height='6' rx='1'/%3E%3Crect x='87' y='19' width='4' height='6' rx='1'/%3E%3Crect x='103' y='19' width='4' height='6' rx='1'/%3E%3Crect x='119' y='19' width='4' height='6' rx='1'/%3E%3Crect x='135' y='19' width='4' height='6' rx='1'/%3E%3Crect x='151' y='19' width='4' height='6' rx='1'/%3E%3Crect x='167' y='19' width='4' height='6' rx='1'/%3E%3Crect x='55' y='75' width='4' height='6' rx='1'/%3E%3Crect x='71' y='75' width='4' height='6' rx='1'/%3E%3Crect x='87' y='75' width='4' height='6' rx='1'/%3E%3Crect x='103' y='75' width='4' height='6' rx='1'/%3E%3Crect x='119' y='75' width='4' height='6' rx='1'/%3E%3Crect x='135' y='75' width='4' height='6' rx='1'/%3E%3Crect x='151' y='75' width='4' height='6' rx='1'/%3E%3Crect x='167' y='75' width='4' height='6' rx='1'/%3E%3C/g%3E%3Cg transform='translate(112, 50)'%3E%3Cpath d='M0,-28 L4,-6 L28,0 L4,6 L0,28 L-4,6 L-28,0 L-4,-6 Z' fill='%23444' opacity='0.8'/%3E%3Cg fill='%23fcfcfc' font-family='Arial,sans-serif' font-size='7'%3E%3Ctext x='0' y='-21' text-anchor='middle'%3EN%3C/text%3E%3Ctext x='24' y='2.5' text-anchor='middle'%3EE%3C/text%3E%3Ctext x='0' y='27' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='-24' y='2.5' text-anchor='middle'%3EW%3C/text%3E%3C/g%3E%3Cg fill='%238be9fd' filter='url(%23g)'%3E%3Ccircle cx='12.5' cy='-21.6' r='1.2'/%3E%3Ccircle cx='21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-12.5' cy='21.6' r='1.2'/%3E%3Ccircle cx='-21.6' cy='12.5' r='1.2'/%3E%3Ccircle cx='-21.6' cy='-12.5' r='1.2'/%3E%3Ccircle cx='-12.5' cy='-21.6' r='1.2'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0,0 L-1,-16 L1,-16 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-20' r='2.8' fill='%23007acc'/%3E%3C/g%3E%3Cg transform='rotate(270)'%3E%3Cpath d='M0,0 L-1.2,-9 L1.2,-9 Z' fill='%23999'/%3E%3Ccircle cx='0' cy='-13' r='2.8' fill='%2328a745'/%3E%3C/g%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
     <!-- Dependencies: Leaflet, MarkerCluster, Wicket, Preact, HTM, PapaParse, EDTF -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -45,7 +45,7 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 #vibe-header { background: #333; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #444; user-select: none; font-weight: 600; flex-shrink: 0; }
 .vibe-close-btn { background: transparent; color: #aaa; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.2s; }
 .vibe-close-btn:hover { color: #ff5555; }
-#vibe-logs { flex-grow: 1; overflow-y: auto; padding: 10px; font-size: 0.75rem; background: #111; display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 50px; }
+#vibe-logs { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding: 10px; font-size: 0.73rem; background: #111; display: flex; flex-direction: column; gap: 5px; height: 100%; min-height: 50px; box-sizing: border-box; width: 100%; }
 .log-time { color: #888; margin-right: 6px; }
 .tm-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 99999 !important; backdrop-filter: blur(2px); display: none; }
 .tm-backdrop.open { display: block; }
@@ -152,10 +152,10 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 .click-zone { position: absolute; top: 0; bottom: 0; width: 15%; z-index: 10; cursor: pointer; }
 .click-zone-left { left: 0; }
 .click-zone-right { right: 0; }
-.metadata-ribbon { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 0.4rem; width: 100%; }
-.metadata-date { font-weight: 600; color: #007acc; font-size: 0.9rem; flex-shrink: 0; white-space: nowrap; margin-top: 4px; }
-.metadata-pills-wrapper { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end; }
-.place-pill, .tag-pill { display: inline-flex; align-items: center; background: rgba(128,128,128,0.06); color: #444; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; border: 1px solid rgba(128,128,128,0.15); word-break: break-word; line-height: 1.2; text-align: left; }
+.metadata-ribbon { display: flex; gap: 12px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; margin-bottom: 0.4rem; width: 100%; box-sizing: border-box; }
+.metadata-date { font-weight: 600; color: #007acc; font-size: 0.9rem; flex: 2 1 300px; min-width: 0; max-width: 100%; white-space: normal; word-break: break-word; overflow-wrap: anywhere; margin-top: 4px; line-height: 1.35; }
+.metadata-pills-wrapper { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 2 140px; min-width: 0; max-width: 100%; margin-left: auto; justify-content: flex-end; }
+.place-pill, .tag-pill { display: inline-flex; align-items: center; background: rgba(128,128,128,0.06); color: #444; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; border: 1px solid rgba(128,128,128,0.15); word-break: break-word; overflow-wrap: anywhere; max-width: 100%; line-height: 1.2; text-align: left; }
 
 /* --- [ SubBlock: Status Bar & Modals ] --- */
 .status-right { justify-content: flex-end; }
@@ -197,6 +197,18 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
     <div id="root"></div>
     <script type="module">
 // === [ MAJOR BLOCK: Imports & Globals v2.0.6 ] ===
+
+// === [ GLOBAL UTILITY: Temporal Approximation Evaluator ] ===
+window.checkIsApprox = (node) => {
+  if (!node) return false;
+  if (node.isApprox) return true;
+  if (node.obj && (node.obj.approximate || node.obj.uncertain || node.obj.unspecified || node.obj.type === 'Approximate')) return true;
+  const txt = (node.text || '').toLowerCase().trim();
+  if (!txt) return false;
+  return txt.includes('~') || txt.includes('?') || txt.includes('%') || txt.includes('x') || txt.startsWith('c.') || txt.startsWith('ca.') || txt.includes('approx');
+};
+const checkIsApprox = window.checkIsApprox;
+
 import { h, render, Component } from 'https://esm.sh/preact';
 import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
 import htm from 'https://esm.sh/htm';
@@ -204,9 +216,21 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.14.1-b303';
+const APP_VERSION = 'v8.17.3-b606';
 document.title = 'CarTiMap - ' + APP_VERSION;
-const MODULE_VERSIONS = { Styles: 'v6.1.0', Globals: 'v2.0.6' };
+const MODULE_VERSIONS = {
+  'AppOrchestrator': 'v3.9.168-b586',
+  'MapViewer': 'v7.2.115-b586',
+  'ContentSlider': 'v6.2.115-b586',
+  'MediaViewer': 'v3.2.114-b586',
+  'TimelineScrubber': 'v8.17.1-b589',
+  'OverviewGantt': 'v2.1.86-b586',
+  'ASTCompiler': 'v2.1.50-b586',
+  'VibeMonitor': 'v2.5.50-b586',
+  'SymbologyLegend': 'v1.2.60-b587',
+  'Globals': 'v2.1.43-b586',
+  'Styles': 'v6.1.49-b586'
+};
 const TM_CONFIG = { paneBackground: '#fcfcfc' };
 // === [ END MAJOR BLOCK ] ===
 
@@ -222,7 +246,7 @@ class ErrorBoundary extends Component {
 // === [ END MAJOR BLOCK ] ===
 
 // === [ MAJOR BLOCK: TelemetryMonitor v2.1.16 ] ===
-const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVersion, moduleVersions, isTimelineExpanded, timelineRequiredHeight}) => {
+const TelemetryMonitor = ({logs = [], status, isOpen, setIsOpen, activeSlide, appVersion, moduleVersions, isTimelineExpanded, timelineRequiredHeight, unfilteredData, chronoIngestionSummary = null, spatialEngineSummary = null, layersTRegistrySummary = null, connectionSummary = null}) => {
   const logsEndRef = useRef(null);
   const monitorRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -314,21 +338,77 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
               </label>
             `)}
           </div>
+          <div style="margin-top: 12px; color: #8be9fd; font-size: 0.75rem; border-top: 1px solid #222; padding-top: 8px;">
+            <strong>Module Versions Registry:</strong>
+            <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px; font-family: monospace;">
+              ${Object.entries(MODULE_VERSIONS).map(([k, v]) => html`<div>• <span style="color: #aaa;">${k}:</span> <span style="color: #50fa7b;">${v}</span></div>`)}
+            </div>
+          </div>
         </div>
       ` : html`
-        <div style="background: #222; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.75rem; color: #8be9fd; display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; align-items: center;">
-          <div style="background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;">ENGINE: ${appVersion}</div>
-          <div style="color: #ffb86c; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;">LAYOUT: ${window.innerWidth >= 1024 ? 'Desktop' : 'Mobile'}</div>
-          ${trackedFields.map(f => {
-            let val = activeSlide ? activeSlide[f] : 'N/A';
-            if (val instanceof Date) val = val.toISOString();
-            if (Array.isArray(val)) val = val.length > 0 ? `[${val.join(', ')}]` : '[]';
-            return html`<div style="color: #50fa7b; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;" title=${val}>
-              <span style="color: #aaa;">${f.toUpperCase()}:</span> ${val || 'NULL'}
-            </div>`;
-          })}
+        <!-- Pinned Independent Summary Deck with Micro-Scroll Containment -->
+        <div id="vibe-summary-deck" style="background: #181818; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.73rem; color: #8be9fd; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; max-height: 220px; overflow-y: auto;">
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+            <div style="background: rgba(0,0,0,0.3); padding: 3px 6px; border-radius: 4px; border: 1px solid #333; color: #38bdf8; font-weight: 700;">ENGINE: ${appVersion}</div>
+            <div style="color: #ffb86c; background: rgba(0,0,0,0.3); padding: 3px 6px; border-radius: 4px; border: 1px solid #333;">LAYOUT: ${window.innerWidth >= 1024 ? 'Desktop' : 'Mobile'}</div>
+            <div style="color: #4ade80; background: rgba(0,0,0,0.3); padding: 3px 6px; border-radius: 4px; border: 1px solid #333;">REGISTRY: ${activeSlide ? activeSlide.id : 1} / ${unfilteredData ? unfilteredData.length : 0} Records</div>
+          </div>
+
+          <!-- Static Summary Card 0: Module Versions Registry -->
+          <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid #333; border-radius: 4px; padding: 6px 8px; font-size: 0.7rem;">
+            <strong style="color: #a855f7; display: block; margin-bottom: 4px;">🧩 Module Versions Registry:</strong>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px 12px; color: #cbd5e1; font-family: monospace;">
+              ${Object.entries(MODULE_VERSIONS).map(([k, v]) => html`<div><span style="color: #888;">${k}:</span> <span style="color: #50fa7b;">${v}</span></div>`)}
+            </div>
+          </div>
+
+          <!-- Static Summary Card 0B: Database Connection Summary -->
+          ${(typeof connectionSummary !== 'undefined' && connectionSummary) ? html`
+            <div style="background: rgba(16, 185, 129, 0.18); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 4px; padding: 5px 8px; color: #e2e8f0; font-family: monospace;">
+              <strong>🔗 Database Connection:</strong> Google Sheet ID=<span style="color: #34d399;">${connectionSummary.source}</span> (GID=${connectionSummary.gid})
+            </div>
+          ` : ''}
+
+          <!-- Static Summary Card 1: Dataset Ingestion Summary -->
+          ${(typeof chronoIngestionSummary !== 'undefined' && chronoIngestionSummary) ? html`
+            <div style="background: rgba(0, 122, 204, 0.18); border: 1px solid rgba(0, 122, 204, 0.4); border-radius: 4px; padding: 5px 8px; color: #e2e8f0; font-family: monospace;">
+              <strong>📋 Dataset Ingestion:</strong> Parsed ${chronoIngestionSummary.total} Records (<span style="color: #4ade80;">${chronoIngestionSummary.valid} Valid EDTF</span> | <span style="color: #f59e0b;">${chronoIngestionSummary.missing} Missing EDTF</span> | <span style="color: #f87171;">${chronoIngestionSummary.malformed} Malformed EDTF</span>)
+            </div>
+          ` : ''}
+
+          <!-- Static Summary Card 2: Spatial Engine Summary -->
+          ${(typeof spatialEngineSummary !== 'undefined' && spatialEngineSummary) ? html`
+            <div style="background: rgba(139, 233, 253, 0.18); border: 1px solid rgba(139, 233, 253, 0.4); border-radius: 4px; padding: 5px 8px; color: #e2e8f0; font-family: monospace;">
+              <strong>🗺️ Spatial Engine:</strong> ${spatialEngineSummary.total} Features (<span style="color: #38bdf8;">${spatialEngineSummary.points} Points</span> | <span style="color: #fbbf24;">${spatialEngineSummary.lines} Lines</span> | <span style="color: #34d399;">${spatialEngineSummary.polygons} Polygons</span> | <span style="color: #94a3b8;">${spatialEngineSummary.unmapped} Unmapped</span>)
+            </div>
+          ` : ''}
+
+          <!-- Static Summary Card 3: LayersT Registry Summary -->
+          ${(typeof layersTRegistrySummary !== 'undefined' && layersTRegistrySummary) ? html`
+            <div style="background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 4px; padding: 5px 8px; color: #e2e8f0; font-family: monospace;">
+              <strong>⚙️ LayersT Registry:</strong> ${layersTRegistrySummary.services} Active Spatial Services Ingested
+            </div>
+          ` : ''}
+
+          <!-- Tracked Current Record Fields with Full Word-Wrap -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            ${trackedFields.map(f => {
+              let val = activeSlide ? activeSlide[f] : 'N/A';
+              if (val instanceof Date) val = val.toISOString();
+              if (Array.isArray(val)) val = val.length > 0 ? `[${val.join(', ')}]` : '[]';
+              return html`<div style="color: #50fa7b; white-space: normal; word-break: break-all; overflow-wrap: anywhere; max-width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.25); padding: 3px 6px; border-radius: 4px; border: 1px solid #222;" title=${val}>
+                <span style="color: #aaa;">${f.toUpperCase()}:</span> ${val || 'NULL'}
+              </div>`;
+            })}
+          </div>
         </div>
       `}
+      <!-- Real-Time System Telemetry Stream Header -->
+      <div style="background: #111; padding: 6px 12px; border-bottom: 1px solid #333; font-size: 0.73rem; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+        <span>📡 REAL-TIME TELEMETRY LOG STREAM</span>
+        <span style="font-size: 0.7rem; color: #4ade80;">Active</span>
+      </div>
+
       <div id="vibe-logs" style="flex-grow: 1; overflow-y: auto; padding: 8px 10px; font-size: 0.73rem; background: #111; display: flex; flex-direction: column; gap: 5px; height: 100%; min-height: 50px;">
         ${logs.map((log, i) => {
           const rawMsg = String(log.msg || log);
@@ -350,10 +430,10 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
             col = '#cbd5e1'; badgeCol = 'rgba(203, 213, 225, 0.15)'; label = 'INFO';
           }
 
-          return html`<div key=${i} style="display: flex; align-items: flex-start; gap: 6px; color: ${col}; word-break: break-all; line-height: 1.35;">
+          return html`<div key=${i} style="display: flex; align-items: flex-start; gap: 6px; color: ${col}; width: 100%; max-width: 100%; box-sizing: border-box; line-height: 1.35;">
             <span style="color: #777; flex-shrink: 0; font-size: 0.68rem; font-family: monospace;">[${log.time || ''}]</span>
             <span style="background: ${badgeCol}; color: ${col}; font-size: 0.62rem; font-weight: 800; padding: 1px 4px; border-radius: 3px; flex-shrink: 0; font-family: monospace; letter-spacing: 0.5px;">${label}</span>
-            <span style="flex: 1; font-family: monospace;">${rawMsg}</span>
+            <span style="flex: 1; min-width: 0; font-family: monospace; word-break: break-all; overflow-wrap: anywhere; white-space: pre-wrap; line-height: 1.35;">${rawMsg}</span>
           </div>`;
         })}
         <div ref=${logsEndRef} />
@@ -362,7 +442,7 @@ const TelemetryMonitor = ({logs, status, isOpen, setIsOpen, activeSlide, appVers
   `;
 };
 
-MODULE_VERSIONS['VibeMonitor'] = 'v2.2.38-b303';
+MODULE_VERSIONS['VibeMonitor'] = 'v8.17.1-b585';
 
 
 // 🔽🔽🔽 [ START_INJECT: MediaViewer v2.13.6 ] 🔽🔽🔽
@@ -590,7 +670,7 @@ const MediaViewer = ({ activeSlide, maxPane, setMaxPane }) => {
     </div>
   `;
 };
-MODULE_VERSIONS['MediaViewer'] = 'v2.13.29-b303';
+MODULE_VERSIONS['MediaViewer'] = 'v8.17.1-b585';
 // 🔼🔼🔼 [ END_INJECT: MediaViewer ] 🔼🔼🔼
 
 
@@ -701,9 +781,9 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
 
         <div style="flex-shrink: 0; position: sticky; top: 0; background: var(--paneBg, #ffffff); z-index: 10; padding-top: ${isScrolled ? '0.6rem' : '1.2rem'}; padding-bottom: ${isScrolled ? '0.4rem' : '0.5rem'}; border-bottom: 1px solid rgba(128,128,128,0.2); box-shadow: ${isScrolled ? '0 4px 12px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.04)'}; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); width: 100%; padding-left: 1.5rem; padding-right: 55px; box-sizing: border-box;">
           <div style="max-width: 85ch; width: 100%; margin: 0 auto; display: flex; flex-direction: column;">
-            <div class="metadata-ribbon" style="width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
-              ${isDateValid ? html`<div class="metadata-date" style="font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; flex-shrink: 0; white-space: nowrap; margin-top: 4px;">${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</div>` : ''}
-              <div class="metadata-pills-wrapper">
+            <div class="metadata-ribbon" style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; width: 100%; padding: 0; margin-bottom: 0.4rem; box-sizing: border-box;">
+              ${isDateValid ? html`<div class="metadata-date" style="flex: 2 1 300px; min-width: 0; max-width: 100%; font-weight: 600; color: #007acc; font-size: ${isScrolled ? '0.75rem' : '0.9rem'}; transition: font-size 0.2s ease; margin-top: 4px; line-height: 1.35; white-space: normal; word-break: break-word; overflow-wrap: anywhere;">📅 ${formatSmartDate(slide.startDate, slide.endDate, dateLocale)}</div>` : ''}
+              <div class="metadata-pills-wrapper" style="flex: 1 2 140px; min-width: 0; max-width: 100%; display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; justify-content: flex-end;">
                 ${hasLocation ? html`<span class="place-pill"><span style="margin-right: 4px;">📍</span> ${formatPlaces(slide.place)}</span>` : ''}
                 ${tags.map(tag => html`<span class="tag-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255, 193, 7, 0.2)" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span>${tag}</span></span>`)}
               </div>
@@ -725,14 +805,14 @@ const ContentSlider = ({data, activeIndex, setActiveIndex, maxPane, setMaxPane, 
     </div>
   `;
 };
-MODULE_VERSIONS['ContentSlider'] = 'v5.8.58-b303';
+MODULE_VERSIONS['ContentSlider'] = 'v6.2.128-b602';
 // 🔼🔼🔼 [ END_INJECT: ContentSlider ] 🔼🔼🔼
 
 
 
 // 🔽🔽🔽 [ START_INJECT: TimelineScrubber v26.11.10 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: TimelineScrubber v26.11.10 ] ===
-const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane }) => {
+const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoomLock, setVisibleTimeSpan, isTimelineExpanded, setIsTimelineExpanded, isTimelineMinimized, setIsTimelineMinimized, dateLocale, formatSmartDate: propFormatSmartDate, timelineRequiredHeight, setVisibleTimeBounds, maxPane, setMaxPane, setDurationInspectionPayload }) => {
   const formatSmartDate = propFormatSmartDate || ((s, e, loc) => (s && s.isEDTF ? s.text : (s && s.date ? s.date.toLocaleDateString(loc || 'en-GB') : 'Undated')));
   const wrapperRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -744,7 +824,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
   const [containerHeight, setContainerHeight] = useState(200);
   const [viewLeftEdge, setViewLeftEdge] = useState(0);
   const [caliperTooltip, setCaliperTooltip] = useState(null);
-  const [durationModalData, setDurationModalData] = useState(null);
+  // durationModalData state purged
   const hoverTimeoutRef = useRef(null);
   const lastMouseXRef = useRef(0);
 
@@ -838,10 +918,26 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       else { orderedTags.unshift(remaining.at(bestMatchIdx)); remaining.splice(bestMatchIdx, 1); }
     }
   const laneCount = Math.max(1, orderedTags.length);
-  const availableHeight = Math.max(40, containerHeight - 53);
-  const laneHeight = Math.max(16, Math.min(36, availableHeight / laneCount));
+  const totalTracks = laneCount + 1;
+  const topPadding = 6;
+  const availableHeight = Math.max(40, containerHeight - 28 - topPadding);
+  const laneHeight = Math.max(16, Math.min(36, availableHeight / totalTracks));
 
-  const validData = (data || []).filter(d => d.startDate && !isNaN(d.startDate.min));
+  const validData = (data || []).filter(d => {
+    if (!d.startDate || isNaN(d.startDate.min)) return false;
+    const yr = new Date(d.startDate.min).getUTCFullYear();
+    return yr >= 1800 && yr <= 2050;
+  }).sort((a, b) => {
+    const aStart = a.startDate ? a.startDate.min : 0;
+    const bStart = b.startDate ? b.startDate.min : 0;
+    if (aStart !== bStart) return aStart - bStart;
+    const aEnd = (a.endDate && !isNaN(a.endDate.max)) ? a.endDate.max : aStart;
+    const bEnd = (b.endDate && !isNaN(b.endDate.max)) ? b.endDate.max : bStart;
+    const aDur = aEnd - aStart;
+    const bDur = bEnd - bStart;
+    if (aDur !== bDur) return bDur - aDur;
+    return (a.title || '').localeCompare(b.title || '');
+  });
   const minTimeRaw = validData.length > 0 ? validData.at(0).startDate.min : new Date().getTime();
   let maxTimeRaw = minTimeRaw;
 
@@ -916,9 +1012,8 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     const activeNode = data[nodeGlobalIdx];
     if (!activeNode || !activeNode.startDate) return 0;
     const startMs = activeNode.startDate.min;
-    const endMs = (activeNode.endDate && !isNaN(activeNode.endDate.max)) ? activeNode.endDate.max : startMs;
-    const centerMs = (startMs + endMs) / 2;
-    const basePx = ((centerMs - renderMinTime) / renderTimeRange) * trackW;
+    // Center viewport directly on event start pin so active marker lands dead-center
+    const basePx = ((startMs - renderMinTime) / renderTimeRange) * trackW;
     return basePx - (containerW / 2);
   };
 
@@ -1057,9 +1152,37 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
 
 
-    const targetMsPerMajorTick = Math.max((120 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 12);
+    // Dual-Scale Axis Ticks: Minor Ticks (~70px) + Scale-Tailored Major Tick Labels (~280px)
+    const targetMsPerMinorTick = Math.max((70 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 20);
+    const targetMsPerMajorTick = Math.max((280 / (containerW || 1000)) * visibleTimeSpanMs, visibleTimeSpanMs / 5);
+
+    let activeMinorScale = scaleConfigs.find(c => targetMsPerMinorTick > c.ms) || scaleConfigs.at(-1);
     let activeScale = scaleConfigs.find(c => targetMsPerMajorTick > c.ms) || scaleConfigs.at(-1);
 
+    // Minor Ticks Generation (Rendered directly ON axis line, 5px height)
+    const minorTicksData = [];
+    let iterMinor = new Date(Math.max(renderMinTime, visibleLeftMs - (activeMinorScale.ms * 2)));
+    iterMinor.setMilliseconds(0);
+    if (activeMinorScale.type === 'year') { iterMinor.setMonth(0, 1); iterMinor.setHours(0, 0, 0, 0); iterMinor.setFullYear(Math.floor(iterMinor.getFullYear() / activeMinorScale.step) * activeMinorScale.step); }
+    else if (activeMinorScale.type === 'month') { iterMinor.setDate(1); iterMinor.setHours(0,0,0,0); iterMinor.setMonth(Math.floor(iterMinor.getMonth() / activeMinorScale.step) * activeMinorScale.step); }
+    else if (activeMinorScale.type === 'day') { iterMinor.setHours(0,0,0,0); }
+    else if (activeMinorScale.type === 'hour') { iterMinor.setMinutes(0,0,0); iterMinor.setHours(Math.floor(iterMinor.getHours() / activeMinorScale.step) * activeMinorScale.step); }
+    else if (activeMinorScale.type === 'minute') { iterMinor.setSeconds(0,0); iterMinor.setMinutes(Math.floor(iterMinor.getMinutes() / activeMinorScale.step) * activeMinorScale.step); }
+
+    let minorSafety = 0;
+    const stopMinorTime = Math.min(renderMaxTime, visibleRightMs + (activeMinorScale.ms * 2));
+    while (iterMinor.getTime() <= stopMinorTime && minorSafety < 1000) {
+      minorSafety++;
+      const t = iterMinor.getTime();
+      if (t >= renderMinTime) minorTicksData.push({ t, pctLeft: ((t - renderMinTime) / renderTimeRange) * 100 });
+      if (activeMinorScale.type === 'year') iterMinor.setFullYear(iterMinor.getFullYear() + activeMinorScale.step);
+      else if (activeMinorScale.type === 'month') iterMinor.setMonth(iterMinor.getMonth() + activeMinorScale.step);
+      else if (activeMinorScale.type === 'day') iterMinor.setDate(iterMinor.getDate() + activeMinorScale.step);
+      else if (activeMinorScale.type === 'hour') iterMinor.setHours(iterMinor.getHours() + activeMinorScale.step);
+      else if (activeMinorScale.type === 'minute') iterMinor.setMinutes(iterMinor.getMinutes() + activeMinorScale.step);
+    }
+
+    // Major Ticks Generation (Scale-Tailored Labels, 10px height)
     let iterDate = new Date(Math.max(renderMinTime, visibleLeftMs - (activeScale.ms * 2)));
     iterDate.setMilliseconds(0);
     if (activeScale.type === 'year') { iterDate.setMonth(0, 1); iterDate.setHours(0, 0, 0, 0); iterDate.setFullYear(Math.floor(iterDate.getFullYear() / activeScale.step) * activeScale.step); }
@@ -1082,7 +1205,6 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       else if (activeScale.type === 'minute') iterDate.setMinutes(iterDate.getMinutes() + activeScale.step);
     }
 
-    // viewportCenterMs previously declared
     let minDist = Infinity;
     let centerTickIndex = -1;
     majorTicksData.forEach((d, i) => {
@@ -1092,16 +1214,33 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
       }
     });
 
-    const rulerTicksHTML = majorTicksData.map((d, i) => {
-      const labelText = activeScale.type === 'year' ? d.date.getFullYear() : (activeScale.type === 'month' ? d.date.toLocaleDateString(dateLocale, { month: 'short', year: 'numeric' }) : d.date.toLocaleDateString(dateLocale, { month: 'numeric', day: 'numeric', year: 'numeric' }));
-      const isCenter = i === centerTickIndex;
-      return html`
-        <div class="timeline-ruler-tick" style="left: ${d.pctLeft}%;">
-          <div style="height: 10px; width: 1px; background: #666;"></div>
-          <span style="font-size: 0.75rem; font-family: monospace; color: ${isCenter ? '#007acc' : '#555'}; font-weight: ${isCenter ? '700' : '400'}; margin-top: 2px; white-space: nowrap;">${labelText}</span>
-        </div>
-      `;
-    });
+    const formatTickLabel = (dObj, type) => {
+      if (!dObj) return '';
+      if (type === 'year') return String(dObj.getFullYear());
+      if (type === 'month') return dObj.toLocaleDateString(dateLocale || 'en-GB', { month: 'short', year: 'numeric' });
+      if (type === 'day') return dObj.toLocaleDateString(dateLocale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      if (type === 'hour') return dObj.toLocaleDateString(dateLocale || 'en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+      if (type === 'minute') return dObj.toLocaleTimeString(dateLocale || 'en-GB', { hour: '2-digit', minute: '2-digit' });
+      return dObj.toLocaleDateString(dateLocale || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    };
+
+    const minorTicksHTML = minorTicksData.map(m => html`
+      <div style="position: absolute; left: ${m.pctLeft}%; top: 0; width: 1px; height: 5px; background: #94a3b8; z-index: 1;"></div>
+    `);
+
+    const rulerTicksHTML = html`
+      ${minorTicksHTML}
+      ${majorTicksData.map((d, i) => {
+        const labelText = formatTickLabel(d.date, activeScale.type);
+        const isCenter = i === centerTickIndex;
+        return html`
+          <div class="timeline-ruler-tick" style="left: ${d.pctLeft}%; z-index: 2;">
+            <div style="height: 10px; width: 1.5px; background: #334155;"></div>
+            <span style="font-size: 0.72rem; font-family: monospace; color: ${isCenter ? '#007acc' : '#475569'}; font-weight: ${isCenter ? '700' : '500'}; margin-top: 2px; white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis;">${labelText}</span>
+          </div>
+        `;
+      })}
+    `;
   const stackRegistry = {};
 
   const markers = validData.map((item, index) => {
@@ -1137,7 +1276,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
     const tagIndices = getParsedTags(item.tags).map(t => orderedTags.indexOf(t)).filter(idx => idx !== -1);
     const laneIdx = tagIndices.length > 0 ? Math.min(...tagIndices) : 0;
-    const topPos = (laneIdx * laneHeight) + 15;
+    const topPos = topPadding + laneIdx * laneHeight;
     const blockHeight = Math.max(24, ((tagIndices.length > 0 ? Math.max(...tagIndices) : 0) - laneIdx + 1) * laneHeight);
     const hasMedia = item.media && item.media.length > 0;
     const { lines, pxWidth } = formatLabelSmart(safeStripHTML(item.title), 180, hasMedia);
@@ -1152,32 +1291,59 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     if (item.endDate && !isNaN(item.endDate.max) && item.endDate.max > itemStartMs) {
       endPct = Number((((item.endDate.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
     }
+    const isChoiceSet = item.startDate && item.startDate.isEDTF && item.startDate.obj && (item.startDate.obj.type === 'Set' || item.startDate.obj.type === 'List');
     const hasDuration = (endPct - startPct) > 0.001;
+
     const isActive = globalIndex === activeIndex;
     const isVip = String(item.priority).trim().toUpperCase() === 'VIP';
-    const colActive = 'var(--tm-active, #007acc)';
+    const colActive = 'var(--tm-active, #28a745)';
     const colInactive = 'rgba(var(--tm-inactive-rgb, 204, 0, 0), 0.6)';
-    const colApprox = 'var(--tm-approx, #ffb300)';
+    const colApprox = '#f59e0b';
 
-    const isApproxStart = item.startDate && item.startDate.isEDTF && item.startDate.obj && item.startDate.obj.approximate;
-    const isApproxEnd = item.endDate && item.endDate.isEDTF && item.endDate.obj && item.endDate.obj.approximate;
+    // Exact track-canvas vector alignment accounting for xOffset pixels, card width (pxWidth/hasDuration), and zoomLevel:
+    const xOffsetPct = (xOffset / trackWidthPx) * 100;
+    const groupLeftTrackPct = startPct + xOffsetPct;
+    const groupWidthTrackPct = hasDuration 
+      ? Math.max(0.0001, (endPct - startPct) - xOffsetPct)
+      : (pxWidth / trackWidthPx) * 100;
 
-    let xAxisMarker = '';
-    if (item.startDate.isEDTF && item.startDate.obj && !hasDuration) {
-      const obj = item.startDate.obj;
-      if (obj.type === 'Set') {
-        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: calc(${setEndPct - startPct}% + 6px); height: 10px; background: rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.1); border: 1px dashed ${colApprox}; border-radius: 4px; z-index: 900; transform: translateX(-3px);"></div>`;
-      } else if (obj.type === 'List') {
-        const setEndPct = Number((((obj.max - renderMinTime) / renderTimeRange) * 100).toFixed(4));
-        const subDots = (obj.values || []).map(v => {
-          const vPct = Number((((v.min - itemStartMs) / renderTimeRange) * trackWidthPx).toFixed(2));
-          return html`<div style="position: absolute; bottom: 1px; left: ${vPct}px; width: 4px; height: 4px; border-radius: 50%; background: ${colInactive}; transform: translateX(-2px);"></div>`;
-        });
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: ${setEndPct - startPct}%; height: 1px; background: rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.4); z-index: 900;">${subDots}</div>`;
-      }
+    const itemStartTrackPct = (((itemStartMs - renderMinTime) / renderTimeRange) * 100);
+    const x1RelPct = Number((((itemStartTrackPct - groupLeftTrackPct) / groupWidthTrackPct) * 100).toFixed(4));
+
+    let subDropLines = '';
+    if (isChoiceSet && item.startDate.obj.values && item.startDate.obj.values.length > 1) {
+      const isList = item.startDate.obj.type === 'List';
+      const subColor = isList ? (isActive ? colActive : colInactive) : colApprox;
+      const subDash = isList ? 'none' : '3,3';
+      subDropLines = html`
+        <svg style="position: absolute; left: 0; right: 0; top: ${blockHeight / 2}px; bottom: 0; width: 100%; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: 880;">
+          ${item.startDate.obj.values.map(v => {
+            if (typeof v.min !== 'number' || isNaN(v.min)) return null;
+            const vTrackPct = (((v.min - renderMinTime) / renderTimeRange) * 100);
+            const x2RelPct = Number((((vTrackPct - groupLeftTrackPct) / groupWidthTrackPct) * 100).toFixed(4));
+            if (v.min < renderMinTime || v.min > renderMaxTime) return null;
+            return html`
+              <line x1="${x1RelPct}%" y1="0" x2="${x2RelPct}%" y2="100%" stroke="${subColor}" stroke-width="1.5" stroke-dasharray="${subDash}" />
+            `;
+          }).filter(Boolean)}
+        </svg>
+      `;
     }
 
+    
+    const checkIsApprox = (node) => {
+      if (!node) return false;
+      if (node.isApprox) return true;
+      if (node.obj && (node.obj.approximate || node.obj.uncertain || node.obj.unspecified || node.obj.type === 'Approximate')) return true;
+      const txt = (node.text || '').toLowerCase().trim();
+      if (!txt) return false;
+      return txt.includes('~') || txt.includes('?') || txt.includes('%') || txt.includes('x') || txt.startsWith('c.') || txt.startsWith('ca.') || txt.includes('approx');
+    };
+
+    const isApproxStart = checkIsApprox(item.startDate);
+    const isApproxEnd = checkIsApprox(item.endDate);
+
+    let xAxisMarker = '';
     if (!xAxisMarker && hasDuration) {
       const overlappingEvents = validData.filter(other => {
         const oStart = other.startDate ? other.startDate.min : renderMinTime;
@@ -1203,45 +1369,61 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
           return `${i + 1}. ${isCurrent ? '▶ ' : ''}${safeStripHTML(ev.title)}${durText}`;
         }).join('\n');
 
-        spanMarkerTooltip = `🔍 Concurrent Active Events (${overlappingEvents.length}) in Duration Span:\n${eventList}\n\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+        spanMarkerTooltip = `🔍 Concurrent Active Events (${overlappingEvents.length}) in Duration Span:\n${eventList}\n\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale, false)}\nClick duration bar to focus slide`;
       } else {
-        spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick duration bar to focus slide`;
+        spanMarkerTooltip = `${safeStripHTML(item.title)}${durationStr ? ` (Duration: ${durationStr}${(isApproxStart || isApproxEnd) ? ' - Approximate' : ''})` : ''}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale, false)}\nClick duration bar to focus slide`;
       }
       if (isActive) {
-        const activeBorderL = isApproxStart ? `3px solid ${colApprox}` : `2px solid ${colActive}`;
-        const activeBorderR = isApproxEnd ? `3px solid ${colApprox}` : 'none';
         const cStyle = (isApproxStart || isApproxEnd) ? 'cursor: zoom-in;' : '';
-        xAxisMarker = html`<div style="position: absolute; bottom: 0; left: 0; width: 100%; min-width: 4px; height: 10px; background: rgba(var(--tm-active-shadow-rgb, 102, 178, 255), 0.30); border-left: ${activeBorderL}; border-right: ${activeBorderR}; border-top: none; border-bottom: none; ${cStyle} clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); z-index: 950; box-sizing: border-box; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationModalData({ item, overlappingEvents }); }}></div>`;
-      } else {
-        const styleIdx = index % 4;
-        const hatchAngles = ['45deg', '-45deg', '60deg', '-60deg'];
-        const borderL = isApproxStart ? `3px solid rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.6)` : `2px solid rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.6)`;
-        const borderR = isApproxEnd ? `3px solid rgba(var(--tm-approx-shadow-rgb, 255, 183, 77), 0.6)` : `2px solid rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.6)`;
-        const hatchStyle = `background: repeating-linear-gradient(${hatchAngles[styleIdx]}, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 0, rgba(var(--tm-inactive-shadow-rgb, 176, 190, 197), 0.3) 1px, transparent 1px, transparent 13px);`;
-        const segmentedMask = `-webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); -webkit-mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px); mask-image: repeating-linear-gradient(to right, black 0, black 70px, transparent 70px, transparent 100px);`;
+        const bgGrad = (isApproxStart && isApproxEnd)
+          ? 'linear-gradient(90deg, rgba(245, 158, 11, 0.35) 0%, rgba(40, 167, 69, 0.35) 15%, rgba(40, 167, 69, 0.35) 85%, rgba(245, 158, 11, 0.35) 100%)'
+          : isApproxStart
+            ? 'linear-gradient(90deg, rgba(245, 158, 11, 0.35) 0%, rgba(40, 167, 69, 0.35) 20%, rgba(40, 167, 69, 0.35) 100%)'
+            : isApproxEnd
+              ? 'linear-gradient(90deg, rgba(40, 167, 69, 0.35) 0%, rgba(40, 167, 69, 0.35) 80%, rgba(245, 158, 11, 0.35) 100%)'
+              : 'rgba(40, 167, 69, 0.35)';
+
         xAxisMarker = html`
-          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; z-index: 900; mix-blend-mode: multiply; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); setDurationModalData({ item, overlappingEvents }); }}>
-            <div style="position: absolute; inset: 0; ${hatchStyle} border-left: ${borderL}; border-right: ${borderR}; border-bottom: none; border-top: none; clip-path: polygon(0 0, 100% 7px, 100% 100%, 0 100%); box-sizing: border-box; ${segmentedMask}" title="${spanMarkerTooltip}"></div>
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: ${laneHeight}px; background: ${bgGrad}; clip-path: polygon(0% 0%, 100% 75%, 100% 100%, 0% 100%); border: none !important; ${cStyle} opacity: 0.90; z-index: 950; pointer-events: auto; cursor: pointer;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+            ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: rgba(245, 158, 11, 0.35); z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
+            ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: 6px; background: rgba(245, 158, 11, 0.35); z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
           </div>
         `;
-      }
-    }
+      } else {
+        const hatchAngles = ['135deg', '90deg', '45deg'];
+        const currentAngle = hatchAngles[globalIndex % 3];
+        
+        xAxisMarker = html`
+          <div style="position: absolute; bottom: 0; left: ${xOffset > 0 ? `-${xOffset}px` : '0'}; width: ${xOffset > 0 ? `calc(100% + ${xOffset}px)` : '100%'}; height: ${laneHeight}px; background: repeating-linear-gradient(${currentAngle}, rgba(0, 122, 204, 0.45) 0, rgba(0, 122, 204, 0.45) 1.2px, transparent 1.2px, transparent 24px); clip-path: polygon(0% 0%, 100% 75%, 100% 100%, 0% 100%); border: none !important; z-index: 900; pointer-events: auto; cursor: pointer; overflow: hidden;" title="${spanMarkerTooltip}" onClick=${(e) => { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); const clickX = e.clientX - rect.left; const ratio = Math.max(0, Math.min(1, clickX / (rect.width || 1))); const itemStart = item.startDate ? item.startDate.min : renderMinTime; const itemEnd = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max) && item.startDate.max > itemStart) ? item.startDate.max : itemStart); const exactPointerTime = Math.round(itemStart + ratio * (itemEnd - itemStart)); setDurationInspectionPayload({ item, overlappingEvents, pointerTime: exactPointerTime }); }}>
+            ${isApproxStart ? html`<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: rgba(245, 158, 11, 0.35); z-index: 999;" title="Approximate Start Date (~)"></div>` : ''}
+            ${isApproxEnd ? html`<div style="position: absolute; right: 0; top: 0; bottom: 0; width: 6px; background: rgba(245, 158, 11, 0.35); z-index: 999;" title="Approximate End Date (~)"></div>` : ''}
+          </div>
+        `;
+      }}
 
     let dropLine = '';
-    if (isActive) {
-      if (isApproxStart) dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colApprox}; z-index: 999;"></div>`;
-      else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colActive}; z-index: 999;"></div>`;
-    } else if (!hasDuration) {
-      if (isApproxStart) dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colApprox}; z-index: 900; cursor: zoom-in;" title="Approximate Date"></div>`;
-      else dropLine = html`<div style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; background: ${colInactive}; z-index: 900;"></div>`;
+    const dropColor = isActive ? colActive : (isApproxStart ? colApprox : colInactive);
+    if (xOffset > 0) {
+      dropLine = html`
+        <svg style="position: absolute; left: -${xOffset}px; top: ${blockHeight / 2}px; bottom: 0; width: ${xOffset + 2}px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
+          <line x1="${xOffset}" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
+        </svg>
+      `;
+    } else {
+      dropLine = html`
+        <svg style="position: absolute; left: 0; top: ${blockHeight / 2}px; bottom: 0; width: 2px; height: calc(100% - ${blockHeight / 2}px); overflow: visible; pointer-events: none; z-index: ${isActive ? 999 : 890};">
+          <line x1="0" y1="0" x2="0" y2="100%" stroke="${dropColor}" stroke-width="${isActive ? 2 : 1.5}" stroke-dasharray="${isApproxStart ? '4,3' : 'none'}" />
+        </svg>
+      `;
     }
-    const fullNodeTooltip = `${safeStripHTML(item.title)}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale)}\nClick node to focus slide`;
+    const fullNodeTooltip = `${safeStripHTML(item.title)}\nDates: ${formatSmartDate(item.startDate, item.endDate, dateLocale, false)}\nClick node to focus slide`;
 
     return html`
       <div id="timeline-marker-${globalIndex}" class="event-group ${isActive ? 'active' : ''}" style="position: absolute; left: calc(${startPct}% + ${xOffset}px); top: calc(${topPos}px + ${yOffset}px); bottom: 28px; ${hasDuration ? `width: calc(${endPct - startPct}% - ${xOffset}px); min-width: 4px;` : `width: ${pxWidth}px;`}; pointer-events: none;" onClick=${() => handleNodeClick(globalIndex)}>
         ${dropLine}
+        ${subDropLines}
         ${xAxisMarker}
-        <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --half-lane: ${laneHeight / 2}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#007acc' : '#ffffff'}; color: ${isActive ? '#fff' : '#333333'}; box-shadow: ${isActive ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25}; pointer-events: auto;" title="${fullNodeTooltip}">
+        <div class="event-block" style="position: absolute; top: ${blockHeight / 2}px; transform: translateY(-50%); left: 0; min-height: ${blockHeight}px; height: auto; --lane-h: ${laneHeight}px; --half-lane: ${laneHeight / 2}px; --calc-w: ${pxWidth}px; width: var(--calc-w); min-width: var(--calc-w); background: ${isActive ? '#b3e2c2' : '#ffffff'}; color: ${isActive ? '#111111' : '#333333'}; font-weight: normal; box-shadow: ${isActive ? '0 3px 10px rgba(40, 167, 69, 0.25)' : '0 1px 4px rgba(0,0,0,0.1)'}; border: ${isActive ? 'none' : '1px solid #ddd'}; z-index: ${isActive ? 35 : 25}; pointer-events: auto;" title="${fullNodeTooltip}">
           ${hasMedia ? html`<svg style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; opacity: 0.8;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>` : ''}
           <div style="display: flex; flex-direction: column; width: 100%; letter-spacing: -0.2px; ${hasMedia ? 'padding-left: 14px;' : ''}">
             ${lines.map(l => html`<div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; line-height: 1.15;">${l}</div>`)}
@@ -1263,50 +1445,6 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     </style>
     <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: #ffffff;">
       <!-- 1. Window Controls Toolbar (Top-Right: Minimise LEFT, Maximise RIGHT) -->
-      ${durationModalData ? html`
-        <div class="tm-backdrop open" onClick=${() => setDurationModalData(null)} style="z-index: 10000;"></div>
-        <div class="tm-modal open" style="display: block; width: 90%; max-width: 850px; max-height: 80vh; overflow-y: auto; z-index: 10001; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); padding: 20px; font-family: monospace;">
-          <button class="modal-close" onClick=${() => setDurationModalData(null)} title="Close">✕</button>
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #007acc; padding-bottom: 8px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <h3 style="margin: 0; font-size: 1.15rem; color: #222;">Duration Detail Inspection HUD</h3>
-            <span style="font-size: 0.75rem; background: #e6f4ff; color: #007acc; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${durationModalData.overlappingEvents.length} Concurrent Actions</span>
-          </div>
-          <div style="font-size: 0.85rem; color: #555; margin-bottom: 15px; background: #f8f9fa; padding: 8px 12px; border-radius: 4px; border: 1px solid #eee;">
-            <strong>Target Event:</strong> ${safeStripHTML(durationModalData.item.title)}<br/>
-            <strong>Time Interval:</strong> ${formatSmartDate(durationModalData.item.startDate, durationModalData.item.endDate, dateLocale)}
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 5px;">
-            ${durationModalData.overlappingEvents.map((ev, i) => {
-              const isSelected = ev.id === durationModalData.item.id;
-              const oStart = ev.startDate ? ev.startDate.min : renderMinTime;
-              const oEnd = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > oStart) ? ev.startDate.max : oStart);
-              let durStr = '';
-              if (oEnd > oStart) {
-                const dMs = oEnd - oStart;
-                const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
-                if (dDays >= 365) durStr = `${(dDays / 365.25).toFixed(1)} yrs`;
-                else if (dDays >= 30) durStr = `${Math.round(dDays / 30.43)} mos`;
-                else if (dDays >= 1) durStr = `${dDays} days`;
-                else durStr = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
-              }
-              return html`
-                <div style="background: ${isSelected ? '#e6f4ff' : '#fafafa'}; border: 1px solid ${isSelected ? '#007acc' : '#e0e0e0'}; border-radius: 6px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center;" onClick=${() => { handleNodeClick(data.findIndex(d => d.id === ev.id)); setDurationModalData(null); }}>
-                  <div style="display: flex; flex-direction: column; gap: 4px; max-width: 75%;">
-                    <div style="font-weight: 700; color: ${isSelected ? '#007acc' : '#222'}; font-size: 0.9rem;">
-                      ${i + 1}. ${safeStripHTML(ev.title)}
-                    </div>
-                    <div style="font-size: 0.78rem; color: #666;">
-                      📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${ev.tags ? `• 🏷️ ${Array.isArray(ev.tags) ? ev.tags.join(', ') : ev.tags}` : ''}
-                    </div>
-                  </div>
-                  ${durStr ? html`<div style="font-size: 0.8rem; font-weight: 700; color: #007acc; background: #ffffff; border: 1px solid #70b8ff; padding: 4px 10px; border-radius: 12px; white-space: nowrap;">⏳ ${durStr}</div>` : ''}
-                </div>
-              `;
-            })}
-          </div>
-        </div>
-      ` : ''}
       <div class="timeline-window-toolbar" style="position: absolute; top: 8px; right: 12px; z-index: 1000; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.95); padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
         <button class="status-btn" onClick=${() => setIsTimelineMinimized(true)} title="Minimize Timeline (-)" style="width: 24px; height: 24px; border: none; display: flex; align-items: center; justify-content: center; padding: 0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -1345,31 +1483,33 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
 
       <div class="timeline-scroll-wrapper" ref=${wrapperRef} onScroll=${onScroll} onMouseDown=${onDown} onMouseLeave=${onUp} onMouseUp=${onUp} onMouseMove=${onMove} onTouchStart=${onDown} onTouchEnd=${onUp} onTouchMove=${onMove} onWheel=${onWheel}>
         <div class="timeline-track-container" style="position: relative; width: ${trackWidthPx}px; flex-shrink: 0; height: 100%; box-sizing: border-box; background: #ffffff;">
-          <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 38px; pointer-events: none; z-index: 0;">
+          <div style="position: absolute; top: 0px; left: 0; right: 0; bottom: 28px; pointer-events: none; z-index: 0;">
             ${orderedTags.map((tag, i) => html`
-              <div class="tag-lane" style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; background: ${i % 2 === 0 ? 'rgba(0,0,0,0.04)' : 'transparent'}; border-bottom: 1px solid rgba(0,0,0,0.05);"></div>
+              <div class="tag-lane" style="position: absolute; top: ${topPadding + i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; background: ${(orderedTags.length - 1 - i) % 2 === 0 ? 'rgba(0,0,0,0.05)' : 'transparent'}; border-bottom: 1px solid rgba(0,0,0,0.05);"></div>
             `)}
+            <div class="duration-lane-track-bed" style="position: absolute; top: ${topPadding + orderedTags.length * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; background: #f8fafc; border-top: 1px solid rgba(0,0,0,0.08); z-index: 0; pointer-events: none;"></div>
           </div>
 
           <!-- Solid White Duration Lane Background Band (28px - 38px from bottom) -->
-              <div style="position: absolute; bottom: 28px; left: 0; right: 0; height: 10px; background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1; pointer-events: none;"></div>
+              
               <div class="timeline-axis" style="position: absolute; bottom: 0; left: 0; right: 0; height: 28px; background: #f8f9fa; border-top: 2px solid #999; z-index: 5;">${rulerTicksHTML}</div>
 
           ${markers}
 
-          <div style="position: absolute; top: 15px; left: 0; right: 0; bottom: 38px; pointer-events: none; z-index: 45;">
+          <div style="position: absolute; top: 0px; left: 0; right: 0; bottom: 28px; pointer-events: none; z-index: 45;">
             ${orderedTags.map((tag, i) => html`
-              <div style="position: absolute; top: ${i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; pointer-events: none;">
-                <div class="tag-lane-label" style="background: ${i % 2 === 0 ? '#f4f4f4' : '#fcfcfc'}; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05); pointer-events: auto; position: sticky; left: 0; height: 100%; display: inline-flex; align-items: center; padding: 0 10px; font-size: 0.75rem; color: #555;">${tag}</div>
+              <div style="position: absolute; top: ${topPadding + i * laneHeight}px; height: ${laneHeight}px; left: 0; right: 0; pointer-events: none;">
+                <div class="tag-lane-label" style="background: ${(orderedTags.length - 1 - i) % 2 === 0 ? '#f0f0f0' : '#fcfcfc'}; border-right: 1px solid #ccc; box-shadow: 2px 0 4px rgba(0,0,0,0.05); pointer-events: auto; position: sticky; left: 0; height: 100%; display: inline-flex; align-items: center; padding: 0 10px; font-size: 0.75rem; color: #555;">${tag}</div>
               </div>
             `)}
+            
           </div>
         </div>
       </div>
     </div>
   `;
 };
-MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.25-b303';
+MODULE_VERSIONS['TimelineScrubber'] = 'v8.17.1-b585';
 // 🔼🔼🔼 [ END_INJECT: TimelineScrubber ] 🔼🔼🔼
 
 
@@ -1381,10 +1521,12 @@ MODULE_VERSIONS['TimelineScrubber'] = 'v26.13.25-b303';
 
 // 🔽🔽🔽 [ START_INJECT: MapViewer v8.13.68-b178 ] 🔽🔽🔽
 // === [ MAJOR BLOCK: MapViewer v8.13.68-b178 ] ===
-const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds }) => {
+const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry, maxAutoZoom, minimapOffset, setMinimapOffset, maxPane, setMaxPane, polygonOpacity, showButtonText, visibleTimeBounds, setSpatialEngineSummary }) => {
+          const [isMapReady, setIsMapReady] = useState(false);
           useEffect(() => {
             const handleMapEsc = (e) => {
               if (e.key === 'Escape') {
+                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; }
                 setShowLegendMenu(false);
                 setShowLayersMenu(false);
               }
@@ -1702,6 +1844,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 baseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: defaultBase.attrText, zIndex: 0 }).addTo(map);
                 miniBaseLayerRef.current = L.tileLayer(defaultBase.url, { maxNativeZoom: defaultBase.maxZoom || 19, maxZoom: maxGlobalZoom, attribution: '', zIndex: 0 }).addTo(miniMap);
               }
+              setIsMapReady(true);
             }
           }, [basemapsRegistry, maxGlobalZoom]);
 
@@ -1803,6 +1946,11 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             if (clusterLayer.current) clusterLayer.current.clearLayers();
             if (chevronLayerRef.current) chevronLayerRef.current.clearLayers();
             let validMarkers = 0;
+            let validGeomCount = 0;
+            let pointCount = 0;
+            let lineCount = 0;
+            let polyCount = 0;
+            let failedGeomCount = 0;
 
             const coLocationMap = {};
             (data || []).forEach(item => {
@@ -1876,7 +2024,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                         wkt.read(sub);
                         const extracted = extractLayers(wkt.toObject());
                         featureLayers = featureLayers.concat(extracted);
-                        if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): Parsed WKT GEOMETRYCOLLECTION sub-item ("${sub.substring(0, 40)}...") -> ${extracted.length} layers`, 'info');
+                        // Info chatter log purged per [REF: TELEMETRY-01]
                       } catch (err) {
                         if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): WKT Parse Failure on "${sub}": ${err.message}`, 'warning');
                       }
@@ -1889,7 +2037,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                         wkt.read(locStr);
                         const extracted = extractLayers(wkt.toObject());
                         featureLayers = featureLayers.concat(extracted);
-                        if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): Parsed WKT string ("${locStr.substring(0, 40)}...") -> ${extracted.length} layers`, 'info');
+                        // Info chatter log purged per [REF: TELEMETRY-01]
                       }
                     } catch (err) {
                       if (typeof addLog === 'function') addLog(`[MapViewer] Row ${idx + 2} ("${item.title || 'Untitled'}"): [WKT SYNTAX ERR] Invalid WKT string "${locStr}": ${err.message}`, 'error');
@@ -1998,10 +2146,29 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                 else markerLayer.current.addLayer(layer);
                 validMarkers++;
               });
+              if (featureLayers.length > 0) {
+                validGeomCount++;
+                featureLayers.forEach(l => {
+                  if (l instanceof L.Polygon) polyCount++;
+                  else if (l instanceof L.Polyline) lineCount++;
+                  else if (l instanceof L.Marker) pointCount++;
+                });
+              } else if (rawLocStr) {
+                failedGeomCount++;
+              }
               markersRef.current.push(featureLayers);
             });
 
-          }, [data]);
+          if (data && data.length > 0 && typeof setSpatialEngineSummary === 'function') {
+              setSpatialEngineSummary({
+                total: validGeomCount,
+                points: pointCount,
+                lines: lineCount,
+                polygons: polyCount,
+                unmapped: failedGeomCount
+              });
+            }
+          }, [data, isMapReady]);
 
           // --- [ DECOUPLED SPATIAL LAYER LIFECYCLE: STATE-BASED LAYER SWAPPING & O(1) ACTIVE STYLING ] ---
           useEffect(() => {
@@ -2354,7 +2521,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             </div>
           `;
         };
-MODULE_VERSIONS['MapViewer'] = 'v6.5.31-b303';
+MODULE_VERSIONS['MapViewer'] = 'v8.17.1-b585';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: MapViewer ] 🔼🔼🔼
 
@@ -2382,6 +2549,10 @@ const App = () => {
           const [isMenuOpen, setIsMenuOpen] = useState(false);
           const [isFilterOpen, setIsFilterOpen] = useState(false);
           const [filterFlashMsg, setFilterFlashMsg] = useState(null);
+          const [connectionSummary, setConnectionSummary] = useState(null);
+          const [chronoIngestionSummary, setChronoIngestionSummary] = useState(null);
+          const [spatialEngineSummary, setSpatialEngineSummary] = useState(null);
+          const [layersTRegistrySummary, setLayersTRegistrySummary] = useState(null);
 
           const triggerFilterFlash = (msg) => {
             setFilterFlashMsg(msg);
@@ -2389,6 +2560,7 @@ const App = () => {
           };
           const [isSearchOpen, setIsSearchOpen] = useState(false);
                     const [isTocOpen, setIsTocOpen] = useState(false);
+          const [durationInspectionPayload, setDurationInspectionPayload] = useState(null);
 
           const resetLayout = () => {
             const appNode = document.getElementById('app-layout') || document.documentElement;
@@ -2494,8 +2666,33 @@ const App = () => {
             catch (e) { return 'auto'; }
           });
           const [allTags, setAllTags] = useState([]);
-          const [activeTags, setActiveTags] = useState([]);
-          const [activeExtractTypes, setActiveExtractTypes] = useState([]);
+          // isFilterInitializedRef purged for direct sync
+          const [activeTags, setActiveTags] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('tm_active_tags')) || []; }
+            catch(e) { return []; }
+          });
+          const [activeExtractTypes, setActiveExtractTypes] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('tm_active_extract_types')) || []; }
+            catch(e) { return []; }
+          });
+
+          useEffect(() => {
+            if (activeTags.length > 0) {
+              try {
+                localStorage.setItem('tm_active_tags', JSON.stringify(activeTags));
+              } catch(e) {}
+            }
+          }, [activeTags]);
+
+          useEffect(() => {
+            if (activeExtractTypes.length > 0) {
+              try {
+                localStorage.setItem('tm_active_extract_types', JSON.stringify(activeExtractTypes));
+              } catch(e) {}
+            }
+          }, [activeExtractTypes]);
+
+
           const [minimapOffset, setMinimapOffset] = useState(-4);
           const [basemapsRegistry, setBasemapsRegistry] = useState([
             { id: 'carto-light', label: 'CartoDB Positron (Light)', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: true, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
@@ -2519,7 +2716,7 @@ const App = () => {
 
           const addLog = (msg, type = 'info') => {
             const timeStr = new Date().toTimeString().split(' ').at(0);
-            setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 100));
+            setLogs(prev => [{ time: timeStr, msg, type }, ...prev].slice(0, 500));
           };
 
           const stripAndNormalize = (str) => {
@@ -2527,16 +2724,87 @@ const App = () => {
             return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/σ/g, 'ς').trim();
           };
 
-          const formatSmartDate = (startObj, endObj, locale) => {
-            if (!startObj) return 'Undated';
-            if (startObj.isEDTF) return startObj.text;
-            const d = startObj.date; if (!d || isNaN(d.getTime())) return 'Invalid Date';
-            if (endObj && endObj.date && !isNaN(endObj.date.getTime())) {
-              const dEnd = endObj.date;
-              if (dEnd.getTime() === d.getTime()) return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
-              return `${d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })} — ${dEnd.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}`;
+          const formatSmartDate = (startInput, endInput, locale, includeSuffix = true) => {
+            const checkApprox = (val) => {
+              if (!val) return false;
+              if (typeof val === 'object') {
+                if (val.isApprox || val.uncertain || val.approximate) return true;
+                if (val.type && val.type === 'Approximate') return true;
+                if (val.text && (val.text.includes('~') || val.text.includes('?'))) return true;
+              }
+              return false;
+            };
+            const checkIsEDTF = (val) => {
+              if (!val) return false;
+              if (typeof val === 'object' && (val.isEDTF || val.sourceType === 'EDTF_AST')) return true;
+              if (typeof val === 'string' && /^[P\d~?%\{\[\/\.]/i.test(val.trim())) return true;
+              return false;
+            };
+
+            const isApprox = checkApprox(startInput) || checkApprox(endInput);
+            const isEDTF = checkIsEDTF(startInput) || checkIsEDTF(endInput);
+            const approxPrefix = isApprox ? '~ ' : '';
+
+            if (startInput === null || startInput === undefined) return 'Undated';
+
+            const toValidDate = (val) => {
+              if (val === null || val === undefined) return null;
+              if (typeof val === 'number') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
+              if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+              if (typeof val === 'object') {
+                if (val.isEDTF && val.text) return val.text;
+                if (val.date && val.date instanceof Date && !isNaN(val.date.getTime())) return val.date;
+                if (typeof val.min === 'number') { const d = new Date(val.min); return isNaN(d.getTime()) ? null : d; }
+                if (typeof val.start === 'number') { const d = new Date(val.start); return isNaN(d.getTime()) ? null : d; }
+              }
+              if (typeof val === 'string') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
+              return null;
+            };
+
+            const d1 = toValidDate(startInput);
+            const d2 = toValidDate(endInput);
+            const loc = locale || 'en-GB';
+            const opt = { day: '2-digit', month: 'short', year: 'numeric' };
+
+            let mainDateStr = 'Undated';
+            if (typeof d1 === 'string') {
+              mainDateStr = d1;
+            } else if (d1) {
+              if (d2 && typeof d2 !== 'string') {
+                if (d2.getTime() === d1.getTime()) mainDateStr = approxPrefix + d1.toLocaleDateString(loc, opt);
+                else mainDateStr = approxPrefix + `${d1.toLocaleDateString(loc, opt)} – ${d2.toLocaleDateString(loc, opt)}`;
+              } else {
+                mainDateStr = approxPrefix + d1.toLocaleDateString(loc, opt);
+              }
+            } else if (typeof startInput === 'string') {
+              mainDateStr = startInput;
             }
-            return d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
+
+            const cleanMainDateStr = String(mainDateStr).replace(/,/g, ',\u200B');
+
+            if (!includeSuffix) return cleanMainDateStr;
+
+            let badgeText = 'Num';
+            let badgeColor = '#777777';
+            if (isEDTF && isApprox) {
+              badgeText = 'ISO~';
+              badgeColor = '#f59e0b';
+            } else if (isEDTF) {
+              badgeText = 'ISO';
+              badgeColor = '#007acc';
+            } else if (isApprox) {
+              badgeText = 'Num~';
+              badgeColor = '#f59e0b';
+            }
+
+            const suffixVNode = html`<sup style="font-size: 0.68em; font-family: monospace; color: ${badgeColor}; vertical-align: super; font-weight: 700;">${badgeText}</sup>`;
+
+            const resVNode = html`<span>${cleanMainDateStr}${suffixVNode}</span>`;
+            if (resVNode && typeof resVNode === 'object') {
+              resVNode.toString = () => cleanMainDateStr;
+              resVNode.valueOf = () => cleanMainDateStr;
+            }
+            return resVNode;
           };
 
           const formatPlaces = (placeStr) => {
@@ -2556,7 +2824,7 @@ const App = () => {
             const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
 
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
-            addLog(`Initializing connection: ID=${source}, GID=${gid}`, 'info');
+            setConnectionSummary({ source, gid });
 
             const fetchUrlPrimary = `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
             const fetchUrlBasemaps = bgid ? `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}` : null;
@@ -2609,76 +2877,51 @@ const App = () => {
               const omniSplitRegex = /\||\r?\n/;
               const rows = results.data;
 
-              const parseChronoNode = (legacyStr, edtfStr, index, rowTitle) => {
-                const cleanLegacy = legacyStr ? legacyStr.toString().trim() : '';
+                            const parseChronoNode = (legacyStr, edtfStr, index, rowTitle, isRequired = true) => {
                 const cleanEdtf = edtfStr ? edtfStr.toString().trim() : '';
-                if (activeMode === 'edtf' || (activeMode === 'auto' && cleanEdtf)) {
+
+                if (cleanEdtf) {
                   try {
-                    if (cleanEdtf) {
-                      const parsed = compileCartiMapAST(cleanEdtf);
-                      if (parsed) {
-                        return {
-                          isEDTF: true,
-                          min: parsed.min,
-                          max: parsed.max,
-                          obj: parsed,
-                          isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
-                          text: cleanEdtf
-                        };
-                      }
+                    const parsed = compileCartiMapAST(cleanEdtf);
+                    if (parsed && typeof parsed.min === 'number' && !isNaN(parsed.min)) {
+                      const isApproxFlag = !!(parsed.approximate || parsed.uncertain || cleanEdtf.includes('~') || cleanEdtf.includes('?') || cleanEdtf.includes('%') || cleanEdtf.toLowerCase().includes('x') || cleanEdtf.toLowerCase().startsWith('c.'));
+                      return {
+                        isEDTF: true,
+                        isApprox: isApproxFlag,
+                        type: isApproxFlag ? 'Approximate' : 'Exact',
+                        min: parsed.min,
+                        max: parsed.max,
+                        obj: parsed,
+                        isOpen: parsed.values ? parsed.values.some(v => v === Number.POSITIVE_INFINITY || v === Number.NEGATIVE_INFINITY) : false,
+                        text: cleanEdtf
+                      };
                     }
                   } catch (e) {
-                    addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): EDTF syntax failure. DB String: "${cleanEdtf}". Rerouted to Legacy.`, 'warning');
+                    addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): AST Parsing exception for EDTF "${cleanEdtf}": ${e.message}`, 'error');
                   }
-                }
-
-                if (!cleanLegacy) {
-                  if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): No Legacy fallback found for failed EDTF. Rendering as Undated.`, 'warning');
-                  return null;
-                }
-
-                if (/^\d+(\.\d+)?$/.test(cleanLegacy)) {
-                  const serialVal = parseFloat(cleanLegacy);
-                  const ts = (serialVal - 25569) * 86400 * 1000;
-                  return { 
-                    isEDTF: false, 
-                    min: ts, 
-                    max: ts, 
-                    date: new Date(ts), 
-                    text: cleanLegacy 
+                  addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Could not parse EDTF "${cleanEdtf}". Classified as Malformed EDTF.`, 'error');
+                  return {
+                    isEDTF: false,
+                    isApprox: true,
+                    type: 'Malformed',
+                    min: 0,
+                    max: 0,
+                    text: cleanEdtf
                   };
                 }
 
-                const parts = cleanLegacy.split(' ');
-                if (parts.length >= 1) {
-                  const [ dateStr = '', timeStr = '' ] = parts;
-                  const dParts = dateStr.split(/(?:\/|\.|\-)/);
-                  if (dParts.length >= 3) {
-                    const [ dp0 = '', dp1 = '', dp2 = '' ] = dParts;
-                    const [ tHourStr = '0', tMinStr = '0', tSecFullStr = '0' ] = timeStr ? timeStr.split(':') : [];
-                    const [ tSecStr = '0', tMsStr = '0' ] = tSecFullStr.split('.');
-                    const dYear = parseInt(dp2, 10);
-                    const dMonth = parseInt(isUS ? dp0 : dp1, 10) - 1;
-                    const dDay = parseInt(isUS ? dp1 : dp0, 10);
-                    const tHour = parseInt(tHourStr, 10);
-                    const tMin = parseInt(tMinStr, 10);
-                    const tSec = parseInt(tSecStr, 10);
-                    const tMs = parseInt(tMsStr, 10);
-                    const dateObj = new Date(dYear, dMonth, dDay, tHour, tMin, tSec, tMs);
-                    const ts = dateObj.getTime();
-                    if (!isNaN(ts)) {
-                      return { 
-                        isEDTF: false, 
-                        min: ts, 
-                        max: ts, 
-                        date: dateObj, 
-                        text: cleanLegacy 
-                      };
-                    }
-                  }
+                if (isRequired) {
+                  addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Start EDTF cell is blank. Classified as Missing EDTF.`, 'warning');
+                  return {
+                    isEDTF: false,
+                    isApprox: true,
+                    type: 'Missing',
+                    min: 0,
+                    max: 0,
+                    text: 'Missing Start EDTF'
+                  };
                 }
 
-                if (cleanEdtf) addLog(`[Chrono-Engine] Row ${index + 2} ("${rowTitle}"): Failed to parse. Rendering as Undated.`, 'warning');
                 return null;
               };
 
@@ -2690,8 +2933,8 @@ const App = () => {
                 return {
                   id: index + 1,
                   title: rowTitle,
-                  startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf'), index, rowTitle),
-                  endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf'), index, rowTitle),
+                  startDate: parseChronoNode(exactGet(norm, 'start'), exactGet(norm, 'start edtf'), index, rowTitle, true),
+                  endDate: parseChronoNode(exactGet(norm, 'end'), exactGet(norm, 'end edtf'), index, rowTitle, false),
                   description: exactGet(norm, 'description'),
                   place: exactGet(norm, 'place'),
                   location: exactGet(norm, 'location') || exactGet(norm, 'location (wkt)') || exactGet(norm, 'location wkt') || exactGet(norm, 'wkt') || exactGet(norm, 'coordinates') || exactGet(norm, 'geo') || exactGet(norm, 'wkt location'),
@@ -2717,7 +2960,7 @@ const App = () => {
               // =========================================================================
               const indexedData = valid.map(d => ({
                 ...d,
-                _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale)}`)
+                _searchIndex: stripAndNormalize(`${d.title} ${d.description} ${d.place} ${d.tags.join(' ')} ${formatSmartDate(d.startDate, d.endDate, dateLocale, false)}`)
               }));
               setUnfilteredData(indexedData);
               const discoveredTypes = Array.from(new Set(indexedData.map(d => d.extractType).filter(Boolean)));
@@ -2736,9 +2979,46 @@ const App = () => {
                 arr.map(s => String(s).trim()).filter(Boolean).forEach(t => tagsMap.add(t));
               });
 
+              const validEdtfCount = cleaned.filter(d => (d.startDate && d.startDate.isEDTF && d.startDate.type !== 'Undated')).length;
+              const missingEdtfCount = cleaned.filter(d => (!d.startDate || !d.startDate.text || d.startDate.text === 'Undated')).length;
+              const malformedEdtfCount = cleaned.length - validEdtfCount - missingEdtfCount;
+              addLog(`[Dataset Ingestion] Parsed ${rows.length} records: ${validEdtfCount} Valid EDTF, ${missingEdtfCount} Missing EDTF, ${malformedEdtfCount} Malformed EDTF.`, 'info');
+              setChronoIngestionSummary({
+                total: rows.length,
+                valid: validEdtfCount,
+                missing: missingEdtfCount,
+                malformed: malformedEdtfCount
+              });
+
               const uniqueTagsList = Array.from(tagsMap).sort();
               setAllTags(uniqueTagsList);
-              setActiveTags(uniqueTagsList);
+              
+              // 1. Read defaults first, read locally stored settings second
+              let tagsToApply = uniqueTagsList;
+              try {
+                const stored = localStorage.getItem('tm_active_tags');
+                if (stored) {
+                  const parsed = JSON.parse(stored);
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    const valid = parsed.filter(t => uniqueTagsList.includes(t));
+                    if (valid.length > 0) tagsToApply = valid;
+                  }
+                }
+              } catch(e) {}
+              setActiveTags(tagsToApply);
+
+              let typesToApply = discoveredTypes;
+              try {
+                const storedTypes = localStorage.getItem('tm_active_extract_types');
+                if (storedTypes) {
+                  const parsedTypes = JSON.parse(storedTypes);
+                  if (Array.isArray(parsedTypes) && parsedTypes.length > 0) {
+                    const validTypes = parsedTypes.filter(t => discoveredTypes.includes(t));
+                    if (validTypes.length > 0) typesToApply = validTypes;
+                  }
+                }
+              } catch(e) {}
+              setActiveExtractTypes(typesToApply);
 
               const parseLayersTRows = (rows) => {
                 return rows.map(row => {
@@ -2782,7 +3062,12 @@ const App = () => {
                   });
                   return merged;
                 });
-                addLog(`[v8.12.74 Ingestion] LayersT registry parsed. Merged ${parsedBMs.length} spatial services into basemapsRegistry.`, 'info');
+                if (typeof setLayersTRegistrySummary === 'function') {
+                  setLayersTRegistrySummary({
+                    services: parsedBMs.length,
+                    total: basemapsRegistry ? basemapsRegistry.length : parsedBMs.length
+                  });
+                }
               }
 
               if (!hasInitializedRef.current) {
@@ -2820,13 +3105,30 @@ const App = () => {
           // --- [ Active filtering of datasets by swimlanes and streams ] ---
           useEffect(() => {
             if (unfilteredData.length === 0) return;
-            const filtered = unfilteredData.filter(d => 
-              ((d.tags || []).length === 0 || d.tags.some(t => (activeTags || []).includes(t))) &&
-              (activeExtractTypes || []).includes(d.extractType)
-            );
+            if (true) {
+              try {
+                if (activeTags.length > 0) localStorage.setItem('tm_active_tags', JSON.stringify(activeTags));
+                if (activeExtractTypes.length > 0) localStorage.setItem('tm_active_extract_types', JSON.stringify(activeExtractTypes));
+              } catch(e) {}
+            }
+
+            const curEventId = data[activeIndex] ? data[activeIndex].id : null;
+
+            const filtered = unfilteredData.filter(d => {
+              const tagMatch = (!activeTags || activeTags.length === 0) || ((d.tags || []).length === 0) || d.tags.some(t => activeTags.includes(t));
+              const extractMatch = (!activeExtractTypes || activeExtractTypes.length === 0) || activeExtractTypes.includes(d.extractType);
+              return tagMatch && extractMatch;
+            });
             setData(filtered);
 
-            if (activeIndex >= filtered.length) {
+            if (curEventId !== null) {
+              const keepIdx = filtered.findIndex(d => d.id === curEventId);
+              if (keepIdx >= 0) {
+                setActiveIndex(keepIdx);
+              } else if (activeIndex >= filtered.length) {
+                setActiveIndex(Math.max(0, filtered.length - 1));
+              }
+            } else if (activeIndex >= filtered.length) {
               setActiveIndex(Math.max(0, filtered.length - 1));
             }
 
@@ -3004,40 +3306,14 @@ const App = () => {
 
           useEffect(() => {
             const handleKeyDown = (e) => {
-              if (e.key === 'Escape') {
+              if (e.key === 'Escape' || e.keyCode === 27) {
                 if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
+                setDurationInspectionPayload(null);
                 setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
-                return;
-              }
-              if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
-              else if (e.key === 'ArrowRight') jumpToSlide(activeIndex + 1);
-              else if (e.key === 'ArrowLeft') jumpToSlide(activeIndex - 1);
-              else if (e.key === 'ArrowDown') {
-                const textPane = document.querySelector('.content-slider-pane');
-                if (textPane) textPane.scrollBy({ top: 120, behavior: 'smooth' });
-              }
-              else if (e.key === 'ArrowUp') {
-                const textPane = document.querySelector('.content-slider-pane');
-                if (textPane) textPane.scrollBy({ top: -120, behavior: 'smooth' });
               }
             };
-            window.addEventListener('keydown', handleKeyDown);
-            return () => window.removeEventListener('keydown', handleKeyDown);
-          }, [activeIndex, data.length]);
-
-          useEffect(() => {
-            updateAppHeight();
-            let wasDesktop = window.innerWidth >= 1024;
-            const handleResize = () => {
-              updateAppHeight();
-              const isDesktop = window.innerWidth >= 1024;
-              if (isDesktop !== wasDesktop) {
-                window.dispatchEvent(new Event('resize'));
-              }
-              wasDesktop = isDesktop;
-            };
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
+            window.addEventListener('keydown', handleKeyDown, true);
+            return () => window.removeEventListener('keydown', handleKeyDown, true);
           }, []);
 
           const handleResultClick = (id, qString) => {
@@ -3084,7 +3360,37 @@ const SymbologyLegend = () => html`
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #ffb300; border-radius: 50%; display: inline-block;"></span> VIP Priority</div>
     <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: #007acc; border-radius: 50%; display: inline-block;"></span> Standard Feature</div>
     <div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: bold; color: #007acc; font-size: 1rem;">›››</span> Directional Polyline</div>
-    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: rgba(0,122,204,0.35); border: 1px solid #007acc; display: inline-block;"></span> Spatial Polygon</div>
+    <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: rgba(0,122,204,0.35); border: none; display: inline-block;"></span> Spatial Polygon</div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 28px; height: 12px; background: rgba(40, 167, 69, 0.35); clip-path: polygon(0% 0%, 100% 75%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
+      <span>Active Duration Ribbon (Green)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 28px; height: 12px; background: linear-gradient(90deg, rgba(245, 158, 11, 0.35) 0%, rgba(0, 122, 204, 0.35) 40%, rgba(245, 158, 11, 0.35) 100%); clip-path: polygon(0% 0%, 100% 75%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
+      <span>Approximate Edge Blend (~)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 28px; height: 12px; background: repeating-linear-gradient(135deg, rgba(0, 122, 204, 0.45) 0, rgba(0, 122, 204, 0.45) 1.2px, transparent 1.2px, transparent 24px); clip-path: polygon(0% 0%, 100% 75%, 100% 100%, 0% 100%); flex-shrink: 0;"></div>
+      <span>Inactive Ribbon (/ | \ Rotate)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <svg width="28" height="18" viewBox="0 0 28 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
+        <circle cx="2" cy="2" r="2" fill="#007acc" />
+        <line x1="2" y1="2" x2="2" y2="16" stroke="#007acc" stroke-width="1.5" />
+        <line x1="2" y1="2" x2="14" y2="16" stroke="#007acc" stroke-width="1.5" />
+        <line x1="2" y1="2" x2="26" y2="16" stroke="#007acc" stroke-width="1.5" />
+      </svg>
+      <span>Multi-Date Occurrence Legs {...}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <svg width="28" height="18" viewBox="0 0 28 18" style="flex-shrink: 0; background: rgba(0,0,0,0.03); border-radius: 3px; border: 1px solid #ddd;">
+        <circle cx="2" cy="2" r="2" fill="#ffb300" />
+        <line x1="2" y1="2" x2="2" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
+        <line x1="2" y1="2" x2="14" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
+        <line x1="2" y1="2" x2="26" y2="16" stroke="#ffb300" stroke-width="1.5" stroke-dasharray="2,2" />
+      </svg>
+      <span>Choice Set Candidate Legs [...]</span>
+    </div>
   </div>
 `;
 
@@ -3371,6 +3677,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       data=${data}
                       activeIndex=${activeIndex}
                       setActiveIndex=${jumpToSlide}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                       maxPane=${maxPane}
                       setMaxPane=${setMaxPane}
                       dateLocale=${dateLocale}
@@ -3388,9 +3695,11 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     <!-- Map Viewer Container -->
                     <div class="map-pane ${maxPane === 'map' ? 'pane-maximized' : ''} ${maxPane && maxPane !== 'map' ? 'pane-hidden' : ''}" style="position: relative; z-index: 100 !important; overflow: visible !important;">
                       <${MapViewer}
+                        setSpatialEngineSummary=${setSpatialEngineSummary}
                         data=${data}
                         activeIndex=${activeIndex}
                         setActiveIndex=${jumpToSlide}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                         addLog=${addLog}
                         basemapsRegistry=${basemapsRegistry}
                         maxAutoZoom=${window.MAX_AUTO_ZOOM || 18}
@@ -3464,6 +3773,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                         }}
                         onKeyDown=${(e) => {
                           if (e.key === 'Escape') {
+                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; }
                             if (e.target) e.target.blur();
                             setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
                           } else {
@@ -3523,6 +3833,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     data=${data}
                     activeIndex=${activeIndex}
                     setActiveIndex=${jumpToSlide}
+                    setDurationInspectionPayload=${setDurationInspectionPayload}
                     addLog=${addLog}
                     activeTags=${activeTags}
                     isTimelineExpanded=${isTimelineExpanded}
@@ -3593,7 +3904,8 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <button class="modal-close" onClick=${() => setIsSearchOpen(false)} style="position: absolute; top: 16px; right: 16px; z-index: 101000; border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.06); cursor: pointer; color: #333; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1; transition: all 0.2s;" title="Close Search (Esc)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
-                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} onKeyDown=${(e) => { if (e.key === 'Escape') { e.target.blur(); setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false); } }} style="flex-shrink: 0; width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
+                  <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} onKeyDown=${(e) => { if (e.key === 'Escape') {
+                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; } e.target.blur(); setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false); } }} style="flex-shrink: 0; width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
                   <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
                     ${searchHistoryLayout}
                     ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
@@ -3606,7 +3918,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           return html`
             <div id="tm-root" onClick=${() => { setIsMenuOpen(false); setIsFilterOpen(false); }}>
-              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} />
+              <${TelemetryMonitor} logs=${logs} status=${status.text} isOpen=${isMonitorOpen} setIsOpen=${setIsMonitorOpen} activeSlide=${activeSlide} appVersion=${APP_VERSION} moduleVersions=${MODULE_VERSIONS} isTimelineExpanded=${isTimelineExpanded} timelineRequiredHeight=${timelineRequiredHeight} unfilteredData=${unfilteredData} chronoIngestionSummary=${chronoIngestionSummary} spatialEngineSummary=${spatialEngineSummary} layersTRegistrySummary=${layersTRegistrySummary} connectionSummary=${connectionSummary} />
 
               ${loadingScreen}
               ${appLayout}
@@ -3809,134 +4121,535 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                 </div>
               `}
             </div>
-          `;
+          
+      ${durationInspectionPayload ? html`
+        <div id="duration-inspection-root">
+          <div class="tm-backdrop open" onClick=${() => setDurationInspectionPayload(null)} style="z-index: 100000 !important; background: rgba(0,0,0,0.55);"></div>
+          <div id="duration-inspection-modal" class="tm-modal open" style="z-index: 100001 !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); padding: 24px 28px; font-family: monospace; width: 95vw; max-width: 1150px; max-height: 92vh; overflow-y: auto;">
+            <button class="modal-close" onClick=${() => setDurationInspectionPayload(null)} title="Close (Esc)" style="position: absolute; top: 18px; right: 20px; z-index: 10; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; color: #475569;">✕</button>
+            
+            <!-- Header with High-Precision Optical Microscope SVG Icon -->
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #007acc; padding-bottom: 12px; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#007acc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 21h16"></path>
+                  <path d="M5 14h10"></path>
+                  <path d="M9 14v-2"></path>
+                  <path d="M14 21a6 6 0 0 0 6-6V9a4 4 0 0 0-4-4h-2"></path>
+                  <path d="M10 3l4 4"></path>
+                  <path d="M8 5l5 5"></path>
+                  <path d="M11 10l-2 2"></path>
+                  <circle cx="16" cy="12" r="1.5" fill="#007acc"></circle>
+                </svg>
+                <h3 style="margin: 0; font-size: 1.25rem; color: #111; font-weight: 700; letter-spacing: -0.2px;">Duration Inspection Overview</h3>
+              </div>
+              <span style="font-size: 0.82rem; background: #e6f4ff; color: #007acc; padding: 4px 12px; border-radius: 12px; font-weight: 700; border: 1px solid #70b8ff; margin-right: 36px;">
+                ${durationInspectionPayload.overlappingEvents ? durationInspectionPayload.overlappingEvents.length : 0} Concurrent Actions
+              </span>
+            </div>
+
+            <!-- Single-Line Focus & Span Summary Box -->
+            ${(() => {
+              const events = durationInspectionPayload.overlappingEvents || [];
+              if (events.length === 0) return html`<div style="color: #666; padding: 12px;">No concurrent events found at this time coordinate.</div>`;
+
+              const selItem = durationInspectionPayload.item;
+              const pTime = durationInspectionPayload.pointerTime || (selItem && selItem.startDate ? selItem.startDate.min : (events[0].startDate ? events[0].startDate.min : 0));
+              
+              const focusDateObj = new Date(pTime);
+              const focusTimeStr = (!isNaN(focusDateObj.getTime()) && (focusDateObj.getHours() !== 0 || focusDateObj.getMinutes() !== 0 || focusDateObj.getSeconds() !== 0))
+                ? focusDateObj.toLocaleTimeString(dateLocale || 'en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                : '';
+              const focusDateStr = formatSmartDate(pTime, null, dateLocale) + (focusTimeStr ? `, ${focusTimeStr}` : '');
+
+              const formatOverviewTickTime = (tMs, spanMs, loc) => {
+                const d = new Date(tMs);
+                if (isNaN(d.getTime())) return 'Undated';
+                const datePart = d.toLocaleDateString(loc || 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const timePart = d.toLocaleTimeString(loc || 'en-GB', { hour: '2-digit', minute: '2-digit' });
+                if (spanMs <= 7 * 24 * 3600 * 1000) return `${datePart} ${timePart}`;
+                if (d.getHours() !== 0 || d.getMinutes() !== 0) return `${datePart} ${timePart}`;
+                return datePart;
+              };
+
+              let hasEventSpan = false;
+              let itemStart = pTime;
+              let itemEnd = pTime;
+              if (selItem && selItem.startDate && selItem.endDate && !isNaN(selItem.endDate.max) && selItem.endDate.max > selItem.startDate.min) {
+                hasEventSpan = true;
+                itemStart = selItem.startDate.min;
+                itemEnd = selItem.endDate.max;
+              }
+
+              // Compute Unified Envelope [minT, maxT] across all overlapping events
+              let minT = Infinity;
+              let maxT = -Infinity;
+              events.forEach(ev => {
+                const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
+                const e = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > s) ? ev.startDate.max : s);
+                if (s < minT) minT = s;
+                if (e > maxT) maxT = e;
+              });
+              if (minT === Infinity) minT = pTime;
+              if (maxT === -Infinity || maxT <= minT) maxT = minT + (1000 * 60 * 60 * 24 * 365); // 1 yr fallback
+
+              const tSpan = maxT - minT;
+              const cursorPct = Math.max(0, Math.min(100, ((pTime - minT) / tSpan) * 100));
+
+              const spanLeftPct = hasEventSpan ? Math.max(0, Math.min(100, ((itemStart - minT) / tSpan) * 100)) : cursorPct;
+              const spanWidthPct = hasEventSpan ? Math.max(0.5, Math.min(100 - spanLeftPct, ((itemEnd - itemStart) / tSpan) * 100)) : 0;
+
+              // Generate 10 evenly spaced ticks along the X-Axis Ruler
+              const numTicks = 10;
+              const ticks = [];
+              for (let i = 0; i < numTicks; i++) {
+                const tickTime = minT + (i / (numTicks - 1)) * tSpan;
+                const tickLabel = formatOverviewTickTime(tickTime, tSpan, dateLocale);
+                ticks.push({ pct: (i / (numTicks - 1)) * 100, label: tickLabel });
+              }
+
+              return html`
+                <div>
+                  <!-- Single-Line Focus & Span Summary Box -->
+                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+                    <div style="font-size: 0.9rem; color: #0f172a; font-weight: 700;">
+                      🎯 Cursor Focus: <span style="color: #007acc;">${focusDateStr}</span>
+                      ${hasEventSpan ? html`<span style="color: #64748b; margin: 0 6px;">•</span><span style="color: #0f172a;">Duration Span: <span style="color: #007acc;">${formatSmartDate(itemStart, itemEnd, dateLocale)}</span></span>` : ''}
+                    </div>
+                  </div>
+
+                  <!-- 10-Tick Aligned Top X-Axis Ruler Scale Header (Card-Matched Geometry) -->
+                  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 47px 12px 16px; margin-bottom: 14px; position: relative;">
+                    <div style="position: relative; width: 100%; height: 32px; overflow: visible;">
+                      <!-- Horizontal Scale Line -->
+                      <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #cbd5e1;"></div>
+
+                      <!-- 10 Scale Ticks -->
+                      ${ticks.map(t => html`
+                        <div style="position: absolute; left: ${t.pct}%; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 5;">
+                          <div style="font-size: 0.68rem; color: #475569; font-weight: 600; white-space: nowrap; margin-bottom: 2px;">${t.label}</div>
+                          <div style="width: 1px; height: 6px; background: #94a3b8;"></div>
+                        </div>
+                      `)}
+                      
+                      <!-- Event Span Highlight Overlay across Ruler Track -->
+                      ${hasEventSpan ? html`
+                        <div style="position: absolute; left: ${spanLeftPct}%; width: ${spanWidthPct}%; bottom: 0; height: 10px; background: linear-gradient(90deg, rgba(34, 197, 94, 0.25) 0%, rgba(0, 122, 204, 0.25) 100%); mix-blend-mode: multiply; border-left: 2px solid #22c55e; border-right: 2px solid #22c55e; pointer-events: none; z-index: 10;"></div>
+                      ` : ''}
+
+                      <!-- Synchronized Vertical Red Dashed Cursor Line -->
+                      <div style="position: absolute; left: ${cursorPct}%; top: -4px; bottom: -12px; width: 2px; border-left: 2px dashed #ef4444; z-index: 20;" title="Cursor Focus: ${focusDateStr}"></div>
+                    </div>
+                  </div>
+
+                  <!-- Multi-Lane Gantt Cards Container (Expanded Height: max-height 65vh) -->
+                  <div style="display: flex; flex-direction: column; gap: 10px; max-height: 65vh; overflow-y: auto; padding-right: 16px; scrollbar-gutter: stable;">
+                    ${events.map((ev, i) => {
+                      const isMainActiveSlide = data[activeIndex] && ev.id === data[activeIndex].id;
+                      const s = ev.startDate ? ev.startDate.min : (ev.start ? ev.start.min : 0);
+                      const eTime = (ev.endDate && !isNaN(ev.endDate.max)) ? ev.endDate.max : ((ev.startDate && !isNaN(ev.startDate.max) && ev.startDate.max > s) ? ev.startDate.max : s);
+
+                      const isEvApproxStart = checkIsApprox(ev.startDate);
+                      const isEvApproxEnd = checkIsApprox(ev.endDate);
+
+                      const sMin = (isEvApproxStart && ev.startDate && typeof ev.startDate.min === "number") ? ev.startDate.min : s;
+                      const eMax = (isEvApproxEnd && ev.endDate && typeof ev.endDate.max === "number") ? ev.endDate.max : eTime;
+
+                      const fullStart = Math.min(s, sMin);
+                      const fullEnd = Math.max(eTime, eMax);
+
+                      const leftPct = Math.max(0, Math.min(100, ((fullStart - minT) / tSpan) * 100));
+                      const widthPct = Math.max(1.5, Math.min(100 - leftPct, ((fullEnd - fullStart) / tSpan) * 100));
+
+                      let durStr = "";
+                      if (eTime > s) {
+                        const dMs = eTime - s;
+                        const dDays = Math.round(dMs / (1000 * 60 * 60 * 24));
+                        if (dDays >= 365) durStr = `${(dDays / 365.25).toFixed(1)} yrs`;
+                        else if (dDays >= 30) durStr = `${Math.round(dDays / 30.43)} mos`;
+                        else if (dDays >= 1) durStr = `${dDays} days`;
+                        else durStr = `${Math.max(1, Math.round(dMs / (1000 * 60 * 60)))} hrs`;
+                      }
+
+                      const mainCol = isMainActiveSlide ? "#22c55e" : "#007acc";
+                      const approxCol = "#f59e0b";
+
+                      let ganttBarGrad = mainCol;
+                      if (isEvApproxStart && isEvApproxEnd) {
+                        ganttBarGrad = `linear-gradient(90deg, ${approxCol} 0%, ${mainCol} 20%, ${mainCol} 80%, ${approxCol} 100%)`;
+                      } else if (isEvApproxStart) {
+                        ganttBarGrad = `linear-gradient(90deg, ${approxCol} 0%, ${mainCol} 25%, ${mainCol} 100%)`;
+                      } else if (isEvApproxEnd) {
+                        ganttBarGrad = `linear-gradient(90deg, ${mainCol} 0%, ${mainCol} 75%, ${approxCol} 100%)`;
+                      }
+
+                      return html`
+                        <div style="background: ${isMainActiveSlide ? "#f0fdf4" : "#ffffff"}; border: 1.5px solid ${isMainActiveSlide ? "#22c55e" : "#e2e8f0"}; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);"
+                             onClick=${() => {
+                               const idx = data.findIndex(d => d.id === ev.id);
+                               if (idx >= 0) {
+                                 if (typeof setPreviousActiveIndex === "function") {
+                                   setPreviousActiveIndex(activeIndex);
+                                 }
+                                 jumpToSlide(idx);
+                               }
+                               setDurationInspectionPayload(null);
+                             }}>
+                          
+                          <!-- Event Title & Metadata Header (Strategy A: Balanced Side-by-Side Flex with Comma-Breakable Date) -->
+                          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
+                            <div style="flex: 1 1 220px; min-width: 0; font-weight: 600; color: ${isMainActiveSlide ? "#15803d" : "#1e293b"}; font-size: 0.88rem; display: flex; align-items: baseline; gap: 8px; line-height: 1.35;">
+                              <span style="color: #64748b; font-family: monospace; font-size: 0.80rem; flex-shrink: 0;">#${ev.id}</span>
+                              <span style="overflow-wrap: break-word;">${safeStripHTML(ev.title)}</span>
+                            </div>
+                            <div style="flex: 1 1 220px; max-width: 100%; min-width: 0; font-size: 0.78rem; color: ${isMainActiveSlide ? "#15803d" : "#007acc"}; font-weight: 600; line-height: 1.35; margin-left: auto; text-align: right; overflow-wrap: anywhere; word-break: break-word;">
+                              📅 ${formatSmartDate(ev.startDate, ev.endDate, dateLocale)} ${durStr ? html`<span style="color: #64748b; font-weight: 500; margin-left: 4px; display: inline-block;">• ⏳ ${durStr}</span>` : ""}
+                            </div>
+                          </div>
+
+                          <!-- Mini-Gantt Track (Card-Matched Margin Scale Alignment & Gradient Approximation Blending) -->
+                          <div style="position: relative; width: 100%; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0;">
+                            <!-- Unified Gradient-Blended Gantt Bar -->
+                            <div style="position: absolute; left: ${leftPct}%; width: ${widthPct}%; top: 0; bottom: 0; background: ${ganttBarGrad}; border-radius: 4px; opacity: 0.88; z-index: 2; ${isEvApproxStart ? "border-left: 2px dashed #f59e0b;" : ""} ${isEvApproxEnd ? "border-right: 2px dashed #f59e0b;" : ""}" title="${safeStripHTML(ev.title)} (${formatSmartDate(ev.startDate, ev.endDate, dateLocale)})"></div>
+
+                            <!-- Red Cursor Line Intersection -->
+                            <div style="position: absolute; left: ${cursorPct}%; top: 0; bottom: 0; width: 2px; background: #ef4444; z-index: 5;" title="Focus: ${focusDateStr}"></div>
+                          </div>
+                        </div>
+                      `;
+                    })}
+                  </div>
+                </div>
+              `;
+            })()}
+          </div>
+        </div>
+      ` : ''}
+
+`;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v3.8.39-b303';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.3-b606';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
 // 🔽🔽🔽 [ START_INJECT: CarTiMap AST Compiler v8.13.68-b178 ] 🔽🔽🔽
-// === [ MAJOR BLOCK: CarTiMap AST Compiler v8.13.68-b178 ] ===
-// [REF: ETL-08] The Native AST Decorator (Zero-Build Implementation)
-        const compileCartiMapAST = (str) => {
-          if (!str) return null;
-          let clean = String(str).trim()
-            .replace(/[\r\n]+/g, ',')
-            .replace(/\s*\/\s*/g, '/')
-            .replace(/\s*,\s*/g, ',')
-            .replace(/,,+/g, ',');
+// === [ MAJOR BLOCK: CarTiMap AST Compiler v2.0.68-b487 ] ===
+// [REF: ETL-08 / ETL-09] Native ECMAScript AST Decorator running complementary to edtf.js
 
-          // 1. Array Geometry: Choice Sets [] (Comma Split Executes FIRST)
-          if (clean.startsWith(String.fromCharCode(91)) && clean.endsWith(String.fromCharCode(93))) {
-            const inner = clean.slice(1, -1);
-            const parts = inner.split(",");
-            const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
-            if (values.length === 0) return null;
-            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
-            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
-            return {
-              type: "Set",
-              values: values,
-              min: minVals.length > 0 ? Math.min(...minVals) : 0,
-              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
-            };
-          }
 
-          // 2. Array Geometry: Inclusive Lists {}
-          if (clean.startsWith("{") && clean.endsWith("}")) {
-            const inner = clean.slice(1, -1);
-            const parts = inner.split(",");
-            const values = parts.map(p => compileCartiMapAST(p.trim())).filter(Boolean);
-            if (values.length === 0) return null;
-            const minVals = values.map(v => typeof v.min === 'number' ? v.min : (v.min ? Number(v.min.valueOf()) : 0)).filter(n => !isNaN(n));
-            const maxVals = values.map(v => typeof v.max === 'number' ? v.max : (v.max ? Number(v.max.valueOf()) : 0)).filter(n => !isNaN(n));
-            return {
-              type: "List",
-              values: values,
-              min: minVals.length > 0 ? Math.min(...minVals) : 0,
-              max: maxVals.length > 0 ? Math.max(...maxVals) : 0
-            };
-          }
+const splitTopLevel = (str) => {
+  const parts = [];
+  let curr = [];
+  let depthSquare = 0, depthCurly = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    if (char === '[') depthSquare++;
+    else if (char === ']') depthSquare--;
+    else if (char === '{') depthCurly++;
+    else if (char === '}') depthCurly--;
 
-          // 3. Duration Range Expansion (..) (Executes SECOND on isolated elements)
-          if (clean.includes("..")) {
-            const parts = clean.split("..");
-            const part0 = parts.at(0) || '';
-            const part1 = parts.at(1) || '';
-            const v1 = compileCartiMapAST(part0);
-            const v2 = compileCartiMapAST(part1);
-            if (!v1 || !v2) return null;
-            const min1 = typeof v1.min === 'number' ? v1.min : Number(v1.min?.valueOf() || 0);
-            const min2 = typeof v2.min === 'number' ? v2.min : Number(v2.min?.valueOf() || 0);
-            const max1 = typeof v1.max === 'number' ? v1.max : Number(v1.max?.valueOf() || 0);
-            const max2 = typeof v2.max === 'number' ? v2.max : Number(v2.max?.valueOf() || 0);
-            return {
-              type: "Set",
-              values: Array.of(v1, v2),
-              min: Math.min(min1, min2),
-              max: Math.max(max1, max2)
-            };
-          }
+    if ((char === ',' || char === '\n' || char === '\r') && depthSquare === 0 && depthCurly === 0) {
+      const s = curr.join('').trim();
+      if (s) parts.push(s);
+      curr = [];
+    } else {
+      curr.push(char);
+    }
+  }
+  if (curr.length > 0) {
+    const s = curr.join('').trim();
+    if (s) parts.push(s);
+  }
+  return parts;
+};
 
-          // 4. Base Digits & Qualified Time (Clock-X & Qualifier Extractor)
-          let mathStr = clean;
-          let isApprox = false;
-          let isUncertain = false;
 
-          // Normalize short timezone offset: +02 or -05 -> +02:00 or -05:00
-          mathStr = mathStr.replace(/([+-]\d{2})(?!\:\d{2})(?=\s*|$)/g, '$1:00');
 
-          if (mathStr.includes("T")) {
-            mathStr = mathStr.replace(new RegExp("(T" + String.fromCharCode(91) + "0-9X:~.?%" + String.fromCharCode(93) + "+(?:" + String.fromCharCode(91) + "+\\-Z" + String.fromCharCode(93) + String.fromCharCode(91) + "0-9:" + String.fromCharCode(93) + "*)?)", "gi"), (match) => {
-              if (match.includes("~")) isApprox = true;
-              if (match.includes("?")) isUncertain = true;
-              if (match.includes("%")) { isApprox = true; isUncertain = true; }
-              return match.replace(/X/gi, "0").replace(/[~?%]/g, "");
-            });
-          }
+const compileCartiMapAST = (str, baseStartMs = null) => {
+  if (!str) return null;
+  let rawStr = String(str).trim();
+  if (!rawStr) return null;
 
-          // 5. Qualified Durations (PT30~M)
-          if (mathStr.startsWith("P") || mathStr.startsWith("-P")) {
-            if (mathStr.includes("~")) { isApprox = true; mathStr = mathStr.replace(/~/g, ""); }
-            if (mathStr.includes("?")) { isUncertain = true; mathStr = mathStr.replace(/\?/g, ""); }
-          }
+  // Pre-normalize Greek Chi (Χ/χ) -> Latin X
+  rawStr = rawStr.replace(/[\u03A7\u03C7]/g, 'X');
 
-          // 6. Native AST Evaluation
-          let parsed = null;
-          try {
-            const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
-            parsed = edtfFn ? (typeof edtfFn === 'function' ? edtfFn(mathStr, { level: 3 }) : edtfFn.parse(mathStr, { level: 3 })) : null;
-          } catch (e) {
-            return null;
-          }
-
-          if (parsed && typeof parsed === "object") {
-            let minMs = 0;
-            let maxMs = 0;
-            try {
-              if (typeof parsed.min === 'number') minMs = parsed.min;
-              else if (parsed.min && typeof parsed.min.valueOf === 'function') minMs = Number(parsed.min.valueOf());
-
-              if (typeof parsed.max === 'number') maxMs = parsed.max;
-              else if (parsed.max && typeof parsed.max.valueOf === 'function') maxMs = Number(parsed.max.valueOf());
-            } catch(e) {}
-
-            return {
-              type: parsed.type || "Date",
-              values: parsed.values,
-              min: minMs,
-              max: maxMs,
-              approximate: isApprox || !!parsed.approximate,
-              uncertain: isUncertain || !!parsed.uncertain,
-              raw: str
-            };
-          }
-
-          return null;
+  // Handle multi-line / compound multi-expression strings
+  if (rawStr.includes('\n') || rawStr.includes('\r') || (rawStr.includes(',') && !rawStr.startsWith('[') && !rawStr.startsWith('{'))) {
+    const parts = splitTopLevel(rawStr);
+    if (parts.length > 1) {
+      const compiledParts = parts.map(p => compileCartiMapAST(p, baseStartMs)).filter(Boolean);
+      if (compiledParts.length > 0) {
+        const minVals = compiledParts.map(v => v.min).filter(n => typeof n === 'number' && !isNaN(n));
+        const maxVals = compiledParts.map(v => v.max).filter(n => typeof n === 'number' && !isNaN(n));
+        return {
+          type: 'Set',
+          values: compiledParts,
+          min: minVals.length > 0 ? Math.min(...minVals) : 0,
+          max: maxVals.length > 0 ? Math.max(...maxVals) : 0,
+          isEDTF: true,
+          sourceType: 'EDTF',
+          approximate: compiledParts.some(v => v.approximate),
+          raw: str
         };
+      }
+    }
+  }
 
-        MODULE_VERSIONS['ASTCompiler'] = 'v1.2.96-b303';
+  // Normalize hour-only clock components (T~22+02 -> T~22:00+02:00) and timezone offsets
+  if (/T[0-9X:~.?%]+/i.test(rawStr)) {
+    rawStr = rawStr.replace(/T([~?%]*\d{1,2})(?::(\d{2}))?(?::(\d{2}))?([+-]\d{1,2}(?::?\d{2})?|Z|$|\s)/gi, (match, h, m, s, tz) => {
+      let cleanH = h.replace(/[~?%]/g, '').padStart(2, '0');
+      let hDecor = h.replace(/\d+/g, cleanH);
+      let minStr = m !== undefined ? m : '00';
+      let secStr = s !== undefined ? ':' + s : '';
+      let tzStr = tz || '';
+      if (tz && tz !== 'Z' && tz.trim()) {
+        let tzMatch = tz.match(/([+-])(\d{1,2})(?::?(\d{2}))?/);
+        if (tzMatch) {
+          let sign = tzMatch[1];
+          let tzH = tzMatch[2].padStart(2, '0');
+          let tzM = tzMatch[3] !== undefined ? tzMatch[3] : '00';
+          tzStr = sign + tzH + ':' + tzM;
+        }
+      }
+      return 'T' + hDecor + ':' + minStr + secStr + tzStr;
+    });
+  }
+
+  // Intercept uncertainty flags in raw string
+  const hasApproxChar = rawStr.includes('~') || rawStr.includes('?');
+  const hasUncertainChar = rawStr.includes('?') || rawStr.includes('%');
+
+  // 0. Combined Start Date + Duration Interval ("1944-12-22T~19:XX+02 – PT30~M" or "1944-12-22T~19:XX+02/PT30~M")
+  const comboMatch = rawStr.match(/^(.+?)\s*(?:[\/–—]|\s-\s)\s*(PT?[\d~?%]+[YMWDHMS].*)$/i);
+  if (comboMatch) {
+    const startPart = comboMatch[1].trim();
+    const durPart = comboMatch[2].trim();
+    const startObj = compileCartiMapAST(startPart, baseStartMs);
+    const durObj = compileCartiMapAST(durPart, startObj ? startObj.min : baseStartMs);
+    if (startObj && durObj) {
+      let durationMs = 0;
+      if (typeof durObj.durMs === 'number' && !isNaN(durObj.durMs) && durObj.durMs > 0) {
+        durationMs = durObj.durMs;
+      } else if (Array.isArray(durObj.values) && durObj.values.length >= 3) {
+        const [y = 0, m = 0, d = 0, h = 0, mins = 0, s = 0] = durObj.values;
+        durationMs = ((y * 365.25 * 86400) + (m * 30.44 * 86400) + (d * 86400) + (h * 3600) + (mins * 60) + s) * 1000;
+      } else if (typeof durObj.max === 'number' && typeof durObj.min === 'number' && durObj.type === 'Duration' && (durObj.max - durObj.min) > 0) {
+        durationMs = durObj.max - durObj.min;
+      } else {
+        durationMs = 1800000;
+      }
+
+      const calculatedMax = startObj.min + durationMs;
+
+      return {
+        type: 'Interval',
+        min: startObj.min,
+        max: calculatedMax,
+        isEDTF: true,
+        sourceType: 'EDTF',
+        approximate: startObj.approximate || durObj.approximate || hasApproxChar,
+        uncertain: startObj.uncertain || durObj.uncertain || hasUncertainChar,
+        raw: str
+      };
+    }
+  }
+
+  let clean = rawStr
+    .replace(/[\r\n]+/g, ',')
+    .replace(/\s*\/\s*/g, '/')
+    .replace(/\s*,\s*/g, ',')
+    .replace(/,,+/g, ',');
+
+  // 1. Choice Sets [...] - Evaluated FIRST per [REF: ETL-09]
+  if (clean.startsWith('[') && clean.endsWith(']')) {
+    const inner = clean.slice(1, -1);
+    const parts = splitTopLevel(inner);
+    const values = parts.map(p => compileCartiMapAST(p.trim(), baseStartMs)).filter(Boolean);
+    if (values.length === 0) return null;
+    const minVals = values.map(v => v.min).filter(n => typeof n === 'number' && !isNaN(n));
+    const maxVals = values.map(v => v.max).filter(n => typeof n === 'number' && !isNaN(n));
+    return {
+      type: 'Set',
+      values: values,
+      min: minVals.length > 0 ? Math.min(...minVals) : 0,
+      max: maxVals.length > 0 ? Math.max(...maxVals) : 0,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      approximate: true,
+      raw: str
+    };
+  }
+
+  // 2. Inclusive Lists {} - Evaluated FIRST per [REF: ETL-09]
+  if (clean.startsWith('{') && clean.endsWith('}')) {
+    const inner = clean.slice(1, -1);
+    const parts = splitTopLevel(inner);
+    const values = parts.map(p => compileCartiMapAST(p.trim(), baseStartMs)).filter(Boolean);
+    if (values.length === 0) return null;
+    const minVals = values.map(v => v.min).filter(n => typeof n === 'number' && !isNaN(n));
+    const maxVals = values.map(v => v.max).filter(n => typeof n === 'number' && !isNaN(n));
+    return {
+      type: 'List',
+      values: values,
+      min: minVals.length > 0 ? Math.min(...minVals) : 0,
+      max: maxVals.length > 0 ? Math.max(...maxVals) : 0,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      approximate: true,
+      raw: str
+    };
+  }
+
+  // 3. Duration Range Expansion (..) - Evaluated SECOND per [REF: ETL-09]
+  if (clean.includes('..')) {
+    const parts = clean.split('..');
+    const v1 = compileCartiMapAST(parts[0] || '', baseStartMs);
+    const startAnchor = v1 ? v1.min : baseStartMs;
+    const v2 = compileCartiMapAST(parts[1] || '', startAnchor);
+    if (!v1 || !v2) return null;
+    const minVal = Math.min(v1.min, v2.min);
+    const maxVal = Math.max(v1.max, v2.max);
+    return {
+      type: 'Set',
+      values: [v1, v2],
+      min: minVal,
+      max: maxVal,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      approximate: true,
+      raw: str
+    };
+  }
+
+  // 4. ISO 8601-2 Durations (PT45~M, P25Y, P6M, P2W, P30D, PT2H)
+  if (/^P/i.test(clean) || /^-P/i.test(clean)) {
+    const isApprox = clean.includes('~') || clean.includes('?') || hasApproxChar;
+    const durClean = clean.replace(/[~?%]/g, '');
+
+    let durMs = 0;
+    const tSplit = durClean.split(/T/i);
+    const datePart = tSplit[0] || '';
+    const timePart = tSplit.length > 1 ? tSplit[1] : '';
+
+    // Date designators
+    const yMatch = datePart.match(/P.*?(\d+)Y/i);
+    const monthMatch = datePart.match(/P.*?(\d+)M/i);
+    const wMatch = datePart.match(/P.*?(\d+)W/i);
+    const dMatch = datePart.match(/P.*?(\d+)D/i);
+
+    if (yMatch) durMs += parseInt(yMatch[1], 10) * 365.25 * 86400 * 1000;
+    if (monthMatch) durMs += parseInt(monthMatch[1], 10) * 30.4375 * 86400 * 1000;
+    if (wMatch) durMs += parseInt(wMatch[1], 10) * 7 * 86400 * 1000;
+    if (dMatch) durMs += parseInt(dMatch[1], 10) * 86400 * 1000;
+
+    // Time designators
+    if (timePart) {
+      const hMatch = timePart.match(/(\d+)H/i);
+      const minMatch = timePart.match(/(\d+)M/i);
+      const sMatch = timePart.match(/(\d+)S/i);
+      if (hMatch) durMs += parseInt(hMatch[1], 10) * 3600 * 1000;
+      if (minMatch) durMs += parseInt(minMatch[1], 10) * 60 * 1000;
+      if (sMatch) durMs += parseInt(sMatch[1], 10) * 1000;
+    }
+
+    if (durMs === 0) durMs = 1800000; // 30 min default fallback
+
+    const startAnchorMs = (typeof baseStartMs === 'number' && !isNaN(baseStartMs)) ? baseStartMs : null;
+    const minVal = startAnchorMs !== null ? startAnchorMs : 0;
+    const maxVal = startAnchorMs !== null ? (startAnchorMs + durMs) : durMs;
+
+    return {
+      type: 'Duration',
+      min: minVal,
+      max: maxVal,
+      durMs: durMs,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      isRelativeDuration: startAnchorMs === null,
+      approximate: isApprox,
+      raw: str
+    };
+  }
+
+  // 5. EDTF Intervals (/)
+  if (clean.includes('/') && !clean.startsWith('http')) {
+    const parts = clean.split('/');
+    const v1 = compileCartiMapAST(parts[0] || '', baseStartMs);
+    const v2 = compileCartiMapAST(parts[1] || '', baseStartMs);
+    if (v1 && v2) {
+      return {
+        type: 'Interval',
+        min: v1.min,
+        max: v2.max,
+        isEDTF: true,
+        sourceType: 'EDTF',
+        approximate: v1.approximate || v2.approximate || hasApproxChar,
+        uncertain: v1.uncertain || v2.uncertain || hasUncertainChar,
+        raw: str
+      };
+    }
+  }
+
+  // 6. edtf.js Core Level 3 Primitive Evaluator
+  let mathStr = clean;
+  // Clock-X Proxy [REF: ETL-08]: Replace T..:XX with T..:00 for edtf.js parsing
+  if (mathStr.includes('T')) {
+    mathStr = mathStr.replace(/(T[0-9X:~.?%]+(?:[+\-Z][0-9:]*)?)/gi, (m) => {
+      return m.replace(/X/gi, '0');
+    });
+  }
+
+  const cleanForEdtf = mathStr.replace(/[~?%]/g, '');
+
+  try {
+    const edtfFn = window.edtf || (window.EDTF && window.EDTF.parse) || (typeof edtf !== 'undefined' ? edtf : null);
+    if (edtfFn) {
+      const res = (typeof edtfFn === 'function') ? edtfFn(cleanForEdtf, { level: 3 }) : edtfFn.parse(cleanForEdtf, { level: 3 });
+      if (res) {
+        const minMs = res.min ? new Date(res.min).getTime() : null;
+        const maxMs = res.max ? new Date(res.max).getTime() : null;
+        if (typeof minMs === 'number' && !isNaN(minMs)) {
+          return {
+            type: 'EDTF',
+            min: minMs,
+            max: (typeof maxMs === 'number' && !isNaN(maxMs)) ? maxMs : minMs,
+            isEDTF: true,
+            sourceType: 'EDTF',
+            approximate: clean.includes('~') || clean.includes('?') || hasApproxChar,
+            uncertain: clean.includes('?') || clean.includes('%') || hasUncertainChar,
+            raw: str,
+            edtfObj: res
+          };
+        }
+      }
+    }
+  } catch (e) {
+    // Fallback to Native ISO Date.parse
+  }
+
+  // 7. Native ISO Fallback Parser
+  const cleanIso = clean.replace(/[~?%]/g, '');
+  const parsedTs = Date.parse(cleanIso);
+  if (!isNaN(parsedTs)) {
+    return {
+      type: 'EDTF',
+      min: parsedTs,
+      max: parsedTs,
+      isEDTF: true,
+      sourceType: 'EDTF',
+      approximate: hasApproxChar,
+      uncertain: hasUncertainChar,
+      raw: str
+    };
+  }
+
+  return null;
+};
+
+MODULE_VERSIONS['ASTCompiler'] = 'v8.17.1-b585';
+
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: CarTiMap AST Compiler ] 🔼🔼🔼
 
