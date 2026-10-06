@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.3-b605';
+const APP_VERSION = 'v8.17.3-b606';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -919,7 +919,7 @@ const TimelineScrubber = ({ data, activeIndex, setActiveIndex, zoomLock, setZoom
     }
   const laneCount = Math.max(1, orderedTags.length);
   const totalTracks = laneCount + 1;
-  const topPadding = 14;
+  const topPadding = 6;
   const availableHeight = Math.max(40, containerHeight - 28 - topPadding);
   const laneHeight = Math.max(16, Math.min(36, availableHeight / totalTracks));
 
@@ -4329,7 +4329,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.3-b605';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.3-b606';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
