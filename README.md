@@ -1,6 +1,6 @@
 # CarTiMap — Spatial-Temporal Narrative History Engine
 
-[![Version](https://img.shields.io/badge/CarTiMap-v8.17.1--b591-28a745.svg)](https://github.com/ageor7/CarTiMap)
+[![Version](https://img.shields.io/badge/CarTiMap-v8.17.3--b606-28a745.svg)](https://github.com/ageor7/CarTiMap)
 [![Architecture](https://img.shields.io/badge/Architecture-Zero--Build%20%7C%20Single--File-007acc.svg)](https://github.com/ageor7/CarTiMap)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -100,3 +100,12 @@ cartimap.v8.html
 - **License:** MIT License — free for academic, personal, and commercial usage.
 - **Author:** Alexandros Georgiadis (`ageor7`)
 - **Built for:** HGBB Historical Research Project & Digital Humanities Spatial Analysis.
+
+
+---
+
+## 📈 Recent Updates (v8.17.3-b606)
+
+- **Timeline Top Swimlane Clearance:** Recalibrated top swimlane padding to `6px` (`topPadding = 6`) in `TimelineScrubber` to optimize label legibility on top-row card nodes.
+- **Multi-Delimiter EDTF Soft Breaks:** Expanded `formatSmartDate` zero-width space replacements to commas, closing brackets `]`, and closing braces `}` (`,​`, `]​`, `}​`) for 2D flex layout flexibility.
+- **Structured Metadata Ribbon:** Enhanced `ContentSlider` text pane header grid to support side-by-side parallel column wrapping for complex EDTF date strings and long location pills.

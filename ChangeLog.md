@@ -5,6 +5,63 @@ This project adheres to Semantic Versioning.
 **Repository:** ageor7/CarTiMap
 
 ---
+## [v8.17.3-b606] — 2026-10-06
+### AppOrchestrator v8.17.3-b606 | TimelineScrubber v27.2.179-b606 | ContentSlider v6.2.130-b606 | ASTCompiler v2.1.67-b606 | SymbologyLegend v1.2.78-b606
+
+- **Recalibrated Swimlane Padding [REF: UI-66]**: Reduced top swimlane padding clearance to `6px` (`topPadding = 6`) in `TimelineScrubber`, preventing 3-line node label clipping while preserving vertical track height.
+- **Multi-Delimiter Soft Date Breaks [REF: ETL-10]**: Extended `formatSmartDate` zero-width space replacements to include commas `,`, closing brackets `]`, and closing braces `}` (`,\u200B`, `]\u200B`, `}\u200B`), enabling optimal 2D side-by-side flex wrapping for complex EDTF date strings.
+- **Automated Syntax Gate Passed**: Passed 100% clean `node --check` tokenization check and mock DOM runtime execution test.
+
+---
+
+## [v8.17.3-b605] — 2026-10-06
+### AppOrchestrator v8.17.3-b605 | TimelineScrubber v27.2.178-b605 | ContentSlider v6.2.128-b602 | ASTCompiler v2.1.66-b605 | SymbologyLegend v1.2.77-b605
+
+- **2D Minimum-Lines Ribbon Flex [REF: UI-64]**: Configured `.metadata-date` flex base to `flex: 2 1 300px` and `.metadata-pills-wrapper` flex base to `flex: 1 2 140px` in `ContentSlider`.
+- **Top Swimlane Clearance [REF: UI-65]**: Re-introduced `14px` top padding clearance in `TimelineScrubber` (`topPadding = 14`), shifting top swimlane track bed down to prevent top boundary label clipping.
+
+---
+
+## [v8.17.3-b604] — 2026-10-06
+### AppOrchestrator v8.17.3-b604 | TimelineScrubber v27.2.177-b604 | ContentSlider v6.2.129-b604 | ASTCompiler v2.1.65-b604 | SymbologyLegend v1.2.76-b604
+
+- **Side-by-Side Flex Allocation [REF: UI-63]**: Configured `.metadata-date` flex to `flex: 1 1 200px` and `.metadata-pills-wrapper` flex to `flex: 1 1 160px` (`justify-content: flex-end`).
+- **Intra-Pill Right-Aligned Wrapping**: Guaranteed location and tag pills wrap internally on the right side as Date wraps on the left, achieving minimum total ribbon line height (2 lines).
+
+---
+
+## [v8.17.3-b603] — 2026-10-06
+### AppOrchestrator v8.17.3-b603 | TimelineScrubber v27.2.176-b603 | ContentSlider v6.2.128-b602 | ASTCompiler v2.1.64-b603 | SymbologyLegend v1.2.75-b603
+
+- **Cohesive 2-Level Ribbon Architecture [REF: UI-62]**: Set Date flex base to `flex: 1 1 auto` (`min-width: 0`) and Pills wrapper flex base to `flex: 0 1 auto` (`margin-left: auto; justify-content: flex-end`).
+- **Grouped Pills Dropdown**: Guaranteed location and tag pills drop as a cohesive right-aligned unit to Row 2 when complex EDTF dates require full Row 1 width.
+
+---
+
+## [v8.17.3-b601 & b602] — 2026-10-06
+### AppOrchestrator v8.17.3-b602 | ContentSlider v6.2.128-b602 | OverviewGantt v2.1.100-b602
+
+- **Structured 2-Column Metadata Ribbon [REF: UI-61]**: Assigned `flex: 1 1 220px` to `.metadata-date` and `.metadata-pills-wrapper`, preventing date text compression in narrow containers.
+- **Responsive Header Alignment**: Maintained right-alignment for location (`📍`) and tag (`🏷️`) pills in `ContentSlider`.
+
+---
+
+## [v8.17.3-b600 Major Milestone] — 2026-10-06
+### AppOrchestrator v8.17.3-b600 | ContentSlider v6.2.127-b600 | TimelineScrubber v27.2.175-b600
+
+- **Single-File Monolith Release v8.17.3**: Consolidated core runtime scripts into single-file ESM monolith architecture (`cartimap-v8.17.3-b600.html.js`).
+- **Text Pane Metadata Ribbon Refinement**: Re-architected `.metadata-ribbon` flexbox grid in `ContentSlider` for unified date, location, and tag display.
+
+---
+
+## [v8.17.2 Series — b592 to b599] — 2026-10-06
+### AppOrchestrator v8.17.2-b599 | OverviewGantt v2.1.99-b599 | ContentSlider v6.2.126-b599
+
+- **OverviewGantt Strategy A Header [REF: UI-58]**: Implemented balanced side-by-side flex header layout for Overview Gantt cards (`flex: 1 1 220px` title / date).
+- **EDTF Soft Break Integration [REF: ETL-09]**: Injected zero-width spaces (`\u200B`) after commas in `formatSmartDate` output strings to enable soft breaking on multi-date EDTF sets.
+- **Choice Set Leg Click Propagation [REF: TL-36]**: Fixed click and hover event propagation on choice set legs in `OverviewGantt` and `TimelineScrubber`.
+
+---
 
 ## [v8.17.1-b591] — 2026-10-06
 ### AppOrchestrator v8.17.1-b591 | TimelineScrubber v27.2.165-b591 | ASTCompiler v2.1.53-b591 | SymbologyLegend v1.2.64-b591

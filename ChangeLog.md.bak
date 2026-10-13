@@ -1,6 +1,125 @@
-# CarTiMapper Changelog
+# CarTiMap Changelog
 All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
+**Project:** CarTiMap (TimeMapper on Steroids)
+**Repository:** ageor7/CarTiMap
+
+---
+
+## [v8.17.1-b591] — 2026-10-06
+### AppOrchestrator v8.17.1-b591 | TimelineScrubber v27.2.165-b591 | ASTCompiler v2.1.53-b591 | SymbologyLegend v1.2.64-b591
+
+- **Solid Opaque Active Card Fill [REF: UI-46]**: Converted active event card background fill from semi-transparent `rgba(40, 167, 69, 0.35)` to 100% solid opaque `#b3e2c2`. Eliminates vector drop-line (`dropLine`) and choice-set leg (`subDropLines`) bleed-through behind card text during timeline scrubbing.
+- **Normal Typography Weight Calibration [REF: UI-47]**: Reverted active card title font weight from bold (`700`) to normal (`500` / `normal`) with `#111111` pure black text, achieving a **11.8:1 WCAG AAA contrast ratio** without letterform crowding.
+- **Automated Syntax Gate Passed**: Verified 100% clean Node.js syntax tokenization (`node --check`) and mock DOM runtime execution.
+
+---
+
+## [v8.17.1-b590] — 2026-10-06
+### AppOrchestrator v8.17.1-b590 | TimelineScrubber v27.2.164-b590 | SymbologyLegend v1.2.63-b590
+
+- **Sticky Category Column Header Purge [REF: TL-34]**: Removed `⏱️ Duration Lane` text header from the left sticky category column (`z-index: 45`), unencumbering the tag filter axis for user categories (*Military*, *Diplomatic*, *Topography*).
+- **Steeper Asymmetric Duration Trapezoid Slope [REF: TL-35]**: Updated trapezoid clip-path from `polygon(0% 0%, 100% 50%, 100% 100%, 0% 100%)` to `polygon(0% 0%, 100% 75%, 100% 100%, 0% 100%)`, leaving a distinct 25% height vertical end-cap marker.
+- **Color-Matched Active Hexagon [REF: UI-45]**: Matched active card fill to duration ribbon alpha (`rgba(40, 167, 69, 0.35)`) with bold black text (`#111111`).
+
+---
+
+## [v8.17.1-b589] — 2026-10-06
+### AppOrchestrator v8.17.1-b589 | TimelineScrubber v27.2.164-b589 | SymbologyLegend v1.2.62-b589
+
+- **Duration Lane Line Purge [REF: TL-33]**: Purged obsolete `bottom: 28px` white separator band `div`, eliminating the horizontal border line bisecting the Duration Lane track.
+- **Bottom-Up Zebra Contrast [REF: UI-43]**: Enforced bottom-up swimlane zebra striping (`(laneCount - 1 - i) % 2 === 0`), guaranteeing dark shading on the bottom swimlane directly adjacent to the Duration Lane.
+- **Dedicated Slate Track Bed**: Added a `#f8fafc` subtle slate fill track bed with `border-top: 1px solid rgba(0,0,0,0.08)` for the Duration Lane.
+- **Borderless Soft Mint Hexagon [REF: UI-44]**: Styled active `.event-block` with borderless soft mint background (`#e6f4ea`) and dark forest green text (`#137333`).
+
+---
+
+## [v8.17.1-b588] — 2026-10-06
+### AppOrchestrator v8.17.1-b588 | TimelineScrubber v27.2.163-b588 | SymbologyLegend v1.2.61-b588
+
+- **Equal Height Track Partitioning [REF: TL-32]**: Included Duration Lane in height calculation divisor (`totalTracks = laneCount + 1`), partitioning 100% of available timeline height above the X-Axis equally among all category swimlanes and the Duration Lane (`laneHeight = availableHeight / totalTracks`).
+- **100% Canvas Utilization**: Eliminated top and bottom dead space by distributing track heights evenly without compression or overlap.
+- **Clean 0px Baseline Alignment**: Normalized `topPos = laneIdx * laneHeight` starting at `top: 0px`.
+
+---
+
+## [v8.17.1-b587] — 2026-10-06
+### AppOrchestrator v8.17.1-b587 | TimelineScrubber v27.2.162-b587 | SymbologyLegend v1.2.60-b587
+
+- **Full-Stack Active Parity [REF: TL-30]**: Applied Emerald Active Green (`#28a745` / `rgba(40, 167, 69, 0.35)`) to active event cards, hexagons, and duration ribbons, establishing 100% active state visual parity across `MapViewer`, `ContentSlider` TOC, and `TimelineScrubber`.
+- **Swimlane Container Alignment [REF: TL-31]**: Normalized parent container wrappers for `.tag-lane` and `.tag-lane-label` from `top: 15px` to `top: 0px`, aligning swimlane backgrounds and sticky category labels.
+
+---
+
+## [v8.17.1-b585 & b586] — 2026-10-06
+### AppOrchestrator v8.17.1-b586 | TimelineScrubber v27.2.161-b586 | SymbologyLegend v1.2.58-b586
+
+- **Primary Chronological Event Ordering [REF: DATA-12]**: Enforced primary chronological sorting on `validData` (`startDate.min ASC`, duration `DESC`, title `ASC`).
+- **Sparser 24px Rotating Vector Pattern [REF: TL-28]**: Applied `1.2px` stroke width with a `24px` repeating pattern cycle (~95% transparent white space gap) and cardinal rotation angles (`135deg` /, `90deg` |, `45deg` \).
+- **Upward Swimlane Shift [REF: TL-29]**: Reduced top margin offset to `3px`, shifting swimlanes, card hexagons, and leg tops `12px` upwards to close top dead space.
+- **GIS Legend Parity**: Removed border from Spatial Polygon swatch in `SymbologyLegend`, matching `MapViewer`'s borderless Leaflet polygon rendering (`stroke: false`, `weight: 0`).
+
+---
+
+## [v8.17.1-b522 to b584] — 2026-10-01 – 2026-10-05
+### AppOrchestrator v8.17.1-b584 | TimelineScrubber v27.2.160-b584 | MapViewer v7.2.112-b581
+
+- **P-Type EDTF Duration Clamp [REF: CHRONO-09]**: Resolved EDTF P-type duration parsing where range durations erroneously expanded 25 years wide.
+- **WKT GeometryCollection Parser [REF: MAP-01f]**: Expanded WKT parser to support composite `GEOMETRYCOLLECTION` payloads and GeoJSON feature collections.
+- **Pole Vertical Drop-Line Anchoring [REF: TL-27]**: Anchored vertical pole lines connecting card hexagons to X-Axis date ticks across zoom levels, maintaining exact alignment during kinetic scrolling.
+- **Symbology Legend Matrix Integration [REF: LEGEND-05]**: Added `SymbologyLegend` HUD modal providing real-time color-coded explanations for map pins, spatial polygons, choice set legs, and duration ribbons.
+
+---
+
+## [v8.17.0 Series — b419 to b521] — 2026-09-15 – 2026-09-30
+### AppOrchestrator v3.9.150 | TimelineScrubber v26.12.0 | MapViewer v7.0.0
+
+- **Filter Cockpit Popover [REF: UI-35]**: Implemented floating Filter Cockpit menu supporting extract type filters ('Storyline', 'Context', 'Related history', 'Presentation') and dynamic tag swimlane toggles.
+- **Telemetry Monitor Vibe-Monitor Refinement [REF: DIAG-05]**: Re-engineered Vibe-Monitor into a multi-segment layout featuring an unscrollable top summary (App/Module versions, CSV row counts), dynamic active slide variable inspector, and running error/warning log stream.
+- **Micro-Scroll Ribbon Header [REF: UI-65]**: Implemented smooth micro-scroll transition in `ContentSlider`, compressing header padding and shrinking title size upon breaching a 40px scroll threshold.
+- **Persistent State Engine [REF: DATA-12]**: Serialized user filter states, polygon opacity, date locale (`en-GB`, `en-US`, `el-GR`), auto-zoom depth, and minimap zoom offset to `localStorage`.
+
+---
+
+## [v8.16.0 Series — b400 to b418] — 2026-09-01 – 2026-09-14
+### AppOrchestrator v3.8.0 | MapViewer v6.8.0 | TimelineScrubber v26.10.0
+
+- **WKT MultiPoint Linear Flattening [REF: MAP-05]**: MultiPoint geometries flattened linearly to maintain 1:1 parity with pipe-delimited sub-label arrays.
+- **Stacked Pin Cluster Engine [REF: MAP-02b]**: Injected custom `iconCreateFunction` rendering Stacked Pins with numeric depth badges for identical Cartesian coordinates (`[Lat, Lon]`), expanding on click via spiderfy animations.
+- **IIIF Spatial Proxy Integration [REF: MAP-87]**: Integrated `allmaps.xyz` IIIF manifest proxies for historical raster map georeferencing.
+- **WMS Academic Layer Routing [REF: MAP-80]**: Added support for enterprise GeoServer WMS layers, including Harvard Geospatial Library (`mapimages_public`) and Dipylon Attica Survey (Kaupert 1878/1882).
+
+---
+
+## [v8.15.0 Series — b305 to b399] — 2026-08-15 – 2026-08-31
+### AppOrchestrator v3.7.0 | ASTCompiler v1.2.0 | MediaViewer v3.0.0
+
+- **Native ECMAScript AST Compiler [REF: ETL-08]**: Implemented zero-build `compileCartiMapAST` decorator natively parsing ISO 8601-2 EDTF choice sets `[]`, inclusive lists `{}`, and range expansions `..` without Nearley/edtf.js runtime bloat.
+- **Obsidian Glass Media HUD [REF: UI-182]**: Applied `rgba(0,0,0,0.6)` obsidian glass styling with 1px border for carousel controls, guaranteeing >4.5:1 WCAG contrast over bright and dark media.
+- **YouTube Timestamp Interceptor [REF: MED-12]**: Extracted `?t=` parameters from YouTube URLs and dynamically appended `?start=[seconds]` to embed iframe URLs.
+- **Multi-Media Carousel Array Flattening [REF: MED-11]**: Implemented `omniSplitRegex` (`/\|\|\r?\n/`) to split multi-value cell arrays 1:1 across Media, Caption, and Credit columns.
+
+---
+
+## [v8.14.0 Series — b262 to b304] — 2026-08-01 – 2026-08-14
+### AppOrchestrator v3.6.0 | ContentSlider v5.5.0 | MapViewer v6.5.0
+
+- **Search Engine Title Number Matching [REF: SEARCH-02]**: Direct jump navigation for title numbers (e.g. `'74.'`) using absolute dataset ID `d.id`.
+- **Greek Diacritic & Polytonic Normalization [REF: SEARCH-03]**: Unicode NFD decomposition stripping accents and mapping `σ = ς` for Greek search queries.
+- **Haversine Bounding Box Auto-Zoom [REF: MAP-01]**: Calculates mathematical bounding box of active features, flying to tight Zoom 11 for urban clusters and Zoom 6 for regional points.
+- **Map Scale Bar Repositioning [REF: MAP-01b]**: Shifted Leaflet scale control to bottom-right (`margin-bottom: 10px !important; margin-right: 10px !important;`), clearing the bottom-left Minimap keep-out zone.
+
+---
+
+## [v8.13.69-b261 Baseline] — 2026-07-28
+### AppOrchestrator v3.5.10 | TimelineScrubber v26.11.10 | MapViewer v6.4.45
+
+- **Responsive Viewport Axis Rotation [REF: UI-51]**: At `<1024px` mobile viewports, stacked viewports vertically; at `>=1024px` desktop, rotated axis 90 degrees for side-by-side reading room layout.
+- **Protomaps Vector Tile Streaming [REF: MAP-85]**: Integrated keyless OSM vector tile streaming via `tile.ourmap.us` and MapLibre GL `style.json`.
+- **Search Focus & HTML Sanitization**: Auto-focused search input on modal open; stripped raw HTML tags from search result titles and descriptions.
+- **Filter Cockpit Active State**: Highlighted Filter button blue when active tags or extract types were filtered.
+- **Resizable Minimap Radar [REF: MAP-08]**: Implemented resizable Minimap container with `ResizeObserver` WebGL reflow hook.
+
 
 ## [v8.13.69-b261] — 2026-09-15 — AppOrchestrator v3.7.154-b261, MapViewer v6.4.122-b261, ContentSlider v5.8.36-b253, MediaViewer v2.13.7-b228, TimelineScrubber v26.12.44-b260, ASTCompiler v1.2.74-b228, VibeMonitor v2.2.16-b228 [STABLE MONOLITH RELEASE]
 ### Cartographic Optics & Vector Z-Stacking

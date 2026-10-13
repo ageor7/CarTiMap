@@ -1,5 +1,5 @@
 # CAR TIMAP ENGINE MASTER BLUEPRINT
-**Version:** v8.17.1 | **Date:** 2026-10-06
+**Version:** v8.17.3-b606 | **Date:** 2026-10-06
 **Architecture:** Zero-Build, Single-File ESM Monolithic Engine (<500KB)
 **Repository:** ageor7/CarTiMap
 
@@ -67,3 +67,12 @@
 1. **[REF: DIAG-01] Floating Diagnostic HUD:** Draggable, resizable, fixed-position telemetry window (`#vibe-monitor`).
 2. **[REF: DIAG-05] Multi-Segment Telemetry Layout:** Top unscrollable segment displays App/Module versions and dataset row counts; middle segment inspects active slide variables; bottom segment provides running error/warning log stream.
 3. **[REF: DATA-12] Local Storage Persistence:** User settings, active tag filters, extract type switches, polygon opacities, date locale, and telemetry fields persist across sessions in `localStorage`.
+
+---
+
+## 7. RECENT SPECIFICATION UPDATES (b591 to b606)
+
+1. **[REF: UI-66] 6px Top Swimlane Clearance:** `TimelineScrubber` enforces `topPadding = 6` above track beds, preventing 3-line node label clipping while preserving vertical track height.
+2. **[REF: ETL-10] Multi-Delimiter Soft-Break Dates:** `formatSmartDate` replaces `,`, `]`, and `}` with zero-width space appended strings (`,\u200B`, `]\u200B`, `}\u200B`), securing fluid multi-line flex wrapping.
+3. **[REF: UI-63] Side-by-Side Flex Ribbon Allocation:** `.metadata-date` flex is `flex: 1 1 200px` and `.metadata-pills-wrapper` flex is `flex: 1 1 160px` (`max-width: 70%`), keeping location and tag pills right-aligned.
+4. **[REF: UI-62] Cohesive Right-Aligned Pills Dropdown:** `.metadata-pills-wrapper` encapsulates location (`📍`) and tag (`🏷️`) pills in a single cohesive parent wrapper (`flex: 0 1 auto; margin-left: auto; justify-content: flex-end;`).
