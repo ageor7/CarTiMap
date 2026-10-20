@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.17.3-b610';
+const APP_VERSION = 'v8.18.0-b612';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -2170,10 +2170,12 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
             }
           }, [data, isMapReady]);
 
-          // --- [ DECOUPLED SPATIAL LAYER LIFECYCLE: STATE-BASED LAYER SWAPPING & O(1) ACTIVE STYLING ] ---
+          // --- [ DECOUPLED SPATIAL LAYER LIFECYCLE: STATE-BASED LAYER SWAPPING & O(1) ACTIVE STYLING & TEMPORAL GHOSTING ] ---
           useEffect(() => {
             const map = mapInstance.current;
             if (!map || !markerLayer.current || !clusterLayer.current || markersRef.current.length === 0) return;
+
+            const [visMinMs, visMaxMs] = (visibleTimeBounds && visibleTimeBounds.length === 2) ? visibleTimeBounds : [0, Infinity];
 
             const coLocationMap = {};
             (data || []).forEach(item => {
@@ -2196,12 +2198,24 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               const item = data[idx] || {};
               const isVip = item.priority && item.priority.toLowerCase() === 'vip';
 
+              // Temporal Ghosting [REF: TL-19 / MAP-06]: Check if event falls within visibleTimeBounds
+              const itemStartMs = item.startDate ? item.startDate.min : null;
+              const itemEndMs = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max)) ? item.startDate.max : itemStartMs);
+              const isTemporallyVisible = (visMinMs === 0 && visMaxMs === Infinity) || (
+                itemStartMs === null || isNaN(itemStartMs) ||
+                (itemStartMs <= visMaxMs && itemEndMs >= visMinMs)
+              );
+
               layers.forEach(layer => {
                 if (layer instanceof L.Polygon) {
+                  let fillOp = polygonOpacity;
+                  if (isActive) fillOp = Math.min(polygonOpacity + 0.25, 0.65);
+                  if (!isTemporallyVisible && !isActive) fillOp = Math.min(polygonOpacity * 0.2, 0.12);
+
                   layer.setStyle({
                     stroke: false, weight: 0,
                     fillColor: isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc'),
-                    fillOpacity: isActive ? Math.min(polygonOpacity + 0.25, 0.65) : polygonOpacity
+                    fillOpacity: fillOp
                   });
                   if (polygonLayer.current && !polygonLayer.current.hasLayer(layer)) {
                     polygonLayer.current.addLayer(layer);
@@ -2209,11 +2223,14 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   if (layer.bringToBack) layer.bringToBack();
                 } else if (layer instanceof L.Polyline) {
                   const strokeCol = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
+                  let lineOp = isActive ? 1.0 : 0.65;
+                  if (!isTemporallyVisible && !isActive) lineOp = 0.2; // 20% opacity [REF: TL-19]
+
                   layer.setStyle({
                     color: strokeCol,
                     weight: isActive ? 4 : 2,
                     dashArray: isActive ? 'none' : '8, 8',
-                    opacity: isActive ? 1.0 : 0.65
+                    opacity: lineOp
                   });
                   if (polylineLayer.current && !polylineLayer.current.hasLayer(layer)) {
                     polylineLayer.current.addLayer(layer);
@@ -2231,9 +2248,10 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   layer.options.isVip = isVip;
                   layer.setIcon(L.divIcon({ className: 'custom-div-icon', html: createPinHtml(isActive, isVip, coCount), iconSize: new L.Point(24, 34), iconAnchor: new L.Point(12, 34) }));
                   
+                  const markerOp = (!isTemporallyVisible && !isActive) ? 0.2 : 1.0; // 20% opacity [REF: TL-19]
+                  if (layer.setOpacity) layer.setOpacity(markerOp);
+
                   // STATE-BASED LAYER SWAPPING [REF: MAP-02]:
-                  // Active non-VIP markers are temporarily promoted to unclustered markerLayer so all multi-point nodes render unswallowed.
-                  // Inactive non-VIP markers return to clusterLayer for spatial decluttering.
                   if (!isVip) {
                     if (isActive) {
                       if (clusterLayer.current && clusterLayer.current.hasLayer(layer)) clusterLayer.current.removeLayer(layer);
@@ -2255,6 +2273,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                     layer.setZIndexOffset(isVip ? 5000 : 0);
                     if (layer._icon) {
                       layer._icon.style.zIndex = isVip ? '5000' : '0';
+                      layer._icon.style.opacity = String(markerOp);
                     }
                   }
                 }
@@ -2276,6 +2295,13 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                   const isVip = item.priority && item.priority.toLowerCase() === 'vip';
                   const fillColor = isActive ? '#28a745' : (isVip ? '#ffb300' : '#007acc');
 
+                  const itemStartMs = item.startDate ? item.startDate.min : null;
+                  const itemEndMs = (item.endDate && !isNaN(item.endDate.max)) ? item.endDate.max : ((item.startDate && !isNaN(item.startDate.max)) ? item.startDate.max : itemStartMs);
+                  const isTemporallyVisible = (visMinMs === 0 && visMaxMs === Infinity) || (
+                    itemStartMs === null || isNaN(itemStartMs) ||
+                    (itemStartMs <= visMaxMs && itemEndMs >= visMinMs)
+                  );
+
                   layers.forEach(layer => {
                     if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
                       try {
@@ -2289,9 +2315,8 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                               const p1 = containerPts[i];
                               const p2 = containerPts[i + 1];
                               const segLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-                              if (segLen < 15) continue; // Skip tiny segments
+                              if (segLen < 15) continue;
 
-                              // Place exactly ONE midpoint arrow per line segment (ratio = 0.5)
                               const cx = p1.x + 0.5 * (p2.x - p1.x);
                               const cy = p1.y + 0.5 * (p2.y - p1.y);
                               const latLng = map.containerPointToLatLng(L.point(cx, cy));
@@ -2304,6 +2329,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
                                   iconSize: [12, 12],
                                   iconAnchor: [6, 6]
                                 }),
+                                opacity: (!isTemporallyVisible && !isActive) ? 0.2 : 1.0,
                                 interactive: false
                               });
                               chevronLayerRef.current.addLayer(arrowMarker);
@@ -2325,7 +2351,7 @@ const MapViewer = ({ data, activeIndex, setActiveIndex, addLog, basemapsRegistry
               if (rafId) cancelAnimationFrame(rafId);
               map.off('zoomend moveend', renderChevrons);
             };
-          }, [activeIndex, polygonOpacity, data]);
+          }, [activeIndex, polygonOpacity, data, visibleTimeBounds]);
 
           useEffect(() => {
             const map = mapInstance.current;
@@ -2546,6 +2572,8 @@ const App = () => {
           const [isMonitorOpen, setIsMonitorOpen] = useState(false);
           const [isAboutOpen, setIsAboutOpen] = useState(false);
           const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+          const [isWizardOpen, setIsWizardOpen] = useState(() => !new URLSearchParams(window.location.search).has('source'));
+          const [customInputSource, setCustomInputSource] = useState('');
           const [isMenuOpen, setIsMenuOpen] = useState(false);
           const [isFilterOpen, setIsFilterOpen] = useState(false);
           const [filterFlashMsg, setFilterFlashMsg] = useState(null);
@@ -3309,7 +3337,7 @@ const App = () => {
               if (e.key === 'Escape' || e.keyCode === 27) {
                 if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
                 setDurationInspectionPayload(null);
-                setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
+                setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsWizardOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
               }
             };
             window.addEventListener('keydown', handleKeyDown, true);
@@ -3477,6 +3505,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const settingsBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsWizardOpen(!isWizardOpen)} title="Dataset Wizard & Ingestion" style="display: flex; align-items: center; gap: 4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>${showButtonText ? ' Wizard' : ''}
+            </button>
             <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(!isSettingsOpen)} title="Engine Configurations" style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
               ${showButtonText ? html`<span>Settings</span>` : ''}
@@ -3529,6 +3560,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <div style="font-size: 0.72rem; color: #007acc; padding: 4px 8px; border-bottom: 1px solid #eee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">⚡ CarTiMap Command Hub</div>
                   <button onClick=${() => { setIsTocOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> Table of Contents
+                  </button>
+                  <button onClick=${() => { setIsWizardOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Dataset Wizard
                   </button>
                   <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Engine Settings
@@ -3775,7 +3809,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                           if (e.key === 'Escape') {
                 if (durationInspectionPayload) { setDurationInspectionPayload(null); return; }
                             if (e.target) e.target.blur();
-                            setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
+                            setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsWizardOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false);
                           } else {
                             e.stopPropagation();
                           }
@@ -3905,7 +3939,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
                   <input type="text" class="search-input" placeholder="Search events, places, dates..." value=${searchQuery} onInput=${e => setSearchQuery(e.target.value)} onKeyDown=${(e) => { if (e.key === 'Escape') {
-                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; } e.target.blur(); setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false); } }} style="flex-shrink: 0; width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
+                if (durationInspectionPayload) { setDurationInspectionPayload(null); return; } e.target.blur(); setIsSearchOpen(false); setIsAboutOpen(false); setIsSettingsOpen(false); setIsWizardOpen(false); setIsFilterOpen(false); setIsTocOpen(false); setIsMonitorOpen(false); setIsMenuOpen(false); } }} style="flex-shrink: 0; width: calc(100% - 48px); margin-top: 6px; padding: 12px 15px; font-size: 1.1rem; border: 2px solid #007acc; border-radius: 6px; margin-bottom: 20px; outline: none; box-sizing: border-box;" />
                   <div style="overflow-y: auto; flex-grow: 1; padding-right: 10px; box-sizing: border-box; text-align: left;">
                     ${searchHistoryLayout}
                     ${searchQuery && searchResults.length === 0 ? html`<div style="padding: 20px; text-align: center; color: #888;">No events found for "${searchQuery}"</div>` : ''}
@@ -3923,7 +3957,76 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               ${loadingScreen}
               ${appLayout}
 
-              ${isSettingsOpen && html`
+              ${isWizardOpen && html`
+            <div class="tm-backdrop open" onClick=${() => setIsWizardOpen(false)} style="z-index: 99999 !important;"></div>
+            <div id="dataset-wizard-modal" class="tm-modal open" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000 !important; width: 90%; max-width: 580px; max-height: 88vh; overflow-y: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); padding: 24px; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; border: 1px solid #e2e8f0;" onClick=${(e) => e.stopPropagation()}>
+              <button class="modal-close" onClick=${() => setIsWizardOpen(false)} title="Close (Esc)" style="position: absolute; top: 16px; right: 16px; border: none; background: #f1f5f9; border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">✕</button>
+              
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                <div style="background: #e0f2fe; color: #0284c7; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                <div>
+                  <h3 style="margin: 0; font-size: 1.25rem; color: #0f172a; font-weight: 700;">CarTiMap Dataset Wizard</h3>
+                  <p style="margin: 2px 0 0 0; font-size: 0.82rem; color: #64748b;">Select a featured dataset, load custom Google Sheets / CSV data, or clone a template.</p>
+                </div>
+              </div>
+
+              <!-- Section 1: Featured Datasets -->
+              <div style="margin-bottom: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                <h4 style="margin: 0 0 8px 0; font-size: 0.88rem; color: #334155; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🌟 Featured Master Dataset</h4>
+                <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+                  <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">HGBB Dekemvriana 1944 Spatial-Temporal Forensics</div>
+                  <div style="font-size: 0.8rem; color: #475569; line-height: 1.4;">
+                    The 1944 Hotel Grande Bretagne subterranean demolition plot & Winston Churchill peace mission during the Battle of Athens.
+                  </div>
+                  <div style="display: flex; gap: 8px; margin-top: 4px;">
+                    <button onClick=${() => {
+                      const newUrl = `${window.location.pathname}?source=1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE&gid=0`;
+                      window.history.pushState({}, '', newUrl);
+                      window.location.reload();
+                    }} style="background: #0284c7; color: #ffffff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Load HGBB Dataset</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 2: Open Custom Dataset by ID or URL -->
+              <div style="margin-bottom: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                <h4 style="margin: 0 0 8px 0; font-size: 0.88rem; color: #334155; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔗 Open Custom Dataset</h4>
+                <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: #64748b;">Paste a Google Sheet ID, full Google Sheet URL, or direct published CSV endpoint URL:</p>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <input type="text" placeholder="e.g. 1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE or full URL" value=${customInputSource} onInput=${(e) => setCustomInputSource(e.target.value)} style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; font-family: monospace; box-sizing: border-box;" />
+                  <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                    <button onClick=${() => {
+                      if (!customInputSource.trim()) return;
+                      let rawStr = customInputSource.trim();
+                      let sheetId = rawStr;
+                      const match = rawStr.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                      if (match) sheetId = match[1];
+                      const newUrl = `${window.location.pathname}?source=${encodeURIComponent(sheetId)}`;
+                      window.history.pushState({}, '', newUrl);
+                      window.location.reload();
+                    }} style="background: #16a34a; color: #ffffff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">Load Custom Dataset</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 3: Create New Dataset from Template -->
+              <div style="margin-bottom: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <div>
+                  <h4 style="margin: 0; font-size: 0.88rem; color: #334155; font-weight: 700;">📄 Create New Dataset</h4>
+                  <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: #64748b;">Make a copy of the official Google Sheets CarTiMap template.</p>
+                </div>
+                <a href="https://docs.google.com/spreadsheets/d/1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE/copy" target="_blank" rel="noopener noreferrer" style="background: #475569; color: #ffffff; text-decoration: none; padding: 7px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; display: inline-block;">Clone Template ↗</a>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 12px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                <button onClick=${() => setIsWizardOpen(false)} style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 6px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">Explore Workspace</button>
+              </div>
+            </div>
+          `}
+
+          ${isSettingsOpen && html`
             <div class="tm-backdrop open" onClick=${() => setIsSettingsOpen(false)} style="z-index: 99999 !important;"></div>
             <div id="settings-modal" class="tm-modal open" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000 !important; width: 85%; max-width: 480px; max-height: 85vh; overflow-y: auto; background: #fff; border-radius: 12px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #ccc; font-family: monospace; box-sizing: border-box;" onClick=${(e) => e.stopPropagation()}>
               <button class="modal-close" onClick=${() => setIsSettingsOpen(false)} title="Close (Esc)" style="position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #888;">✕</button>
@@ -4329,7 +4432,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.17.3-b610';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.18.0-b612';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
