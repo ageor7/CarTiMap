@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b612';
+const APP_VERSION = 'v8.18.0-b613';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -4001,9 +4001,23 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       if (!customInputSource.trim()) return;
                       let rawStr = customInputSource.trim();
                       let sheetId = rawStr;
-                      const match = rawStr.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                      if (match) sheetId = match[1];
-                      const newUrl = `${window.location.pathname}?source=${encodeURIComponent(sheetId)}`;
+                      let extractedGid = null;
+
+                      // Extract gid parameter if present in pasted URL
+                      const gidMatch = rawStr.match(/[?&#]gid=([0-9]+)/);
+                      if (gidMatch) extractedGid = gidMatch[1];
+
+                      // Handle Google Sheets published vs standard URLs vs raw IDs
+                      const pubMatch = rawStr.match(/\/d\/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || rawStr.match(/(2PACX-[a-zA-Z0-9-_]+)/i);
+                      if (pubMatch) {
+                        sheetId = pubMatch[1].startsWith('e/') ? pubMatch[1] : `e/${pubMatch[1]}`;
+                      } else {
+                        const stdMatch = rawStr.match(/\/d\/([a-zA-Z0-9-_]{20,})/i);
+                        if (stdMatch) sheetId = stdMatch[1];
+                      }
+
+                      let newUrl = `${window.location.pathname}?source=${encodeURIComponent(sheetId)}`;
+                      if (extractedGid) newUrl += `&gid=${encodeURIComponent(extractedGid)}`;
                       window.history.pushState({}, '', newUrl);
                       window.location.reload();
                     }} style="background: #16a34a; color: #ffffff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">Load Custom Dataset</button>
@@ -4432,7 +4446,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.18.0-b612';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.18.0-b613';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
