@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b616';
+const APP_VERSION = 'v8.18.0-b617';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -2723,12 +2723,12 @@ const App = () => {
 
           const [minimapOffset, setMinimapOffset] = useState(-4);
           const [basemapsRegistry, setBasemapsRegistry] = useState([
-            { id: 'carto-light', label: 'CartoDB Positron (Light)', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: true, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
+            { id: 'carto-light', label: 'CartoDB Positron (Light)', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: false, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
             { id: 'carto-dark', label: 'CartoDB Dark Matter', type: 'base', url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 20, active: false, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
             { id: 'osm', label: 'OpenStreetMap Standard', type: 'base', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: false, attrText: 'OpenStreetMap contributors', attrLink: 'https://openstreetmap.org' },
             { id: 'esri-sat', label: 'Esri World Imagery', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', format: 'png', maxZoom: 19, active: false, attrText: 'Esri', attrLink: 'https://www.esri.com' },
             { id: 'opentopo', label: 'OpenTopoMap', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 17, active: false, attrText: 'OpenTopoMap', attrLink: 'https://opentopomap.org' },
-            { id: 'protomaps-light', label: 'Protomaps Vector Light', type: 'base', url: 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt', format: 'vector', maxZoom: 18, active: false, attrText: 'Protomaps / OSM', attrLink: 'https://protomaps.com' },
+            { id: 'protomaps-light', label: 'Protomaps Vector Light', type: 'base', url: 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt', format: 'vector', maxZoom: 18, active: true, attrText: 'Protomaps / OSM', attrLink: 'https://protomaps.com' },
             { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '' }
           ]);
           const [zoomLock, setZoomLock] = useState(() => {
@@ -2915,6 +2915,19 @@ const App = () => {
                 downloadUrl: fetchUrlPrimary
               };
               setAboutData(aboutDataObj);
+              const registerDatasetInHistory = (title, src, sheetGid) => {
+                try {
+                  const rawHist = localStorage.getItem('tm_dataset_library');
+                  let histList = rawHist ? JSON.parse(rawHist) : [];
+                  if (!Array.isArray(histList)) histList = [];
+                  const existIdx = histList.findIndex(item => item.src === src && String(item.gid) === String(sheetGid || 0));
+                  const newEntry = { title: title || 'Custom Dataset', src, gid: sheetGid || '0', time: new Date().toISOString() };
+                  if (existIdx >= 0) histList.splice(existIdx, 1);
+                  histList.unshift(newEntry);
+                  localStorage.setItem('tm_dataset_library', JSON.stringify(histList.slice(0, 10)));
+                } catch(e) {}
+              };
+              registerDatasetInHistory(aboutDataObj.title, source, gid);
 
               let activeMode = dateEngineMode;
               if (activeMode === 'auto') {
