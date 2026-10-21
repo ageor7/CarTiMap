@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b614';
+const APP_VERSION = 'v8.18.0-b613';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -2854,16 +2854,28 @@ const App = () => {
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             setConnectionSummary({ source, gid });
 
-            const isPublished = source.startsWith('e/') || source.includes('2PACX-');
-            const fetchUrlPrimary = isPublished 
-              ? `https://docs.google.com/spreadsheets/d/${source}/pub?output=csv&gid=${gid}`
-              : `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${gid}`;
-            
-            const fetchUrlBasemaps = bgid 
-              ? (isPublished 
-                  ? `https://docs.google.com/spreadsheets/d/${source}/pub?output=csv&gid=${bgid}`
-                  : `https://docs.google.com/spreadsheets/d/${source}/gviz/tq?tqx=out:csv&gid=${bgid}`) 
-              : null;
+            const buildCsvFetchUrl = (src, sheetGid) => {
+              if (!src) return '';
+              const s = String(src).trim();
+              if (s.startsWith('http://') || s.startsWith('https://')) {
+                if (!s.includes('docs.google.com/spreadsheets')) return s;
+              }
+              if (s.includes('2PACX-') || s.includes('/pub') || s.includes('pubhtml')) {
+                let cleanToken = s;
+                const pubMatch = s.match(/\/d\/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || s.match(/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || s.match(/(2PACX-[a-zA-Z0-9-_]+)/i);
+                if (pubMatch) cleanToken = pubMatch[1] || pubMatch[0];
+                if (!cleanToken.startsWith('e/')) cleanToken = 'e/' + cleanToken;
+                const gidParam = (sheetGid !== undefined && sheetGid !== null && sheetGid !== '') ? `&gid=${sheetGid}` : '';
+                return `https://docs.google.com/spreadsheets/d/${cleanToken}/pub?output=csv${gidParam}`;
+              }
+              let cleanId = s;
+              const stdMatch = s.match(/\/d\/([a-zA-Z0-9-_]{20,})/i);
+              if (stdMatch) cleanId = stdMatch[1];
+              return `https://docs.google.com/spreadsheets/d/${cleanId}/gviz/tq?tqx=out:csv&gid=${sheetGid || 0}`;
+            };
+
+            const fetchUrlPrimary = buildCsvFetchUrl(source, gid);
+            const fetchUrlBasemaps = bgid ? buildCsvFetchUrl(source, bgid) : null;
 
             Promise.all([
               fetch(fetchUrlPrimary).then(res => {
@@ -2875,9 +2887,6 @@ const App = () => {
                 return res.text();
               }) : Promise.resolve(null)
             ]).then(([primaryCsv, basemapsCsv]) => {
-              if (primaryCsv && primaryCsv.trim().startsWith('<')) {
-                throw new Error(`Received HTML markup instead of CSV data. Please ensure the Google Sheet is published to the web (File -> Share -> Publish to Web) and that GID (${gid}) is valid.`);
-              }
               setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
 
               const results = Papa.parse(primaryCsv, { header: true, skipEmptyLines: true });
@@ -3515,9 +3524,10 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
             </button>
           `;
 
-          const settingsBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsWizardOpen(!isWizardOpen)} title="Open or Create Dataset (Dataset Wizard)" style="display: flex; align-items: center; gap: 4px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>${showButtonText ? ' Open/Create' : ''}
+          const openCreateBtn = html`
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsWizardOpen(!isWizardOpen)} title="Open or Create Dataset Wizard" style="display: flex; align-items: center; gap: 4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              ${showButtonText ? html`<span>Open/Create</span>` : ''}
             </button>
             <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => setIsSettingsOpen(!isSettingsOpen)} title="Engine Configurations" style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -3541,27 +3551,29 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 
           const firstBtn = html`
             <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(0); }} disabled=${activeIndex === 0} title="First Entry (<<)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"></polyline><polyline points="18 17 13 12 18 7"></polyline></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 18 5 12 11 6"></polyline><polyline points="18 18 12 12 18 6"></polyline></svg>
+              ${showButtonText ? html`<span>First</span>` : ''}
             </button>
           `;
 
           const prevBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Node (<)">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(activeIndex - 1); }} disabled=${activeIndex === 0} title="Previous Entry (<)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
               ${prevBtnText}
             </button>
           `;
 
           const nextBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next Node (>)">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(activeIndex + 1); }} disabled=${activeIndex === data.length - 1} title="Next Entry (>)">
               ${nextBtnText}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
           `;
 
           const lastBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(data.length - 1); }} disabled=${activeIndex === data.length - 1 || data.length === 0} title="Last Entry (>>)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(data.length - 1); }} disabled=${activeIndex === data.length - 1} title="Last Entry (>>)">
+              ${showButtonText ? html`<span>Last</span>` : ''}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 18 19 12 13 6"></polyline><polyline points="6 18 12 12 6 6"></polyline></svg>
             </button>
           `;
 
@@ -3585,7 +3597,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> Table of Contents
                   </button>
                   <button onClick=${() => { setIsWizardOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Open/Create Dataset...
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> 📂 Open / Create Dataset
                   </button>
                   <button onClick=${() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} style="background: none; border: none; padding: 8px 10px; text-align: left; font-size: 0.85rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; color: #222;" onMouseEnter=${(e) => e.target.style.background = '#f0f7ff'} onMouseLeave=${(e) => e.target.style.background = 'none'}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Engine Settings
@@ -3805,7 +3817,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <div class="status-left" style="display: flex; align-items: center; gap: 6px; position: relative; max-width: calc(50vw - 100px); overflow: visible;">
                     ${logoCommandHub}
                     ${!hideToc ? tocBtn : ''}
-                    ${!hideSettings ? settingsBtn : ''}
+                    ${!hideSettings ? openCreateBtn : ''}
                     ${!hideReset ? resetLayoutBtn : ''}
                     ${!hideTelemetry ? telemetryBtn : ''}
                     ${!hideSpecs ? aboutBtn : ''}
@@ -3855,7 +3867,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     const spanStr = spanStrPart.replace('Span: ', '');
                     const zoomStr = zoomStrPart.replace('Zoom: ', '').replace(')', '');
                     return html`
-                      <div class="telemetry-span-zoom" style="position: absolute; left: calc(50% + 95px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
+                      <div class="telemetry-span-zoom" style="position: absolute; left: calc(50% + 145px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
                         <div style="display: flex; align-items: center; gap: 4px;">
                           ${showTelemetryLabels ? html`<span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>` : ''}
                           <span style="font-family: monospace; color: #333;">${spanStr}</span>
@@ -4028,22 +4040,31 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       let sheetId = rawStr;
                       let extractedGid = null;
 
-                      // Extract gid parameter if present in pasted URL
+                      // 1. Extract gid if present
                       const gidMatch = rawStr.match(/[?&#]gid=([0-9]+)/);
                       if (gidMatch) extractedGid = gidMatch[1];
 
-                      // Handle Google Sheets published vs standard URLs vs raw IDs
+                      // 2. Convert published /pubhtml URLs to /pub
+                      if (rawStr.includes('/pubhtml')) {
+                        rawStr = rawStr.replace('/pubhtml', '/pub');
+                      }
+
+                      // 3. Extract 2PACX published token vs standard sheet ID
                       const pubMatch = rawStr.match(/\/d\/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || rawStr.match(/(2PACX-[a-zA-Z0-9-_]+)/i);
                       if (pubMatch) {
-                        sheetId = pubMatch[1].startsWith('e/') ? pubMatch[1] : `e/${pubMatch[1]}`;
+                        const token = pubMatch[1] || pubMatch[0];
+                        sheetId = token.startsWith('e/') ? token : `e/${token}`;
                       } else {
                         const stdMatch = rawStr.match(/\/d\/([a-zA-Z0-9-_]{20,})/i);
                         if (stdMatch) sheetId = stdMatch[1];
                       }
 
                       let newUrl = `${window.location.pathname}?source=${encodeURIComponent(sheetId)}`;
-                      if (extractedGid) newUrl += `&gid=${encodeURIComponent(extractedGid)}`;
+                      if (extractedGid) newUrl += `&gid=${extractedGid}`;
+                      
                       window.history.pushState({}, '', newUrl);
+                      setIsWizardOpen(false);
+                      if (typeof setConnectionSummary === 'function') setConnectionSummary({ source: sheetId, gid: extractedGid || '0' });
                       window.location.reload();
                     }} style="background: #16a34a; color: #ffffff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">Load Custom Dataset</button>
                   </div>
@@ -4471,7 +4492,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
 `;
         };
 
-MODULE_VERSIONS['AppOrchestrator'] = 'v8.18.0-b614';
+MODULE_VERSIONS['AppOrchestrator'] = 'v8.18.0-b613';
 // === [ END MAJOR BLOCK ] ===
 // 🔼🔼🔼 [ END_INJECT: AppOrchestrator ] 🔼🔼🔼
 
