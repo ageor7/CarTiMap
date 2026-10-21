@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b618';
+const APP_VERSION = 'v8.18.0-b619';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -2729,6 +2729,11 @@ const App = () => {
             { id: 'esri-sat', label: 'Esri World Imagery', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', format: 'png', maxZoom: 19, active: false, attrText: 'Esri', attrLink: 'https://www.esri.com' },
             { id: 'opentopo', label: 'OpenTopoMap', type: 'base', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', format: 'png', maxZoom: 17, active: false, attrText: 'OpenTopoMap', attrLink: 'https://opentopomap.org' },
             { id: 'protomaps-light', label: 'Protomaps Vector Light (OSM)', type: 'base', url: 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt', format: 'vector', maxZoom: 18, active: true, attrText: 'Protomaps / OSM', attrLink: 'https://protomaps.com' },
+            { id: 'protomaps-ourmap', label: 'Our Map (OSM Vector)', type: 'base', url: 'https://tile.ourmap.us/default/{z}/{x}/{y}.mvt', format: 'vector', maxZoom: 15, active: false, attrText: 'OSM / OpenMapTiles', attrLink: 'https://tile.ourmap.us' },
+            { id: 'carto-light-b', label: 'CartoDB Light B (Voyager)', type: 'base', url: 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', format: 'png', maxZoom: 19, active: false, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
+            { id: 'carto-light-c', label: 'CartoDB Light C (Subtle)', type: 'base', url: 'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', format: 'png', maxZoom: 19, active: false, attrText: 'CartoDB / OpenStreetMap', attrLink: 'https://carto.com' },
+            { id: 'esri-street', label: 'Esri World Street', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', format: 'png', maxZoom: 19, active: false, attrText: 'Esri Street', attrLink: 'https://www.esri.com' },
+            { id: 'esri-topo', label: 'Esri World Topo', type: 'base', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', format: 'png', maxZoom: 19, active: false, attrText: 'Esri Topo', attrLink: 'https://www.esri.com' },
             { id: 'no-basemap', label: 'No Basemap (Blank Canvas)', type: 'base', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', format: 'xyz', maxZoom: 22, active: false, attrText: 'Canvas', attrLink: '' }
           ]);
           const [zoomLock, setZoomLock] = useState(() => {
@@ -2847,7 +2852,12 @@ const App = () => {
           useEffect(() => {
             const urlParams = new URLSearchParams(window.location.search);
             const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
-            let source = urlParams.get('source') || urlParams.get('amp;source') || '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE';
+            const hasExplicitSource = urlParams.has('source') || urlParams.has('amp;source');
+            if (!hasExplicitSource) {
+              setStatus({ text: 'Dataset Wizard Active — Select a Dataset', progress: 0, isFading: false, active: false });
+              return;
+            }
+            let source = urlParams.get('source') || urlParams.get('amp;source');
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
             const isDefaultHgbb = (source === '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE');
             const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || (isDefaultHgbb ? '1652171772' : null);
@@ -3884,7 +3894,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     const spanStr = spanStrPart.replace('Span: ', '');
                     const zoomStr = zoomStrPart.replace('Zoom: ', '').replace(')', '');
                     return html`
-                      <div class="telemetry-span-zoom" style="position: absolute; left: calc(50% + 165px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
+                      <div class="telemetry-span-zoom" style="margin-left: 12px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
                         <div style="display: flex; align-items: center; gap: 4px;">
                           ${showTelemetryLabels ? html`<span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>` : ''}
                           <span style="font-family: monospace; color: #333;">${spanStr}</span>
