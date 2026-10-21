@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b613';
+const APP_VERSION = 'v8.18.0-b616';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -2849,7 +2849,8 @@ const App = () => {
             const getOmniParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key);
             let source = urlParams.get('source') || urlParams.get('amp;source') || '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE';
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
-            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || '1652171772';
+            const isDefaultHgbb = (source === '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE');
+            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || (isDefaultHgbb ? '1652171772' : null);
 
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             setConnectionSummary({ source, gid });
@@ -2885,6 +2886,9 @@ const App = () => {
               fetchUrlBasemaps ? fetch(fetchUrlBasemaps).then(res => {
                 if (!res.ok) throw new Error(`HTTP network failure fetching basemaps config (status ${res.status})`);
                 return res.text();
+              }).catch(err => {
+                if (typeof addLog === 'function') addLog(`Basemaps layer config fetch non-fatal warning: ${err.message}`, 'warning');
+                return null;
               }) : Promise.resolve(null)
             ]).then(([primaryCsv, basemapsCsv]) => {
               setStatus({ text: 'Compiling core datasets...', progress: 60, isFading: false, active: false });
@@ -3867,7 +3871,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     const spanStr = spanStrPart.replace('Span: ', '');
                     const zoomStr = zoomStrPart.replace('Zoom: ', '').replace(')', '');
                     return html`
-                      <div class="telemetry-span-zoom" style="position: absolute; left: calc(50% + 145px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
+                      <div class="telemetry-span-zoom" style="position: absolute; left: calc(50% + 95px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; font-size: 0.75rem; line-height: 1.1; text-align: left; white-space: nowrap; font-weight: normal; user-select: none; pointer-events: none; z-index: 5;">
                         <div style="display: flex; align-items: center; gap: 4px;">
                           ${showTelemetryLabels ? html`<span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Span:</span>` : ''}
                           <span style="font-family: monospace; color: #333;">${spanStr}</span>
@@ -4040,31 +4044,22 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       let sheetId = rawStr;
                       let extractedGid = null;
 
-                      // 1. Extract gid if present
+                      // Extract gid parameter if present in pasted URL
                       const gidMatch = rawStr.match(/[?&#]gid=([0-9]+)/);
                       if (gidMatch) extractedGid = gidMatch[1];
 
-                      // 2. Convert published /pubhtml URLs to /pub
-                      if (rawStr.includes('/pubhtml')) {
-                        rawStr = rawStr.replace('/pubhtml', '/pub');
-                      }
-
-                      // 3. Extract 2PACX published token vs standard sheet ID
+                      // Handle Google Sheets published vs standard URLs vs raw IDs
                       const pubMatch = rawStr.match(/\/d\/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || rawStr.match(/(2PACX-[a-zA-Z0-9-_]+)/i);
                       if (pubMatch) {
-                        const token = pubMatch[1] || pubMatch[0];
-                        sheetId = token.startsWith('e/') ? token : `e/${token}`;
+                        sheetId = pubMatch[1].startsWith('e/') ? pubMatch[1] : `e/${pubMatch[1]}`;
                       } else {
                         const stdMatch = rawStr.match(/\/d\/([a-zA-Z0-9-_]{20,})/i);
                         if (stdMatch) sheetId = stdMatch[1];
                       }
 
                       let newUrl = `${window.location.pathname}?source=${encodeURIComponent(sheetId)}`;
-                      if (extractedGid) newUrl += `&gid=${extractedGid}`;
-                      
+                      if (extractedGid) newUrl += `&gid=${encodeURIComponent(extractedGid)}`;
                       window.history.pushState({}, '', newUrl);
-                      setIsWizardOpen(false);
-                      if (typeof setConnectionSummary === 'function') setConnectionSummary({ source: sheetId, gid: extractedGid || '0' });
                       window.location.reload();
                     }} style="background: #16a34a; color: #ffffff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">Load Custom Dataset</button>
                   </div>
