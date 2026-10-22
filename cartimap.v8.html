@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b620';
+const APP_VERSION = 'v8.18.0-b621';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -3905,19 +3905,6 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                       `;
                     })() : ''}
                   </div>
-
-                  
-                          <span style="font-family: monospace; color: #333;">${spanStr}</span>
-                        </div>
-                        ${zoomStr ? html`
-                          <div style="display: flex; align-items: center; gap: 4px;">
-                            ${showTelemetryLabels ? html`<span style="font-family: 'Arial Narrow', sans-serif; font-stretch: condensed; color: #888;">Zoom:</span>` : ''}
-                            <span style="font-family: monospace; color: #333;">${zoomStr}</span>
-                          </div>
-                        ` : ''}
-                      </div>
-                    `;
-                  })() : ''}
 
                   <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 6px; max-width: calc(50vw - ${telemetryOffset}px); overflow: visible; justify-content: flex-end;">
                     ${!hideRightFilter ? html`<div style="position: relative; display: inline-flex; align-items: center;">${filterBtn}${filterPopup}</div>` : ''}
