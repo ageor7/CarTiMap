@@ -216,7 +216,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b621';
+const APP_VERSION = 'v8.18.0-b622';
 document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
@@ -3118,7 +3118,12 @@ const App = () => {
                 }).filter(b => b.id && b.url);
               };
 
-              const rawLayersRows = (typeof sheetsData !== 'undefined' && sheetsData && (sheetsData.LayersT || sheetsData.Layers)) ? (sheetsData.LayersT || sheetsData.Layers) : ((typeof window !== 'undefined' && window.sheetsData && (window.sheetsData.LayersT || window.sheetsData.Layers)) ? (window.sheetsData.LayersT || window.sheetsData.Layers) : null);
+              const findLayersTab = (sObj) => {
+                if (!sObj || typeof sObj !== 'object') return null;
+                const matchKey = Object.keys(sObj).find(k => /^layers[\s_.-]?[a-z0-9]?$/i.test(k.trim()));
+                return matchKey ? sObj[matchKey] : null;
+              };
+              const rawLayersRows = (typeof sheetsData !== 'undefined' && sheetsData) ? (findLayersTab(sheetsData) || sheetsData.LayersT || sheetsData.Layers) : ((typeof window !== 'undefined' && window.sheetsData) ? (findLayersTab(window.sheetsData) || window.sheetsData.LayersT || window.sheetsData.Layers) : null);
               let parsedBMs = [];
               if (rawLayersRows && Array.isArray(rawLayersRows) && rawLayersRows.length > 0) {
                 parsedBMs = parseLayersTRows(rawLayersRows);
@@ -3906,6 +3911,9 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                     })() : ''}
                   </div>
 
+                  
+
+
                   <div class="status-right" style="position: relative; display: flex; align-items: center; gap: 6px; max-width: calc(50vw - ${telemetryOffset}px); overflow: visible; justify-content: flex-end;">
                     ${!hideRightFilter ? html`<div style="position: relative; display: inline-flex; align-items: center;">${filterBtn}${filterPopup}</div>` : ''}
             ${(!isFilterOpen && filterFlashMsg) ? html`
@@ -4092,7 +4100,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   <h4 style="margin: 0; font-size: 0.88rem; color: #334155; font-weight: 700;">📄 Create New Dataset</h4>
                   <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: #64748b;">Make a copy of the official Google Sheets CarTiMap template.</p>
                 </div>
-                <a href="https://docs.google.com/spreadsheets/d/1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE/copy" target="_blank" rel="noopener noreferrer" style="background: #475569; color: #ffffff; text-decoration: none; padding: 7px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; display: inline-block;">Clone Template ↗</a>
+                <a href="https://docs.google.com/spreadsheets/d/1FHz-H7W2vDToOES1t-Md8MdmKRi1rBr7NIx_YoI4bbE/copy" target="_blank" rel="noopener noreferrer" style="background: #475569; color: #ffffff; text-decoration: none; padding: 7px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; display: inline-block;">Clone Template ↗</a>
               </div>
 
               <div style="display: flex; justify-content: flex-end; margin-top: 12px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
