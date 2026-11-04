@@ -203,7 +203,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b627';
+const APP_VERSION = 'v8.18.0-b628';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
 
@@ -2895,7 +2895,7 @@ const App = () => {
                       if (g && n) matches.push({ gid: g, name: n });
                     }
                   }
-                  const found = matches.find(item => /^layers[\s_.-]?[a-z0-9]?$/i.test(item.name.trim()));
+                  const found = matches.find(item => /^layers.?$/i.test(item.name.trim()) || /^layers[\s_.-]?[a-z0-9]?$/i.test(item.name.trim()));
                   return found ? found.gid : null;
                 }
 
@@ -2904,18 +2904,18 @@ const App = () => {
                 if (cleanId.startsWith('http')) return null;
 
                 const isLayerCsv = (txt) => {
-                  if (!txt) return false;
+                  if (!txt || typeof txt !== 'string') return false;
                   const clean = txt.trim();
-                  if (clean.startsWith('<') || clean.startsWith('{') || clean.startsWith('/*O_o*/')) return false;
+                  if (clean.startsWith('<') || clean.startsWith('{') || clean.startsWith('/*')) return false;
                   if (clean.includes('invalid_query') || clean.includes('Invalid sheet name') || clean.includes('"status":"error"')) return false;
-                  const firstLine = clean.split('\n')[0].toLowerCase();
-                  const headers = firstLine.split(',').map(h => h.replace(/["'\s]/g, ''));
-                  const validSpatialKeys = ['url', 'tileurl', 'wmsurl', 'layertype', 'maxzoom', 'attrtext', 'attrlink', 'wms', 'id', 'label', 'type', 'format', 'active'];
-                  return headers.some(h => validSpatialKeys.includes(h));
+                  const firstLine = clean.split(/\r?\n/)[0];
+                  return firstLine.includes(',') || firstLine.includes('\t');
                 };
 
-                const candidateNames = ['LayersT', 'Layers', 'Layers_', 'Layers-', 'Layers 1', 'Layers_T', 'Layers-T', 'Layers T'];
-                for (const candidate of candidateNames) {
+                const candidateSuffixes = ['', 'T', '_', '-', ' 1', '1', ' T', '_T', '-T', '.', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '2', '3', '4', '5', '6', '7', '8', '9', ' '];
+                const candidateNames = candidateSuffixes.map(s => 'Layers' + s);
+
+                const probePromises = candidateNames.map(async (candidate) => {
                   try {
                     const probeUrl = `https://docs.google.com/spreadsheets/d/${cleanId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(candidate)}`;
                     const res = await fetch(probeUrl);
@@ -2926,7 +2926,16 @@ const App = () => {
                       }
                     }
                   } catch(e) {}
+                  return null;
+                });
+
+                const results = await Promise.all(probePromises);
+                const validFound = results.find(Boolean);
+                if (validFound) {
+                  if (typeof addLog === 'function') addLog(`[Layers Discovery] Auto-discovered spatial layers tab: '${validFound}'`, 'info');
+                  return validFound;
                 }
+
                 return null;
               } catch(e) {
                 return null;
@@ -3182,8 +3191,8 @@ const App = () => {
                   const rawOpac = parseFloat(norm.defaultopacity || norm.opacity);
                   const rawType = String(norm.type || norm.layertype || '').toLowerCase().trim();
                   return {
-                    id: norm.id || norm.name || '',
-                    label: norm.label || norm.title || norm.name || '',
+                    id: norm.id || norm.name || norm.label || norm.title || norm.url || ('layer-' + (idx + 1)),
+                    label: norm.label || norm.title || norm.name || norm.id || ('Layer ' + (idx + 1)),
                     type: (rawType === 'overlay' || rawType === 'wms') ? 'overlay' : 'base',
                     url: norm.url || norm.tileurl || norm.link || norm.wmsurl || norm.templateurl || norm.source || '',
                     maxZoom: parseInt(norm.maxzoom || norm.maxzoomlevel, 10) || 19,
