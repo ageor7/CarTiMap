@@ -196,6 +196,17 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 <body>
     <div id="root"></div>
     <script type="module">
+import { h, render, Component } from 'https://esm.sh/preact';
+import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
+import htm from 'https://esm.sh/htm';
+import Papa from 'https://esm.sh/papaparse';
+import edtf from 'https://esm.sh/edtf@4.11.0';
+
+const html = htm.bind(h);
+const APP_VERSION = 'v8.18.0-b624';
+document.title = 'CarTiMap - ' + APP_VERSION;
+
+
 // === [ MAJOR BLOCK: Imports & Globals v2.0.6 ] ===
 
 // === [ GLOBAL UTILITY: Temporal Approximation Evaluator ] ===
@@ -209,19 +220,6 @@ window.checkIsApprox = (node) => {
 };
 const checkIsApprox = window.checkIsApprox;
 
-import { h, render, Component } from 'https://esm.sh/preact';
-import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
-import htm from 'https://esm.sh/htm';
-import Papa from 'https://esm.sh/papaparse';
-import edtf from 'https://esm.sh/edtf@4.11.0';
-
-const html = htm.bind(h);
-<<<<<<< HEAD
-const APP_VERSION = 'v8.18.0-b623';
-=======
-const APP_VERSION = 'v8.18.0-b622';
->>>>>>> 2e0d8af3a3b7a1ef401478b541a81889e93f1478
-document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
   'MapViewer': 'v7.2.115-b586',
@@ -2864,7 +2862,6 @@ const App = () => {
             let source = urlParams.get('source') || urlParams.get('amp;source');
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
             const isDefaultHgbb = (source === '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE');
-<<<<<<< HEAD
             const bgidParam = urlParams.get('bgid') || urlParams.get('amp;bgid');
             const bgid = bgidParam || (isDefaultHgbb ? '1652171772' : null);
 
@@ -2894,9 +2891,6 @@ const App = () => {
                 return null;
               }
             };
-=======
-            const bgid = urlParams.get('bgid') || urlParams.get('amp;bgid') || (isDefaultHgbb ? '1652171772' : null);
->>>>>>> 2e0d8af3a3b7a1ef401478b541a81889e93f1478
 
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             setConnectionSummary({ source, gid });
@@ -2922,15 +2916,11 @@ const App = () => {
             };
 
             const fetchUrlPrimary = buildCsvFetchUrl(source, gid);
-<<<<<<< HEAD
             let resolvedBgid = bgid;
             if (!resolvedBgid && !isDefaultHgbb && source) {
               resolvedBgid = await autoDiscoverLayersGid(source);
             }
             const fetchUrlBasemaps = resolvedBgid ? buildCsvFetchUrl(source, resolvedBgid) : null;
-=======
-            const fetchUrlBasemaps = bgid ? buildCsvFetchUrl(source, bgid) : null;
->>>>>>> 2e0d8af3a3b7a1ef401478b541a81889e93f1478
 
             Promise.all([
               fetch(fetchUrlPrimary).then(res => {
@@ -3626,7 +3616,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           ` : '';
 
           const firstBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(0); }} disabled=${activeIndex === 0} title="First Entry (<<)">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(0); }} disabled=${activeIndex === 0} title="First Entry (&laquo;)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 18 5 12 11 6"></polyline><polyline points="18 18 12 12 18 6"></polyline></svg>
               ${showButtonText ? html`<span>First</span>` : ''}
             </button>
@@ -3647,7 +3637,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const lastBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(data.length - 1); }} disabled=${activeIndex === data.length - 1} title="Last Entry (>>)">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(data.length - 1); }} disabled=${activeIndex === data.length - 1} title="Last Entry (&raquo;)">
               ${showButtonText ? html`<span>Last</span>` : ''}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 18 19 12 13 6"></polyline><polyline points="6 18 12 12 6 6"></polyline></svg>
             </button>
@@ -4073,11 +4063,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               ${isWizardOpen && html`
             <div class="tm-backdrop open" onClick=${() => setIsWizardOpen(false)} style="z-index: 99999 !important;"></div>
             <div id="dataset-wizard-modal" class="tm-modal open" style="display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000 !important; width: 90%; max-width: 580px; max-height: 88vh; overflow-y: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); padding: 24px; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; border: 1px solid #e2e8f0;" onClick=${(e) => e.stopPropagation()}>
-<<<<<<< HEAD
               <button class="modal-close" onClick=${() => { if (data.length > 0) setIsWizardOpen(false); }} disabled=${data.length === 0} title=${data.length === 0 ? "Please select or load a dataset first" : "Close (Esc)"} style="position: absolute; top: 16px; right: 16px; border: none; background: #f1f5f9; border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; cursor: ${data.length === 0 ? "not-allowed" : "pointer"}; color: ${data.length === 0 ? "#cbd5e1" : "#64748b"}; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">✕</button>
-=======
-              <button class="modal-close" onClick=${() => setIsWizardOpen(false)} title="Close (Esc)" style="position: absolute; top: 16px; right: 16px; border: none; background: #f1f5f9; border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">✕</button>
->>>>>>> 2e0d8af3a3b7a1ef401478b541a81889e93f1478
               
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
                 <div style="background: #e0f2fe; color: #0284c7; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
@@ -4152,11 +4138,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
               </div>
 
               <div style="display: flex; justify-content: flex-end; margin-top: 12px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-<<<<<<< HEAD
                 <button onClick=${() => { if (data.length > 0) setIsWizardOpen(false); }} disabled=${data.length === 0} title=${data.length === 0 ? "Please select or load a dataset first" : "Explore Workspace"} style="background: ${data.length === 0 ? "#e2e8f0" : "#f1f5f9"}; color: ${data.length === 0 ? "#94a3b8" : "#334155"}; border: 1px solid #cbd5e1; padding: 6px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: ${data.length === 0 ? "not-allowed" : "pointer"}; opacity: ${data.length === 0 ? 0.6 : 1};">Explore Workspace</button>
-=======
-                <button onClick=${() => setIsWizardOpen(false)} style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 6px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">Explore Workspace</button>
->>>>>>> 2e0d8af3a3b7a1ef401478b541a81889e93f1478
               </div>
             </div>
           `}
