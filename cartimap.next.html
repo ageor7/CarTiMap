@@ -203,7 +203,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b629';
+const APP_VERSION = 'v8.18.0-b630';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
 
@@ -2576,11 +2576,6 @@ const App = () => {
           const [isSettingsOpen, setIsSettingsOpen] = useState(false);
           const [isWizardOpen, setIsWizardOpen] = useState(() => !new URLSearchParams(window.location.search).has('source'));
 
-          useEffect(() => {
-            if (isWizardOpen) {
-              loadHistoryFromStorage();
-            }
-          }, [isWizardOpen]);
           const [customInputSource, setCustomInputSource] = useState('');
           const [datasetHistory, setDatasetHistory] = useState([]);
           const [editingAliasKey, setEditingAliasKey] = useState(null);
@@ -2601,6 +2596,65 @@ const App = () => {
               setDatasetHistory([]);
             }
           };
+
+          const togglePinDataset = (src, sheetGid) => {
+            try {
+              const raw = localStorage.getItem('tm_dataset_library');
+              let list = raw ? JSON.parse(raw) : [];
+              if (!Array.isArray(list)) list = [];
+              const idx = list.findIndex(item => item.src === src && String(item.gid) === String(sheetGid || 0));
+              if (idx >= 0) {
+                list[idx].pinned = !list[idx].pinned;
+                list.sort((a, b) => {
+                  if (a.pinned && !b.pinned) return -1;
+                  if (!a.pinned && b.pinned) return 1;
+                  return new Date(b.time || 0) - new Date(a.time || 0);
+                });
+                localStorage.setItem('tm_dataset_library', JSON.stringify(list));
+                setDatasetHistory(list);
+              }
+            } catch(e) {}
+          };
+
+          const deleteDatasetFromHistory = (src, sheetGid) => {
+            try {
+              const raw = localStorage.getItem('tm_dataset_library');
+              let list = raw ? JSON.parse(raw) : [];
+              if (!Array.isArray(list)) list = [];
+              const updated = list.filter(item => !(item.src === src && String(item.gid) === String(sheetGid || 0)));
+              localStorage.setItem('tm_dataset_library', JSON.stringify(updated));
+              setDatasetHistory(updated);
+            } catch(e) {}
+          };
+
+          const saveDatasetAlias = (src, sheetGid, newAlias) => {
+            try {
+              const raw = localStorage.getItem('tm_dataset_library');
+              let list = raw ? JSON.parse(raw) : [];
+              if (!Array.isArray(list)) list = [];
+              const idx = list.findIndex(item => item.src === src && String(item.gid) === String(sheetGid || 0));
+              if (idx >= 0) {
+                list[idx].customTitle = newAlias.trim();
+                localStorage.setItem('tm_dataset_library', JSON.stringify(list));
+                setDatasetHistory(list);
+              }
+            } catch(e) {}
+            setEditingAliasKey(null);
+            setAliasInputVal('');
+          };
+
+          const clearDatasetHistory = () => {
+            if (window.confirm('Clear all recently opened datasets from local history?')) {
+              localStorage.removeItem('tm_dataset_library');
+              setDatasetHistory([]);
+            }
+          };
+
+          useEffect(() => {
+            if (isWizardOpen) {
+              loadHistoryFromStorage();
+            }
+          }, [isWizardOpen]);
           const [isMenuOpen, setIsMenuOpen] = useState(false);
           const [isFilterOpen, setIsFilterOpen] = useState(false);
           const [filterFlashMsg, setFilterFlashMsg] = useState(null);
@@ -3069,58 +3123,7 @@ const App = () => {
                 } catch(e) {}
               };
 
-              const togglePinDataset = (src, sheetGid) => {
-                try {
-                  const raw = localStorage.getItem('tm_dataset_library');
-                  let list = raw ? JSON.parse(raw) : [];
-                  if (!Array.isArray(list)) list = [];
-                  const idx = list.findIndex(item => item.src === src && String(item.gid) === String(sheetGid || 0));
-                  if (idx >= 0) {
-                    list[idx].pinned = !list[idx].pinned;
-                    list.sort((a, b) => {
-                      if (a.pinned && !b.pinned) return -1;
-                      if (!a.pinned && b.pinned) return 1;
-                      return new Date(b.time || 0) - new Date(a.time || 0);
-                    });
-                    localStorage.setItem('tm_dataset_library', JSON.stringify(list));
-                    setDatasetHistory(list);
-                  }
-                } catch(e) {}
-              };
 
-              const deleteDatasetFromHistory = (src, sheetGid) => {
-                try {
-                  const raw = localStorage.getItem('tm_dataset_library');
-                  let list = raw ? JSON.parse(raw) : [];
-                  if (!Array.isArray(list)) list = [];
-                  const updated = list.filter(item => !(item.src === src && String(item.gid) === String(sheetGid || 0)));
-                  localStorage.setItem('tm_dataset_library', JSON.stringify(updated));
-                  setDatasetHistory(updated);
-                } catch(e) {}
-              };
-
-              const saveDatasetAlias = (src, sheetGid, newAlias) => {
-                try {
-                  const raw = localStorage.getItem('tm_dataset_library');
-                  let list = raw ? JSON.parse(raw) : [];
-                  if (!Array.isArray(list)) list = [];
-                  const idx = list.findIndex(item => item.src === src && String(item.gid) === String(sheetGid || 0));
-                  if (idx >= 0) {
-                    list[idx].customTitle = newAlias.trim();
-                    localStorage.setItem('tm_dataset_library', JSON.stringify(list));
-                    setDatasetHistory(list);
-                  }
-                } catch(e) {}
-                setEditingAliasKey(null);
-                setAliasInputVal('');
-              };
-
-              const clearDatasetHistory = () => {
-                if (window.confirm('Clear all recently opened datasets from local history?')) {
-                  localStorage.removeItem('tm_dataset_library');
-                  setDatasetHistory([]);
-                }
-              };
               registerDatasetInHistory(aboutDataObj.title, source, gid);
 
               let activeMode = dateEngineMode;
