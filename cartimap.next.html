@@ -196,6 +196,17 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw;
 <body>
     <div id="root"></div>
     <script type="module">
+import { h, render, Component } from 'https://esm.sh/preact';
+import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
+import htm from 'https://esm.sh/htm';
+import Papa from 'https://esm.sh/papaparse';
+import edtf from 'https://esm.sh/edtf@4.11.0';
+
+const html = htm.bind(h);
+const APP_VERSION = 'v8.18.0-b625';
+document.title = 'CarTiMap - ' + APP_VERSION;
+
+
 // === [ MAJOR BLOCK: Imports & Globals v2.0.6 ] ===
 
 // === [ GLOBAL UTILITY: Temporal Approximation Evaluator ] ===
@@ -209,15 +220,6 @@ window.checkIsApprox = (node) => {
 };
 const checkIsApprox = window.checkIsApprox;
 
-import { h, render, Component } from 'https://esm.sh/preact';
-import { useState, useEffect, useLayoutEffect, useRef } from 'https://esm.sh/preact/hooks';
-import htm from 'https://esm.sh/htm';
-import Papa from 'https://esm.sh/papaparse';
-import edtf from 'https://esm.sh/edtf@4.11.0';
-
-const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b623';
-document.title = 'CarTiMap - ' + APP_VERSION;
 const MODULE_VERSIONS = {
   'AppOrchestrator': 'v3.9.168-b586',
   'MapViewer': 'v7.2.115-b586',
@@ -2857,6 +2859,7 @@ const App = () => {
               setStatus({ text: 'Dataset Wizard Active — Select a Dataset', progress: 0, isFading: false, active: false });
               return;
             }
+            (async () => {
             let source = urlParams.get('source') || urlParams.get('amp;source');
             const gid = urlParams.get('gid') || urlParams.get('amp;gid') || '0';
             const isDefaultHgbb = (source === '1K9kZynV-lGUd-yT6GiGsIabfjF-_k-sn5qAeEONzNIE');
@@ -3212,6 +3215,7 @@ const App = () => {
               setStatus({ text: 'Database Sync Failure', progress: 100, isFading: false, active: false });
               addLog(`Database Sync Error: ${err.message}`, 'error');
             });
+            })();
           }, [rawCsvRows, dateEngineMode, dateLocale]);
 
           // --- [ Active filtering of datasets by swimlanes and streams ] ---
@@ -3614,7 +3618,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           ` : '';
 
           const firstBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(0); }} disabled=${activeIndex === 0} title="First Entry (<<)">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex > 0) jumpToSlide(0); }} disabled=${activeIndex === 0} title="First Entry (&laquo;)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 18 5 12 11 6"></polyline><polyline points="18 18 12 12 18 6"></polyline></svg>
               ${showButtonText ? html`<span>First</span>` : ''}
             </button>
@@ -3635,7 +3639,7 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
           `;
 
           const lastBtn = html`
-            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(data.length - 1); }} disabled=${activeIndex === data.length - 1} title="Last Entry (>>)">
+            <button class=${showButtonText ? 'status-btn-text' : 'status-btn'} onClick=${() => { if(activeIndex < data.length - 1) jumpToSlide(data.length - 1); }} disabled=${activeIndex === data.length - 1} title="Last Entry (&raquo;)">
               ${showButtonText ? html`<span>Last</span>` : ''}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 18 19 12 13 6"></polyline><polyline points="6 18 12 12 6 6"></polyline></svg>
             </button>
