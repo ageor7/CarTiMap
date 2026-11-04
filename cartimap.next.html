@@ -203,7 +203,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b628';
+const APP_VERSION = 'v8.18.0-b629';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
 
@@ -2575,7 +2575,32 @@ const App = () => {
           const [isAboutOpen, setIsAboutOpen] = useState(false);
           const [isSettingsOpen, setIsSettingsOpen] = useState(false);
           const [isWizardOpen, setIsWizardOpen] = useState(() => !new URLSearchParams(window.location.search).has('source'));
+
+          useEffect(() => {
+            if (isWizardOpen) {
+              loadHistoryFromStorage();
+            }
+          }, [isWizardOpen]);
           const [customInputSource, setCustomInputSource] = useState('');
+          const [datasetHistory, setDatasetHistory] = useState([]);
+          const [editingAliasKey, setEditingAliasKey] = useState(null);
+          const [aliasInputVal, setAliasInputVal] = useState('');
+
+          const loadHistoryFromStorage = () => {
+            try {
+              const raw = localStorage.getItem('tm_dataset_library');
+              let list = raw ? JSON.parse(raw) : [];
+              if (!Array.isArray(list)) list = [];
+              list.sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return new Date(b.time || 0) - new Date(a.time || 0);
+              });
+              setDatasetHistory(list);
+            } catch(e) {
+              setDatasetHistory([]);
+            }
+          };
           const [isMenuOpen, setIsMenuOpen] = useState(false);
           const [isFilterOpen, setIsFilterOpen] = useState(false);
           const [filterFlashMsg, setFilterFlashMsg] = useState(null);
@@ -3019,11 +3044,82 @@ const App = () => {
                   let histList = rawHist ? JSON.parse(rawHist) : [];
                   if (!Array.isArray(histList)) histList = [];
                   const existIdx = histList.findIndex(item => item.src === src && String(item.gid) === String(sheetGid || 0));
-                  const newEntry = { title: title || 'Custom Dataset', src, gid: sheetGid || '0', time: new Date().toISOString() };
+                  let existingEntry = existIdx >= 0 ? histList[existIdx] : {};
+
+                  const newEntry = {
+                    title: title || 'Custom Dataset',
+                    customTitle: existingEntry.customTitle || '',
+                    src,
+                    gid: sheetGid || '0',
+                    time: new Date().toISOString(),
+                    pinned: !!existingEntry.pinned
+                  };
+
                   if (existIdx >= 0) histList.splice(existIdx, 1);
                   histList.unshift(newEntry);
-                  localStorage.setItem('tm_dataset_library', JSON.stringify(histList.slice(0, 10)));
+
+                  histList.sort((a, b) => {
+                    if (a.pinned && !b.pinned) return -1;
+                    if (!a.pinned && b.pinned) return 1;
+                    return new Date(b.time || 0) - new Date(a.time || 0);
+                  });
+
+                  localStorage.setItem('tm_dataset_library', JSON.stringify(histList.slice(0, 15)));
+                  setDatasetHistory(histList.slice(0, 15));
                 } catch(e) {}
+              };
+
+              const togglePinDataset = (src, sheetGid) => {
+                try {
+                  const raw = localStorage.getItem('tm_dataset_library');
+                  let list = raw ? JSON.parse(raw) : [];
+                  if (!Array.isArray(list)) list = [];
+                  const idx = list.findIndex(item => item.src === src && String(item.gid) === String(sheetGid || 0));
+                  if (idx >= 0) {
+                    list[idx].pinned = !list[idx].pinned;
+                    list.sort((a, b) => {
+                      if (a.pinned && !b.pinned) return -1;
+                      if (!a.pinned && b.pinned) return 1;
+                      return new Date(b.time || 0) - new Date(a.time || 0);
+                    });
+                    localStorage.setItem('tm_dataset_library', JSON.stringify(list));
+                    setDatasetHistory(list);
+                  }
+                } catch(e) {}
+              };
+
+              const deleteDatasetFromHistory = (src, sheetGid) => {
+                try {
+                  const raw = localStorage.getItem('tm_dataset_library');
+                  let list = raw ? JSON.parse(raw) : [];
+                  if (!Array.isArray(list)) list = [];
+                  const updated = list.filter(item => !(item.src === src && String(item.gid) === String(sheetGid || 0)));
+                  localStorage.setItem('tm_dataset_library', JSON.stringify(updated));
+                  setDatasetHistory(updated);
+                } catch(e) {}
+              };
+
+              const saveDatasetAlias = (src, sheetGid, newAlias) => {
+                try {
+                  const raw = localStorage.getItem('tm_dataset_library');
+                  let list = raw ? JSON.parse(raw) : [];
+                  if (!Array.isArray(list)) list = [];
+                  const idx = list.findIndex(item => item.src === src && String(item.gid) === String(sheetGid || 0));
+                  if (idx >= 0) {
+                    list[idx].customTitle = newAlias.trim();
+                    localStorage.setItem('tm_dataset_library', JSON.stringify(list));
+                    setDatasetHistory(list);
+                  }
+                } catch(e) {}
+                setEditingAliasKey(null);
+                setAliasInputVal('');
+              };
+
+              const clearDatasetHistory = () => {
+                if (window.confirm('Clear all recently opened datasets from local history?')) {
+                  localStorage.removeItem('tm_dataset_library');
+                  setDatasetHistory([]);
+                }
               };
               registerDatasetInHistory(aboutDataObj.title, source, gid);
 
@@ -4147,6 +4243,62 @@ const CarTiMapperLogo = ({ context, appVersion }) => {
                   </div>
                 </div>
               </div>
+
+              ${(datasetHistory && datasetHistory.length > 0) ? html`
+                <!-- Section 2: Recently Opened Datasets / Library -->
+                <div style="margin-bottom: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                    <h4 style="margin: 0; font-size: 0.88rem; color: #334155; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📚 Recently Opened Datasets</h4>
+                    <button onClick=${clearDatasetHistory} style="background: transparent; border: none; color: #ef4444; font-size: 0.75rem; font-weight: 600; cursor: pointer; text-decoration: underline;" title="Clear local history">Clear History</button>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
+                    ${datasetHistory.map((item) => {
+                      const itemKey = `${item.src}_${item.gid || 0}`;
+                      const isEditing = editingAliasKey === itemKey;
+                      const displayTitle = item.customTitle || item.title || 'Custom Dataset';
+
+                      return html`
+                        <div style="background: ${item.pinned ? '#f0f9ff' : '#ffffff'}; border: 1px solid ${item.pinned ? '#bae6fd' : '#cbd5e1'}; border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                          <div style="flex: 1; min-width: 0;">
+                            ${isEditing ? html`
+                              <div style="display: flex; align-items: center; gap: 6px;">
+                                <input type="text" value=${aliasInputVal} onInput=${(e) => setAliasInputVal(e.target.value)} style="flex: 1; padding: 4px 8px; border: 1px solid #0284c7; border-radius: 4px; font-size: 0.82rem; font-weight: 600;" placeholder="Enter custom alias..." />
+                                <button onClick=${() => saveDatasetAlias(item.src, item.gid, aliasInputVal)} style="background: #0284c7; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">Save</button>
+                                <button onClick=${() => { setEditingAliasKey(null); setAliasInputVal(''); }} style="background: #e2e8f0; color: #334155; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">Cancel</button>
+                              </div>
+                            ` : html`
+                              <div style="display: flex; align-items: center; gap: 6px;">
+                                ${item.pinned ? html`<span title="Pinned Dataset" style="font-size: 0.85rem;">📌</span>` : ''}
+                                <span style="font-weight: 700; font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;" title=${displayTitle}>${displayTitle}</span>
+                                ${item.customTitle ? html`<span style="font-size: 0.7rem; background: #e0f2fe; color: #0369a1; padding: 1px 5px; border-radius: 4px; font-weight: 600;">Alias</span>` : ''}
+                                <button onClick=${() => { setEditingAliasKey(itemKey); setAliasInputVal(item.customTitle || item.title || ''); }} style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 0.8rem; padding: 0 2px;" title="Rename Local Alias">✏️</button>
+                              </div>
+                              <div style="font-size: 0.72rem; color: #64748b; font-family: monospace; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px;" title=${`ID: ${item.src} (gid: ${item.gid || 0})`}>
+                                ${item.src.includes('1K9kZynV') ? 'Featured HGBB Master DB' : item.src}
+                              </div>
+                            `}
+                          </div>
+
+                          <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                            <button onClick=${() => togglePinDataset(item.src, item.gid)} style="background: ${item.pinned ? '#e0f2fe' : '#f1f5f9'}; border: 1px solid ${item.pinned ? '#38bdf8' : '#cbd5e1'}; padding: 4px 8px; border-radius: 5px; font-size: 0.78rem; cursor: pointer;" title=${item.pinned ? "Unpin Dataset" : "Pin Dataset to Top"}>
+                              ${item.pinned ? '📌 Pinned' : '📍 Pin'}
+                            </button>
+
+                            <button onClick=${() => {
+                              let newUrl = `${window.location.pathname}?source=${encodeURIComponent(item.src)}`;
+                              if (item.gid && item.gid !== '0') newUrl += `&gid=${encodeURIComponent(item.gid)}`;
+                              window.history.pushState({}, '', newUrl);
+                              window.location.reload();
+                            }} style="background: #0284c7; color: #ffffff; border: none; padding: 5px 12px; border-radius: 5px; font-size: 0.78rem; font-weight: 600; cursor: pointer;" title="Load this dataset">Load ↗</button>
+
+                            <button onClick=${() => deleteDatasetFromHistory(item.src, item.gid)} style="background: none; border: none; color: #94a3b8; font-size: 0.9rem; cursor: pointer; padding: 2px 4px;" title="Remove from local history">🗑️</button>
+                          </div>
+                        </div>
+                      `;
+                    })}
+                  </div>
+                </div>
+              ` : ''}
 
               <!-- Section 2: Open Custom Dataset by ID or URL -->
               <div style="margin-bottom: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
