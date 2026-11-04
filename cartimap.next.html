@@ -203,7 +203,7 @@ import Papa from 'https://esm.sh/papaparse';
 import edtf from 'https://esm.sh/edtf@4.11.0';
 
 const html = htm.bind(h);
-const APP_VERSION = 'v8.18.0-b625';
+const APP_VERSION = 'v8.18.0-b626';
 document.title = 'CarTiMap - ' + APP_VERSION;
 
 
@@ -2871,23 +2871,45 @@ const App = () => {
               if (bgidParam || isDefaultHgbb || !sheetSrc) return null;
               try {
                 let cleanId = sheetSrc.trim();
+                if (cleanId.includes('2PACX-') || cleanId.includes('/pub')) {
+                  let cleanToken = cleanId;
+                  const pubMatch = cleanId.match(/\/d\/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || cleanId.match(/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || cleanId.match(/(2PACX-[a-zA-Z0-9-_]+)/i);
+                  if (pubMatch) cleanToken = pubMatch[1] || pubMatch[0];
+                  if (!cleanToken.startsWith('e/')) cleanToken = 'e/' + cleanToken;
+                  const pubUrl = `https://docs.google.com/spreadsheets/d/${cleanToken}/pubhtml`;
+                  const res = await fetch(pubUrl);
+                  if (!res.ok) return null;
+                  const html = await res.text();
+                  const matches = [];
+                  const regex1 = /id=["']sheet-button-(\d+)["'][^>]*><a[^>]*>([^<]+)<\/a>/gi;
+                  let m;
+                  while ((m = regex1.exec(html)) !== null) { matches.push({ gid: m[1], name: m[2] }); }
+                  if (matches.length === 0) {
+                    const regex2 = /["']gid["']\s*:\s*["']?(\d+)["']?[^}]*?["']name["']\s*:\s*["']([^"']+)["']/gi;
+                    while ((m = regex2.exec(html)) !== null) { matches.push({ gid: m[1], name: m[2] }); }
+                  }
+                  const found = matches.find(item => /^layers[\s_.-]?[a-z0-9]?$/i.test(item.name.trim()));
+                  return found ? found.gid : null;
+                }
+
                 const stdMatch = cleanId.match(/\/d\/([a-zA-Z0-9-_]{20,})/i);
                 if (stdMatch) cleanId = stdMatch[1];
                 if (cleanId.startsWith('http')) return null;
-                const inspectUrl = `https://docs.google.com/spreadsheets/d/${cleanId}/htmlview`;
-                const res = await fetch(inspectUrl);
-                if (!res.ok) return null;
-                const html = await res.text();
-                const matches = [];
-                const regex1 = /id=["']sheet-button-(\d+)["'][^>]*><a[^>]*>([^<]+)<\/a>/gi;
-                let m;
-                while ((m = regex1.exec(html)) !== null) { matches.push({ gid: m[1], name: m[2] }); }
-                if (matches.length === 0) {
-                  const regex2 = /["']gid["']\s*:\s*["']?(\d+)["']?[^}]*?["']name["']\s*:\s*["']([^"']+)["']/gi;
-                  while ((m = regex2.exec(html)) !== null) { matches.push({ gid: m[1], name: m[2] }); }
+
+                const candidateNames = ['LayersT', 'Layers', 'Layers_', 'Layers-', 'Layers 1', 'Layers_T', 'Layers-T', 'Layers T'];
+                for (const candidate of candidateNames) {
+                  try {
+                    const probeUrl = `https://docs.google.com/spreadsheets/d/${cleanId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(candidate)}`;
+                    const res = await fetch(probeUrl);
+                    if (res.ok) {
+                      const text = await res.text();
+                      if (text && !text.trim().startsWith('<') && /id|label|title|url|tileurl|wms|type/i.test(text)) {
+                        return candidate;
+                      }
+                    }
+                  } catch(e) {}
                 }
-                const found = matches.find(item => /^layers[\s_.-]?[a-z0-9]?$/i.test(item.name.trim()));
-                return found ? found.gid : null;
+                return null;
               } catch(e) {
                 return null;
               }
@@ -2896,24 +2918,28 @@ const App = () => {
             setStatus({ text: 'Fetching CSV payload from Google Sheets...', progress: 30, isFading: false, active: false });
             setConnectionSummary({ source, gid });
 
-            const buildCsvFetchUrl = (src, sheetGid) => {
+            const buildCsvFetchUrl = (src, sheetGidOrName) => {
               if (!src) return '';
               const s = String(src).trim();
               if (s.startsWith('http://') || s.startsWith('https://')) {
                 if (!s.includes('docs.google.com/spreadsheets')) return s;
               }
+              const isNumericGid = /^\d+$/.test(String(sheetGidOrName || '').trim());
+              const paramKey = isNumericGid ? 'gid' : 'sheet';
+              const paramVal = encodeURIComponent(String(sheetGidOrName || '').trim());
+              
               if (s.includes('2PACX-') || s.includes('/pub') || s.includes('pubhtml')) {
                 let cleanToken = s;
                 const pubMatch = s.match(/\/d\/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || s.match(/(e\/2PACX-[a-zA-Z0-9-_]+)/i) || s.match(/(2PACX-[a-zA-Z0-9-_]+)/i);
                 if (pubMatch) cleanToken = pubMatch[1] || pubMatch[0];
                 if (!cleanToken.startsWith('e/')) cleanToken = 'e/' + cleanToken;
-                const gidParam = (sheetGid !== undefined && sheetGid !== null && sheetGid !== '') ? `&gid=${sheetGid}` : '';
+                const gidParam = (sheetGidOrName !== undefined && sheetGidOrName !== null && sheetGidOrName !== '') ? `&${paramKey}=${paramVal}` : '';
                 return `https://docs.google.com/spreadsheets/d/${cleanToken}/pub?output=csv${gidParam}`;
               }
               let cleanId = s;
               const stdMatch = s.match(/\/d\/([a-zA-Z0-9-_]{20,})/i);
               if (stdMatch) cleanId = stdMatch[1];
-              return `https://docs.google.com/spreadsheets/d/${cleanId}/gviz/tq?tqx=out:csv&gid=${sheetGid || 0}`;
+              return `https://docs.google.com/spreadsheets/d/${cleanId}/gviz/tq?tqx=out:csv&${paramKey}=${paramVal || 0}`;
             };
 
             const fetchUrlPrimary = buildCsvFetchUrl(source, gid);
